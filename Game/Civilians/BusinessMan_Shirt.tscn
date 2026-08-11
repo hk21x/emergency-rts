@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Game/Units/Civilian.gd" id="1_7tkcs"]
+[ext_resource type="PackedScene" path="res://Game/Characters/BusinessMan_Shirt.tscn" id="2_4q7ai"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_oi1bu"]
+radius = 0.3
+height = 1.8
+
+[node name="Civilian" type="CharacterBody3D" unique_id=1344692986]
+collision_layer = 128
+script = ExtResource("1_7tkcs")
+display_name = "BusinessMan Shirt"
+
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=800201444]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_oi1bu")
+
+[node name="NavigationAgent" type="NavigationAgent3D" parent="." unique_id=1509889739]
+path_desired_distance = 0.5
+target_desired_distance = 0.7
+navigation_layers = 2
+
+[node name="Character" type="Node3D" parent="." unique_id=1003044970 instance=ExtResource("2_4q7ai")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)

@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Game/Units/Civilian.gd" id="1_omfh8"]
+[ext_resource type="PackedScene" path="res://Game/Characters/Male_Hoodie.tscn" id="2_3p5bw"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_tmfwp"]
+radius = 0.3
+height = 1.8
+
+[node name="Civilian" type="CharacterBody3D" unique_id=754463220]
+collision_layer = 128
+script = ExtResource("1_omfh8")
+display_name = "Male Hoodie"
+
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=1581822469]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_tmfwp")
+
+[node name="NavigationAgent" type="NavigationAgent3D" parent="." unique_id=1905708317]
+path_desired_distance = 0.5
+target_desired_distance = 0.7
+navigation_layers = 2
+
+[node name="Character" type="Node3D" parent="." unique_id=174129359 instance=ExtResource("2_3p5bw")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)

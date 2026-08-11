@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://bd17mls38jwj0"]
+
+[ext_resource type="ArrayMesh" uid="uid://j64kjjgdi6na" path="res://assets/Synty/PolygonStarter/Models/extracted/SM_Bean_Cop_01.res" id="1_08wix"]
+[ext_resource type="Material" uid="uid://bprw8jx500qd0" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_01_mat.tres" id="2_xdoor"]
+
+[node name="SM_Bean_Cop_01" type="MeshInstance3D"]
+gi_mode = 2
+mesh = ExtResource("1_08wix")
+surface_material_override/0 = ExtResource("2_xdoor")

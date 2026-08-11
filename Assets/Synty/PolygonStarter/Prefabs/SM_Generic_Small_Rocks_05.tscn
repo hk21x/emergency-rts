@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://cqe8g6fi4dsdk"]
+
+[ext_resource type="ArrayMesh" uid="uid://55u0x1jbuxta" path="res://assets/Synty/PolygonStarter/Models/extracted/SM_Generic_Small_Rocks_05.res" id="1_211ga"]
+[ext_resource type="Material" uid="uid://bprw8jx500qd0" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_01_mat.tres" id="2_pgfc4"]
+
+[node name="SM_Generic_Small_Rocks_05" type="MeshInstance3D"]
+gi_mode = 2
+mesh = ExtResource("1_211ga")
+surface_material_override/0 = ExtResource("2_pgfc4")

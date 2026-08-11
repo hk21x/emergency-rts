@@ -1,0 +1,2177 @@
+[gd_scene load_steps=57 format=3 uid="uid://c1taxtw64csmx"]
+
+[ext_resource type="PackedScene" uid="uid://dlqr2jtr2ahr5" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_SimpleSky_Dome_01.tscn" id="1_4iega"]
+[ext_resource type="PackedScene" uid="uid://cw1uu5p8xk2se" path="res://Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Bean_Town_Female_01.tscn" id="2_sqjb6"]
+[ext_resource type="PackedScene" uid="uid://cd4mw0ee5d3sv" path="res://Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Bean_Female_01.tscn" id="3_urcym"]
+[ext_resource type="PackedScene" uid="uid://bd17mls38jwj0" path="res://Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Bean_Cop_01.tscn" id="4_kewaq"]
+[ext_resource type="PackedScene" uid="uid://dqeg0edt4mnfe" path="res://Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Bean_Cowboy_01.tscn" id="5_rajpj"]
+[ext_resource type="PackedScene" uid="uid://c4lcadfuat25q" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Prop_Plane_Ring_01.tscn" id="6_cmcmi"]
+[ext_resource type="Material" uid="uid://d1bnres68m4mj" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_02_mat.tres" id="7_5ocp2"]
+[ext_resource type="PackedScene" uid="uid://cqe8g6fi4dsdk" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Small_Rocks_05.tscn" id="8_bt3s7"]
+[ext_resource type="PackedScene" uid="uid://db1wukv3pv4kb" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Ground_01.tscn" id="9_3xsi1"]
+[ext_resource type="PackedScene" uid="uid://chsg13rrbovu0" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Wep_Watergun_01.tscn" id="10_16q2b"]
+[ext_resource type="PackedScene" uid="uid://dgndn5gllrc4e" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Wep_WaterPistol_01.tscn" id="11_0vcni"]
+[ext_resource type="PackedScene" uid="uid://dmdi5i1kgfnmh" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Wep_Watergun_02.tscn" id="12_sj87c"]
+[ext_resource type="PackedScene" uid="uid://bsgovjy8hnuap" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Wep_Shield_04.tscn" id="13_77cgy"]
+[ext_resource type="PackedScene" uid="uid://vcr8k2meqj6e" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Floor_5x5_01P.tscn" id="14_7l41w"]
+[ext_resource type="Material" uid="uid://c3hccy82752cw" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_04_mat.tres" id="15_qr1pt"]
+[ext_resource type="PackedScene" uid="uid://4e1jl5q1a3p6" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Prop_Cone_01.tscn" id="16_ifkb5"]
+[ext_resource type="PackedScene" uid="uid://b01ofgpsjfs58" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Prop_Crate_03.tscn" id="17_3yhtd"]
+[ext_resource type="PackedScene" uid="uid://coxhwjltboo6c" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Tree_02.tscn" id="18_a1tqc"]
+[ext_resource type="PackedScene" uid="uid://csqol0ouqveio" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Icon_Coin_01.tscn" id="19_rsbnb"]
+[ext_resource type="PackedScene" uid="uid://dp8qeav5etj3n" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Mountains_Grass_02.tscn" id="20_yu18x"]
+[ext_resource type="PackedScene" uid="uid://883ccse6n4v2" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Tree_01.tscn" id="21_n5aot"]
+[ext_resource type="PackedScene" uid="uid://drlfpo2e3i0ts" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Prop_Target_03.tscn" id="22_oxoyt"]
+[ext_resource type="PackedScene" uid="uid://csn2soikq3v4m" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_WallDoor_2x3_01P.tscn" id="23_ar4ps"]
+[ext_resource type="PackedScene" uid="uid://ojbkdcnxsqd4" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_WallWindow_2x3_01P.tscn" id="24_7npq1"]
+[ext_resource type="PackedScene" uid="uid://b1jwt46n3a2gr" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Column_2x3_01P.tscn" id="25_s37wt"]
+[ext_resource type="PackedScene" uid="uid://dm0625ox1h3xe" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Prop_Ladder_1x2_01P.tscn" id="26_tmyn8"]
+[ext_resource type="PackedScene" uid="uid://cqccqqg1hpul4" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Floor_1x1_01P.tscn" id="27_4i0kq"]
+[ext_resource type="PackedScene" uid="uid://dlwv45la2sldr" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Icon_Arrow_Small_01.tscn" id="28_l2gu8"]
+[ext_resource type="PackedScene" uid="uid://dbl16aiud2xes" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Block_1x1_01P.tscn" id="29_57st1"]
+[ext_resource type="PackedScene" uid="uid://ikpe0yovxunb" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Ground_Flat_01.tscn" id="30_us5ax"]
+[ext_resource type="PackedScene" uid="uid://fywmu5vrx15m" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Mountains_Soft_01.tscn" id="31_x6tkx"]
+[ext_resource type="PackedScene" uid="uid://cmgxlvx5wjefh" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Bld_Door_01.tscn" id="32_2nni0"]
+[ext_resource type="Material" uid="uid://umkb6ubq2mw" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_03_mat.tres" id="33_y7rfq"]
+[ext_resource type="PackedScene" uid="uid://bf2vligo12hux" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Tree_03.tscn" id="34_7qdet"]
+[ext_resource type="PackedScene" uid="uid://dml2gvelsxql3" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_TreeDead_01.tscn" id="35_kyegh"]
+[ext_resource type="PackedScene" uid="uid://duigrcgsaj84a" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_TreeStump_01.tscn" id="36_vgmdy"]
+[ext_resource type="PackedScene" uid="uid://cbkmcormta7ku" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P.tscn" id="37_1evsx"]
+[ext_resource type="PackedScene" uid="uid://dlwjol7yjo20y" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Small_Rocks_01.tscn" id="38_bp3tj"]
+[ext_resource type="PackedScene" uid="uid://m1yasfp4yyec" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Small_Rocks_02.tscn" id="39_aef6y"]
+[ext_resource type="PackedScene" uid="uid://c8soqp3q48hlb" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Veh_Plane_Stunt_01.tscn" id="40_e0rnt"]
+[ext_resource type="PackedScene" uid="uid://if28rqlc72x5" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Primitive_Sphere_01P.tscn" id="41_68g36"]
+[ext_resource type="PackedScene" uid="uid://dith82jwbyxlv" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Prop_Sword_01.tscn" id="42_3g2k1"]
+[ext_resource type="PackedScene" uid="uid://811sy4078srw" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Primitive_Tube_01P.tscn" id="43_rhe42"]
+[ext_resource type="PackedScene" uid="uid://bqfm15esw3auv" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_DoorFrame_01P.tscn" id="44_gsg3r"]
+[ext_resource type="PackedScene" uid="uid://m48q64l516im" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Icon_Letter_Question_01.tscn" id="45_0y5d5"]
+[ext_resource type="PackedScene" uid="uid://cotw0obnqghno" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Stairs_1x1_01P.tscn" id="46_xhh7n"]
+[ext_resource type="PackedScene" uid="uid://g4jgg4olbxn6" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Tree_04.tscn" id="47_rcd1m"]
+[ext_resource type="PackedScene" uid="uid://n3wnjbiyvrcv" path="res://Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Character_Female_01.tscn" id="48_f3pbm"]
+[ext_resource type="PackedScene" uid="uid://n3yke0eigjmr" path="res://Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Character_Male_01.tscn" id="49_i2pwc"]
+[ext_resource type="PackedScene" uid="uid://bjr6qxgt0nd27" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonApocalypse_Bld_House_01.tscn" id="50_ww3x4"]
+[ext_resource type="PackedScene" uid="uid://bg0g0gh7eb0pg" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonCity_Veh_Car_Small_01.tscn" id="51_mpq4b"]
+[ext_resource type="PackedScene" uid="uid://da0n7m3yt10cw" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_CloudRing_01.tscn" id="52_2lerr"]
+[ext_resource type="Material" uid="uid://ceixfyitrxs3b" path="res://Assets/Synty/PolygonStarter/Materials/Misc/PolygonStarter_Clouds_Mat_mat.tres" id="53_2glsm"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_hbon4"]
+resource_name = "Default-Skybox"
+sky_top_color = Color(0.454902, 0.678431, 0.87451, 1)
+sky_horizon_color = Color(0.894118, 0.952941, 1, 1)
+sky_curve = 0.0731028
+ground_bottom_color = Color(0.454902, 0.470588, 0.490196, 1)
+ground_horizon_color = Color(1, 1, 1, 1)
+
+[sub_resource type="Sky" id="Sky_0n1b6"]
+sky_material = SubResource("ProceduralSkyMaterial_hbon4")
+
+[sub_resource type="Environment" id="Environment_ebq8u"]
+background_mode = 2
+sky = SubResource("Sky_0n1b6")
+fog_light_color = Color(0.5, 0.5, 0.5, 1)
+fog_density = 0.0
+
+[node name="RootNode3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ebq8u")
+
+[node name="SM_SimpleSky_Dome_01" parent="." instance=ExtResource("1_4iega")]
+transform = Transform3D(10.702767, 0, 0, 0, 15.661819, 0, 0, 0, 10.702773, 0, -23.6, 0)
+
+[node name="MeshRenderer" parent="SM_SimpleSky_Dome_01" index="0"]
+cast_shadow = 0
+
+[node name="Demo_Objects" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.275842, 2.7062564, 1.9069135)
+
+[node name="SM_Bean_Town_Female_01 (1)" parent="Demo_Objects" instance=ExtResource("2_sqjb6")]
+transform = Transform3D(-0.49748948, 0, -0.86747, 0, 1, 0, 0.86747, 0, -0.49748948, 15.156841, -2.7342565, 14.654087)
+
+[node name="SM_Bean_Female_01 (1)" parent="Demo_Objects" instance=ExtResource("3_urcym")]
+transform = Transform3D(-0.64268446, 0, -0.766131, 0, 1, 0, 0.766131, 0, -0.64268446, 16.975842, -1.3062564, 24.763086)
+
+[node name="SM_Bean_Cop_01 (1)" parent="Demo_Objects" instance=ExtResource("4_kewaq")]
+transform = Transform3D(-0.23644996, 0, 0.9716437, 0, 1, 0, -0.9716437, 0, -0.23644996, 0.45584202, -0.6712563, 22.573086)
+
+[node name="SM_Bean_Cowboy_01 (1)" parent="Demo_Objects" instance=ExtResource("5_rajpj")]
+transform = Transform3D(0.96175283, 0, -0.2739188, 0, 1, 0, 0.2739188, 0, 0.96175283, 16.608843, -1.3002564, 22.008087)
+
+[node name="SM_Prop_Plane_Ring_01 (5)" parent="Demo_Objects" instance=ExtResource("6_cmcmi")]
+transform = Transform3D(0.30988804, 0, 0, 0, 0.30988806, 0, 0, 0, 0.1750086, 3.7058423, -2.7862563, 9.973086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_Prop_Plane_Ring_01 (5)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_Generic_Small_Rocks_05 (1)" parent="Demo_Objects" instance=ExtResource("8_bt3s7")]
+transform = Transform3D(3.0973372, 0, 0, 0, 3.0973387, 0, 0, 0, 3.0973387, 0.027842045, -2.8852563, 11.356086)
+
+[node name="SM_Generic_Ground_01 (11)" parent="Demo_Objects" instance=ExtResource("9_3xsi1")]
+transform = Transform3D(2.122789, 0, 3.5999548, 0, 3.9861782, 0, -7.951604, 0, 0.96105695, 41.65584, -3.5062563, 6.6530867)
+
+[node name="SM_Wep_Watergun_01" parent="Demo_Objects" instance=ExtResource("10_16q2b")]
+transform = Transform3D(1.9470718e-07, 1, 0, -1, 1.9470718e-07, 0, 0, 0, 1, 14.675842, -0.79925644, 9.609198)
+
+[node name="SM_Wep_WaterPistol_01" parent="Demo_Objects" instance=ExtResource("11_0vcni")]
+transform = Transform3D(1.9470718e-07, 1, 0, -1, 1.9470718e-07, 0, 0, 0, 1, 14.739111, -0.81865644, 10.23365)
+
+[node name="SM_Wep_Watergun_02" parent="Demo_Objects" instance=ExtResource("12_sj87c")]
+transform = Transform3D(1.9470718e-07, 1, 0, -1, 1.9470718e-07, 0, 0, 0, 1, 14.705154, -0.7902564, 8.818087)
+
+[node name="SM_Wep_Shield_04" parent="Demo_Objects" instance=ExtResource("13_77cgy")]
+transform = Transform3D(0.94462276, 0, 0.3281583, 0, 1, 0, -0.3281583, 0, 0.94462276, 3.2689512, -2.3312564, -3.7659135)
+
+[node name="SM_Prop_Plane_Ring_01 (4)" parent="Demo_Objects" instance=ExtResource("6_cmcmi")]
+transform = Transform3D(0.30988804, 0, 0, 0, 0.30988806, 0, 0, 0, 0.1750086, 3.7058423, -2.7862563, 3.0730865)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_Prop_Plane_Ring_01 (4)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_Generic_Ground_01 (10)" parent="Demo_Objects" instance=ExtResource("9_3xsi1")]
+transform = Transform3D(9.193709, 0, 2.1038005, 0, 3.9861782, 0, -6.289427, 0, 3.075277, 17.455843, -3.4062564, 36.953087)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (13)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2758422, -2.8262563, 8.093086)
+
+[node name="SM_Generic_Ground_01 (9)" parent="Demo_Objects" instance=ExtResource("9_3xsi1")]
+transform = Transform3D(2.3189569, 0, 3.3725202, 0, 3.9861782, 0, -7.516525, 0, 1.0404714, -31.05416, -3.1262565, 9.213086)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (12)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1.8185082e-08, 0, -0.7979757, 0, 1, 0, 0.09339708, 0, 1.5537161e-07, 0.7798424, -2.7062564, 12.573086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (12)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_Generic_Ground_01 (8)" parent="Demo_Objects" instance=ExtResource("9_3xsi1")]
+transform = Transform3D(7.18974, 0, 1.4318006, 0, 3.9861782, 0, -3.1911345, 0, 3.225898, 6.515842, -3.1262565, -24.496914)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (10)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1.8185082e-08, 0, -0.7979757, 0, 1, 0, 0.09339708, 0, 1.5537161e-07, 0.797842, -2.7062564, 8.556087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (10)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (9)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(0.09291672, 0, 0, 0, 1, 0, 0, 0, 1, 1.2758422, -2.7062564, 8.093086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (9)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_Generic_Ground_01 (7)" parent="Demo_Objects" instance=ExtResource("9_3xsi1")]
+transform = Transform3D(5.519134, 0, 0.548466, 0, 3.9861782, 0, -1.044091, 0, 2.8992279, -6.8041577, -3.1262565, -17.096912)
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (15)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5858421, -2.7062564, 12.443087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (15)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (15)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.985842, -0.6962564, 27.314371)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (14)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.438843, -0.6962564, 27.314371)
+
+[node name="SM_Generic_Tree_02 (27)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(0.521141, 0.069682345, 1.2966563, -0.15868816, 1.3901291, -0.010926993, -1.2887942, -0.14298847, 0.5256655, 24.791725, -2.5922563, 25.158682)
+
+[node name="SM_Generic_Tree_02 (28)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(0.9459236, -0.14331649, 0.46498954, 0.15472288, 1.0523758, 0.009606178, -0.46131954, 0.059091754, 0.9566707, 24.265842, -2.9062564, 28.703087)
+
+[node name="SM_Generic_Tree_02 (25)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-0.90212756, 0, 1.3180338, 0, 1.5972002, 0, -1.3180337, 0, -0.9021277, 24.533365, -2.6882565, 26.920685)
+
+[node name="SM_Generic_Tree_02 (26)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-0.5960709, -0.13482393, 0.9478776, -0.10860057, 1.1188842, 0.090854205, -0.9512389, -0.043256067, -0.6043372, 23.527107, -2.8562565, 25.169285)
+
+[node name="SM_Generic_Ground_01 (5)" parent="Demo_Objects" instance=ExtResource("9_3xsi1")]
+transform = Transform3D(-3.013467, 0, 0.7404128, 0, 5.6209917, 0, -0.5993733, 0, -3.722571, 38.245842, -3.5562563, 7.573086)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (18)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(-0.39857054, 0, -0.9171377, 0, 1, 0, 0.9171377, 0, -0.39857054, 18.96773, 0.8237436, 19.475086)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (17)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(-0.13844955, 0, -0.9903695, 0, 1, 0, 0.9903695, 0, -0.13844955, 18.96773, 0.8237436, 17.003086)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (16)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(0.33469075, 0, -0.94232804, 0, 1, 0, 0.94232804, 0, 0.33469075, 18.96773, 0.8237436, 14.443087)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (15)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(0.5568025, 0, -0.8306449, 0, 1, 0, 0.8306449, 0, 0.5568025, 18.96773, 0.8237436, 12.283086)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (14)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(0.75845045, 0, -0.65173066, 0, 1, 0, 0.65173066, 0, 0.75845045, 18.96773, 0.8237436, 9.733087)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (13)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(0.8726453, 0, -0.48835456, 0, 1, 0, 0.48835456, 0, 0.8726453, 18.96773, 0.8237436, 6.953086)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (12)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(0.96659607, 0, -0.25630456, 0, 1, 0, 0.25630456, 0, 0.96659607, 18.96773, 0.9237437, 4.4430866)
+
+[node name="SM_Generic_Mountains_Grass_02 (6)" parent="Demo_Objects" instance=ExtResource("20_yu18x")]
+transform = Transform3D(1.6707606, 0, 0.5051164, 0, 0.9116495, 0, -0.5558583, 0, 1.5182441, 32.04584, -3.2662563, 20.313086)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (11)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.96773, 0.99374366, 1.6754956)
+
+[node name="SM_Generic_Tree_01 (3)" parent="Demo_Objects" instance=ExtResource("21_n5aot")]
+transform = Transform3D(-0.6084468, 0, -0.6060426, 0, 0.8587753, 0, 0.6060428, 0, -0.60844654, -7.828158, -3.5032563, 6.378086)
+
+[node name="SM_Generic_Tree_01 (2)" parent="Demo_Objects" instance=ExtResource("21_n5aot")]
+transform = Transform3D(-1.0024346, 0, -0.2679216, 0, 1.0376204, 0, 0.26792166, 0, -1.0024344, -8.026157, -3.5512564, 8.036086)
+
+[node name="SM_Generic_Tree_01 (1)" parent="Demo_Objects" instance=ExtResource("21_n5aot")]
+transform = Transform3D(0.31014544, 0, 0.6929428, 0, 0.75918365, 0, -0.6929428, 0, 0.31014544, -8.031231, -3.2652564, 9.346401)
+
+[node name="SM_PolygonPrototype_Prop_Target_03 (4)" parent="Demo_Objects" instance=ExtResource("22_oxoyt")]
+transform = Transform3D(-1.7708686e-07, -4.0512753, -1.7708686e-07, 0, -1.7708686e-07, 4.0512753, -4.0512753, 1.7708686e-07, 7.740713e-15, -1.2031579, -2.7592564, 5.5730867)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Target_03 (4)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_WallDoor_2x3_01P (2)" parent="Demo_Objects" instance=ExtResource("23_ar4ps")]
+transform = Transform3D(5.9604645e-08, 0, 1, 0, 1, 0, -1, 0, 5.9604645e-08, 15.955843, -2.7062564, -3.4269135)
+
+[node name="SM_PolygonPrototype_Buildings_WallWindow_2x3_01P (3)" parent="Demo_Objects" instance=ExtResource("24_7npq1")]
+transform = Transform3D(-5.2054855e-07, 0, 1, 0, 1, 0, -1, 0, -5.2054855e-07, 15.955843, -2.7062564, -1.4269136)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_WallWindow_2x3_01P (3)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_Generic_Tree_02 (24)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-0.4223562, 0.05319741, 0.97483903, 0.15472266, 1.0523756, 0.009606111, -0.96395123, 0.14560705, -0.42558482, 0.82684183, -2.4562564, -13.320913)
+
+[node name="SM_Generic_Tree_02 (23)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-1.2664678, -0.14002755, 0.57811135, -0.15868822, 1.3901291, -0.0109270485, -0.5732701, -0.07545611, -1.2741382, -2.6931586, -2.990208, -13.990913)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (19)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.285843, -2.7062564, -5.0709133)
+
+[node name="SM_Generic_Tree_02 (22)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-0.9747578, -0.04871886, -0.5651758, -0.1086006, 1.1188842, 0.09085417, 0.55677915, 0.13294753, -0.9717368, -2.734158, -2.7562563, -12.726913)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (5)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.285843, -2.7062564, -6.9069138)
+
+[node name="SM_Generic_Tree_02 (21)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-1.3537307, 0, -0.8476218, 0, 1.5972002, 0, 0.8476216, 0, -1.3537309, -0.9431586, -2.7562563, -13.660913)
+
+[node name="SM_PolygonPrototype_Prop_Ladder_1x2_01P (4)" parent="Demo_Objects" instance=ExtResource("26_tmyn8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.474042, -2.6892564, -4.7739134)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Ladder_1x2_01P (4)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (14)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(3.627085, 0, 0, 0, 1, 0, 0, 0, 2.0380707, 14.145842, -0.8312564, -6.8359137)
+
+[node name="SM_Generic_Tree_02 (15)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(0.089967035, 0, -1.3169304, 0, 1.3199999, 0, 1.3169304, 0, 0.089967035, 24.665842, -1.9362564, -1.6469135)
+
+[node name="SM_Generic_Tree_02 (18)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(1.0334901, -0.0055960575, 0.3388036, -0.0045096483, 1.0871501, 0.031712864, -0.33881974, -0.03153929, 1.0330187, 10.3238945, -1.2362564, -19.369925)
+
+[node name="SM_Generic_Tree_02 (17)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(1.0888268, 0, -0.75421596, 0, 1.3245323, 0, 0.75421596, 0, 1.0888268, 8.653851, -1.2262564, -20.117266)
+
+[node name="SM_Generic_Tree_02 (16)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-0.8650891, 0, 0.46184316, 0, 0.98065156, 0, -0.46184316, 0, -0.8650891, 21.775843, -1.5762564, -12.126914)
+
+[node name="SM_Generic_Tree_02 (20)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-0.2571301, -0.11447829, -1.0640479, 0.03193998, 1.0930209, -0.12531386, 1.0697119, -0.060153466, -0.25202692, 28.865843, -2.1662564, 11.293086)
+
+[node name="SM_Generic_Tree_02 (19)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(0.49187067, 0, 1.224934, 0, 1.3199999, 0, -1.224934, 0, 0.49187067, 28.76856, -2.2362564, 12.642425)
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (14)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.9458423, -1.6432564, 28.341085)
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (13)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.041157722, -1.6432564, 28.341085)
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (12)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.418158, -0.9512564, 28.341085)
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (11)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.432158, -1.6032563, 23.033087)
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (10)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.432158, -1.5322564, 19.025085)
+
+[node name="SM_Generic_Ground_01 (4)" parent="Demo_Objects" instance=ExtResource("9_3xsi1")]
+transform = Transform3D(1.8649684, 0, -2.238321, 0, 3.2427938, 0, 1.5660621, 0, 2.6655378, -17.344158, -3.1278963, -5.9769135)
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (9)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3748393, -1.6402564, 14.927721)
+
+[node name="SM_Generic_Ground_01 (3)" parent="Demo_Objects" instance=ExtResource("9_3xsi1")]
+transform = Transform3D(-0.79761815, 0, 3.3520026, 0, 3.9861782, 0, -2.598324, 0, -1.0289779, -7.854158, -3.1262565, -10.886913)
+
+[node name="SM_Generic_Ground_01 (2)" parent="Demo_Objects" instance=ExtResource("9_3xsi1")]
+transform = Transform3D(1.5715715, 0, -2.4600449, 0, 2.5335186, 0, 1.8603281, 0, 2.0782013, 16.935843, -3.1362565, 32.063087)
+
+[node name="SM_PolygonPrototype_Prop_Target_03 (3)" parent="Demo_Objects" instance=ExtResource("22_oxoyt")]
+transform = Transform3D(-8.190636e-08, -1.8737991, -8.190636e-08, 0, -8.190636e-08, 1.8737991, -1.873799, 8.190636e-08, 3.5802406e-15, -0.66315794, -1.5522563, 15.561087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Target_03 (3)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_Generic_Ground_01 (1)" parent="Demo_Objects" instance=ExtResource("9_3xsi1")]
+transform = Transform3D(-2.388507, 0, 0.62821865, 0, 3.2427938, 0, -0.4750698, 0, -3.1584928, 21.935843, -3.1278963, 23.853086)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (10)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(1.8389018, 0, 0, 0, 1.8389012, 0, 0, 0, 1.8389012, 5.9349895, 2.6037436, -5.7769136)
+
+[node name="SM_Generic_Ground_01" parent="Demo_Objects" instance=ExtResource("9_3xsi1")]
+transform = Transform3D(3.007606, 0, -0.11812604, 0, 4.0066395, 0, 0.08932895, 0, 3.9771721, 21.865843, -3.2262564, 12.0630865)
+
+[node name="SM_PolygonPrototype_Icon_Arrow_Small_01 (1)" parent="Demo_Objects" instance=ExtResource("28_l2gu8")]
+transform = Transform3D(2.086158, 0, 0, 0, -9.118891e-08, -1.0414308, 0, 2.086159, -4.5522388e-08, 3.7558422, -2.7182565, 10.663086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (19)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(0.33891067, 0, 0, 0, 2.980491, 0, 0, 0, 3.770164, 16.515842, -2.7062564, 12.413086)
+
+[node name="SM_PolygonPrototype_Buildings_WallDoor_2x3_01P (1)" parent="Demo_Objects" instance=ExtResource("23_ar4ps")]
+transform = Transform3D(2.0638952e-07, 0, -1.0599995, 0, 1.06, 0, 1.0599995, 0, 2.0638952e-07, 16.207842, -2.7832563, 15.555086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_WallDoor_2x3_01P (1)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_Generic_Ground_Flat_01 (3)" parent="Demo_Objects" instance=ExtResource("30_us5ax")]
+transform = Transform3D(-1.2327712, 0, 0.01810429, 0, 0.80349714, 0, -0.017216528, 0, -1.2963384, 25.581842, -2.7262564, -1.544384)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (12)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.7454967, -2.2222564, 26.203087)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (13)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(1.9470718e-07, 0, -1, 0, 1, 0, 1, 0, 1.9470718e-07, 6.785842, -2.2222564, 23.943087)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (11)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(1.9470718e-07, 0, -1, 0, 1, 0, 1, 0, 1.9470718e-07, 7.7988424, -2.2222564, 26.203087)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (10)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.7454967, -2.2222564, 25.093086)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (9)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.7988424, -2.2222564, 27.314371)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (8)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(1.9470718e-07, 0, -1, 0, 1, 0, 1, 0, 1.9470718e-07, 6.7454967, -2.2222564, 27.314371)
+
+[node name="SM_Generic_Mountains_Grass_02 (5)" parent="Demo_Objects" instance=ExtResource("20_yu18x")]
+transform = Transform3D(2.2201781, 0, 1.264216, 0, 2.3204513, 0, -1.2628919, 0, 2.2225058, 35.265842, -3.6462564, -12.586914)
+
+[node name="SM_Generic_Mountains_Soft_01 (3)" parent="Demo_Objects" instance=ExtResource("31_x6tkx")]
+transform = Transform3D(-0.87140864, 0, -0.46828797, 0, 1.0127668, 0, 0.4682879, 0, -0.87140876, 11.645842, -3.0662565, -19.156914)
+
+[node name="SM_Generic_Mountains_Grass_02 (4)" parent="Demo_Objects" instance=ExtResource("20_yu18x")]
+transform = Transform3D(2.440226, 0, -0.6856921, 0, 1.4433825, 0, 0.7545739, 0, 2.2174683, 25.655674, -3.1090865, -20.626913)
+
+[node name="SM_Generic_Ground_Flat_01 (1)" parent="Demo_Objects" instance=ExtResource("30_us5ax")]
+transform = Transform3D(-1.2327712, 0, 0.01810429, 0, 0.80349714, 0, -0.017216528, 0, -1.2963384, 16.945843, -2.7262564, -15.826914)
+
+[node name="SM_Generic_Mountains_Soft_01 (4)" parent="Demo_Objects" instance=ExtResource("31_x6tkx")]
+transform = Transform3D(0.314645, 0, 0.9390294, 0, 1.5218605, 0, -0.7742611, 0, 0.3816037, 28.425842, -2.9147964, 0.35308647)
+
+[node name="SM_PolygonPrototype_Prop_Ladder_1x2_01P (3)" parent="Demo_Objects" instance=ExtResource("26_tmyn8")]
+transform = Transform3D(-1, 0, -5.939602e-05, 0, 1, 0, 5.939602e-05, 0, -1, -12.296158, -0.47225642, 16.323086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Ladder_1x2_01P (3)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Prop_Ladder_1x2_01P (2)" parent="Demo_Objects" instance=ExtResource("26_tmyn8")]
+transform = Transform3D(-1, 0, -5.939602e-05, 0, 1, 0, 5.939602e-05, 0, -1, -12.296158, -2.4722564, 16.323086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Ladder_1x2_01P (2)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (9)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(0.80616766, 0, 0.5916872, 0, 1, 0, -0.5916872, 0, 0.80616766, 2.185842, -2.0432563, 0.7230866)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (8)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0858421, -2.0432563, -2.3769135)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (7)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(0.9660755, 0, 0.25825992, 0, 1, 0, -0.25825992, 0, 0.9660755, 2.185842, -2.0432563, -0.83691347)
+
+[node name="SM_Bld_Door_01 (1)" parent="Demo_Objects" instance=ExtResource("32_2nni0")]
+transform = Transform3D(-0.54258955, 0, -0.839998, 0, 1, 0, 0.839998, 0, -0.54258955, -13.310158, -2.2002563, 10.297087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_Bld_Door_01 (1)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_Generic_Small_Rocks_05" parent="Demo_Objects" instance=ExtResource("8_bt3s7")]
+transform = Transform3D(1.7655423, 0, 0, 0, 1.7655425, 0, 0, 0, 1.7655425, -2.6317592, -2.8522563, 9.599997)
+
+[node name="SM_Generic_Tree_03 (1)" parent="Demo_Objects" instance=ExtResource("34_7qdet")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.085842, -2.9862564, 35.813087)
+
+[node name="SM_Generic_Tree_01" parent="Demo_Objects" instance=ExtResource("21_n5aot")]
+transform = Transform3D(0.030868588, 0, 0.8157427, 0, 0.8163265, 0, -0.8157427, 0, 0.030868588, -16.526157, -2.1812563, 14.214087)
+
+[node name="SM_Generic_Tree_02 (14)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4951735, -2.5062563, 50.42556)
+
+[node name="SM_Generic_TreeDead_01 (1)" parent="Demo_Objects" instance=ExtResource("35_kyegh")]
+transform = Transform3D(0.15984087, 0, -0.77723116, 0, 0.79349715, 0, 0.77723116, 0, 0.15984087, -14.574158, -1.4762564, 26.253086)
+
+[node name="SM_Generic_Tree_02 (13)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.908472, -2.5142565, 21.404863)
+
+[node name="SM_Generic_Tree_03" parent="Demo_Objects" instance=ExtResource("34_7qdet")]
+transform = Transform3D(0.013043734, 0, -0.89990574, 0, 0.90000004, 0, 0.89990574, 0, 0.013043734, -14.093157, -2.5592566, 14.843086)
+
+[node name="SM_Generic_TreeStump_01" parent="Demo_Objects" instance=ExtResource("36_vgmdy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.404158, -2.5262563, 17.263086)
+
+[node name="SM_Generic_Tree_02 (11)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(0.016397461, 0, -1.3198982, 0, 1.3199999, 0, 1.3198982, 0, 0.016397461, -24.06265, -1.9362564, 17.519924)
+
+[node name="SM_Generic_Tree_02 (12)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-0.17350428, 0.12880233, 1.0792243, 0.031940017, 1.0930212, -0.12531403, -1.0864135, 0.011564062, -0.1760403, -23.634157, -1.8662565, 18.803085)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (6)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0804667, -0.11732268, 22.249086)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (5)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0804667, -0.11732268, 21.196383)
+
+[node name="SM_Generic_Tree_02 (10)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(0.6288311, -0.12100711, -0.8951801, 0.03194004, 1.0930209, -0.1253138, 0.90275705, 0.045617916, 0.62798685, -7.838158, -1.8662565, 28.374086)
+
+[node name="SM_Generic_Tree_02 (9)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-0.57443136, 0.02454827, -0.9232263, -0.0045096274, 1.0871501, 0.031712823, 0.92354167, 0.02057724, -0.57408035, 3.6658423, -2.2962563, 40.753086)
+
+[node name="SM_Generic_Tree_02 (8)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-1.31896, 0, -0.121378206, 0, 1.3245323, 0, 0.1213782, 0, -1.3189601, 5.4258423, -2.2862563, 40.253086)
+
+[node name="SM_Generic_Tree_02 (7)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-0.9676689, 0, -1.1425834, 0, 1.497291, 0, 1.1425831, 0, -0.9676691, 7.535842, -2.6562564, 29.383087)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (77)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(3.8941437e-07, 0, -2, 0, 1.0706859, 0, 2, 0, 3.8941437e-07, 4.275842, -2.7062564, 28.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (78)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 1.2454821, 0, 0, 0, 2, 2.2758422, -2.7936544, 26.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (76)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 1.0706859, 0, 0, 0, 2, 6.275842, -2.7062564, 26.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (80)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2.2719865, 0, 0, 0, 2, -1.7241578, -3.2169063, 26.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (79)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, -5.3644176e-06, 0, 1.0706859, 0, 5.3644176e-06, 0, 2, 0.27584362, -2.7062564, 26.593088)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (71)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(5.8730416e-06, 0, 2, 0, 1.0706859, 0, -2, 0, 5.8730416e-06, 4.2758427, -2.7062564, 24.593082)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (73)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 1.0706859, 0, 0, 0, 2, 2.2758422, -2.2262564, 24.593086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (73)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (75)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-2, 0, 1.1746083e-05, 0, 1.0706859, 0, -1.1746083e-05, 0, -2, -3.7241626, -2.7062564, 26.593084)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (72)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(3.8941437e-07, 0, -2, 0, 1.0706859, 0, 2, 0, 3.8941437e-07, 4.275842, -2.2262564, 26.593086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (72)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (74)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(3.8941437e-07, 0, -2, 0, 1.0706859, 0, 2, 0, 3.8941437e-07, 0.2758422, -2.2262564, 26.593086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (74)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (66)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 1.2258104, 0, 0, 0, 2, 6.275842, -2.7838185, 22.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (68)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 1.0706859, 0, 0, 0, 2, 2.2758422, -1.6862564, 22.593086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (68)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (67)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(3.8941437e-07, 0, -2, 0, 1.0706859, 0, 2, 0, 3.8941437e-07, 4.275842, -2.2262564, 24.593086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (67)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (70)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 1.1543133, 0, 0, 0, 2, -1.7241578, -2.7480705, 22.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (69)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(3.8941437e-07, 0, -2, 0, 1.0706859, 0, 2, 0, 3.8941437e-07, 0.2758422, -1.6862564, 24.593086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (69)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (65)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 1.0706859, 0, 0, 0, 2, -1.7241578, -2.7062564, 20.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (64)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(3.8941437e-07, 0, -2, 0, 1.0706859, 0, 2, 0, 3.8941437e-07, 0.2758422, -1.6862564, 22.593086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (64)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (62)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(3.8941437e-07, 0, -2, 0, 1.200362, 0, 2, 0, 3.8941437e-07, 4.275842, -2.2910964, 22.593086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (62)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (61)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(5.8730416e-06, 0, -2, 0, 1.0706859, 0, 2, 0, 5.8730416e-06, 6.275844, -2.7062564, 22.593084)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (63)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 1.0706859, 0, 0, 0, 2, 2.2758422, -1.6862564, 20.593086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (63)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_Generic_Tree_02 (6)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(0.81885064, 0, -0.07894249, 0, 0.822647, 0, 0.07894249, 0, 0.81885064, -15.209158, -0.34025645, 33.268085)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (58)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-2, 0, -3.019916e-07, 0, 1.0706859, 0, 3.019916e-07, 0, -2, 0.27584362, -2.2262564, 20.593084)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (58)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (57)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(3.8941437e-07, 0, -2, 0, 1.0706859, 0, 2, 0, 3.8941437e-07, 4.275842, -2.2262564, 20.593086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (57)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (60)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(5.8730416e-06, 0, -2, 0, 1.0706859, 0, 2, 0, 5.8730416e-06, -1.7241564, -2.5862565, 20.593084)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (59)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(3.8941437e-07, 0, -2, 0, 1.0706859, 0, 2, 0, 3.8941437e-07, 0.2758422, -2.2262564, 20.593086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (59)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (56)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 1.0706859, 0, 0, 0, 2, 6.275842, -2.7062564, 18.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (52)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-2, 0, -3.019916e-07, 0, 1.0706859, 0, 3.019916e-07, 0, -2, 2.2758408, -2.7062564, 18.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (54)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(3.8941437e-07, 0, -2, 0, 0.93406147, 0, 2, 0, 3.8941437e-07, 0.2758422, -2.6379445, 18.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (55)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 1.0706859, 0, 0, 0, 2, -1.7241578, -2.7062564, 16.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (51)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(5.8730416e-06, 0, 2, 0, 1.0470613, 0, -2, 0, 5.8730416e-06, 4.2758427, -2.8562565, 16.593082)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (53)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 1.0706859, 0, 0, 0, 2, 2.2758422, -2.8362565, 16.593086)
+
+[node name="SM_Generic_Tree_02 (5)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(0.9761259, 0, -0.094104856, 0, 0.98065156, 0, 0.094104856, 0, 0.9761259, -4.784158, -0.9262564, 34.173088)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (50)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(5.8730416e-06, 0, 2, 0, 1.0706859, 0, -2, 0, 5.8730416e-06, -3.724156, -2.7062564, 14.593082)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (49)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-8.742278e-08, 0, 2, 0, 1.0706859, 0, -2, 0, -8.742278e-08, -1.7241607, -2.5862565, 14.593088)
+
+[node name="SM_Generic_Tree_02 (4)" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(-0.5889362, 0, 1.1813357, 0, 1.3199999, 0, -1.1813357, 0, -0.5889362, -6.760158, -1.7722564, 29.118086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (48)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(5.8730416e-06, 0, -2, 0, 1.0706859, 0, 2, 0, 5.8730416e-06, 2.275844, -2.7062564, 16.593084)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (47)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(3.8941437e-07, 0, -2, 0, 1.0706859, 0, 2, 0, 3.8941437e-07, 4.275842, -2.8662565, 16.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (46)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 1.0706859, 0, 0, 0, 2, 6.275842, -2.7062564, 14.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (9)" parent="Demo_Objects" instance=ExtResource("37_1evsx")]
+transform = Transform3D(-2, 0, -2.2093402e-06, 0, 1, 0, 2.2093402e-06, 0, -2, -3.6581578, -2.7062564, 14.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (8)" parent="Demo_Objects" instance=ExtResource("37_1evsx")]
+transform = Transform3D(-2, 0, -2.2093402e-06, 0, 1, 0, 2.2093402e-06, 0, -2, -1.6831579, -2.7062564, 14.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (7)" parent="Demo_Objects" instance=ExtResource("37_1evsx")]
+transform = Transform3D(-2, 0, -2.2093402e-06, 0, 1, 0, 2.2093402e-06, 0, -2, 0.30684233, -2.7062564, 14.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (6)" parent="Demo_Objects" instance=ExtResource("37_1evsx")]
+transform = Transform3D(-2, 0, -2.2093402e-06, 0, 1, 0, 2.2093402e-06, 0, -2, 2.3008423, -2.7062564, 14.593086)
+
+[node name="SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (5)" parent="Demo_Objects" instance=ExtResource("37_1evsx")]
+transform = Transform3D(-2, 0, -2.2093402e-06, 0, 1, 0, 2.2093402e-06, 0, -2, 4.295842, -2.7062564, 14.593086)
+
+[node name="SM_Generic_Mountains_Soft_01 (2)" parent="Demo_Objects" instance=ExtResource("31_x6tkx")]
+transform = Transform3D(0.8659426, 0, -0.13464962, 0, 1.1346073, 0, 0.13464956, 0, 0.86594296, 0.9241009, -3.0562563, 34.75425)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_Generic_Mountains_Soft_01 (2)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (13)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(1.0084849e-06, 0, -1.8297756, 0, 1, 0, 5.1794953, 0, 3.5627045e-07, -7.1601577, -2.6912563, 10.146087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (13)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (12)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(1.2296123e-07, 0, -0.29350236, 0, 1, 0, 0.63151866, 0, 5.714702e-08, -6.9401574, -2.6062565, 5.8580856)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (12)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (11)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(1.2296123e-07, 0, -0.29350236, 0, 1, 0, 0.63151866, 0, 5.714702e-08, -6.9401574, -2.6062565, 6.5390863)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (11)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (10)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(1.2296123e-07, 0, -0.29350236, 0, 1, 0, 0.63151866, 0, 5.714702e-08, -6.9401574, -2.6062565, 7.2090864)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (10)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (9)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(1.2296123e-07, 0, -0.29350236, 0, 1, 0, 0.63151866, 0, 5.714702e-08, -6.9401574, -2.6062565, 7.908086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (9)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (8)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(1.2296123e-07, 0, -0.29350236, 0, 1, 0, 0.63151866, 0, 5.714702e-08, -6.9401574, -2.6062565, 8.578086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (8)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (7)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(1.2296123e-07, 0, -0.29350236, 0, 1, 0, 0.63151866, 0, 5.714702e-08, -6.9401574, -2.6062565, 9.259087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (7)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (6)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(1.2296123e-07, 0, -0.29350236, 0, 1, 0, 0.63151866, 0, 5.714702e-08, -6.9401574, -2.6062565, 9.929087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (6)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (5)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(0.6315189, 0, 0, 0, 1, 0, 0, 0, 0.29350248, -6.9401574, -2.6062565, 9.957087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (5)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (4)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(0.6315189, 0, 0, 0, 1, 0, 0, 0, 0.29350248, -7.623158, -2.6062565, 9.957087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (4)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (3)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(0.6315189, 0, 0, 0, 1, 0, 0, 0, 0.29350248, -8.299158, -2.6062565, 9.957087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (3)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_Generic_Small_Rocks_01" parent="Demo_Objects" instance=ExtResource("38_bp3tj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0421576, -2.7012563, -0.805676)
+
+[node name="SM_Generic_Small_Rocks_02 (2)" parent="Demo_Objects" instance=ExtResource("39_aef6y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7070947, -2.6962564, -1.7635304)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (4)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(0.9259747, 0, 0.37758556, 0, 1, 0, -0.37758556, 0, 0.9259747, -1.1041579, -2.2080085, -5.841913)
+
+[node name="SM_Generic_Mountains_Soft_01 (1)" parent="Demo_Objects" instance=ExtResource("31_x6tkx")]
+transform = Transform3D(-0.025046563, 0, -0.8996591, 0, 1.865777, 0, 0.8063404, 0, -0.02794523, -25.194157, -3.3262563, 8.583086)
+
+[node name="SM_Generic_Mountains_Soft_01" parent="Demo_Objects" instance=ExtResource("31_x6tkx")]
+transform = Transform3D(0.60338676, 0, -0.78394604, 0, 1.0127668, 0, 0.7839458, 0, 0.60338694, -16.104156, -2.8062563, 25.763086)
+
+[node name="SM_Prop_Plane_Ring_01 (3)" parent="Demo_Objects" instance=ExtResource("6_cmcmi")]
+transform = Transform3D(0.5963158, -0.5208805, -0.6108117, 0.22803025, 0.839467, -0.49325183, 0.7696816, 0.15485033, 0.61936396, 28.575842, 33.493744, -7.4069138)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_Prop_Plane_Ring_01 (3)" index="0"]
+cast_shadow = 0
+
+[node name="SM_Prop_Plane_Ring_01 (2)" parent="Demo_Objects" instance=ExtResource("6_cmcmi")]
+transform = Transform3D(0.9063967, -0.057847697, -0.41844794, 0.046139654, 0.99820995, -0.03805328, 0.4199002, 0.015184327, 0.9074433, -25.024157, 24.193743, 69.09309)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_Prop_Plane_Ring_01 (2)" index="0"]
+cast_shadow = 0
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_Prop_Plane_Ring_01 (1)" parent="Demo_Objects" instance=ExtResource("6_cmcmi")]
+transform = Transform3D(0.7303212, 0.0490449, -0.681341, 0.16350958, 0.95587355, 0.24407049, 0.6632463, -0.28965563, 0.6900754, -13.924158, 18.493744, 49.693085)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_Prop_Plane_Ring_01 (1)" index="0"]
+cast_shadow = 0
+
+[node name="SM_Prop_Plane_Ring_01" parent="Demo_Objects" instance=ExtResource("6_cmcmi")]
+transform = Transform3D(0.5963158, -0.5208805, -0.6108117, 0.22803025, 0.839467, -0.49325183, 0.7696816, 0.15485033, 0.61936396, 5.3258424, 17.973743, 16.723085)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_Prop_Plane_Ring_01" index="0"]
+cast_shadow = 0
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_Veh_Plane_Stunt_01" parent="Demo_Objects" instance=ExtResource("40_e0rnt")]
+transform = Transform3D(0.59549725, -0.51335096, -0.6179431, 0.32200143, 0.85723144, -0.40183246, 0.7360013, 0.04031156, 0.67577875, 11.305975, 22.993744, 10.3141365)
+
+[node name="SM_Veh_Plane_Stunt_01_Flap_fl_01" parent="Demo_Objects/SM_Veh_Plane_Stunt_01" index="4"]
+transform = Transform3D(0.9981375, -0.061003357, 0, 0.061003357, 0.9981375, 0, 0, 0, 1, 2.2379854, -0.43559423, 0.6635542)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (3)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(0.92259085, 0, 0.38577986, 0, 1, 0, -0.38577986, 0, 0.92259085, 13.599842, -2.2080085, 7.241086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (3)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (2)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(0.9600539, 0, -0.2798151, 0, 1, 0, 0.2798151, 0, 0.9600539, 15.513842, -2.2080085, 10.502087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (2)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (16)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1.7905337, 0, 0, 0, 1, 16.525843, -3.4962564, 8.983087)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (2)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8758421, -2.6062565, -3.651562)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (2)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_Bean_Female_01" parent="Demo_Objects" instance=ExtResource("3_urcym")]
+transform = Transform3D(0.9191006, 0, -0.39402297, 0, 1, 0, 0.39402297, 0, 0.9191006, 2.8538423, -0.76625633, -5.723913)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (31)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 16.245842, -2.7362564, 11.283086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (31)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_Generic_Small_Rocks_02" parent="Demo_Objects" instance=ExtResource("39_aef6y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4541578, -2.7062564, 21.093086)
+
+[node name="SM_PolygonPrototype_Prop_Ladder_1x2_01P (1)" parent="Demo_Objects" instance=ExtResource("26_tmyn8")]
+transform = Transform3D(5.669991e-05, 0, -1, 0, 1, 0, 1, 0, 5.669991e-05, 14.325842, -2.6892564, 8.666086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Ladder_1x2_01P (1)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P (1)" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(0.00020565535, 0, -2.0380697, 0, 1, 0, 3.627084, 0, 0.000115558374, 16.387995, -0.8312564, 11.33777)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (1)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (30)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 16.245842, -2.7362564, 5.9030867)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (30)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (1)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(0.86459345, 0, -0.50247204, 0, 1, 0, 0.50247204, 0, 0.86459345, 4.9758425, -2.2092564, -3.0569134)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (1)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (29)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 16.185843, -0.73625636, 0.56308675)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (28)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 16.185843, -2.7362564, 0.5630865)
+
+[node name="SM_PolygonPrototype_Primitive_Sphere_01P" parent="Demo_Objects" instance=ExtResource("41_68g36")]
+transform = Transform3D(3.0914521, 0, 0, 0, 3.0914497, 0, 0, 0, 3.0914497, 14.635841, -1.0462564, 4.3030863)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Primitive_Sphere_01P" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (27)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(6.598832e-08, 0, -3.770163, 0, 2.980491, 0, 0.33891055, 0, 7.3407784e-07, 6.8458424, -1.4962564, -6.591913)
+
+[node name="SM_Bean_Town_Female_01" parent="Demo_Objects" instance=ExtResource("2_sqjb6")]
+transform = Transform3D(0.84970933, 0, 0.5272514, 0, 1, 0, -0.5272514, 0, 0.84970933, 0.26584196, -2.708177, -4.2769136)
+
+[node name="SM_Bean_Cowboy_01" parent="Demo_Objects" instance=ExtResource("5_rajpj")]
+transform = Transform3D(0.96175283, 0, -0.2739188, 0, 1, 0, 0.2739188, 0, 0.96175283, 8.941842, -0.7075181, -6.032913)
+
+[node name="SM_Bean_Cop_01" parent="Demo_Objects" instance=ExtResource("4_kewaq")]
+transform = Transform3D(0.9500676, 0, 0.31204417, 0, 1, 0, -0.31204417, 0, 0.9500676, -1.4541578, -0.8312564, -5.819914)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (26)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(1, 0, 0, 0, 0.47813198, 0, 0, 0, 0.114729665, 0.8648424, -0.84025633, -4.9555135)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (22)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(1, 0, 0, 0, 0.47813198, 0, 0, 0, 0.114729665, -0.38415766, -0.84025633, -4.9555135)
+
+[node name="SM_PolygonPrototype_Prop_Sword_01 (1)" parent="Demo_Objects" instance=ExtResource("42_3g2k1")]
+transform = Transform3D(-0.3413454, 0.5574926, 0.7567597, 0.030280158, -0.7981766, 0.60166204, 0.93945, 0.22828938, 0.25557294, 3.115842, -1.6602564, -4.3239136)
+
+[node name="SM_PolygonPrototype_Prop_Target_03" parent="Demo_Objects" instance=ExtResource("22_oxoyt")]
+transform = Transform3D(-3.6064528e-06, 0, -2.2633247, 0, 2.2633238, 0, 2.2633238, 0, -3.6064544e-06, 16.095839, 0.39374352, 10.567086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Target_03" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Prop_Sword_01" parent="Demo_Objects" instance=ExtResource("42_3g2k1")]
+transform = Transform3D(-0.99921095, -0.039650813, -0.0023141755, 0.030279906, -0.798177, 0.60166156, -0.02570349, 0.6011168, 0.7987478, 3.5298421, -1.6602564, -4.7479134)
+
+[node name="SM_PolygonPrototype_Primitive_Tube_01P" parent="Demo_Objects" instance=ExtResource("43_rhe42")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5358422, -2.2062564, -4.3209133)
+
+[node name="SM_Bld_Door_01" parent="Demo_Objects" instance=ExtResource("32_2nni0")]
+transform = Transform3D(0.85567737, 0, -0.51750964, 0, 1, 0, 0.51750964, 0, 0.85567737, -3.8621573, -2.2162564, 1.8670864)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_Bld_Door_01" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_DoorFrame_01P" parent="Demo_Objects" instance=ExtResource("44_gsg3r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0988421, -0.74625635, -6.878914)
+
+[node name="SM_PolygonPrototype_Icon_Arrow_Small_01" parent="Demo_Objects" instance=ExtResource("28_l2gu8")]
+transform = Transform3D(3.2660205, 0, 0, 0, 3.2660203, 0, 0, 0, 3.2660203, 5.045842, -0.64625645, -4.859914)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Icon_Arrow_Small_01" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (4)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9366069, -2.7062564, -2.5489135)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.065842, -0.076256275, -5.4721937)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.41684198, -2.2080085, -5.841913)
+
+[node name="SM_PolygonPrototype_Icon_Letter_Question_01" parent="Demo_Objects" instance=ExtResource("45_0y5d5")]
+transform = Transform3D(2.1712158, 0, 0, 0, 2.171215, 0, 0, 0, 2.171215, 10.9758415, 0.37574363, 15.963087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Icon_Letter_Question_01" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Prop_Ladder_1x2_01P" parent="Demo_Objects" instance=ExtResource("26_tmyn8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.471158, -2.6892564, -4.7739134)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Ladder_1x2_01P" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P" parent="Demo_Objects" instance=ExtResource("27_4i0kq")]
+transform = Transform3D(3.627085, 0, 0, 0, 1, 0, 0, 0, 2.0380707, 1.2006421, -0.8312564, -6.8359137)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (4)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1.4482611, 0, 0, 0, 1, 1.7758422, -2.8382564, -6.9069138)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (10)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(6.598832e-08, 0, -3.770163, 0, 4.265305, 0, 0.33891055, 0, 7.3407784e-07, 1.4858422, -2.8062563, -6.591913)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (10)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (9)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(6.598832e-08, 0, -3.770163, 0, 2.980491, 0, 0.33891055, 0, 7.3407784e-07, 10.4358425, -2.7062564, -6.591913)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (3)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.3789693, 10.775843, -2.7062564, -7.017914)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (3)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(0.33891067, 0, 0, 0, 2.980491, 0, 0, 0, 3.770164, -2.2311578, -2.7062564, -6.591913)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (1)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2241578, -2.7062564, -6.9069138)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2241578, -2.7062564, -2.9069135)
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.091842, -2.7062564, -3.9399135)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_Generic_TreeDead_01" parent="Demo_Objects" instance=ExtResource("35_kyegh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.524157, -2.8862565, 5.145834)
+
+[node name="SM_Generic_Tree_02" parent="Demo_Objects" instance=ExtResource("18_a1tqc")]
+transform = Transform3D(1.3199999, 0, 0, 0, 1.3199999, 0, 0, 0, 1.3199999, -19.405157, -2.8832564, 9.387773)
+
+[node name="SM_Generic_Tree_04" parent="Demo_Objects" instance=ExtResource("47_rcd1m")]
+transform = Transform3D(1.174701, 0, 0.4160796, 0, 1.2462125, 0, -0.4160795, 0, 1.1747013, -14.634157, -2.7482564, 13.233087)
+
+[node name="SM_Character_Female_01" parent="Demo_Objects" instance=ExtResource("48_f3pbm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.716842, -2.7062564, 1.6320865)
+
+[node name="GeneralSkeleton" parent="Demo_Objects/SM_Character_Female_01" index="2"]
+bones/1/position = Vector3(4.817043e-08, 7.748604e-07, 0.8762762)
+bones/1/rotation = Quaternion(0.47939086, 0.47939128, 0.47939074, 0.55727285)
+bones/3/rotation = Quaternion(-0.098004, -5.9604645e-08, -2.9802322e-08, 0.9951861)
+bones/5/rotation = Quaternion(-0.13407624, 5.9604645e-08, 1.1920929e-07, 0.990971)
+bones/10/rotation = Quaternion(0.012269348, 0.9993142, -0.034937188, 0.00051538646)
+bones/11/rotation = Quaternion(-0.024663903, -0.7058118, 0.055237677, 0.7058118)
+bones/12/rotation = Quaternion(-0.0665601, 0.6938298, -0.18102534, 0.6938299)
+bones/13/rotation = Quaternion(-0.34862992, 0.6227132, 0.25436658, 0.65267384)
+bones/14/rotation = Quaternion(0.06936517, -7.658452e-05, 0.17059687, 0.9828964)
+bones/15/rotation = Quaternion(0.05373177, 0.18574123, -0.017513692, -0.98097205)
+bones/16/rotation = Quaternion(-0.04461904, -0.0027086884, 0.079466105, 0.99583495)
+bones/17/rotation = Quaternion(0.09468438, -1.6391277e-07, 0.02865699, 0.9950948)
+bones/18/rotation = Quaternion(1.4901161e-08, -8.940697e-08, -2.9802322e-08, 1)
+bones/20/rotation = Quaternion(-0.13607784, -0.012498349, 0.16174698, 0.97732526)
+bones/21/rotation = Quaternion(0.012298273, 4.470349e-08, 0.026116136, 0.9995833)
+bones/22/rotation = Quaternion(1.1920929e-07, 8.940697e-08, -2.0861626e-07, 1)
+bones/24/rotation = Quaternion(0.6470827, -0.3231882, -0.42981565, -0.5404553)
+bones/25/rotation = Quaternion(-0.017538145, 0.99931574, -0.032557845, -0.00050881505)
+bones/26/rotation = Quaternion(-0.0246619, 0.7058119, -0.055236846, 0.7058118)
+bones/27/rotation = Quaternion(-2.2351743e-07, -0.7071067, 1.7881393e-07, 0.7071068)
+bones/28/rotation = Quaternion(0.28055796, -0.49819717, -0.7082925, 0.41401523)
+bones/30/rotation = Quaternion(-0.036403257, 0.15203469, 0.22999534, 0.96055317)
+bones/31/rotation = Quaternion(0.3729804, -0.40589702, -0.6042688, 0.57531947)
+bones/35/rotation = Quaternion(0.4535959, -0.31654537, -0.5916324, 0.58653307)
+bones/39/rotation = Quaternion(-9.313227e-08, -0.074887656, 0.997065, 0.015917294)
+bones/40/rotation = Quaternion(0.46307114, 0.796449, -0.38856304, 0.015901193)
+bones/41/rotation = Quaternion(2.9802326e-08, 0.70710677, -0.70710677, -8.940697e-08)
+bones/42/rotation = Quaternion(-5.9604645e-08, 1.0000001, -8.940697e-08, -2.9802322e-08)
+bones/45/rotation = Quaternion(-0.43810487, 0.1385134, -0.3934594, -0.7962839)
+bones/46/rotation = Quaternion(-1.7881393e-07, 0.7071068, -0.7071068, 3.7252907e-08)
+bones/47/rotation = Quaternion(2.9802322e-08, 1, -8.940697e-08, 0)
+
+[node name="SM_Character_Male_01" parent="Demo_Objects" instance=ExtResource("49_i2pwc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6248422, -2.7062564, 1.5930865)
+
+[node name="GeneralSkeleton" parent="Demo_Objects/SM_Character_Male_01" index="2"]
+bones/1/position = Vector3(4.817043e-08, 7.748604e-07, 0.8762762)
+bones/1/rotation = Quaternion(0.47939086, 0.47939128, 0.47939074, 0.55727285)
+bones/3/rotation = Quaternion(-0.098004, -5.9604645e-08, -2.9802322e-08, 0.9951861)
+bones/5/rotation = Quaternion(-0.13308075, 2.9802322e-08, 8.940697e-08, 0.9911053)
+bones/10/rotation = Quaternion(0.012269348, 0.9993142, -0.034937188, 0.00051538646)
+bones/11/rotation = Quaternion(-0.024663903, -0.7058118, 0.055237677, 0.7058118)
+bones/12/rotation = Quaternion(-0.0665601, 0.6938298, -0.18102534, 0.6938299)
+bones/13/rotation = Quaternion(-0.34862992, 0.6227132, 0.25436658, 0.65267384)
+bones/14/rotation = Quaternion(0.06936517, -7.658452e-05, 0.17059687, 0.9828964)
+bones/15/rotation = Quaternion(0.05373177, 0.18574123, -0.017513692, -0.98097205)
+bones/16/rotation = Quaternion(-0.04461904, -0.0027086884, 0.079466105, 0.99583495)
+bones/17/rotation = Quaternion(0.09468438, -1.6391277e-07, 0.02865699, 0.9950948)
+bones/18/rotation = Quaternion(1.4901161e-08, -8.940697e-08, -2.9802322e-08, 1)
+bones/20/rotation = Quaternion(-0.13607784, -0.012498349, 0.16174698, 0.97732526)
+bones/21/rotation = Quaternion(0.012298273, 4.470349e-08, 0.026116136, 0.9995833)
+bones/22/rotation = Quaternion(1.1920929e-07, 8.940697e-08, -2.0861626e-07, 1)
+bones/24/rotation = Quaternion(0.6470827, -0.3231882, -0.42981565, -0.5404553)
+bones/25/rotation = Quaternion(-0.017538145, 0.99931574, -0.032557845, -0.00050881505)
+bones/26/rotation = Quaternion(-0.0246619, 0.7058119, -0.055236846, 0.7058118)
+bones/27/rotation = Quaternion(-2.2351743e-07, -0.7071067, 1.7881393e-07, 0.7071068)
+bones/28/rotation = Quaternion(0.28055796, -0.49819717, -0.7082925, 0.41401523)
+bones/30/rotation = Quaternion(-0.036403257, 0.15203469, 0.22999534, 0.96055317)
+bones/31/rotation = Quaternion(0.3729804, -0.40589702, -0.6042688, 0.57531947)
+bones/35/rotation = Quaternion(0.4535959, -0.31654537, -0.5916324, 0.58653307)
+bones/39/rotation = Quaternion(-9.313227e-08, -0.074887656, 0.997065, 0.015917294)
+bones/40/rotation = Quaternion(0.46307114, 0.796449, -0.38856304, 0.015901193)
+bones/41/rotation = Quaternion(2.9802326e-08, 0.70710677, -0.70710677, -8.940697e-08)
+bones/42/rotation = Quaternion(-5.9604645e-08, 1.0000001, -8.940697e-08, -2.9802322e-08)
+bones/45/rotation = Quaternion(-0.43810487, 0.1385134, -0.3934594, -0.7962839)
+bones/46/rotation = Quaternion(-1.7881393e-07, 0.7071068, -0.7071068, 3.7252907e-08)
+bones/47/rotation = Quaternion(2.9802322e-08, 1, -8.940697e-08, 0)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_Character_Male_01/GeneralSkeleton/Character_Hair_Male_01" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="Character_Male_Face_01" parent="Demo_Objects/SM_Character_Male_01/GeneralSkeleton" index="2"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.275842, -2.7062564, -1.9069135)
+
+[node name="SM_PolygonApocalypse_Bld_House_01" parent="Demo_Objects" instance=ExtResource("50_ww3x4")]
+transform = Transform3D(-5.2054855e-07, 0, 1, 0, 1, 0, -1, 0, -5.2054855e-07, -11.584158, -2.7062564, 2.6630867)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (1)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.275842, -2.7062564, 3.0930865)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (1)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (2)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2758422, -2.7062564, -1.9069135)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (3)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2758422, -2.7062564, 3.0930865)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (3)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (4)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.275842, -2.7062564, 8.093086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (4)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (5)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(0.09339711, 0, 0, 0, 1, 0, 0, 0, 1, -3.2241578, -2.7062564, 8.093086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (5)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (6)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.275843, -2.7062564, -1.9069135)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (7)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.275843, -2.7062564, 3.0930865)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (7)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (8)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.275843, -2.7062564, 8.093086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (8)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonCity_Veh_Car_Small_01" parent="Demo_Objects" instance=ExtResource("51_mpq4b")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7158422, -2.7062564, 6.0730867)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonCity_Veh_Car_Small_01" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonCity_Veh_Car_Small_01/SM_PolygonCity_Veh_Car_Small_Wheel_rl" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Prop_Cone_01" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.9658422, -2.7062564, 8.403087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (1)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6558423, -2.7062564, 8.453086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (1)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (11)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.275843, -2.7062564, 13.093086)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (14)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.275843, -2.7062564, 18.093086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (14)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (2)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.045842, -2.7062564, 12.443087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (2)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (3)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.815842, -2.7062564, 19.823086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (3)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (15)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.7241578, -2.7062564, -1.9069135)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (16)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.7241578, -2.7062564, 3.0930865)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (16)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (17)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.7241578, -2.7062564, 8.093086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (17)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (18)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.724157, -2.7062564, 3.0930865)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (19)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.724157, -2.7062564, 8.093086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (19)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (20)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.724157, -2.7062564, 3.0930865)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (20)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (21)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.724157, -2.7062564, 8.093086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (21)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (22)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.275842, -2.7062564, -6.9069138)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (23)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2758422, -2.7062564, -6.9069138)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (24)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.275843, -2.7062564, -6.9069138)
+
+[node name="SM_Generic_Ground_Flat_01" parent="Demo_Objects" instance=ExtResource("30_us5ax")]
+transform = Transform3D(1.5344068, 0, 0, 0, 1, 0, 0, 0, 1.6135278, -15.384157, -2.7062564, 23.663086)
+
+[node name="SM_Generic_Ground_Flat_01 (2)" parent="Demo_Objects" instance=ExtResource("30_us5ax")]
+transform = Transform3D(1.5344068, 0, 0, 0, 1, 0, 0, 0, 1.6135278, -22.814157, -2.7062564, 37.863087)
+
+[node name="SM_Generic_Mountains_Grass_02 (1)" parent="Demo_Objects" instance=ExtResource("20_yu18x")]
+transform = Transform3D(-1.6413995, 0, 1.3878156, 0, 1.4433825, 0, -1.9570123, 0, -1.1639986, -24.465696, -3.1090865, 29.552973)
+
+[node name="SM_Generic_Mountains_Grass_02 (2)" parent="Demo_Objects" instance=ExtResource("20_yu18x")]
+transform = Transform3D(1.4106593, 0, 1.9526768, 0, 1.0506293, 0, -2.0495958, 0, 1.3439536, -8.696426, -3.2162564, 40.63459)
+
+[node name="SM_Generic_Mountains_Grass_02 (3)" parent="Demo_Objects" instance=ExtResource("20_yu18x")]
+transform = Transform3D(2.3455431, 0, -0.76934034, 0, 2.3045232, 0, 0.76934034, 0, 2.3455431, -19.262463, -2.6962562, 41.476128)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (25)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.7241578, -2.7062564, -6.9069138)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (25)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (26)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.724157, -2.7062564, -6.9069138)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (26)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (27)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.724157, -2.7062564, -6.9069138)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (27)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (28)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.724157, -2.7062564, -1.9069135)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (28)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_WallDoor_2x3_01P" parent="Demo_Objects" instance=ExtResource("23_ar4ps")]
+transform = Transform3D(5.9604645e-08, 0, 1, 0, 1, 0, -1, 0, 5.9604645e-08, 10.775843, -2.7062564, 0.5930865)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_WallDoor_2x3_01P" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_WallWindow_2x3_01P" parent="Demo_Objects" instance=ExtResource("24_7npq1")]
+transform = Transform3D(-5.2054855e-07, 0, 1, 0, 1, 0, -1, 0, -5.2054855e-07, 10.775843, -2.7062564, 2.5930865)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_WallWindow_2x3_01P" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (1)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 3.0258422, -2.7062564, -6.9069138)
+
+[node name="SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P" parent="Demo_Objects" instance=ExtResource("37_1evsx")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 3.0258422, -2.7062564, -4.9069138)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (2)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 7.025842, -0.7062564, -6.9069138)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (2)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (1)" parent="Demo_Objects" instance=ExtResource("37_1evsx")]
+transform = Transform3D(1.509958e-07, 0, -2, 0, 2, 0, 2, 0, 1.509958e-07, 5.025842, -0.7062564, -4.9069138)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (1)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (4)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 5.025842, -2.7062564, -6.9069138)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (4)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (5)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 7.025842, -2.7062564, -6.9069138)
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (1)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(1.9712965, 0, 2.235174e-06, 0, 1, 0, -4.406191e-06, 0, 1, 9.012942, -2.7062564, -1.9069151)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (1)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (2)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(1.9712965, 0, 2.235174e-06, 0, 1, 0, -4.406191e-06, 0, 1, 9.012942, -2.2062564, -2.9069135)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (2)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (3)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(1.9712965, 0, 2.235174e-06, 0, 1, 0, -4.406191e-06, 0, 1, 9.012942, -1.7062564, -3.9069135)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (3)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (6)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-1.9712965, 0, -1.1046701e-06, 0, 1, 0, 2.1776323e-06, 0, -1, 7.0416923, -2.7062564, -3.9069135)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (6)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (7)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-1.9712965, 0, -1.1046701e-06, 0, 1, 0, 2.1776323e-06, 0, -1, 7.0416923, -3.2062564, -2.9069135)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (7)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (11)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 9.025843, -2.7062564, -6.9069138)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (12)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(1.5484463, 0, 0, 0, 2, 0, 0, 0, 2, 10.591542, -2.7062564, -6.9069138)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (12)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (13)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 11.915842, -2.7062564, 14.843086)
+
+[node name="SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (2)" parent="Demo_Objects" instance=ExtResource("37_1evsx")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 11.915842, -2.7062564, 16.843086)
+
+[node name="SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (3)" parent="Demo_Objects" instance=ExtResource("37_1evsx")]
+transform = Transform3D(-2, 0, -2.2093402e-06, 0, 2, 0, 2.2093402e-06, 0, -2, 9.915842, -2.7062564, 14.843086)
+
+[node name="SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (4)" parent="Demo_Objects" instance=ExtResource("37_1evsx")]
+transform = Transform3D(3.488856e-06, 0, -2, 0, 1.3857871, 0, 2, 0, 3.488856e-06, 9.915842, -2.7062564, 16.843086)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (1)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.645842, -0.076256275, -5.4721937)
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (5)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(0.80988294, 0, 0.58659154, 0, 1, 0, -0.58659154, 0, 0.80988294, 11.746283, -2.7062564, 20.141235)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (5)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (6)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(0.80988294, 0, 0.58659154, 0, 1, 0, -0.58659154, 0, 0.80988294, 8.595842, -2.7062564, 22.423086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (6)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (7)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(-0.046903487, 0, 0.9988994, 0, 1, 0, -0.9988994, 0, -0.046903487, 9.465842, -2.7062564, 21.233086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (7)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Prop_Cone_01 (8)" parent="Demo_Objects" instance=ExtResource("16_ifkb5")]
+transform = Transform3D(-0.046903487, 0, 0.9988994, 0, 1, 0, -0.9988994, 0, -0.046903487, 9.6483, -2.7062564, 25.118813)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (8)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (31)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.275843, -2.7062564, 23.093086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (31)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Prop_Target_03 (1)" parent="Demo_Objects" instance=ExtResource("22_oxoyt")]
+transform = Transform3D(-3.6064528e-06, 0, -2.2633247, 0, 2.2633238, 0, 2.2633238, 0, -3.6064544e-06, 16.095846, 0.25574327, 8.083086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Target_03 (1)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Prop_Target_03 (2)" parent="Demo_Objects" instance=ExtResource("22_oxoyt")]
+transform = Transform3D(-3.6064528e-06, 0, -2.2633247, 0, 2.2633238, 0, 2.2633238, 0, -3.6064544e-06, 16.095842, 1.8337436, 9.143086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Target_03 (2)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (15)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2.5587044e-08, 0, -3.770164, 0, 2.980491, 0, 0.33891067, 0, 2.8463947e-07, 16.265842, -2.7062564, 28.163086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (15)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (16)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2.5587044e-08, 0, -3.770164, 0, 2.980491, 0, 0.33891067, 0, 2.8463947e-07, 12.515842, -2.7062564, 28.163086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (16)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (6)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.775843, -2.7062564, 27.848085)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (6)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (7)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.775843, -2.7062564, 27.848085)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (7)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (8)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.525843, -2.7062564, 20.093086)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (32)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.275843, -2.7062564, 18.093086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (32)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (33)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.275843, -2.7062564, 23.093086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (33)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (18)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(0.33891067, 0, 0, 0, 2.980491, 0, 0, 0, 3.770164, 16.515842, -2.7062564, 16.413086)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (10)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.525843, -2.7062564, 16.093086)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (11)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.525843, -2.7062564, 12.093086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (20)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(0.33891067, 0, 0, 0, 2.980491, 0, 0, 0, 3.770164, 16.515842, -2.7062564, 8.413086)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (12)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.525843, -2.7062564, 8.093086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (21)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(0.33891067, 0, 0, 0, 2.980491, 0, 0, 0, 3.770164, 16.515842, -2.7062564, 4.413087)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (13)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.525843, -2.7062564, 4.093087)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (23)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(0.33891067, 0, 0, 0, 2.980491, 0, 0, 0, 3.770164, 16.515842, -2.7062564, 0.4130864)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (14)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.525843, -2.7062564, 0.09308696)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (34)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.275843, -2.7062564, 8.093086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (34)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (35)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.275843, -2.7062564, 13.093086)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (36)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.275843, -2.7062564, -1.9069135)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (37)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.275843, -2.7062564, 3.0930865)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (37)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P (38)" parent="Demo_Objects" instance=ExtResource("14_7l41w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.275843, -2.7062564, -6.9069138)
+
+[node name="SM_Generic_Small_Rocks_02 (1)" parent="Demo_Objects" instance=ExtResource("39_aef6y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.764158, -2.7062564, 10.973086)
+
+[node name="SM_Generic_CloudRing_01" parent="Demo_Objects" instance=ExtResource("52_2lerr")]
+transform = Transform3D(0.07629604, 0, 0.075077966, 0, 0.10704108, 0, -0.07507791, 0, 0.07629608, 7.275842, 0.49374366, 12.693087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_Generic_CloudRing_01" index="0"]
+cast_shadow = 0
+surface_material_override/0 = ExtResource("53_2glsm")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (4)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(-2, 0, -5.8730416e-06, 0, 1, 0, 1.1746083e-05, 0, -1, 10.998823, -2.7062564, 20.913095)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (4)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (5)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(2, 0, 4.589557e-06, 0, 1, 0, -9.179114e-06, 0, 1, 12.998842, -2.7062564, 24.913082)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (5)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (32)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-2, 0, -1.1746083e-05, 0, 0.7365206, 0, 1.1746083e-05, 0, -2, 10.9988365, -2.7062564, 23.913094)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (32)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (33)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-1.7641939e-07, 0, -1.5240378, 0, 2.980491, 0, 0.33891055, 0, -7.933357e-07, -2.484158, -2.7062564, -2.5969136)
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (6)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(1.1595088e-05, 0, -1.1564908, 0, 1, 0, 2, 0, 6.7048063e-06, 12.908838, -1.9622564, 23.906082)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (6)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (34)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-1.0057199, 0, -1.1746083e-05, 0, 0.7365206, 0, 5.9066347e-06, 0, -2, 13.011835, -2.7062564, 23.913084)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (34)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (7)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(4.613769e-06, 0, -1, 0, 1, 0, 1.9712965, 0, 2.3404743e-06, 11.025845, -2.7062564, 27.833084)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (7)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (8)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(4.613769e-06, 0, -1, 0, 1, 0, 1.9712965, 0, 2.3404743e-06, 12.025843, -2.2062564, 27.833086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (8)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (9)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(4.613769e-06, 0, -1, 0, 1, 0, 1.9712965, 0, 2.3404743e-06, 13.025845, -1.7062564, 27.833086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (9)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (35)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-2.6711334e-06, 0, 1, 0, 1, 0, -1.9712965, 0, -1.3550135e-06, 13.025843, -2.7062564, 25.861837)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (35)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (36)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-2.6711334e-06, 0, 1, 0, 1, 0, -1.9712965, 0, -1.3550135e-06, 12.025844, -3.2062564, 25.861837)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (36)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (37)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 16.025843, -3.1682563, 25.843086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (37)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (38)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 16.025843, -3.1682563, 23.843086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (38)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (39)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(1.8199258e-06, 0, -2, 0, 2, 0, 2, 0, 1.8199258e-06, 16.025843, -3.1682563, 23.843086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (39)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (40)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 16.025843, -3.1682563, 19.843086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (40)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (10)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(-1.9712965, 0, -2.5351817e-06, 0, 1, 0, 4.9975947e-06, 0, -1, 14.035845, -2.7062564, 16.84309)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (10)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (11)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(-1.9712965, 0, -2.5351817e-06, 0, 1, 0, 4.9975947e-06, 0, -1, 14.035843, -2.2062564, 17.843086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (11)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (12)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(-1.9712965, 0, -2.5351817e-06, 0, 1, 0, 4.9975947e-06, 0, -1, 14.035841, -1.7062564, 18.84309)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (12)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (41)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(1.9712965, 0, 1.4305114e-06, 0, 1, 0, -2.8199622e-06, 0, 1, 16.007092, -2.7062564, 18.843088)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (41)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (42)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(1.9712965, 0, 1.4305114e-06, 0, 1, 0, -2.8199622e-06, 0, 1, 16.007092, -3.2062564, 17.84309)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (42)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (43)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 0.46001655, 0, 0, 0, 2, -5.1741576, -2.2062564, 16.323086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (43)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (44)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 0.46001655, 0, 0, 0, 2, -7.9241576, -1.2062564, 16.323086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (44)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (45)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 0.46001655, 0, 0, 0, 2, -10.924158, -0.20625639, 16.323086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (45)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (2)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.2521577, -1.3672564, 17.273087)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (3)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.915157, -0.38725638, 17.273087)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (4)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.937157, 0.70274353, 17.273087)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (5)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(5.9604645e-08, 0, -1, 0, 1, 0, 1, 0, 5.9604645e-08, -11.937157, 1.7467437, 17.273087)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01 (6)" parent="Demo_Objects" instance=ExtResource("19_rsbnb")]
+transform = Transform3D(0.96592593, 0, -0.2588186, 0, 1, 0, 0.2588186, 0, 0.96592593, -11.937157, 2.7467437, 17.273087)
+
+[node name="SM_Generic_Tree_04 (1)" parent="Demo_Objects" instance=ExtResource("47_rcd1m")]
+transform = Transform3D(0.79099184, 0, -0.9630044, 0, 1.2462125, 0, 0.9630044, 0, 0.79099184, -5.8841577, -2.7482564, 23.893085)
+
+[node name="SM_Generic_Tree_04 (2)" parent="Demo_Objects" instance=ExtResource("47_rcd1m")]
+transform = Transform3D(-0.51989496, 0, 0.8013336, 0, 0.95521, 0, -0.8013332, 0, -0.5198952, -5.444158, -4.0962563, 22.333086)
+
+[node name="SM_Generic_Tree_04 (3)" parent="Demo_Objects" instance=ExtResource("47_rcd1m")]
+transform = Transform3D(0.5924542, 0, 0.7492822, 0, 0.95521, 0, -0.74928176, 0, 0.5924545, -7.434158, -4.1662564, 24.073086)
+
+[node name="SM_Generic_Small_Rocks_02 (3)" parent="Demo_Objects" instance=ExtResource("39_aef6y")]
+transform = Transform3D(1, 0, 0, 0, 0.99869704, 0.051032107, 0, -0.051032107, 0.99869704, -8.032158, -2.5032563, 16.051086)
+
+[node name="SM_PolygonPrototype_Buildings_WallWindow_2x3_01P (1)" parent="Demo_Objects" instance=ExtResource("24_7npq1")]
+transform = Transform3D(1, 0, 4.4703478e-07, 0, 1, 0, -4.4703478e-07, 0, 1, 10.825842, -2.7062564, 4.543086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_WallWindow_2x3_01P (1)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_WallWindow_2x3_01P (2)" parent="Demo_Objects" instance=ExtResource("24_7npq1")]
+transform = Transform3D(-2.8212997e-07, 0, 1, 0, 1, 0, -1, 0, -2.8212997e-07, 8.775843, -2.7062564, 4.5930862)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_WallWindow_2x3_01P (2)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Prop_Crate_03 (7)" parent="Demo_Objects" instance=ExtResource("17_3yhtd")]
+transform = Transform3D(0.9679045, 0, 0.2513183, 0, 1, 0, -0.2513183, 0, 0.9679045, -4.614158, -2.2092564, 6.2730865)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (7)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (81)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 18.025843, -3.1682563, 25.843086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (81)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (82)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 18.025843, -3.1682563, 23.843086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (82)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (83)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(1.8199258e-06, 0, -2, 0, 2, 0, 2, 0, 1.8199258e-06, 18.025843, -3.1682563, 23.843086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (83)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (84)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 1.399808, 18.025843, -3.1682563, 20.441086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (84)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (85)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 20.025843, -3.1682563, 25.843086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (85)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (86)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 20.025843, -3.1682563, 23.843086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (86)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (87)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(1.8199258e-06, 0, -2, 0, 2, 0, 2, 0, 1.8199258e-06, 20.025843, -3.1682563, 23.843086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (87)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (88)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 1.399808, 20.025843, -3.1682563, 20.441086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (88)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (17)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2.5587044e-08, 0, -3.770164, 0, 2.980491, 0, 0.33891067, 0, 2.8463947e-07, 20.015842, -2.7062564, 28.163086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (17)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (24)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(0.33891067, 0, -3.5955081e-06, 0, 2.980491, 0, 3.2321037e-07, 0, 3.770164, 20.295843, -2.7062564, 24.363087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (24)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (25)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(0.33891067, 0, -3.5955081e-06, 0, 2.980491, 0, 3.2321037e-07, 0, 3.770164, 20.295843, -2.7062564, 20.363087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (25)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (89)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-5.521556e-08, 0, 3.770164, 0, 2.980491, 0, -0.33891067, 0, -6.142377e-07, 16.490843, -2.7062564, 20.083086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (89)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (9)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1.6157848, 0, 0, 0, 1.0813924, 0, 0, 0, 1.3723286, 20.398842, -2.8283465, 20.019087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (9)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (15)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1.6157848, 0, 0, 0, 1.0813924, 0, 0, 0, 1.3723286, 20.398842, -2.8283465, 24.020086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (15)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (17)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1.6157848, 0, 0, 0, 1.0813924, 0, 0, 0, 1.3723286, 20.398842, -2.8283465, 27.729086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (17)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (18)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1.6157848, 0, 0, 0, 1.0813924, 0, 0, 0, 1.3723286, 16.525843, -2.8283465, 27.729086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (18)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (13)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(1.9712965, 0, 7.7486027e-07, 0, 1, 0, -1.5274794e-06, 0, 1, 19.985834, -1.2062564, 23.37309)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (13)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (14)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(1.9712965, 0, 7.7486027e-07, 0, 1, 0, -1.5274794e-06, 0, 1, 19.985842, -0.7062564, 22.373087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (14)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P (15)" parent="Demo_Objects" instance=ExtResource("46_xhh7n")]
+transform = Transform3D(1.9712965, 0, 7.7486027e-07, 0, 1, 0, -1.5274794e-06, 0, 1, 19.985846, -0.20625639, 21.373087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (15)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (90)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-1.9712965, 0, -1.509958e-07, 0, 1, 0, 2.976575e-07, 0, -1, 18.014599, -1.2062564, 21.37308)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (90)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (91)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(-1.9712965, 0, -1.509958e-07, 0, 1, 0, 2.976575e-07, 0, -1, 18.014591, -1.7062564, 22.37308)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (91)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (92)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(0.72642803, 0, 0, 0, 0.33808175, 0, 0, 0, 4.6945553, 19.335842, -0.1652565, 15.573086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (93)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(0.72642803, 0, 0, 0, 0.33808175, 0, 0, 0, 4.6945553, 19.335842, -0.1652565, 10.856086)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (94)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(1.1550457, 0, 0, 0, 0.33808175, 0, 0, 0, 1.3053646, 19.549843, -0.1652565, 8.957087)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (94)" index="0"]
+surface_material_override/0 = ExtResource("15_qr1pt")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (95)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(1.1550457, 0, 0, 0, 0.33808175, 0, 0, 0, 1.3053646, 19.549843, -0.04425645, 6.328086)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (95)" index="0"]
+surface_material_override/0 = ExtResource("33_y7rfq")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (96)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(1.1550457, 0, 0, 0, 0.33808175, 0, 0, 0, 1.3053646, 19.549843, 0.039743662, 3.7660863)
+
+[node name="MeshRenderer" parent="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (96)" index="0"]
+surface_material_override/0 = ExtResource("7_5ocp2")
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (97)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(1.1550457, 0, 0, 0, 0.33808175, 0, 0, 0, 1.3053646, 19.549843, 0.19574356, 0.9810865)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P (98)" parent="Demo_Objects" instance=ExtResource("29_57st1")]
+transform = Transform3D(2, 0, 0, 0, 0.47685266, 0, 0, 0, 2, 18.185843, 0.4037435, 0.56308675)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (20)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.165842, -2.9962564, 15.303085)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (21)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.165842, -2.9962564, 11.083086)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (22)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.165842, -3.0002563, 9.452086)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (23)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.165842, -2.9452565, 6.849086)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (24)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.165842, -2.8342564, 4.144087)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (25)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.165842, -2.6862564, 1.4070864)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P (26)" parent="Demo_Objects" instance=ExtResource("25_s37wt")]
+transform = Transform3D(1, 0, 0, 0, 1.1451601, 0, 0, 0, 1, 17.477842, -2.7252564, 1.4070864)
+
+[node name="SM_Generic_Mountains_Grass_02 (7)" parent="Demo_Objects" instance=ExtResource("20_yu18x")]
+transform = Transform3D(1.445905, 0, 0.84631807, 0, 0.8120262, 0, -1.0552225, 0, 1.1596563, -20.634157, -3.1962564, -8.676913)
+
+[node name="Lights" type="Node3D" parent="."]
+transform = Transform3D(-0.673971, -0.42714188, 0.6027544, -0.56145966, -0.23410812, -0.79369795, 0.48013136, -0.8733517, -0.08204086, 0, 5, 0)
+
+[node name="Directional Light" type="Node3D" parent="Lights"]
+transform = Transform3D(-0.049603384, -0.43144175, 0.13667312, 0.14527771, 0.11503571, 0.41586435, -0.42862076, 0.088920325, 0.12513712, 1.9607847, 1.1546874, 0.5501962)
+
+[node name="Light" type="DirectionalLight3D" parent="Lights/Directional Light"]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+light_color = Color(1, 0.95686275, 0.8392157, 1)
+light_bake_mode = 0
+shadow_enabled = true
+shadow_bias = 0.05
+shadow_normal_bias = 0.0
+
+[node name="Directional Light (1)" type="Node3D" parent="Lights"]
+transform = Transform3D(1, 2.235174e-08, 0, -2.235174e-08, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Light" type="DirectionalLight3D" parent="Lights/Directional Light (1)"]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+light_color = Color(0.8014706, 0.86855984, 1, 1)
+light_energy = 0.27
+light_bake_mode = 0
+shadow_bias = 0.05
+shadow_normal_bias = 0.4
+
+[node name="Main Camera" type="Node3D" parent="."]
+transform = Transform3D(-0.89940065, 0.08753704, 0.4282706, -1.5646219e-07, 0.9797435, -0.20025653, -0.4371252, -0.18011093, -0.8811819, -9.475063, 4.118261, 17.491535)
+
+[node name="Camera" type="Camera3D" parent="Main Camera"]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+cull_mask = 16777215
+current = true
+fov = 60.0
+near = 0.3
+far = 1000.0
+
+[node name="Global Volume" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4636705, 2.311544, 0.54421115)
+
+[editable path="SM_SimpleSky_Dome_01"]
+[editable path="Demo_Objects/SM_Bean_Town_Female_01 (1)"]
+[editable path="Demo_Objects/SM_Bean_Female_01 (1)"]
+[editable path="Demo_Objects/SM_Bean_Cop_01 (1)"]
+[editable path="Demo_Objects/SM_Bean_Cowboy_01 (1)"]
+[editable path="Demo_Objects/SM_Prop_Plane_Ring_01 (5)"]
+[editable path="Demo_Objects/SM_Generic_Small_Rocks_05 (1)"]
+[editable path="Demo_Objects/SM_Generic_Ground_01 (11)"]
+[editable path="Demo_Objects/SM_Wep_Watergun_01"]
+[editable path="Demo_Objects/SM_Wep_WaterPistol_01"]
+[editable path="Demo_Objects/SM_Wep_Watergun_02"]
+[editable path="Demo_Objects/SM_Wep_Shield_04"]
+[editable path="Demo_Objects/SM_Prop_Plane_Ring_01 (4)"]
+[editable path="Demo_Objects/SM_Generic_Ground_01 (10)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (13)"]
+[editable path="Demo_Objects/SM_Generic_Ground_01 (9)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (12)"]
+[editable path="Demo_Objects/SM_Generic_Ground_01 (8)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (10)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (9)"]
+[editable path="Demo_Objects/SM_Generic_Ground_01 (7)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (15)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (15)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (14)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (27)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (28)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (25)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (26)"]
+[editable path="Demo_Objects/SM_Generic_Ground_01 (5)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (18)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (17)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (16)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (15)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (14)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (13)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (12)"]
+[editable path="Demo_Objects/SM_Generic_Mountains_Grass_02 (6)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (11)"]
+[editable path="Demo_Objects/SM_Generic_Tree_01 (3)"]
+[editable path="Demo_Objects/SM_Generic_Tree_01 (2)"]
+[editable path="Demo_Objects/SM_Generic_Tree_01 (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Target_03 (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_WallDoor_2x3_01P (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_WallWindow_2x3_01P (3)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (24)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (23)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (19)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (22)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (5)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (21)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Ladder_1x2_01P (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (14)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (15)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (18)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (17)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (16)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (20)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (19)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (14)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (13)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (12)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (11)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (10)"]
+[editable path="Demo_Objects/SM_Generic_Ground_01 (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (9)"]
+[editable path="Demo_Objects/SM_Generic_Ground_01 (3)"]
+[editable path="Demo_Objects/SM_Generic_Ground_01 (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Target_03 (3)"]
+[editable path="Demo_Objects/SM_Generic_Ground_01 (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (10)"]
+[editable path="Demo_Objects/SM_Generic_Ground_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Arrow_Small_01 (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (19)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_WallDoor_2x3_01P (1)"]
+[editable path="Demo_Objects/SM_Generic_Ground_Flat_01 (3)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (12)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (13)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (11)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (10)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (9)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (8)"]
+[editable path="Demo_Objects/SM_Generic_Mountains_Grass_02 (5)"]
+[editable path="Demo_Objects/SM_Generic_Mountains_Soft_01 (3)"]
+[editable path="Demo_Objects/SM_Generic_Mountains_Grass_02 (4)"]
+[editable path="Demo_Objects/SM_Generic_Ground_Flat_01 (1)"]
+[editable path="Demo_Objects/SM_Generic_Mountains_Soft_01 (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Ladder_1x2_01P (3)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Ladder_1x2_01P (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (9)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (8)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (7)"]
+[editable path="Demo_Objects/SM_Bld_Door_01 (1)"]
+[editable path="Demo_Objects/SM_Generic_Small_Rocks_05"]
+[editable path="Demo_Objects/SM_Generic_Tree_03 (1)"]
+[editable path="Demo_Objects/SM_Generic_Tree_01"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (14)"]
+[editable path="Demo_Objects/SM_Generic_TreeDead_01 (1)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (13)"]
+[editable path="Demo_Objects/SM_Generic_Tree_03"]
+[editable path="Demo_Objects/SM_Generic_TreeStump_01"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (11)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (12)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (6)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (5)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (10)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (9)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (8)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (7)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (77)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (78)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (76)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (80)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (79)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (71)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (73)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (75)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (72)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (74)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (66)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (68)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (67)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (70)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (69)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (65)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (64)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (62)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (61)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (63)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (6)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (58)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (57)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (60)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (59)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (56)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (52)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (54)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (55)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (51)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (53)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (5)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (50)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (49)"]
+[editable path="Demo_Objects/SM_Generic_Tree_02 (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (48)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (47)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (46)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (9)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (8)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (7)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (6)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (5)"]
+[editable path="Demo_Objects/SM_Generic_Mountains_Soft_01 (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (13)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (12)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (11)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (10)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (9)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (8)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (7)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (6)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (5)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (3)"]
+[editable path="Demo_Objects/SM_Generic_Small_Rocks_01"]
+[editable path="Demo_Objects/SM_Generic_Small_Rocks_02 (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (4)"]
+[editable path="Demo_Objects/SM_Generic_Mountains_Soft_01 (1)"]
+[editable path="Demo_Objects/SM_Generic_Mountains_Soft_01"]
+[editable path="Demo_Objects/SM_Prop_Plane_Ring_01 (3)"]
+[editable path="Demo_Objects/SM_Prop_Plane_Ring_01 (2)"]
+[editable path="Demo_Objects/SM_Prop_Plane_Ring_01 (1)"]
+[editable path="Demo_Objects/SM_Prop_Plane_Ring_01"]
+[editable path="Demo_Objects/SM_Veh_Plane_Stunt_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (3)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (16)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (2)"]
+[editable path="Demo_Objects/SM_Bean_Female_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (31)"]
+[editable path="Demo_Objects/SM_Generic_Small_Rocks_02"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Ladder_1x2_01P (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (30)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (29)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (28)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Primitive_Sphere_01P"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (27)"]
+[editable path="Demo_Objects/SM_Bean_Town_Female_01"]
+[editable path="Demo_Objects/SM_Bean_Cowboy_01"]
+[editable path="Demo_Objects/SM_Bean_Cop_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (26)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (22)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Sword_01 (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Target_03"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Sword_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Primitive_Tube_01P"]
+[editable path="Demo_Objects/SM_Bld_Door_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_DoorFrame_01P"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Arrow_Small_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Letter_Question_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Ladder_1x2_01P"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_1x1_01P"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (10)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (9)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (3)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (3)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P"]
+[editable path="Demo_Objects/SM_Generic_TreeDead_01"]
+[editable path="Demo_Objects/SM_Generic_Tree_02"]
+[editable path="Demo_Objects/SM_Generic_Tree_04"]
+[editable path="Demo_Objects/SM_Character_Female_01"]
+[editable path="Demo_Objects/SM_Character_Male_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P"]
+[editable path="Demo_Objects/SM_PolygonApocalypse_Bld_House_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (3)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (5)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (6)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (7)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (8)"]
+[editable path="Demo_Objects/SM_PolygonCity_Veh_Car_Small_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (11)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (14)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (3)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (15)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (16)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (17)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (18)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (19)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (20)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (21)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (22)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (23)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (24)"]
+[editable path="Demo_Objects/SM_Generic_Ground_Flat_01"]
+[editable path="Demo_Objects/SM_Generic_Ground_Flat_01 (2)"]
+[editable path="Demo_Objects/SM_Generic_Mountains_Grass_02 (1)"]
+[editable path="Demo_Objects/SM_Generic_Mountains_Grass_02 (2)"]
+[editable path="Demo_Objects/SM_Generic_Mountains_Grass_02 (3)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (25)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (26)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (27)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (28)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_WallDoor_2x3_01P"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_WallWindow_2x3_01P"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (5)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (3)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (6)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (7)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (11)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (12)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (13)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (3)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (5)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (6)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (7)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Cone_01 (8)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (31)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Target_03 (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Target_03 (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (15)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (16)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (6)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (7)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (8)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (32)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (33)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (18)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (10)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (11)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (20)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (12)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (21)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (13)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (23)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (14)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (34)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (35)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (36)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (37)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Floor_5x5_01P (38)"]
+[editable path="Demo_Objects/SM_Generic_Small_Rocks_02 (1)"]
+[editable path="Demo_Objects/SM_Generic_CloudRing_01"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (5)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (32)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (33)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (6)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (34)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (7)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (8)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (9)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (35)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (36)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (37)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (38)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (39)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (40)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (10)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (11)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (12)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (41)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (42)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (43)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (44)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (45)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (3)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (4)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (5)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Icon_Coin_01 (6)"]
+[editable path="Demo_Objects/SM_Generic_Tree_04 (1)"]
+[editable path="Demo_Objects/SM_Generic_Tree_04 (2)"]
+[editable path="Demo_Objects/SM_Generic_Tree_04 (3)"]
+[editable path="Demo_Objects/SM_Generic_Small_Rocks_02 (3)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_WallWindow_2x3_01P (1)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_WallWindow_2x3_01P (2)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Prop_Crate_03 (7)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (81)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (82)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (83)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (84)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (85)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (86)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (87)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (88)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (17)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (24)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (25)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (89)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (9)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (15)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (17)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (18)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (13)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (14)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Stairs_1x1_01P (15)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (90)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (91)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (92)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (93)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (94)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (95)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (96)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (97)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Block_1x1_01P (98)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (20)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (21)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (22)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (23)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (24)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (25)"]
+[editable path="Demo_Objects/SM_PolygonPrototype_Buildings_Column_2x3_01P (26)"]
+[editable path="Demo_Objects/SM_Generic_Mountains_Grass_02 (7)"]
+

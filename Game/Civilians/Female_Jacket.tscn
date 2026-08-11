@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Game/Units/Civilian.gd" id="1_rygy2"]
+[ext_resource type="PackedScene" path="res://Game/Characters/Female_Jacket.tscn" id="2_talq2"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_m275e"]
+radius = 0.3
+height = 1.8
+
+[node name="Civilian" type="CharacterBody3D" unique_id=937634381]
+collision_layer = 128
+script = ExtResource("1_rygy2")
+display_name = "Female Jacket"
+
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=435380415]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_m275e")
+
+[node name="NavigationAgent" type="NavigationAgent3D" parent="." unique_id=770564575]
+path_desired_distance = 0.5
+target_desired_distance = 0.7
+navigation_layers = 2
+
+[node name="Character" type="Node3D" parent="." unique_id=524726384 instance=ExtResource("2_talq2")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)

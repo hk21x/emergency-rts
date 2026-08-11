@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://if28rqlc72x5"]
+
+[ext_resource type="ArrayMesh" uid="uid://bdb0pfygm3joi" path="res://Assets/Synty/PolygonStarter/Models/extracted/SM_PolygonPrototype_Primitive_Sphere_01P.res" id="1_v4tc6"]
+[ext_resource type="Material" uid="uid://bprw8jx500qd0" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_01_mat.tres" id="2_kr4vv"]
+[ext_resource type="Shape3D" uid="uid://cwp23cii70nqi" path="res://Assets/Synty/PolygonStarter/Models/Collision/extracted/SM_Primitive_Sphere_02.res" id="3_kr4vv"]
+
+[node name="SM_PolygonPrototype_Primitive_Sphere_01P" type="MeshInstance3D"]
+gi_mode = 2
+mesh = ExtResource("1_v4tc6")
+surface_material_override/0 = ExtResource("2_kr4vv")
+
+[node name="MeshCollider" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider"]
+shape = ExtResource("3_kr4vv")

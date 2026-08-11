@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://cqccqqg1hpul4"]
+
+[ext_resource type="ArrayMesh" uid="uid://d2m0uvnhrgb05" path="res://Assets/Synty/PolygonStarter/Models/extracted/SM_PolygonPrototype_Buildings_Floor_1x1_01P.res" id="1_qokgo"]
+[ext_resource type="Material" uid="uid://bprw8jx500qd0" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_01_mat.tres" id="2_bd8ec"]
+[ext_resource type="Shape3D" uid="uid://n7j1aesh4sqh" path="res://Assets/Synty/PolygonStarter/Models/Collision/extracted/SM_Buildings_Floor_1x1_01.res" id="3_bd8ec"]
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P" type="MeshInstance3D"]
+gi_mode = 2
+mesh = ExtResource("1_qokgo")
+surface_material_override/0 = ExtResource("2_bd8ec")
+
+[node name="BoxCollider" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoxCollider"]
+shape = ExtResource("3_bd8ec")

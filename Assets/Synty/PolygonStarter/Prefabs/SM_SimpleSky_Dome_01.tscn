@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://dlqr2jtr2ahr5"]
+
+[ext_resource type="ArrayMesh" uid="uid://bk3b8kkpft7y0" path="res://assets/Synty/PolygonStarter/Models/extracted/SM_SimpleSky_Dome_01.res" id="1_wutor"]
+[ext_resource type="Material" uid="uid://bao083vado4cf" path="res://Assets/Synty/PolygonStarter/Materials/Misc/PolygonStarter_SimpleSky_01_mat.tres" id="2_wyg2h"]
+
+[node name="SM_SimpleSky_Dome_01" type="MeshInstance3D"]
+gi_mode = 2
+mesh = ExtResource("1_wutor")
+surface_material_override/0 = ExtResource("2_wyg2h")

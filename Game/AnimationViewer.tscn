@@ -1,0 +1,86 @@
+; Standalone animation viewer. Run with:
+;   godot --path . res://Game/AnimationViewer.tscn
+
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Game/AnimationViewer.gd" id="1_script"]
+[ext_resource type="Environment" path="res://Assets/Synty/PolygonStarter/Materials/WorldEnvironmentLighting.tres" id="2_env"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonStarter/Models/extracted/SM_PolygonPrototype_Buildings_Floor_5x5_01P.res" id="3_floor"]
+; Mat_04 (orange) rather than Mat_01 (blue): the character is blue, and blue-on-blue
+; makes the silhouette hard to read, which is the whole point of this scene.
+[ext_resource type="Material" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_04_mat.tres" id="4_mat"]
+[ext_resource type="PackedScene" path="res://Game/Characters/Character.tscn" id="5_character"]
+
+[node name="AnimationViewer" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("2_env")
+
+[node name="KeyLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.57357645, 0.6087486, -0.54811966, 0, 0.66913056, 0.74314487, 0.819152, 0.4262504, -0.38379753, 0, 0, 0)
+light_color = Color(1, 0.9569, 0.8392, 1)
+shadow_enabled = true
+shadow_bias = 0.05
+
+[node name="FillLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.5, 0, 0.86602545, 0.4330127, 0.8660254, -0.25, -0.75, 0.5, 0.4330127, 0, 0, 0)
+light_color = Color(0.8015, 0.8686, 1, 1)
+light_energy = 0.27
+
+; Tile has a corner origin covering x[-5,0] z[0,5]; scaled 3x and shifted so the
+; 15x15 slab is centred on the character. Its top surface stays at y=0.
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(3, 0, 0, 0, 1, 0, 0, 0, 3, 7.5, 0, -7.5)
+mesh = ExtResource("3_floor")
+surface_material_override/0 = ExtResource("4_mat")
+
+[node name="Character" parent="." instance=ExtResource("5_character")]
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 4.2)
+current = true
+near = 0.05
+far = 500.0
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Clip" type="Label" parent="UI"]
+offset_left = 28.0
+offset_top = 20.0
+offset_right = 560.0
+offset_bottom = 66.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 32
+text = "Walk"
+
+[node name="Time" type="Label" parent="UI"]
+offset_left = 30.0
+offset_top = 64.0
+offset_right = 560.0
+offset_bottom = 90.0
+theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 18
+
+[node name="Help" type="Label" parent="UI"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = -118.0
+offset_right = 560.0
+offset_bottom = -18.0
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 1, 1, 0.85)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 16
+text = "Left / Right     previous, next clip
+Up / Down        playback speed
+Space            pause
+R                restart clip
+Drag             orbit          Wheel  zoom
+Esc              quit"

@@ -1,0 +1,273 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://Game/HUD.gd" id="1_hud"]
+[ext_resource type="Script" path="res://Game/UI/GameMenu.gd" id="12_menu"]
+[ext_resource type="Script" path="res://Game/UI/ShopPanel.gd" id="13_shop"]
+[ext_resource type="Script" path="res://Game/Soundscape.gd" id="14_sound"]
+[ext_resource type="Script" path="res://Game/UI/SelectionBox.gd" id="2_box"]
+[ext_resource type="Script" path="res://Game/UI/Minimap.gd" id="3_minimap"]
+[ext_resource type="Theme" path="res://Game/UI/Theme.tres" id="4_theme"]
+[ext_resource type="Script" path="res://Game/UI/Portrait.gd" id="5_portrait"]
+[ext_resource type="Script" path="res://Game/UI/Roster.gd" id="6_roster"]
+[ext_resource type="Script" path="res://Game/UI/CommandGrid.gd" id="7_commands"]
+[ext_resource type="Script" path="res://Game/UI/StatusStrip.gd" id="8_status"]
+[ext_resource type="Script" path="res://Game/UI/CallList.gd" id="9_calls"]
+[ext_resource type="Script" path="res://Game/UI/DispatchPanel.gd" id="10_dispatch"]
+[ext_resource type="Script" path="res://Game/UI/ControlsPanel.gd" id="11_controls"]
+[ext_resource type="Script" path="res://Game/UI/RadioLog.gd" id="13_radio"]
+[ext_resource type="Script" path="res://Game/UI/DebriefCard.gd" id="14_debrief"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+; A CanvasLayer cannot carry a theme, so everything hangs off one Control that can.
+; Click-through: the panels below claim their own input.
+; The district's own sounds: the city bed and the dispatch radio. Not a panel, but
+; this is the always-present hand-authored scene and the one that already holds the
+; references to the board and the director.
+[node name="Soundscape" type="Node" parent="."]
+script = ExtResource("14_sound")
+
+[node name="Root" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_theme")
+
+[node name="SelectionBox" type="Control" parent="Root"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_box")
+
+; Everything drawn over the 3D view. Ignores the mouse as a whole; the minimap and the
+; incident rows inside it opt back in, because a click meant for either must never also
+; be read as an order out in the world.
+[node name="World" type="Control" parent="Root"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+; The shift clock and what is outstanding, centred at the top -- where the eye returns
+; to between orders.
+[node name="StatusStrip" type="HBoxContainer" parent="Root/World"]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 16.0
+offset_right = 300.0
+offset_bottom = 54.0
+grow_horizontal = 2
+mouse_filter = 2
+alignment = 1
+script = ExtResource("8_status")
+
+[node name="CallList" type="VBoxContainer" parent="Root/World"]
+offset_left = 22.0
+offset_top = 20.0
+offset_right = 430.0
+offset_bottom = 300.0
+mouse_filter = 2
+script = ExtResource("9_calls")
+
+[node name="MinimapCard" type="PanelContainer" parent="Root/World"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -232.0
+offset_top = 20.0
+offset_right = -22.0
+offset_bottom = 230.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_type_variation = &"CardPanel"
+
+[node name="Minimap" type="Control" parent="Root/World/MinimapCard"]
+script = ExtResource("3_minimap")
+
+; The controls card, closed by default and opened from the chip below it (or F1).
+; Sits just above the docked bar, in the corner the bar does not reach. The card
+; builds its own rows -- keycap textures for the keys, matching chips for the rest.
+[node name="HelpPanel" type="PanelContainer" parent="Root/World"]
+visible = false
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = -512.0
+offset_right = 500.0
+offset_bottom = -196.0
+grow_vertical = 0
+mouse_filter = 2
+theme_type_variation = &"CardPanel"
+
+[node name="Help" type="VBoxContainer" parent="Root/World/HelpPanel"]
+mouse_filter = 2
+script = ExtResource("11_controls")
+
+; The visible way into the card -- F1 is a shortcut, not a secret.
+[node name="RadioLog" type="VBoxContainer" parent="Root/World"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = -294.0
+offset_right = 460.0
+offset_bottom = -196.0
+grow_vertical = 0
+mouse_filter = 2
+alignment = 2
+script = ExtResource("13_radio")
+
+[node name="DebriefCard" type="Control" parent="Root/World"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("14_debrief")
+
+[node name="ControlsToggle" type="PanelContainer" parent="Root/World"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = -186.0
+offset_right = 136.0
+offset_bottom = -160.0
+grow_vertical = 0
+mouse_filter = 0
+theme_type_variation = &"PillPanel"
+
+[node name="Caption" type="Label" parent="Root/World/ControlsToggle"]
+mouse_filter = 2
+theme_type_variation = &"HeaderLabel"
+horizontal_alignment = 1
+text = "CONTROLS   ·   F1"
+
+; Win/lose banner. Hidden until the mission ends.
+[node name="Banner" type="Label" parent="Root/World"]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -110.0
+offset_right = 340.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+horizontal_alignment = 1
+theme_type_variation = &"BannerLabel"
+
+; The line under the banner at the end of a freeplay shift: score and tallies.
+[node name="Debrief" type="Label" parent="Root/World"]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -18.0
+offset_right = 340.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+
+; The docked command bar. Opaque and mouse-stopping: it is the edge of the screen, and
+; a click that lands on it is a click on the interface, not an order in the world.
+[node name="Bar" type="PanelContainer" parent="Root"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -148.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_type_variation = &"BarPanel"
+
+[node name="Row" type="HBoxContainer" parent="Root/Bar"]
+
+[node name="PortraitBlock" type="PanelContainer" parent="Root/Bar/Row"]
+custom_minimum_size = Vector2(250, 0)
+theme_type_variation = &"CardPanel"
+
+[node name="Portrait" type="VBoxContainer" parent="Root/Bar/Row/PortraitBlock"]
+script = ExtResource("5_portrait")
+
+[node name="RosterBlock" type="PanelContainer" parent="Root/Bar/Row"]
+size_flags_horizontal = 3
+theme_type_variation = &"CardPanel"
+
+[node name="Body" type="VBoxContainer" parent="Root/Bar/Row/RosterBlock"]
+
+[node name="Heading" type="Label" parent="Root/Bar/Row/RosterBlock/Body"]
+theme_type_variation = &"HeaderLabel"
+text = "UNITS UNDER COMMAND"
+
+[node name="Roster" type="HFlowContainer" parent="Root/Bar/Row/RosterBlock/Body"]
+size_flags_vertical = 3
+script = ExtResource("6_roster")
+
+; Wide enough for the fattest selection -- seven verbs, on an officer or a patrol
+; car -- in ONE row of tiles. Let them wrap and the PanelContainer grows, the bar
+; grows with it, and whatever sits just above the bar is silently covered. That is
+; the same trap the dispatch pills fell into, and it once ate the CONTROLS chip.
+[node name="CommandBlock" type="PanelContainer" parent="Root/Bar/Row"]
+custom_minimum_size = Vector2(460, 0)
+theme_type_variation = &"CardPanel"
+
+[node name="Body" type="VBoxContainer" parent="Root/Bar/Row/CommandBlock"]
+
+[node name="Heading" type="Label" parent="Root/Bar/Row/CommandBlock/Body"]
+theme_type_variation = &"HeaderLabel"
+text = "COMMANDS"
+
+[node name="CommandGrid" type="HFlowContainer" parent="Root/Bar/Row/CommandBlock/Body"]
+size_flags_vertical = 3
+script = ExtResource("7_commands")
+
+; Wide enough for the roster laid out in two columns -- six types stacked in one
+; made the bar 185px tall and swallowed the CONTROLS chip. The purse readout lives
+; in the Heading below, updated by the Dispatch panel.
+[node name="DispatchBlock" type="PanelContainer" parent="Root/Bar/Row"]
+custom_minimum_size = Vector2(300, 0)
+theme_type_variation = &"CardPanel"
+
+[node name="Body" type="VBoxContainer" parent="Root/Bar/Row/DispatchBlock"]
+
+[node name="Heading" type="Label" parent="Root/Bar/Row/DispatchBlock/Body"]
+theme_type_variation = &"HeaderLabel"
+text = "DISPATCH"
+
+[node name="Dispatch" type="VBoxContainer" parent="Root/Bar/Row/DispatchBlock/Body"]
+size_flags_vertical = 3
+script = ExtResource("10_dispatch")
+
+; The unit shop: portraits, prices and what each unit is for. Opened from the
+; DISPATCH heading (or any empty row); game-side, so it does not pause. Before Menu
+; in the tree so the pause card can still draw over it.
+[node name="Shop" type="Control" parent="Root"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("13_shop")
+
+; The game's framing: the title card, the pause menu (P) and settings. Last child of
+; Root so it draws over everything, including the bar. PROCESS_MODE_ALWAYS is what
+; lets it run -- and hear the keyboard -- while it has the rest of the tree paused.
+[node name="Menu" type="Control" parent="Root"]
+process_mode = 3
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("12_menu")

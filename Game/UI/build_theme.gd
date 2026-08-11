@@ -1,0 +1,162 @@
+extends SceneTree
+
+## Bakes Game/UI/Theme.tres from the colours in Palette.gd.
+##
+##   godot --headless --path . --script res://Game/UI/build_theme.gd
+##
+## Safe headless: a Theme is plain resource data, unlike the map's MultiMesh buffers.
+##
+## Generated rather than hand-authored for the usual reason -- a StyleBoxFlat written as
+## scene text is a dozen unlabelled numbers, and there are twenty of them here. It also
+## keeps every colour coming from one table, so the interface cannot end up with two
+## nearly-identical card whites.
+##
+## Type variations do the work that per-node `theme_override_*` used to. The old HUD set
+## font size, colour, outline colour and outline width on every single label; now a label
+## says what kind of label it is and the theme knows the rest.
+
+const OUT := "res://Game/UI/Theme.tres"
+
+const FONT_SIZE := 14
+const HEADER_SIZE := 11
+const VALUE_SIZE := 22
+const BANNER_SIZE := 54
+
+## Cards. The pill radius is deliberately larger than any pill is tall, which is what
+## makes the ends semicircular however much text is in one.
+const CARD_RADIUS := 12
+const TILE_RADIUS := 8
+const PILL_RADIUS := 999
+
+
+func _init() -> void:
+	_build.call_deferred()
+
+
+func _build() -> void:
+	var theme := Theme.new()
+	theme.default_font_size = FONT_SIZE
+
+	_labels(theme)
+	_panels(theme)
+	_buttons(theme)
+	_containers(theme)
+
+	var err := ResourceSaver.save(theme, OUT)
+	if err != OK:
+		push_error("save failed for %s: %d" % [OUT, err])
+		quit(1)
+		return
+	print("done -- %s" % OUT)
+	quit()
+
+
+# --- Labels ------------------------------------------------------------------
+
+func _labels(theme: Theme) -> void:
+	theme.add_type("Label")
+	theme.set_color("font_color", "Label", Palette.TEXT)
+	theme.set_color("font_outline_color", "Label", Palette.OUTLINE)
+	theme.set_constant("outline_size", "Label", 0)
+
+	# Column headings and units. Dim and small, so the eye lands on the value instead.
+	_label_variation(theme, "HeaderLabel", HEADER_SIZE, Palette.TEXT_DIM, 0)
+	# The one number a panel exists to show: a speed, a count, the clock.
+	_label_variation(theme, "ValueLabel", VALUE_SIZE, Palette.TEXT, 0)
+	_label_variation(theme, "DimLabel", FONT_SIZE, Palette.TEXT_DIM, 0)
+	_label_variation(theme, "PillLabel", 13, Palette.TEXT, 0)
+	_label_variation(theme, "AlarmLabel", 13, Palette.CASUALTY_DEEP, 0)
+	# The banner has no card behind it, so it carries its own outline -- white, because
+	# everything else in this scheme is dark ink on a light ground.
+	_label_variation(theme, "BannerLabel", BANNER_SIZE, Palette.TEXT, 10)
+
+
+func _label_variation(theme: Theme, name: String, size: int, colour: Color,
+		outline: int) -> void:
+	theme.add_type(name)
+	theme.set_type_variation(name, "Label")
+	theme.set_font_size("font_size", name, size)
+	theme.set_color("font_color", name, colour)
+	theme.set_color("font_outline_color", name, Palette.OUTLINE)
+	theme.set_constant("outline_size", name, outline)
+
+
+# --- Panels ------------------------------------------------------------------
+
+func _panels(theme: Theme) -> void:
+	theme.add_type("PanelContainer")
+	theme.set_stylebox("panel", "PanelContainer", _box(Palette.CARD, CARD_RADIUS, 10))
+
+	# The docked bar. Opaque, square, and edged only along the top -- it is the bottom
+	# of the screen, so a border on three sides would be drawing a frame around nothing.
+	theme.add_type("BarPanel")
+	theme.set_type_variation("BarPanel", "PanelContainer")
+	var bar := _box(Palette.BAR, 0, 10)
+	bar.border_width_top = 1
+	bar.border_color = Palette.EDGE
+	theme.set_stylebox("panel", "BarPanel", bar)
+
+	# A white card: a block in the bar, or a panel floating over the city.
+	theme.add_type("CardPanel")
+	theme.set_type_variation("CardPanel", "PanelContainer")
+	theme.set_stylebox("panel", "CardPanel", _box(Palette.CARD, CARD_RADIUS, 10))
+
+	# Rounded to a capsule whatever it contains. Used for the clock, the call count,
+	# and every incident row.
+	theme.add_type("PillPanel")
+	theme.set_type_variation("PillPanel", "PanelContainer")
+	var pill := _box(Palette.CARD, PILL_RADIUS, 6)
+	pill.content_margin_left = 12
+	pill.content_margin_right = 12
+	theme.set_stylebox("panel", "PillPanel", pill)
+
+	# Same shape, washed with alarm colour: something is waiting to be dealt with.
+	theme.add_type("AlarmPill")
+	theme.set_type_variation("AlarmPill", "PanelContainer")
+	var alarm := _box(Palette.ALARM_WASH, PILL_RADIUS, 6)
+	alarm.content_margin_left = 12
+	alarm.content_margin_right = 12
+	theme.set_stylebox("panel", "AlarmPill", alarm)
+
+
+# --- Buttons -----------------------------------------------------------------
+
+func _buttons(theme: Theme) -> void:
+	theme.add_type("Button")
+	theme.set_stylebox("normal", "Button", _box(Palette.WELL, TILE_RADIUS, 8))
+	theme.set_stylebox("hover", "Button", _box(Palette.HOVER, TILE_RADIUS, 8))
+	theme.set_stylebox("pressed", "Button", _box(Palette.PRESSED, TILE_RADIUS, 8))
+	theme.set_stylebox("disabled", "Button",
+		_box(Palette.dim(Palette.WELL, 0.5), TILE_RADIUS, 8))
+	# Focus is drawn as nothing on purpose. Buttons here are set to FOCUS_NONE so the
+	# control-group keys keep working, and a focus ring on a button that cannot hold
+	# focus is a lie.
+	theme.set_stylebox("focus", "Button", StyleBoxEmpty.new())
+	theme.set_color("font_color", "Button", Palette.TEXT)
+	theme.set_color("font_hover_color", "Button", Palette.TEXT)
+	theme.set_color("font_pressed_color", "Button", Palette.MEDICAL_DEEP)
+	theme.set_color("font_disabled_color", "Button", Palette.TEXT_DISABLED)
+	theme.set_font_size("font_size", "Button", FONT_SIZE)
+
+
+# --- Containers --------------------------------------------------------------
+
+func _containers(theme: Theme) -> void:
+	theme.add_type("HBoxContainer")
+	theme.set_constant("separation", "HBoxContainer", 8)
+	theme.add_type("VBoxContainer")
+	theme.set_constant("separation", "VBoxContainer", 6)
+	theme.add_type("HFlowContainer")
+	theme.set_constant("h_separation", "HFlowContainer", 9)
+	theme.set_constant("v_separation", "HFlowContainer", 6)
+
+
+func _box(colour: Color, radius: int, padding: int) -> StyleBoxFlat:
+	var box := StyleBoxFlat.new()
+	box.bg_color = colour
+	box.set_corner_radius_all(radius)
+	box.content_margin_left = padding
+	box.content_margin_right = padding
+	box.content_margin_top = padding
+	box.content_margin_bottom = padding
+	return box

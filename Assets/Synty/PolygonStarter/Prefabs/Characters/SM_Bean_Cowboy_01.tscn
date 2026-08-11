@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://dqeg0edt4mnfe"]
+
+[ext_resource type="ArrayMesh" uid="uid://trdhq8ub333m" path="res://assets/Synty/PolygonStarter/Models/extracted/SM_Bean_Cowboy_01.res" id="1_t4btd"]
+[ext_resource type="Material" uid="uid://bprw8jx500qd0" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_01_mat.tres" id="2_w626l"]
+
+[node name="SM_Bean_Cowboy_01" type="MeshInstance3D"]
+gi_mode = 2
+mesh = ExtResource("1_t4btd")
+surface_material_override/0 = ExtResource("2_w626l")

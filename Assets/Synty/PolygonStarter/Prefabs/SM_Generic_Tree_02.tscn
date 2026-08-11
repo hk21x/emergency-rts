@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://coxhwjltboo6c"]
+
+[ext_resource type="ArrayMesh" uid="uid://b0qtdw05kn1d8" path="res://assets/Synty/PolygonStarter/Models/extracted/SM_Generic_Tree_02.res" id="1_iux4t"]
+[ext_resource type="Material" uid="uid://bprw8jx500qd0" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_01_mat.tres" id="2_wb06n"]
+
+[node name="SM_Generic_Tree_02" type="MeshInstance3D"]
+gi_mode = 2
+mesh = ExtResource("1_iux4t")
+surface_material_override/0 = ExtResource("2_wb06n")

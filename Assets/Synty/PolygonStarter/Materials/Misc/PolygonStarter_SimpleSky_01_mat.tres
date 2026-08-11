@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://bao083vado4cf"]
+
+[ext_resource type="Texture2D" uid="uid://yp7h4xphm4w" path="res://Assets/Synty/PolygonStarter/Textures/Simple_Sky_Texture_01.png" id="1_2m25q"]
+
+[resource]
+resource_name = "PolygonStarter_SimpleSky_01_mat"
+shading_mode = 0
+albedo_color = Color(0.8132577, 0.8132577, 0.81325763, 1)
+albedo_texture = ExtResource("1_2m25q")
+uv1_scale = Vector3(1, 1, 0)

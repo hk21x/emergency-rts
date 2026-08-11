@@ -1,0 +1,137 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Game/Units/TrafficCar.gd" id="1_pj7u3"]
+[ext_resource type="Texture2D" path="res://Game/UI/Portraits/SM_Veh_Car_Van_01.png" id="2_c1n76"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_01.res" id="3_ymhwb"]
+[ext_resource type="Material" path="res://Assets/Synty/PolygonCity/Materials/Alts/PolygonCity_01_A_mat.tres" id="4_5glmg"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Door_l.res" id="5_k72up"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Door_l_Glass.res" id="6_la7ti"]
+[ext_resource type="Material" path="res://Assets/Synty/PolygonCity/Materials/Misc/Glass_Vehicle_01_mat.tres" id="7_fl4a8"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Door_r.res" id="8_hfxlm"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Door_r_Glass.res" id="9_g0h73"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Glass.res" id="10_tyddy"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Plates.res" id="11_cancg"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_SteeringW.res" id="12_xnlll"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Wheel_fl.res" id="13_pxmps"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Wheel_fr.res" id="14_2dnal"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Wheel_rl.res" id="15_4d641"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Wheel_rr.res" id="16_ppa77"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0np88"]
+size = Vector3(2.3242533, 2.0274072, 4.8185744)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vayvt"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.25, 1, 0.4, 0.85)
+
+[sub_resource type="TorusMesh" id="TorusMesh_qgeen"]
+inner_radius = 2.3089
+outer_radius = 2.6089
+rings = 48
+ring_segments = 8
+
+[node name="Vehicle" type="CharacterBody3D" unique_id=65091405]
+collision_layer = 64
+collision_mask = 67
+platform_floor_layers = 1
+script = ExtResource("1_pj7u3")
+max_speed = 9.0
+max_steer_degrees = 40.0
+wheelbase = 3.3121479749679565
+slowdown_distance = 9.0
+door_left_path = NodePath("Lean/Chassis/DoorL")
+door_right_path = NodePath("Lean/Chassis/DoorR")
+seats = 0
+stretchers = 0
+wheel_radius = 0.39758292
+display_name = "Van"
+portrait = ExtResource("2_c1n76")
+selection_ring_path = NodePath("SelectionRing")
+
+[node name="Lean" type="Node3D" parent="." unique_id=965835815]
+
+[node name="Chassis" type="Node3D" parent="Lean" unique_id=1654703727]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="Body" type="MeshInstance3D" parent="Lean/Chassis" unique_id=806559518]
+mesh = ExtResource("3_ymhwb")
+surface_material_override/0 = ExtResource("4_5glmg")
+
+[node name="DoorL" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1844067370]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.806267, 1.0849798, -2.2893221)
+mesh = ExtResource("5_k72up")
+surface_material_override/0 = ExtResource("4_5glmg")
+
+[node name="SM_Veh_Car_Van_Door_l_Glass" type="MeshInstance3D" parent="Lean/Chassis/DoorL" unique_id=116516605]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.41974542, 0.47708273, 0.1011703)
+mesh = ExtResource("6_la7ti")
+surface_material_override/0 = ExtResource("7_fl4a8")
+
+[node name="DoorR" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1527685104]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.80626863, 1.0849798, -2.2893221)
+mesh = ExtResource("8_hfxlm")
+surface_material_override/0 = ExtResource("4_5glmg")
+
+[node name="SM_Veh_Car_Van_Door_r_Glass" type="MeshInstance3D" parent="Lean/Chassis/DoorR" unique_id=635962843]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4197462, 0.47708273, 0.1011703)
+mesh = ExtResource("9_g0h73")
+surface_material_override/0 = ExtResource("7_fl4a8")
+
+[node name="SM_Veh_Car_Van_Glass" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1194374497]
+mesh = ExtResource("10_tyddy")
+surface_material_override/0 = ExtResource("7_fl4a8")
+
+[node name="SM_Veh_Car_Van_Plates" type="MeshInstance3D" parent="Lean/Chassis" unique_id=117712287]
+mesh = ExtResource("11_cancg")
+surface_material_override/0 = ExtResource("4_5glmg")
+
+[node name="SteeringWheel" type="MeshInstance3D" parent="Lean/Chassis" unique_id=153024030]
+transform = Transform3D(1, 0, 0, 0, 0.35328916, 0.93551415, 0, -0.93551415, 0.35328916, 0.43126976, 1.2529176, 1.0940796)
+mesh = ExtResource("12_xnlll")
+surface_material_override/0 = ExtResource("4_5glmg")
+
+[node name="Wheels" type="Node3D" parent="." unique_id=96528845]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="FL" type="Node3D" parent="Wheels" unique_id=1644684739]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.81947315, 0.3975829, 1.8411695)
+
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/FL" unique_id=1908805818]
+mesh = ExtResource("13_pxmps")
+surface_material_override/0 = ExtResource("4_5glmg")
+
+[node name="FR" type="Node3D" parent="Wheels" unique_id=2082897049]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8194732, 0.3975829, 1.8411692)
+
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/FR" unique_id=238878029]
+mesh = ExtResource("14_2dnal")
+surface_material_override/0 = ExtResource("4_5glmg")
+
+[node name="RL" type="Node3D" parent="Wheels" unique_id=129844291]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.81947315, 0.3975829, -1.4709787)
+
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/RL" unique_id=1306616820]
+mesh = ExtResource("15_4d641")
+surface_material_override/0 = ExtResource("4_5glmg")
+
+[node name="RR" type="Node3D" parent="Wheels" unique_id=2071056433]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8194732, 0.3975829, -1.4709787)
+
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/RR" unique_id=110385265]
+mesh = ExtResource("16_ppa77")
+surface_material_override/0 = ExtResource("4_5glmg")
+
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=594863698]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1920929e-07, 1.0137036, -0.08672094)
+shape = SubResource("BoxShape3D_0np88")
+
+[node name="NavigationAgent" type="NavigationAgent3D" parent="." unique_id=1685659833]
+path_desired_distance = 2.0
+target_desired_distance = 2.2
+
+[node name="SelectionRing" type="MeshInstance3D" parent="." unique_id=1400543214]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+material_override = SubResource("StandardMaterial3D_vayvt")
+cast_shadow = 0
+mesh = SubResource("TorusMesh_qgeen")

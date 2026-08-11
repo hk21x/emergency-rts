@@ -1,0 +1,411 @@
+[gd_scene load_steps=62 format=3 uid="uid://cm4yqyi4fg7jy"]
+
+[ext_resource type="PackedScene" uid="uid://da0n7m3yt10cw" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_CloudRing_01.tscn" id="1_2x8f6"]
+[ext_resource type="PackedScene" uid="uid://db1wukv3pv4kb" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Ground_01.tscn" id="2_8k7ux"]
+[ext_resource type="PackedScene" uid="uid://do1iotcgspmrx" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Ground_02.tscn" id="3_d713h"]
+[ext_resource type="PackedScene" uid="uid://ckwxhfjxcdb6o" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Ground_03.tscn" id="4_ww16a"]
+[ext_resource type="PackedScene" uid="uid://cesegdk5aoorh" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Ground_04.tscn" id="5_2tond"]
+[ext_resource type="PackedScene" uid="uid://ikpe0yovxunb" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Ground_Flat_01.tscn" id="6_t5s86"]
+[ext_resource type="PackedScene" uid="uid://dp8qeav5etj3n" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Mountains_Grass_02.tscn" id="7_muysc"]
+[ext_resource type="PackedScene" uid="uid://fywmu5vrx15m" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Mountains_Soft_01.tscn" id="8_3akth"]
+[ext_resource type="PackedScene" uid="uid://dlwjol7yjo20y" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Small_Rocks_01.tscn" id="9_r604c"]
+[ext_resource type="PackedScene" uid="uid://m1yasfp4yyec" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Small_Rocks_02.tscn" id="10_7c0cy"]
+[ext_resource type="PackedScene" uid="uid://b3ng7wd5nvt7q" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Small_Rocks_03.tscn" id="11_imnqw"]
+[ext_resource type="PackedScene" uid="uid://bwhj7ixiynmpi" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Small_Rocks_04.tscn" id="12_ga4qh"]
+[ext_resource type="PackedScene" uid="uid://cqe8g6fi4dsdk" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Small_Rocks_05.tscn" id="13_cwal3"]
+[ext_resource type="PackedScene" uid="uid://883ccse6n4v2" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Tree_01.tscn" id="14_xm6uy"]
+[ext_resource type="PackedScene" uid="uid://coxhwjltboo6c" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Tree_02.tscn" id="15_p05cu"]
+[ext_resource type="PackedScene" uid="uid://bf2vligo12hux" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Tree_03.tscn" id="16_2f78u"]
+[ext_resource type="PackedScene" uid="uid://g4jgg4olbxn6" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_Tree_04.tscn" id="17_qutx2"]
+[ext_resource type="PackedScene" uid="uid://dml2gvelsxql3" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_TreeDead_01.tscn" id="18_gc1jb"]
+[ext_resource type="PackedScene" uid="uid://duigrcgsaj84a" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Generic_TreeStump_01.tscn" id="19_rs6vc"]
+[ext_resource type="PackedScene" uid="uid://bd17mls38jwj0" path="res://Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Bean_Cop_01.tscn" id="20_qr8ue"]
+[ext_resource type="PackedScene" uid="uid://dqeg0edt4mnfe" path="res://Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Bean_Cowboy_01.tscn" id="21_c40ad"]
+[ext_resource type="PackedScene" uid="uid://cd4mw0ee5d3sv" path="res://Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Bean_Female_01.tscn" id="22_v61e6"]
+[ext_resource type="PackedScene" uid="uid://cw1uu5p8xk2se" path="res://Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Bean_Town_Female_01.tscn" id="23_q7gle"]
+[ext_resource type="PackedScene" uid="uid://n3wnjbiyvrcv" path="res://Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Character_Female_01.tscn" id="24_8ua2y"]
+[ext_resource type="PackedScene" uid="uid://n3yke0eigjmr" path="res://Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Character_Male_01.tscn" id="25_5l0gd"]
+[ext_resource type="PackedScene" uid="uid://bsgovjy8hnuap" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Wep_Shield_04.tscn" id="26_2qx54"]
+[ext_resource type="PackedScene" uid="uid://chsg13rrbovu0" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Wep_Watergun_01.tscn" id="27_c2ly8"]
+[ext_resource type="PackedScene" uid="uid://dmdi5i1kgfnmh" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Wep_Watergun_02.tscn" id="28_jjr1m"]
+[ext_resource type="PackedScene" uid="uid://dgndn5gllrc4e" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Wep_WaterPistol_01.tscn" id="29_1vbrf"]
+[ext_resource type="PackedScene" uid="uid://c8soqp3q48hlb" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Veh_Plane_Stunt_01.tscn" id="30_r6uay"]
+[ext_resource type="PackedScene" uid="uid://bg0g0gh7eb0pg" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonCity_Veh_Car_Small_01.tscn" id="31_m8dk6"]
+[ext_resource type="PackedScene" uid="uid://dlqr2jtr2ahr5" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_SimpleSky_Dome_01.tscn" id="32_tioye"]
+[ext_resource type="PackedScene" uid="uid://cmgxlvx5wjefh" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Bld_Door_01.tscn" id="33_p5y1o"]
+[ext_resource type="PackedScene" uid="uid://bjr6qxgt0nd27" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonApocalypse_Bld_House_01.tscn" id="34_drgcx"]
+[ext_resource type="PackedScene" uid="uid://dbl16aiud2xes" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Block_1x1_01P.tscn" id="35_vwl0o"]
+[ext_resource type="PackedScene" uid="uid://b1jwt46n3a2gr" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Column_2x3_01P.tscn" id="36_gjf8i"]
+[ext_resource type="PackedScene" uid="uid://bqfm15esw3auv" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_DoorFrame_01P.tscn" id="37_2ynkp"]
+[ext_resource type="PackedScene" uid="uid://cqccqqg1hpul4" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Floor_1x1_01P.tscn" id="38_tg8qn"]
+[ext_resource type="PackedScene" uid="uid://vcr8k2meqj6e" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Floor_5x5_01P.tscn" id="39_35n8t"]
+[ext_resource type="PackedScene" uid="uid://b1r5ahl8ngpvp" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Ramp_25_1x1_01P.tscn" id="40_6crdi"]
+[ext_resource type="PackedScene" uid="uid://cbkmcormta7ku" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P.tscn" id="41_xk6yk"]
+[ext_resource type="PackedScene" uid="uid://cotw0obnqghno" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Stairs_1x1_01P.tscn" id="42_ka5sl"]
+[ext_resource type="PackedScene" uid="uid://bq26rcdia7hf2" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_Stairs_1x3_01P.tscn" id="43_mt0dw"]
+[ext_resource type="PackedScene" uid="uid://csn2soikq3v4m" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_WallDoor_2x3_01P.tscn" id="44_gcvab"]
+[ext_resource type="PackedScene" uid="uid://ojbkdcnxsqd4" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Buildings_WallWindow_2x3_01P.tscn" id="45_dytn3"]
+[ext_resource type="PackedScene" uid="uid://dlwv45la2sldr" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Icon_Arrow_Small_01.tscn" id="46_mftdb"]
+[ext_resource type="PackedScene" uid="uid://csqol0ouqveio" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Icon_Coin_01.tscn" id="47_lv24b"]
+[ext_resource type="PackedScene" uid="uid://m48q64l516im" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Icon_Letter_Question_01.tscn" id="48_82mhh"]
+[ext_resource type="PackedScene" uid="uid://bjbk0jy06jaf" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Primitive_Cone_01P.tscn" id="49_yikka"]
+[ext_resource type="PackedScene" uid="uid://bnch63c12e72w" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Primitive_Cylander_01P.tscn" id="50_4a7u1"]
+[ext_resource type="PackedScene" uid="uid://if28rqlc72x5" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Primitive_Sphere_01P.tscn" id="51_gfbae"]
+[ext_resource type="PackedScene" uid="uid://811sy4078srw" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Primitive_Tube_01P.tscn" id="52_c5dxt"]
+[ext_resource type="PackedScene" uid="uid://4e1jl5q1a3p6" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Prop_Cone_01.tscn" id="53_cy5l8"]
+[ext_resource type="PackedScene" uid="uid://b01ofgpsjfs58" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Prop_Crate_03.tscn" id="54_ck7vu"]
+[ext_resource type="PackedScene" uid="uid://dm0625ox1h3xe" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Prop_Ladder_1x2_01P.tscn" id="55_1lcec"]
+[ext_resource type="PackedScene" uid="uid://dith82jwbyxlv" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Prop_Sword_01.tscn" id="56_7hr2x"]
+[ext_resource type="PackedScene" uid="uid://drlfpo2e3i0ts" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_PolygonPrototype_Prop_Target_03.tscn" id="57_e1xro"]
+[ext_resource type="PackedScene" uid="uid://c4lcadfuat25q" path="res://Assets/Synty/PolygonStarter/Prefabs/SM_Prop_Plane_Ring_01.tscn" id="58_61df1"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_hbon4"]
+resource_name = "Default-Skybox"
+sky_top_color = Color(0.454902, 0.678431, 0.87451, 1)
+sky_horizon_color = Color(0.894118, 0.952941, 1, 1)
+sky_curve = 0.0731028
+ground_bottom_color = Color(0.454902, 0.470588, 0.490196, 1)
+ground_horizon_color = Color(1, 1, 1, 1)
+
+[sub_resource type="Sky" id="Sky_mbt0u"]
+sky_material = SubResource("ProceduralSkyMaterial_hbon4")
+
+[sub_resource type="Environment" id="Environment_k5t5r"]
+background_mode = 2
+sky = SubResource("Sky_mbt0u")
+fog_light_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="RootNode3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_k5t5r")
+
+[node name="Generic" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.790467, 10.331067, -16.322233)
+
+[node name="SM_Generic_CloudRing_01" parent="Generic" instance=ExtResource("1_2x8f6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20953274, -10.331067, 31.322233)
+
+[node name="SM_Generic_Ground_01" parent="Generic" instance=ExtResource("2_8k7ux")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.209534, -10.331067, 21.586823)
+
+[node name="SM_Generic_Ground_02" parent="Generic" instance=ExtResource("3_d713h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.627625, -10.331067, 21.586826)
+
+[node name="SM_Generic_Ground_03" parent="Generic" instance=ExtResource("4_ww16a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -46.34443, -10.331067, 44.629105)
+
+[node name="SM_Generic_Ground_04" parent="Generic" instance=ExtResource("5_2tond")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -69.91175, -10.331067, 44.629105)
+
+[node name="SM_Generic_Ground_Flat_01" parent="Generic" instance=ExtResource("6_t5s86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.209534, -10.331067, 21.586826)
+
+[node name="SM_Generic_Mountains_Grass_02" parent="Generic" instance=ExtResource("7_muysc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -66.208405, -10.331067, 21.328705)
+
+[node name="SM_Generic_Mountains_Soft_01" parent="Generic" instance=ExtResource("8_3akth")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.97374, -10.331067, 44.629105)
+
+[node name="SM_Generic_Small_Rocks_01" parent="Generic" instance=ExtResource("9_r604c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37.209534, -10.331067, 2.3406563)
+
+[node name="SM_Generic_Small_Rocks_02" parent="Generic" instance=ExtResource("10_7c0cy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.209534, -10.331067, 7.3406563)
+
+[node name="SM_Generic_Small_Rocks_03" parent="Generic" instance=ExtResource("11_imnqw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.209534, -10.331067, 2.3406563)
+
+[node name="SM_Generic_Small_Rocks_04" parent="Generic" instance=ExtResource("12_ga4qh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.209534, -10.331067, 2.3406563)
+
+[node name="SM_Generic_Small_Rocks_05" parent="Generic" instance=ExtResource("13_cwal3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.209534, -10.331067, 2.3406563)
+
+[node name="SM_Generic_Tree_01" parent="Generic" instance=ExtResource("14_xm6uy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.209534, -10.331067, 7.3406563)
+
+[node name="SM_Generic_Tree_02" parent="Generic" instance=ExtResource("15_p05cu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.209534, -10.331067, 7.3406563)
+
+[node name="SM_Generic_Tree_03" parent="Generic" instance=ExtResource("16_2f78u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37.209534, -10.331067, 7.3406563)
+
+[node name="SM_Generic_Tree_04" parent="Generic" instance=ExtResource("17_qutx2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.209534, -10.331067, 7.3406563)
+
+[node name="SM_Generic_TreeDead_01" parent="Generic" instance=ExtResource("18_gc1jb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42.663307, -10.331067, 7.462322)
+
+[node name="SM_Generic_TreeStump_01" parent="Generic" instance=ExtResource("19_rs6vc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.209534, -10.331067, 2.3406563)
+
+[node name="Characters" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.955457, -33.97619, 3.820068)
+
+[node name="SM_Bean_Cop_01" parent="Characters" instance=ExtResource("20_qr8ue")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.533717, 33.97619, 29.152946)
+
+[node name="SM_Bean_Cowboy_01" parent="Characters" instance=ExtResource("21_c40ad")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.533717, 33.97619, 29.152946)
+
+[node name="SM_Bean_Female_01" parent="Characters" instance=ExtResource("22_v61e6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.466283, 33.97619, 29.152946)
+
+[node name="SM_Bean_Town_Female_01" parent="Characters" instance=ExtResource("23_q7gle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.53371716, 33.97619, 29.152946)
+
+[node name="SM_Character_Female_01" parent="Characters" instance=ExtResource("24_8ua2y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.466283, 33.97619, 29.152946)
+
+[node name="GeneralSkeleton" parent="Characters/SM_Character_Female_01" index="2"]
+bones/1/position = Vector3(4.817043e-08, 7.748604e-07, 0.8762762)
+bones/3/rotation = Quaternion(-0.098004, -5.9604645e-08, -2.9802322e-08, 0.9951861)
+bones/10/rotation = Quaternion(0.22902974, 0.9713868, 0.062873326, -7.45058e-08)
+bones/11/rotation = Quaternion(-0.024663903, -0.7058118, 0.055237677, 0.7058118)
+bones/12/rotation = Quaternion(-0.0665601, 0.6938298, -0.18102534, 0.6938299)
+bones/13/rotation = Quaternion(-0.34862992, 0.6227132, 0.25436658, 0.65267384)
+bones/14/rotation = Quaternion(0.06936517, -7.658452e-05, 0.17059687, 0.9828964)
+bones/15/rotation = Quaternion(0, -8.930266e-05, -0.00019234419, 1)
+bones/16/rotation = Quaternion(-0.08869095, 2.9802322e-08, 0.20442131, 0.97485685)
+bones/17/rotation = Quaternion(0.09468438, -1.6391277e-07, 0.02865699, 0.9950948)
+bones/18/rotation = Quaternion(1.4901161e-08, -8.940697e-08, -2.9802322e-08, 1)
+bones/20/rotation = Quaternion(0.0022891462, 4.4703484e-08, 0.1251567, 0.99213433)
+bones/21/rotation = Quaternion(0.012298273, 4.470349e-08, 0.026116136, 0.9995833)
+bones/22/rotation = Quaternion(1.1920929e-07, 8.940697e-08, -2.0861626e-07, 1)
+bones/24/rotation = Quaternion(0.6470827, -0.3231882, -0.42981565, -0.5404553)
+bones/25/rotation = Quaternion(-0.22901866, 0.97138786, 0.06289854, -1.4901163e-07)
+bones/26/rotation = Quaternion(-0.0246619, 0.7058119, -0.055236846, 0.7058118)
+bones/27/rotation = Quaternion(-2.2351743e-07, -0.7071067, 1.7881393e-07, 0.7071068)
+bones/28/rotation = Quaternion(0.28055796, -0.49819717, -0.7082925, 0.41401523)
+bones/35/rotation = Quaternion(0.45359576, -0.31654546, -0.59163237, 0.586533)
+bones/39/rotation = Quaternion(-9.313227e-08, -0.074887656, 0.997065, 0.015917294)
+bones/41/rotation = Quaternion(2.9802326e-08, 0.70710677, -0.70710677, -8.940697e-08)
+bones/42/rotation = Quaternion(-2.9802319e-08, 1, -1.788139e-07, -1.4901159e-08)
+bones/45/rotation = Quaternion(-8.940695e-08, 1, -2.9802319e-08, -2.9802319e-08)
+bones/46/rotation = Quaternion(-1.7881393e-07, 0.7071068, -0.7071068, 3.7252907e-08)
+bones/47/rotation = Quaternion(8.940695e-08, 1, -1.788139e-07, -4.4703476e-08)
+
+[node name="SM_Character_Male_01" parent="Characters" instance=ExtResource("25_5l0gd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.466283, 33.97619, 29.152946)
+
+[node name="GeneralSkeleton" parent="Characters/SM_Character_Male_01" index="2"]
+bones/1/position = Vector3(4.817043e-08, 7.748604e-07, 0.8762762)
+bones/3/rotation = Quaternion(-0.098004, -5.9604645e-08, -2.9802322e-08, 0.9951861)
+bones/10/rotation = Quaternion(0.22902974, 0.9713868, 0.062873326, -7.45058e-08)
+bones/11/rotation = Quaternion(-0.024663903, -0.7058118, 0.055237677, 0.7058118)
+bones/12/rotation = Quaternion(-0.0665601, 0.6938298, -0.18102534, 0.6938299)
+bones/13/rotation = Quaternion(-0.34862992, 0.6227132, 0.25436658, 0.65267384)
+bones/14/rotation = Quaternion(0.06936517, -7.658452e-05, 0.17059687, 0.9828964)
+bones/15/rotation = Quaternion(0, -8.930266e-05, -0.00019234419, 1)
+bones/16/rotation = Quaternion(-0.08869095, 2.9802322e-08, 0.20442131, 0.97485685)
+bones/17/rotation = Quaternion(0.09468438, -1.6391277e-07, 0.02865699, 0.9950948)
+bones/18/rotation = Quaternion(1.4901161e-08, -8.940697e-08, -2.9802322e-08, 1)
+bones/20/rotation = Quaternion(0.0022891462, 4.4703484e-08, 0.1251567, 0.99213433)
+bones/21/rotation = Quaternion(0.012298273, 4.470349e-08, 0.026116136, 0.9995833)
+bones/22/rotation = Quaternion(1.1920929e-07, 8.940697e-08, -2.0861626e-07, 1)
+bones/24/rotation = Quaternion(0.6470827, -0.3231882, -0.42981565, -0.5404553)
+bones/25/rotation = Quaternion(-0.22901866, 0.97138786, 0.06289854, -1.4901163e-07)
+bones/26/rotation = Quaternion(-0.0246619, 0.7058119, -0.055236846, 0.7058118)
+bones/27/rotation = Quaternion(-2.2351743e-07, -0.7071067, 1.7881393e-07, 0.7071068)
+bones/28/rotation = Quaternion(0.28055796, -0.49819717, -0.7082925, 0.41401523)
+bones/35/rotation = Quaternion(0.45359576, -0.31654546, -0.59163237, 0.586533)
+bones/39/rotation = Quaternion(-9.313227e-08, -0.074887656, 0.997065, 0.015917294)
+bones/41/rotation = Quaternion(2.9802326e-08, 0.70710677, -0.70710677, -8.940697e-08)
+bones/42/rotation = Quaternion(-2.9802319e-08, 1, -1.788139e-07, -1.4901159e-08)
+bones/45/rotation = Quaternion(-8.940695e-08, 1, -2.9802319e-08, -2.9802319e-08)
+bones/46/rotation = Quaternion(-1.7881393e-07, 0.7071068, -0.7071068, 3.7252907e-08)
+bones/47/rotation = Quaternion(8.940695e-08, 1, -1.788139e-07, -4.4703476e-08)
+
+[node name="Weapons" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.790465, 10.331067, -17.322233)
+
+[node name="SM_Wep_Shield_04" parent="Weapons" instance=ExtResource("26_2qx54")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.607478, -10.331067, 8.582822)
+
+[node name="SM_Wep_Watergun_01" parent="Weapons" instance=ExtResource("27_c2ly8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.607478, -10.331067, 3.5828218)
+
+[node name="SM_Wep_Watergun_02" parent="Weapons" instance=ExtResource("28_jjr1m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6074781, -10.331067, 8.582822)
+
+[node name="SM_Wep_WaterPistol_01" parent="Weapons" instance=ExtResource("29_1vbrf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6074781, -10.331067, 3.5828218)
+
+[node name="Vehicles" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.790467, 10.331067, -16.322233)
+
+[node name="SM_Veh_Plane_Stunt_01" parent="Vehicles" instance=ExtResource("30_r6uay")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.790466, -10.331067, 7.2436113)
+
+[node name="SM_PolygonCity_Veh_Car_Small_01" parent="Vehicles" instance=ExtResource("31_m8dk6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.790466, -10.331067, 5.1961207)
+
+[node name="Environment" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.790467, 10.331067, -16.322233)
+
+[node name="SM_SimpleSky_Dome_01" parent="Environment" instance=ExtResource("32_tioye")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.790467, -10.331067, -38.677765)
+
+[node name="Main Camera" type="Node3D" parent="."]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -10, 12, 65)
+
+[node name="Camera" type="Camera3D" parent="Main Camera"]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+cull_mask = 16777215
+current = true
+fov = 60.0
+near = 0.3
+far = 1000.0
+
+[node name="Props" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.079042, -29.719637, 13.602794)
+
+[node name="SM_Bld_Door_01" parent="Props" instance=ExtResource("33_p5y1o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.921852, 29.719637, -16.722998)
+
+[node name="SM_PolygonApocalypse_Bld_House_01" parent="Props" instance=ExtResource("34_drgcx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.681854, 29.719637, -3.0874548)
+
+[node name="SM_PolygonPrototype_Buildings_Block_1x1_01P" parent="Props" instance=ExtResource("35_vwl0o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.921852, 29.719637, -16.722998)
+
+[node name="SM_PolygonPrototype_Buildings_Column_2x3_01P" parent="Props" instance=ExtResource("36_gjf8i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.921852, 29.719637, -11.722998)
+
+[node name="SM_PolygonPrototype_Buildings_DoorFrame_01P" parent="Props" instance=ExtResource("37_2ynkp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.921854, 29.719637, -11.722998)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_1x1_01P" parent="Props" instance=ExtResource("38_tg8qn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.921854, 29.719637, -21.722998)
+
+[node name="SM_PolygonPrototype_Buildings_Floor_5x5_01P" parent="Props" instance=ExtResource("39_35n8t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.57904, 29.719637, -11.722998)
+
+[node name="SM_PolygonPrototype_Buildings_Ramp_25_1x1_01P" parent="Props" instance=ExtResource("40_6crdi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.921852, 29.719637, -21.722998)
+
+[node name="SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P" parent="Props" instance=ExtResource("41_xk6yk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.921852, 29.719637, -16.722998)
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x1_01P" parent="Props" instance=ExtResource("42_ka5sl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.921852, 29.719637, -21.722998)
+
+[node name="SM_PolygonPrototype_Buildings_Stairs_1x3_01P" parent="Props" instance=ExtResource("43_mt0dw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.57904, 29.719637, -0.6027937)
+
+[node name="SM_PolygonPrototype_Buildings_WallDoor_2x3_01P" parent="Props" instance=ExtResource("44_gcvab")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.921852, 29.719637, -11.722998)
+
+[node name="SM_PolygonPrototype_Buildings_WallWindow_2x3_01P" parent="Props" instance=ExtResource("45_dytn3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.921852, 29.719637, -11.722998)
+
+[node name="SM_PolygonPrototype_Icon_Arrow_Small_01" parent="Props" instance=ExtResource("46_mftdb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.921854, 29.719637, -26.722998)
+
+[node name="SM_PolygonPrototype_Icon_Coin_01" parent="Props" instance=ExtResource("47_lv24b")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.921852, 29.719637, -26.722998)
+
+[node name="SM_PolygonPrototype_Icon_Letter_Question_01" parent="Props" instance=ExtResource("48_82mhh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.921852, 29.719637, -26.722998)
+
+[node name="SM_PolygonPrototype_Primitive_Cone_01P" parent="Props" instance=ExtResource("49_yikka")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.921854, 29.719637, -16.722998)
+
+[node name="SM_PolygonPrototype_Primitive_Cylander_01P" parent="Props" instance=ExtResource("50_4a7u1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.921852, 29.719637, -21.722998)
+
+[node name="SM_PolygonPrototype_Primitive_Sphere_01P" parent="Props" instance=ExtResource("51_gfbae")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.921852, 29.719637, -21.722998)
+
+[node name="SM_PolygonPrototype_Primitive_Tube_01P" parent="Props" instance=ExtResource("52_c5dxt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.921852, 29.719637, -16.722998)
+
+[node name="SM_PolygonPrototype_Prop_Cone_01" parent="Props" instance=ExtResource("53_cy5l8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.921852, 29.719637, -26.722998)
+
+[node name="SM_PolygonPrototype_Prop_Crate_03" parent="Props" instance=ExtResource("54_ck7vu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.921852, 29.719637, -21.722998)
+
+[node name="SM_PolygonPrototype_Prop_Ladder_1x2_01P" parent="Props" instance=ExtResource("55_1lcec")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.921852, 29.719637, -16.722998)
+
+[node name="SM_PolygonPrototype_Prop_Sword_01" parent="Props" instance=ExtResource("56_7hr2x")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.921852, 29.719637, -26.722998)
+
+[node name="SM_PolygonPrototype_Prop_Target_03" parent="Props" instance=ExtResource("57_e1xro")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.921852, 29.719637, -26.722998)
+
+[node name="SM_Prop_Plane_Ring_01" parent="Props" instance=ExtResource("58_61df1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.92095757, 29.719637, -1.6027937)
+
+[node name="Directional Light" type="Node3D" parent="."]
+transform = Transform3D(0.86602545, 0.38302273, 0.32139307, 0.30731913, 0.099275246, -0.94641393, -0.39440444, 0.9183888, -0.031735335, 0, 3, 0)
+
+[node name="Light" type="DirectionalLight3D" parent="Directional Light"]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+light_color = Color(1, 0.95686275, 0.8392157, 1)
+light_bake_mode = 0
+shadow_enabled = true
+shadow_bias = 0.05
+shadow_normal_bias = 0.4
+
+[editable path="Generic/SM_Generic_CloudRing_01"]
+[editable path="Generic/SM_Generic_Ground_01"]
+[editable path="Generic/SM_Generic_Ground_02"]
+[editable path="Generic/SM_Generic_Ground_03"]
+[editable path="Generic/SM_Generic_Ground_04"]
+[editable path="Generic/SM_Generic_Ground_Flat_01"]
+[editable path="Generic/SM_Generic_Mountains_Grass_02"]
+[editable path="Generic/SM_Generic_Mountains_Soft_01"]
+[editable path="Generic/SM_Generic_Small_Rocks_01"]
+[editable path="Generic/SM_Generic_Small_Rocks_02"]
+[editable path="Generic/SM_Generic_Small_Rocks_03"]
+[editable path="Generic/SM_Generic_Small_Rocks_04"]
+[editable path="Generic/SM_Generic_Small_Rocks_05"]
+[editable path="Generic/SM_Generic_Tree_01"]
+[editable path="Generic/SM_Generic_Tree_02"]
+[editable path="Generic/SM_Generic_Tree_03"]
+[editable path="Generic/SM_Generic_Tree_04"]
+[editable path="Generic/SM_Generic_TreeDead_01"]
+[editable path="Generic/SM_Generic_TreeStump_01"]
+[editable path="Characters/SM_Bean_Cop_01"]
+[editable path="Characters/SM_Bean_Cowboy_01"]
+[editable path="Characters/SM_Bean_Female_01"]
+[editable path="Characters/SM_Bean_Town_Female_01"]
+[editable path="Characters/SM_Character_Female_01"]
+[editable path="Characters/SM_Character_Male_01"]
+[editable path="Weapons/SM_Wep_Shield_04"]
+[editable path="Weapons/SM_Wep_Watergun_01"]
+[editable path="Weapons/SM_Wep_Watergun_02"]
+[editable path="Weapons/SM_Wep_WaterPistol_01"]
+[editable path="Vehicles/SM_Veh_Plane_Stunt_01"]
+[editable path="Vehicles/SM_PolygonCity_Veh_Car_Small_01"]
+[editable path="Environment/SM_SimpleSky_Dome_01"]
+[editable path="Props/SM_Bld_Door_01"]
+[editable path="Props/SM_PolygonApocalypse_Bld_House_01"]
+[editable path="Props/SM_PolygonPrototype_Buildings_Block_1x1_01P"]
+[editable path="Props/SM_PolygonPrototype_Buildings_Column_2x3_01P"]
+[editable path="Props/SM_PolygonPrototype_Buildings_DoorFrame_01P"]
+[editable path="Props/SM_PolygonPrototype_Buildings_Floor_1x1_01P"]
+[editable path="Props/SM_PolygonPrototype_Buildings_Floor_5x5_01P"]
+[editable path="Props/SM_PolygonPrototype_Buildings_Ramp_25_1x1_01P"]
+[editable path="Props/SM_PolygonPrototype_Buildings_Ramp_45_1x1_01P"]
+[editable path="Props/SM_PolygonPrototype_Buildings_Stairs_1x1_01P"]
+[editable path="Props/SM_PolygonPrototype_Buildings_Stairs_1x3_01P"]
+[editable path="Props/SM_PolygonPrototype_Buildings_WallDoor_2x3_01P"]
+[editable path="Props/SM_PolygonPrototype_Buildings_WallWindow_2x3_01P"]
+[editable path="Props/SM_PolygonPrototype_Icon_Arrow_Small_01"]
+[editable path="Props/SM_PolygonPrototype_Icon_Coin_01"]
+[editable path="Props/SM_PolygonPrototype_Icon_Letter_Question_01"]
+[editable path="Props/SM_PolygonPrototype_Primitive_Cone_01P"]
+[editable path="Props/SM_PolygonPrototype_Primitive_Cylander_01P"]
+[editable path="Props/SM_PolygonPrototype_Primitive_Sphere_01P"]
+[editable path="Props/SM_PolygonPrototype_Primitive_Tube_01P"]
+[editable path="Props/SM_PolygonPrototype_Prop_Cone_01"]
+[editable path="Props/SM_PolygonPrototype_Prop_Crate_03"]
+[editable path="Props/SM_PolygonPrototype_Prop_Ladder_1x2_01P"]
+[editable path="Props/SM_PolygonPrototype_Prop_Sword_01"]
+[editable path="Props/SM_PolygonPrototype_Prop_Target_03"]
+[editable path="Props/SM_Prop_Plane_Ring_01"]
+

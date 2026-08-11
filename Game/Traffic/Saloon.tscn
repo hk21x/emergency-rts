@@ -1,0 +1,111 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Game/Units/TrafficCar.gd" id="1_5ys67"]
+[ext_resource type="Texture2D" path="res://Game/UI/Portraits/SM_Veh_Car_Medium_01.png" id="2_rlmdr"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Medium_01.res" id="3_vjhlm"]
+[ext_resource type="Material" path="res://Assets/Synty/PolygonCity/Materials/Alts/PolygonCity_01_A_mat.tres" id="4_kuk8v"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Medium_Glass.res" id="5_iitfv"]
+[ext_resource type="Material" path="res://Assets/Synty/PolygonCity/Materials/Misc/Glass_Vehicle_01_mat.tres" id="6_7j112"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Medium_Plates.res" id="7_00akx"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Medium_SteeringW.res" id="8_q4kw6"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Medium_Wheel_fl.res" id="9_6oj5d"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Medium_Wheel_fr.res" id="10_30q6a"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Medium_Wheel_rl.res" id="11_qvqtb"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Medium_Wheel_rr.res" id="12_2xogn"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yx3ud"]
+size = Vector3(2.22359, 1.8842123, 4.769507)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1hlng"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.25, 1, 0.4, 0.85)
+
+[sub_resource type="TorusMesh" id="TorusMesh_txlb1"]
+inner_radius = 2.2853887
+outer_radius = 2.5853887
+rings = 48
+ring_segments = 8
+
+[node name="Vehicle" type="CharacterBody3D" unique_id=736287455]
+collision_layer = 64
+collision_mask = 67
+platform_floor_layers = 1
+script = ExtResource("1_5ys67")
+max_speed = 9.5
+max_steer_degrees = 40.0
+wheelbase = 2.942910313606262
+slowdown_distance = 9.0
+seats = 0
+stretchers = 0
+wheel_radius = 0.41863045
+display_name = "Saloon"
+portrait = ExtResource("2_rlmdr")
+selection_ring_path = NodePath("SelectionRing")
+
+[node name="Lean" type="Node3D" parent="." unique_id=1571563555]
+
+[node name="Chassis" type="Node3D" parent="Lean" unique_id=2114057099]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="Body" type="MeshInstance3D" parent="Lean/Chassis" unique_id=670857564]
+mesh = ExtResource("3_vjhlm")
+surface_material_override/0 = ExtResource("4_kuk8v")
+
+[node name="SM_Veh_Car_Medium_Glass" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1215427057]
+mesh = ExtResource("5_iitfv")
+surface_material_override/0 = ExtResource("6_7j112")
+
+[node name="SM_Veh_Car_Medium_Plates" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1906291631]
+mesh = ExtResource("7_00akx")
+surface_material_override/0 = ExtResource("4_kuk8v")
+
+[node name="SteeringWheel" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1789589216]
+transform = Transform3D(1, 0, 0, 0, 0.3399828, 0.94043165, 0, -0.94043165, 0.3399828, 0.43101847, 1.1753569, 0.570918)
+mesh = ExtResource("8_q4kw6")
+surface_material_override/0 = ExtResource("4_kuk8v")
+
+[node name="Wheels" type="Node3D" parent="." unique_id=1629977702]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="FL" type="Node3D" parent="Wheels" unique_id=1521280309]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.76908106, 0.41863042, 1.5001032)
+
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/FL" unique_id=126354300]
+mesh = ExtResource("9_6oj5d")
+surface_material_override/0 = ExtResource("4_kuk8v")
+
+[node name="FR" type="Node3D" parent="Wheels" unique_id=2092823068]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.76908106, 0.41863042, 1.5001032)
+
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/FR" unique_id=1092591008]
+mesh = ExtResource("10_30q6a")
+surface_material_override/0 = ExtResource("4_kuk8v")
+
+[node name="RL" type="Node3D" parent="Wheels" unique_id=115960736]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.76908106, 0.41863042, -1.4428071)
+
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/RL" unique_id=1919018842]
+mesh = ExtResource("11_qvqtb")
+surface_material_override/0 = ExtResource("4_kuk8v")
+
+[node name="RR" type="Node3D" parent="Wheels" unique_id=784366501]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.76908106, 0.41863042, -1.4428071)
+
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/RR" unique_id=1015311433]
+mesh = ExtResource("12_2xogn")
+surface_material_override/0 = ExtResource("4_kuk8v")
+
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=2143771129]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9421061, -0.041665316)
+shape = SubResource("BoxShape3D_yx3ud")
+
+[node name="NavigationAgent" type="NavigationAgent3D" parent="." unique_id=676818225]
+path_desired_distance = 2.0
+target_desired_distance = 2.2
+
+[node name="SelectionRing" type="MeshInstance3D" parent="." unique_id=1745427509]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+material_override = SubResource("StandardMaterial3D_1hlng")
+cast_shadow = 0
+mesh = SubResource("TorusMesh_txlb1")

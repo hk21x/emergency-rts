@@ -1,0 +1,28 @@
+; Hospital drop-off. An Area3D that watches for vehicles (collision layer 1) driving
+; in. It detects but is not detectable, and the selection raycast ignores areas, so it
+; never gets in the way of picking.
+
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Game/Incidents/Hospital.gd" id="1_script"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonStarter/Models/extracted/SM_PolygonPrototype_Buildings_Floor_5x5_01P.res" id="2_floor"]
+[ext_resource type="Material" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_02_mat.tres" id="3_red"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_zone"]
+size = Vector3(8, 4, 8)
+
+[node name="Hospital" type="Area3D"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_script")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+shape = SubResource("BoxShape3D_zone")
+
+; Floor tile has a corner origin covering x[-5,0] z[0,5]; scaled 1.6 and shifted to
+; centre an 8x8 pad. Lifted 1cm so it does not z-fight the plaza underneath.
+[node name="Pad" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.6, 0, 0, 0, 1, 0, 0, 0, 1.6, 4, 0.01, -4)
+mesh = ExtResource("2_floor")
+surface_material_override/0 = ExtResource("3_red")

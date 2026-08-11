@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://c3hccy82752cw"]
+
+[ext_resource type="Texture2D" uid="uid://djasxklb5e7kx" path="res://Assets/Synty/PolygonStarter/Textures/PolygonStarter_Texture_04.png" id="1_mlwh3"]
+
+[resource]
+resource_name = "PolygonStarter_Mat_04_mat"
+depth_draw_mode = 1
+albedo_texture = ExtResource("1_mlwh3")
+roughness = 0.8
+uv1_scale = Vector3(1, 1, 0)

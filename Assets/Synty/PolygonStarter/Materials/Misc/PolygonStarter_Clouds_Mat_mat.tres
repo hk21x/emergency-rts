@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://ceixfyitrxs3b"]
+
+[resource]
+resource_name = "PolygonStarter_Clouds_Mat_mat"
+depth_draw_mode = 1
+emission_enabled = true
+emission = Color(1, 0.91791344, 0.74017924, 1)
+emission_energy_multiplier = 0.6
+uv1_scale = Vector3(1, 1, 0)

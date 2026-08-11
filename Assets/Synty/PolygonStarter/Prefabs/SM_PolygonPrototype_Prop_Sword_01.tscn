@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://dith82jwbyxlv"]
+
+[ext_resource type="ArrayMesh" uid="uid://c5veiayni5eqp" path="res://assets/Synty/PolygonStarter/Models/extracted/SM_PolygonPrototype_Prop_Sword_01.res" id="1_ngp3e"]
+[ext_resource type="Material" uid="uid://bprw8jx500qd0" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_01_mat.tres" id="2_h7io7"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_22fb5"]
+points = PackedVector3Array(-0.10750618, 0.14767149, -0.010550171, -0.10750618, 0.14767149, 0.010544557, -0.06964319, 0.96727085, -5.448237e-06, -0.054489575, 0.96727085, -0.00704759, -2.0749867e-05, 0.96727085, -0.026985358, -0.055710282, 0.13069901, -0.026927246, -0.03447418, -0.12155162, -0.022098651, -2.0749867e-05, 0.96727085, 0.026985027, -0.054489575, 0.96727085, 0.0070366934, -0.03447418, -0.12155162, 0.022093035, -0.055710282, 0.13069901, 0.026916347, -2.0749867e-05, 1.1164566, -5.448237e-06, -2.0749867e-05, 1.0828805, -0.00704759, 0.039715387, 0.96727085, -0.012452025, 0.10750676, 0.14767149, -0.010550171, 0.05568982, 0.13069901, -0.026927246, 0.034453712, -0.12155162, -0.022098651, -0.014858663, -0.13999999, -0.014993113, 0.05568982, 0.13069901, 0.026916347, 0.10750676, 0.14767149, 0.010544557, 0.054469116, 0.96727085, 0.0070366934, -2.0749867e-05, 1.0828805, 0.0070366934, -0.014858663, -0.13999999, 0.0149874985, 0.034453712, -0.12155162, 0.022093035, 0.06962273, 0.96727085, -5.448237e-06, 0.054469116, 0.96727085, -0.00704759, 0.014838204, -0.13999999, -0.014993113, 0.014838204, -0.13999999, 0.0149874985)
+
+[node name="SM_PolygonPrototype_Prop_Sword_01" type="MeshInstance3D"]
+gi_mode = 2
+mesh = ExtResource("1_ngp3e")
+surface_material_override/0 = ExtResource("2_h7io7")
+
+[node name="MeshCollider" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider"]
+shape = SubResource("ConvexPolygonShape3D_22fb5")

@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://da0n7m3yt10cw"]
+
+[ext_resource type="ArrayMesh" uid="uid://cg0yqglxxfhh2" path="res://assets/Synty/PolygonStarter/Models/extracted/SM_Generic_CloudRing_01.res" id="1_4n0ai"]
+[ext_resource type="Material" uid="uid://bprw8jx500qd0" path="res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_01_mat.tres" id="2_4uq1g"]
+
+[node name="SM_Generic_CloudRing_01" type="MeshInstance3D"]
+gi_mode = 2
+mesh = ExtResource("1_4n0ai")
+surface_material_override/0 = ExtResource("2_4uq1g")

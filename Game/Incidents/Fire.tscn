@@ -1,0 +1,99 @@
+; A fire. Collision layer 8: pickable by the selection raycast, but outside the
+; vehicle (mask 3) and person (mask 1) masks, so nobody collides with it, and outside
+; the navigation bake (mask 1), so it never carves a hole in the paths.
+
+;
+; The cone is the readable shape from the RTS camera; the particles sell it up close.
+; Both are driven from Fire.intensity by Fire.gd.
+
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://Game/Incidents/Fire.gd" id="1_script"]
+[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonStarter/Models/extracted/SM_PolygonPrototype_Primitive_Cone_01P.res" id="2_cone"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_pick"]
+radius = 1.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flame"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.42, 0.06, 0.92)
+
+[sub_resource type="Gradient" id="Gradient_fire"]
+offsets = PackedFloat32Array(0, 0.45, 1)
+colors = PackedColorArray(1, 0.93, 0.45, 1, 1, 0.45, 0.08, 0.85, 0.5, 0.11, 0.02, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_fire"]
+gradient = SubResource("Gradient_fire")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_fire"]
+emission_shape = 1
+emission_sphere_radius = 0.3
+direction = Vector3(0, 1, 0)
+spread = 12.0
+initial_velocity_min = 1.4
+initial_velocity_max = 2.8
+gravity = Vector3(0, 1.2, 0)
+scale_min = 0.35
+scale_max = 0.8
+color_ramp = SubResource("GradientTexture1D_fire")
+
+[sub_resource type="Gradient" id="Gradient_smoke"]
+offsets = PackedFloat32Array(0, 0.25, 1)
+colors = PackedColorArray(0.2, 0.19, 0.18, 0, 0.26, 0.25, 0.24, 0.3, 0.4, 0.4, 0.4, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_smoke"]
+gradient = SubResource("Gradient_smoke")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_smoke"]
+emission_shape = 1
+emission_sphere_radius = 0.45
+direction = Vector3(0.25, 1, 0)
+spread = 18.0
+initial_velocity_min = 1.0
+initial_velocity_max = 1.8
+gravity = Vector3(0.6, 1.6, 0)
+scale_min = 0.7
+scale_max = 1.6
+color_ramp = SubResource("GradientTexture1D_smoke")
+
+[sub_resource type="QuadMesh" id="QuadMesh_puff"]
+size = Vector2(0.7, 0.7)
+
+[node name="Fire" type="StaticBody3D"]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_script")
+display_name = "Fire"
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("SphereShape3D_pick")
+
+; Unit cone centred on its origin; Fire.gd scales this and lifts it so the base stays
+; on the ground as the fire grows.
+[node name="Flame" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+material_override = SubResource("StandardMaterial3D_flame")
+cast_shadow = 0
+mesh = ExtResource("2_cone")
+
+; local_coords off so the plume is left behind in the world rather than being dragged
+; about when the node is scaled.
+[node name="Flames" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+cast_shadow = 0
+amount = 28
+lifetime = 0.9
+local_coords = false
+process_material = SubResource("ParticleProcessMaterial_fire")
+draw_pass_1 = SubResource("QuadMesh_puff")
+
+[node name="Smoke" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+cast_shadow = 0
+amount = 12
+lifetime = 2.2
+local_coords = false
+process_material = SubResource("ParticleProcessMaterial_smoke")
+draw_pass_1 = SubResource("QuadMesh_puff")
