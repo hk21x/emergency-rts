@@ -35,10 +35,11 @@ found along the way.
 | 20. Structure | **half** | The career economy shipped; campaign scenarios are still to author |
 | 21. Feel & consequence | **part** | Weather, time of day, radio log, debrief — plus the driving faults found from play and fixed |
 
-The fire service wears **placeholder models** — the City pack ships no appliance and
-no firefighter, so the engine is the van body and the crew are police models, both
-repainted. Everything under them is real, and a fire pack would replace them without
-touching a mechanic.
+The fire service is **half dressed**. The engine is a real appliance since August 2026 —
+PolygonTown's fire truck, with a working ladder and its own hose nozzle in the crew's
+hands — but the City pack ships no firefighter, so the crew are still police models
+repainted orange. A style-matched pack would replace them without touching a mechanic:
+the crew's `source` in `build_character.gd` and two portrait entries.
 
 Explicitly parked: **multiplayer co-op**, a **mod editor**, and **save/load**
 (a shift is 5–15 minutes; there is nothing yet worth saving mid-shift).
@@ -56,6 +57,55 @@ The phases are done; what has landed on top of them, in order:
   MP3 importer leaves off, which no check for "a sound is loaded" would ever catch.
 - **The map ships quiet** — no scripted shout; the district idles until `F2` opens
   a shift and the director starts producing calls.
+- **Fires have kinds, and one call can hurt you back** — a fire is now `BIN`,
+  `VEHICLE` or `BUILDING`, each with its own plume, rates and spread, instead of four
+  call sites poking the same four fields inline. A car fire **bills** any vehicle
+  parked in it, straight into the repair economy that already existed, so where you
+  leave the appliance costs money. And a new **gas leak** call puts a pressure cylinder
+  beside a small fire: it heats while the fire burns, the board counts it down through
+  "warming" / "venting" / "about to go", and at the limit it goes — damaging what is
+  near, turning bystanders into casualties, and throwing fresh fires. It is beaten two
+  ways, hose the cylinder (`Cool`, the twelfth verb) or put the fire out first, and
+  choosing between them is the call. The command bar went to **two rows** to hold the
+  new tile.
+- **Group orders spread and queued ones are visible** — ordering ten units somewhere no
+  longer stacks them on one coordinate; slots are laid out per navigation layer, assigned
+  nearest-first, and validated against the unit's own mesh before use. And every order in
+  a queue now has a marker, where only the one being driven at did.
+- **Your own people can be lost** — a blast or a resisting suspect hurts the crew, and a
+  firefighter who goes down leaves a casualty on the pavement wearing their own kit. Send
+  a paramedic and they come back; do not and the career loses the unit it paid for. They
+  still count against the roster while they lie there, so there is no replacing them in
+  the meantime.
+- **A shift you walk out on still costs you** — abandoning fails the calls you left and
+  sweeps outstanding repair damage onto a persisted house account, which then comes off
+  the top of future earnings. Quitting a bad shift used to be strictly better than
+  finishing it.
+- **Arrests are walked in** — Escort moved from the patrol car to the officer, so a
+  cuffed suspect is taken by the arm and marched to the car rather than appearing inside
+  it from five metres away. The car no longer has to reach them, which means an arrest
+  can happen anywhere feet go. And it holds **two** now, not one.
+- **A crowd can turn** — a disorder call draws bystanders in for as long as nobody is
+  standing in it, so arriving *is* the intervention and arriving late costs you the size
+  of the job. It is also the first thing in the game that has ever required a **cordon**:
+  a ring of cones contains it as well as an officer does. Sized to the officers owned,
+  the same way a building fire is sized to the crew.
+- **Someone can be pinned under the load** — a trapped casualty can be treated where
+  they lie but cannot be moved until a fire crew cuts them free (`Free`, `T`). It is the
+  first call needing two services **in sequence** rather than at once, so turning up in
+  the wrong order costs time rather than being a matter of taste.
+- **Fires want the right stuff put on them** — each kind names an agent, and the wrong
+  one does nothing. A car fire burns fuel, so it costs **foam** from a second tank that
+  only the station refills: a hydrant is a water main, and the fourth car fire of a shift
+  sends the appliance home. And an **electrical** fire is the first call in the game that
+  the fire service cannot answer and the police can, because dry powder is what a patrol
+  car actually carries. The board says what each fire wants, so none of it is a memory
+  test.
+- **You can see the water** — a hose stream now leaves the firefighter and lands on
+  what they are fighting, built out of the particle pack's rain streaks since it ships
+  no water. It is driven by water actually *delivered*, not by the order running, so an
+  officer stood in front of a building fire achieving nothing shows nothing — which is
+  the same lesson the mechanic already taught, said out loud for the first time.
 - **The district doubled** — 260m, twenty-five varied blocks, two parks, two parking
   lots, four tower families, on deliberately irregular road spacing.
 - **The minimap became a control surface** — left-click looks, right-click orders
@@ -80,8 +130,9 @@ seam.
 
 - **The crime loop** — a fifth incident: a `Suspect` causing a Disturbance, worked
   with the police mirror of the casualty journey. `Apprehend` (officers, scores with
-  Treat) takes them into custody, `Escort` (patrol cars, scores with Collect) puts
-  them in the back, and driving into the station books them in for 75 points. No
+  Treat) takes them into custody, `Escort` (scores with Collect) puts them in the
+  back, and driving into the station books them in for 75 points. *(Escort moved
+  from the patrol car onto the officer's feet in August 2026 — see below.)* No
   timer — an unattended disturbance just stands there while the response bonus
   drains. The call board gained `Kind.CRIME` and a shield mark.
 - **Medical calls take a civilian** — the director swaps a crowd member for a
@@ -107,7 +158,9 @@ seam.
   outside a parked vehicle's reach. Collect moved onto the **paramedic** as
   `StretcherOrder` — fetch the stretcher from the ambulance, wheel it out, lift
   them on, wheel them back aboard — and crime calls were pinned kerbside (with a
-  longer Escort reach) so the patrol car can always pull up beside its suspect.
+  longer Escort reach) so the patrol car could always pull up beside its suspect.
+  *(That reach is gone: August 2026 moved Escort onto the officer for exactly the
+  reason the stretcher run moved onto the paramedic.)*
   The ambulance still carries and delivers; it just no longer drives at people.
 
 ### Phase 18 — game framing (August 2026)
@@ -866,6 +919,65 @@ centre line became 21%, and the staged blockade stopped arriving. And a `navigat
 guard that clamps any off-map destination is kept, since nothing in play should ever ask
 for one.
 
+**A real fire appliance, and the fire itself** (August 2026). Two Synty packs arrived --
+POLYGON Town and a particle pack -- and closed the oldest gap in the project. The
+appliance had been the City pack's **van in orange paint**, and before that the patrol
+car's hull; it is now a POLYGON Town aerial at **3.11 x 2.84 x 8.82**, 76% longer than
+the van. `Fire.tscn`'s hand-built cone-and-quads became the pack's fire and smoke.
+
+**The swap was gated on a measurement, not on looks.** Turn radius is
+`wheelbase / tan(steer)`, and the appliance's wheelbase is 4.46 against a patrol car's
+2.88 -- the longest body on the map, in a district where wide cornering is the
+known-worst behaviour. `probe_corner.gd` grew a `PROBE_UNIT` switch and drove both round
+the same three junctions before any cosmetic work: the appliance completed all three in
+**74.2s against the patrol car's 76.4s**, reaching full lock and reversing at two apexes.
+Had it not got round, the honest outcome was to stop.
+
+Three things the swap broke that nothing caught, all found by review rather than by the
+suite, and all now pinned:
+
+- **The crew dismounted *inside* the truck.** `dismount_back` was a fixed 3.2 measured on
+  a 5m van; the appliance's tail is 4.4m back. It is derived from the hull now (5.50 on
+  the appliance) and a check reads the number. Nothing would ever have caught it: a
+  vehicle is a `CharacterBody3D`, so it is absent from the baked navigation the dismount
+  point snaps to, and four firefighters simply appeared in the bodywork.
+- **Every other portrait shrank 37%.** `_shoot_group` frames a group on its largest
+  member so the relative sizes stay honest -- which held while the biggest vehicle was a
+  5.2m car. The 9m appliance took the patrol car from filling 82% of its card to 52%.
+  The frame is now capped just above the *second* largest and the appliance overhangs.
+- **The paint check lost its subject quietly.** It samples a body's albedo at its own UVs
+  and asks whether red leads; that is the right question for a *repainted* placeholder
+  and the wrong one for a purpose-built asset. The appliance's red-and-white livery
+  averages +0.03, under the bar, while a yellow taxi reads warmer than either. The check
+  now covers the firefighter alone -- who is still a repaint, and still passes at +0.08
+  -- and the appliance is pinned by what it *is*: wheelbase, bulk, and a ladder no other
+  body in any pack has.
+
+The appliance lost the van's rear doors, which no code needed -- `open_doors()` already
+no-ops without them. It gained an **animated ladder** in their place, raised while its
+hose is being worked and lowered when the crew stop. The ask expires rather than being
+cancelled, so nothing has to remember to put it away.
+
+**The cone went too, a session later** -- on play feedback: "the fire is great, but remove
+the orange cone now that the fire is in place". It had been the readable silhouette at RTS
+zoom while the flame was two hand-built quad emitters, and against the pack's fire it was a
+flat orange lozenge sitting inside one. `FX_Fire_Large_01` replaced the medium in the same
+pass, so a fire is now one big plume and nothing else. Removing it surfaced a real bug: the
+scale was being applied to *every* emitter, and scale is inherited, so the embers were
+running at 2.4 x 2.4. Scale goes on the two roots now, `amount_ratio` on all four.
+
+**The ritual caught a vacuous check, which is what it is for.** "Every emitter thins with
+it" took its emitter list from `_particles` -- the same list the code under test iterates
+-- so it read "N of N" and could not fail for the fault it named. Deleting the
+sub-emitter collection entirely left it green at `(2 of 2)`. Counting off the scene tree
+instead splits the numerator from the denominator, and the same sabotage now reads
+`(2 of 4)`.
+
+Ruled out after review: the Town characters use a different skeleton (`Ankle_L`,
+`Clavicle_L`) from the City pack's humanoid rig, so they would not animate -- a
+retargeting project, not an asset swap. The pack's rain was left alone; the current rain
+encodes a hard-won fix recorded above.
+
 **The kerb, climbable on request** (August 2026). Third attempt, and the first that
 shipped working. The two before it changed the *ground* — a flush pavement, then a bevel
 — and lost lane containment because world geometry is unconditional. This one is a manual
@@ -1160,7 +1272,65 @@ because from inside that timer the two situations are indistinguishable. It want
 different signal rather than a better number, and it is in NEXT.md rather than papered
 over.
 
-**650 automated checks**, all passing. Run them with any Godot 4.6+ binary
+A vehicle on a shout now **takes the pavement to get past a shut street** — reported from
+play as an engine stuck at junctions, and the report's diagnosis was wrong in a way worth
+keeping. The cars were not against kerbs at all: they were queued behind traffic for 64-72%
+of their stuck frames, and the stuck-car route into the kerb climb had never fired once in
+the project's history, because an escape moves the car and movement zeroes the tally it
+needs. Softening that gate measured byte-for-byte identical. What was actually missing was a
+different question — *is the street shut and am I on a shout* — and the answer to it is a
+manoeuvre rather than a looser rule.
+
+It comes in two halves and the second is not optional: going up strands the car, because
+from the pavement the navigation agent's nearest reachable point is the carriageway it just
+left, on the near side of the obstruction. Left there it drove back into the wall and
+mounted again — 555 frames off the carriageway, a 33.3s journey unfinished in sixty seconds.
+`_returning` steers it forwards past the obstruction and puts it down. Measured on a wall of
+three: a journey that never finished in 60s now takes 43.9s, and all three junction turns are
+byte-identical to baseline, which is the point — a kerb runs along a street, and a junction
+mouth is off the navigation mesh with no step on it, so mounting there is pure harm. Two
+probes and `Game/README.md` carry the eight measurements that shaped it, including the three
+plausible signals and the two plausible recovery designs that were built and thrown away.
+
+The medical service gained its **first specialist**, and with it the first dispatch decision
+it has ever had. Medical is the highest-weight call category in the game and had the least
+variety in it: every casualty declined at the same rate and the player performed a sequence —
+treat, lift, drive, deliver — with no question about who went where. A doctor changes that
+without adding a single new verb. A casualty marked `needs_doctor` is beyond a paramedic, who
+can **hold them** indefinitely but never stabilise them; only the doctor closes the gap, and
+a career owning one doctor and three paramedics has to answer where the doctor goes while the
+paramedics buy the time. The director gates those calls on owning a doctor, exactly as it
+gates building fires on owning an engine — a casualty nobody can finish is a broken call, not
+a hard one.
+
+The enabling change underneath is small and was the point of doing this first: `Unit.service`
+is identity, so it could never express a specialist *within* a service, and inventing a
+fourth emergency service for a doctor would have been a lie carried through the palette, the
+roster and the call routing. Capability is now service plus `Person.speciality`.
+
+Adding it exposed a latent fault that no specialist could have avoided: `Station.type_of()`
+identified units by `(service, vehicle)`, exact only while each service had one kind of
+person. Writing off a doctor decremented the *paramedic* count, and the dispatch panel offered
+paramedics that did not exist. Units now carry the id they were bought as. Two of this
+increment's checks were themselves wrong when first written — one inverted, passing under the
+bug and failing once fixed, and one inert — and the sabotage pass is what found both.
+
+The doctor also got a car — the patrol hull in orange — because a specialist on foot arrives
+after the call has resolved itself. It carries no stretcher on purpose: a response car that
+could also run the patient to hospital would quietly replace the ambulance and dissolve the
+bottleneck the doctor exists to be.
+
+The shop is now grouped by service, because eight buyable types in a single row ran off the
+screen and the two rightmost were unbuyable. It is derived from the catalogue's own `service`
+key, so the next unit files itself.
+
+Ambient traffic no longer tries to pull over off the edge of the world — spotted as a warning
+during a play session, fixed by working the kerb point out before committing to the manoeuvre
+and declining it when there is no district left to tuck into. The suite's own fixture had been
+firing the same warning on every run for a destination it deliberately never reached; that is
+gone too, because a diagnostic that cries wolf every run is worse than no diagnostic.
+
+**802 automated checks**, all passing. Run them with any Godot 4.6+ binary
 (`--fixed-fps 60` decouples the loop from the wall clock — ~20s instead of ~9min):
 
     godot --headless --fixed-fps 60 --path . --script res://Game/smoke_test.gd
@@ -1213,8 +1383,8 @@ sessions. Meanwhile the district takes part: traffic pulls over for a passing
 response, and a body draws onlookers along the pavements to stand and watch.
 
 Right-click meaning comes from a scoring ladder rather than any branching in the
-controller: **Treat/Apprehend 30 → Collect/Escort 25 → Extinguish 20 → Board 10 →
-Move 0**. Adding a verb is a new `Ability` and nothing else — it gets a command
+controller: **Free 32 → Treat/Apprehend 30 → Cool 28 → Collect/Escort 25 →
+Extinguish 20 → Board 10 → Move 0**. Adding a verb is a new `Ability` and nothing else — it gets a command
 tile, a hotkey and a right-click meaning without a line changing anywhere else.
 
 Every unit, vehicle, character and the map itself is **generated** by a build script
@@ -1374,9 +1544,9 @@ The table below is where it stands now, with phase 19's fire service in it:
 
 | Service | Verbs |
 | --- | --- |
-| **Police** — officers, patrol cars | Move, Apprehend, Extinguish, Secure, Board, Stop; Escort on the cars (phase 16) |
+| **Police** — officers, patrol cars | Move, Apprehend, Escort, Extinguish, Secure, Board, Stop — all on the officer; a car carries two prisoners |
 | **Medical** — paramedics, the ambulance | Move, Treat, Collect (the stretcher run), Board, Stop; the ambulance carries and delivers |
-| **Fire** — firefighters, the engine | Move, Extinguish, Board, Stop — one verb, done properly; the engine carries the crew and the hose |
+| **Fire** — firefighters, the engine | Move, Extinguish, Cool, Free, Board, Stop; the engine carries the crew, the hose and a foam tank |
 
 Gating is **hard**: an officer is not offered Treat at all, so right-clicking a casualty
 with one selected produces a **Move** order. Sending the wrong unit is a wasted trip
@@ -1568,7 +1738,7 @@ At `Assets/Synty/PolygonCity/` — **337 prefabs, 412 pre-extracted meshes, 51 M
 It arrived as a **complete Godot project** rather than an asset folder, with its own
 `project.godot` and every prefab referencing a path that did not exist from this
 project's root. Fixed by lifting the inner asset folder up so those paths resolve, then
-deleting the wrapper. `SourceFiles/` (763 MB of FBX/OBJ/Maya) was removed; Godot never
+deleting the wrapper. `SourceFiles/` (766 MB of FBX/OBJ/Maya) was removed; Godot never
 needed it, since the meshes ship pre-extracted as `.res`.
 
 Two things about it shaped everything since:

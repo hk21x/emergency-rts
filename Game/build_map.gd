@@ -1148,6 +1148,13 @@ func _build_actors() -> void:
 	nav_debug.set_script(load("res://Game/NavDebug.gd"))
 	_attach(_root, nav_debug, "NavDebug")
 
+	# Call spawner on F5. Third of the same shape as the black box and the navigation
+	# overlay: inert until a key is pressed, and it places nothing itself -- it asks the
+	# director, so every call it opens goes through the same guards a rolled one does.
+	var spawner := Node.new()
+	spawner.set_script(load("res://Game/CallSpawner.gd"))
+	_attach(_root, spawner, "CallSpawner")
+
 	var director := Node.new()
 	director.set_script(load("res://Game/Director.gd"))
 	_attach(_root, director, "Director")

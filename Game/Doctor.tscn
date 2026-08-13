@@ -1,0 +1,73 @@
+; A doctor on foot. The same body as Paramedic.tscn with one field changed -- `speciality`
+; -- and that field is the whole feature: service says which verbs a unit offers, speciality
+; says what one of them achieves. See Person.speciality.
+;
+; Hand-authored, like Person.tscn and Paramedic.tscn. build_character.gd generates the
+; *character* scenes under Game/Characters/; these unit wrappers around them are written by
+; hand and are not regenerated.
+;
+; The body is the City pack's shirted civilian rather than its police model. That is not a
+; costume choice so much as the only way to tell a doctor from a paramedic at RTS zoom: they
+; share a service, so they share the selection-ring colour and the roster grouping, and if
+; they also shared a silhouette the specialist would be invisible in the one place it
+; matters -- on the map, when you are deciding who is nearest. The pack ships no medical
+; uniform of any kind; the same gap is noted in build_character.gd and is why the
+; firefighter is a repainted police model too.
+;
+; The portrait falls back to the drawn service symbol, because Game/UI/Portraits/ has no
+; doctor and build_portraits.gd needs a window to make one. Noted in NEXT.md.
+
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Game/Units/Person.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://Game/Characters/BusinessMan_Shirt.tscn" id="2_character"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.3
+height = 1.8
+
+[sub_resource type="TorusMesh" id="TorusMesh_ring"]
+inner_radius = 0.5
+outer_radius = 0.62
+rings = 32
+ring_segments = 6
+
+; Recoloured at runtime from the unit's service, so this is only the starting point.
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.25, 1, 0.4, 0.85)
+
+; Layer 4 marks people. They collide only with the static world (mask 1), not with
+; vehicles or each other.
+[node name="Doctor" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_script")
+display_name = "Doctor"
+service = 2
+speciality = &"doctor"
+selection_ring_path = NodePath("SelectionRing")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+; navigation_layers = 2 selects the person navigation mesh, baked with a small agent
+; radius. Vehicles use layer 1 and its much wider mesh.
+[node name="NavigationAgent" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.5
+target_desired_distance = 0.7
+navigation_layers = 2
+avoidance_enabled = false
+
+[node name="SelectionRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+material_override = SubResource("StandardMaterial3D_ring")
+cast_shadow = 0
+mesh = SubResource("TorusMesh_ring")
+
+; The character mesh faces +Z, but Godot's forward is -Z. Yaw the visual 180 so the
+; node's -Z really is its forward, or the doctor moonwalks.
+[node name="Character" parent="." instance=ExtResource("2_character")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)

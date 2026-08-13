@@ -22,6 +22,7 @@ func _ready() -> void:
 	custom_minimum_size = Vector2(badge_size + 10.0, 0.0)
 	add_theme_constant_override("separation", 3)
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	Hover.attach(self)
 	size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 
 	_badge = UnitBadge.new()

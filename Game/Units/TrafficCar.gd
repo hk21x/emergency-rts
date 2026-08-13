@@ -298,6 +298,28 @@ func _update_pull_over(delta: float) -> bool:
 	if responder and not is_pulled_over:
 		if _tuck_cooldown > 0.0:
 			return false
+		var forward := -global_basis.z
+		forward.y = 0.0
+		if forward.length() < 0.01:
+			return false
+		forward = forward.normalized()
+		# Well ahead and to the right, so the car noses in over a car length or two
+		# rather than crabbing sideways.
+		var kerb := global_position + forward * 7.0 + forward.cross(Vector3.UP) * kerb_tuck
+		# **Worked out before the manoeuvre is committed to, and declined if it leaves the
+		# district.** Reported from play: a car near the southern edge aimed at z -131 on a
+		# map that ends at 130, seven metres ahead of itself. `Vehicle.navigate_to` caught it
+		# and clamped, which is that guard doing its job, but clamping is the wrong answer
+		# here -- it aims the car at the boundary rather than at a kerb, so it performs a
+		# tuck towards nothing and warns, with a stack trace, in the middle of play.
+		#
+		# Declining is truer than clamping: a car with less than a tuck's length of district
+		# in front of it has nowhere to pull in. It keeps driving and the responder passes it
+		# the way it passes any other obstruction, which is a far better outcome than a car
+		# parked on the map edge.
+		var edge := CityGrid.MAP_HALF
+		if absf(kerb.x) > edge or absf(kerb.z) > edge:
+			return false
 		_tuck_time = 0.0
 		is_pulled_over = true
 		# Handing back whatever the yield logic was doing: the kerb is the new plan.
@@ -308,14 +330,7 @@ func _update_pull_over(delta: float) -> bool:
 		_normal_arrive = arrive_radius
 		arrive_radius = 1.0
 		_agent.target_desired_distance = 1.0
-		var forward := -global_basis.z
-		forward.y = 0.0
-		if forward.length() > 0.01:
-			forward = forward.normalized()
-			# Well ahead and to the right, so the car noses in over a car length or
-			# two rather than crabbing sideways.
-			navigate_to(global_position + forward * 7.0
-				+ forward.cross(Vector3.UP) * kerb_tuck)
+		navigate_to(kerb)
 	elif responder == null and is_pulled_over:
 		_release_tuck()
 	return is_pulled_over

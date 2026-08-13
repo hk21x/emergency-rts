@@ -79,6 +79,14 @@ const FLOOR_FLOOR := -3.0
 @export var slowdown_distance := 16.0
 ## Steering input per radian of heading error.
 @export var steer_gain := 2.2
+## How far ahead the steering looks, as seconds of travel. See [method _steer_point].
+@export var steer_lookahead_time := 0.45
+## Floor and ceiling on that. The floor keeps a crawling car from aiming at its own
+## bonnet -- and from reading every kink in the path as a reason to slow down, since
+## `turn_factor` treats heading error that way. The ceiling stops the aim running past a
+## bend, which is the whole point.
+@export var steer_lookahead_min := 6.0
+@export var steer_lookahead_max := 12.0
 ## Beyond this heading error the car reverses to swing its nose around instead of
 ## driving a long loop. A car cannot turn on the spot.
 @export var reverse_angle_degrees := 115.0
@@ -172,6 +180,21 @@ const ENGINE_STREAMS := ["res://Game/Audio/engine.wav"]
 @export var door_travel := 1.4
 ## How long they stay open after someone has got in or out.
 @export var door_hold := 2.2
+
+@export_group("Ladder")
+## The appliance's main ladder, raised while its hose is being worked. Empty on every
+## other body -- only the fire engine has one.
+@export var ladder_path: NodePath
+## How far it swings up from stowed.
+@export var ladder_degrees := 38.0
+## Seconds from stowed to fully raised. Slower than a door: it is a big hydraulic thing
+## and it should not snap.
+@export var ladder_travel := 3.2
+## How long a single ask keeps it up. Whoever is using the appliance calls
+## [method raise_ladder] repeatedly rather than once, so this only has to outlast the gap
+## between two calls -- and the caller is on the physics tick while this runs on the
+## render one, so "was it asked this frame" would flicker between them.
+@export var ladder_hold := 0.6
 ## Seconds of being pinned at a standstill before the car backs off and tries again.
 ## A safety net for the cases the navigation path cannot express -- wedged against a
 ## knocked-over cone, or shunted off the path by a collision.
@@ -209,6 +232,60 @@ const ENGINE_STREAMS := ["res://Game/Audio/engine.wav"]
 ## This is what separates "stuck" from "briefly stationary": a car cornering hard is
 ## the latter and must never climb, and only counting seconds cannot tell them apart.
 @export var climb_escapes := 2
+## Seconds a vehicle **on a shout** must have spent going nowhere with the street ahead
+## shut before it will take to the pavement to get round the obstruction.
+##
+## Must stay under [constant MoveOrder.HELD_UP_AFTER] (4s), or the order writes the street
+## off and re-routes before the appliance ever tries. Comfortably over a junction's worth of
+## ordinary queueing, so a car waiting its turn behind one taxi never does this.
+@export var mount_after := 2.5
+## How far to the side the pavement line sits.
+##
+## **Measured, not chosen.** A cross-section stepped outward from an appliance stopped in
+## its lane puts the edge of the carriageway between five and six metres, and the line must
+## also clear [member off_road_margin] or [method _is_off_road] still calls it road. 5.4 was
+## tried first and read as on-carriageway on *both* sides at every opportunity, so no mount
+## ever began.
+@export var mount_shift := 7.0
+## How far ahead the pavement line sits. **Much shorter than [member avoid_reach]**, which
+## is the difference between a pass and a mount: nine metres out and seven across is a lane
+## change, and a lane change is no use when the reason the car is stuck is a vehicle
+## touching its own bumper.
+@export var mount_reach := 3.0
+## Speed ceiling while taking the pavement. Slow enough to read as a deliberate, careful
+## manoeuvre; fast enough that the car actually reaches the kerb, which it will not do at
+## the stopped blocker's speed.
+@export var mount_speed := 4.5
+## Under this, a vehicle with the street shut ahead of it counts as going nowhere. Not
+## near-stationary: 2 m/s with a 25 m/s ceiling and a wall in front is not progress.
+@export var mount_crawl := 2.0
+## How long one mount may last before it lapses and the car is handed back to the ordinary
+## reverse-and-retry machinery. Committing to a mount suppresses the escape manoeuvre, so a
+## car that cannot manage one must not be left up there indefinitely.
+@export var mount_window := 6.0
+## Close enough to the pavement spot to call the mount done. A body length, roughly -- the
+## point is to be past the queue, not to park on a particular paving slab.
+@export var mount_arrived := 3.0
+## How far forward to look for somewhere to rejoin the carriageway after a mount.
+##
+## **Must clear the obstruction.** Rejoining short of it puts the car back exactly where it
+## started, which is the loop this whole manoeuvre exists to break. Comfortably longer than
+## a wall of stopped vehicles.
+@export var return_ahead := 14.0
+## How long the car may spend hunting for the carriageway before giving up and letting the
+## ordinary machinery have it back. A safety valve, like [member mount_window].
+@export var return_window := 8.0
+## How far clear of a junction centre a car must be before it may mount.
+##
+## **The single most important term in this feature, and a geometry fact rather than a
+## taste.** A kerb runs along a street; a junction is a crossing, and the ground at its
+## mouth is off the vehicle navigation mesh without having any step on it. Measured at a
+## junction the car drove seven metres sideways onto flat tarmac, spent its whole window
+## there, and turned a 76.7s journey into one it had not finished in 150 seconds. On a
+## straight street the same code turned a journey it never finished in 60s into 41.4s.
+## Same feature, opposite results, and this is what tells them apart.
+@export var mount_clear_of_junction := 12.0
+
 ## How far a destination must be from any legal route before it counts as a deliberate
 ## trip off the road. Generous: the navigation mesh stops a little short of the kerb, so
 ## a tight parking spot on the carriageway must not read as off-road.
@@ -222,6 +299,12 @@ const ENGINE_STREAMS := ["res://Game/Audio/engine.wav"]
 ## Whether this vehicle carries water at all. Only a fire appliance does; on
 ## everything else the tank is meaningless and never drawn.
 @export var carries_water := false
+## Whether this vehicle carries **foam** as well as water. Same appliance, second tank.
+##
+## Split from water rather than folded into it because the whole point is that they run
+## out separately: a shift of kerbside bins costs water, a shift of car fires costs foam,
+## and a crew can be perfectly wet and unable to touch the next job.
+@export var carries_foam := false
 ## Refilled beside a hydrant or back at the station, at this much of the tank a
 ## second. Four seconds for a full one: long enough to be a decision about where to
 ## park, short enough that it is never the boring part of a shift.
@@ -287,6 +370,13 @@ var suspects: Array[Suspect] = []
 ## with only what they carry can knock it down, so an engine that runs dry has to be
 ## moved rather than waited out.
 var water := 1.0
+## What is left of the foam, 0 to 1. Drawn by the same hose against a fuel fire.
+##
+## **A hydrant does not refill this.** Water is a thing the street supplies and foam is a
+## thing the station stocks, which is what turns "which agent" from a lookup into a
+## decision: park by a hydrant and you can fight bins and buildings all day, but the
+## fourth car fire of a shift sends the appliance home.
+var foam := 1.0
 ## True while parked beside a hydrant (or at the station) taking water on. Public so
 ## the interface can say so rather than leaving a number to climb unexplained.
 var is_refilling := false
@@ -314,12 +404,24 @@ var _siren_time := 0.0
 var _siren_audio: AudioStreamPlayer3D
 var _engine_audio: AudioStreamPlayer3D
 var _doors: Array[Node3D] = []
+var _ladder: Node3D
+var _ladder_rest: Basis
+## 0 stowed, 1 fully raised, and where it is heading. Unlike the doors this has no hold
+## timer: a ladder stays up for as long as the crew is working and comes down when they
+## stop, so the wanted value is set every frame by whoever is using the appliance.
+var _ladder_raise := 0.0
+var _ladder_wanted := 0.0
+var _ladder_hold_left := 0.0
 ## 0 shut, 1 fully open, and where it is heading.
 var _door_swing := 0.0
 var _door_wanted := 0.0
 var _door_hold_left := 0.0
 
 var _navigating := false
+## How far along its path the steering has got, as a segment index. Kept so the search
+## for the car's position on the path can only ever move forward -- see
+## [method _closest_on_path].
+var _path_at := 0
 ## Whether the current destination is somewhere the car cannot legally drive to -- a
 ## pavement, a verge, a park lawn. Sent there on purpose by the player, so the car has
 ## to be allowed both to keep going after the navigation path runs out and to climb the
@@ -334,6 +436,37 @@ var _may_turn_round := true
 var _reversing := false
 ## Seconds spent held below cruising speed by a vehicle it cannot get past.
 var _held_time := 0.0
+## Seconds spent going nowhere with the street ahead shut -- the licence for
+## [method _mount_line], and kept apart from [member _held_time] on purpose. That one counts
+## only frames on which no passing line was found *and* a blocker is latched; this one does
+## not care, because the fault it exists for is a car grinding along a wall while the code
+## believes it is passing beautifully.
+var _blocked_time := 0.0
+## Whether the car is currently steering at a spot on the pavement to get round a shut
+## street. Read by [method _climb_kerb] later in the same frame: it is the third way a kerb
+## can be earned, and the only one that does not require the car to have run out of answers.
+var _mounting := false
+## Seconds the current mount has been running, against [member mount_window].
+var _mount_time := 0.0
+## The spot on the pavement this mount is driving at, **fixed in world space when the
+## manoeuvre starts**. Recomputed each frame from the car's own heading it was a carrot on a
+## rotating stick: every degree the nose came round swung the aim another degree further, so
+## the car chased a point it could never reach.
+var _mount_point := Vector3.INF
+## Whether the car is coming back down off the pavement, and where to.
+##
+## **Without this the mount is a trap.** Measured on a short hop past a wall, a car that had
+## mounted successfully spent 555 frames off the carriageway -- 161 of them *turning round*
+## -- because from up on the pavement the navigation agent's nearest reachable point is the
+## carriageway the car just left, which is on the **near** side of the obstruction. So it
+## turned round, drove back, met the wall again and mounted again: a loop, at a mean 2.00
+## m/s and a mean 21.4m from a goal it never closed on. The agent cannot be asked this
+## question. The car has to be steered forwards, past the obstruction, and put down.
+var _returning := false
+var _return_point := Vector3.INF
+var _return_time := 0.0
+## Fractions of a pound of heat damage not yet billed. See [method scorch].
+var _scorch_owed := 0.0
 var _stuck_time := 0.0
 var _escape_time := 0.0
 ## Reverse-and-retry manoeuvres run since the car last got moving properly. Counts how
@@ -390,6 +523,9 @@ func _ready() -> void:
 	var right := get_node_or_null(door_right_path) as Node3D
 	if left and right:
 		_doors = [left, right]
+	_ladder = get_node_or_null(ladder_path) as Node3D
+	if _ladder:
+		_ladder_rest = _ladder.transform.basis
 
 
 ## The first of [param paths] that exists, set to loop, or null if none of them do.
@@ -439,6 +575,7 @@ func _process(delta: float) -> void:
 	_update_siren(delta)
 	_update_engine()
 	_update_doors(delta)
+	_update_ladder(delta)
 
 
 ## Pitches the engine note with road speed. A fixed idle floor keeps a parked unit
@@ -524,6 +661,40 @@ func _update_doors(delta: float) -> void:
 	_doors[1].rotation.y = angle
 
 
+## Asks for the ladder up or down. Called every frame the appliance is being worked as
+## a hose supply, so it needs no hold timer -- it simply stops being asked.
+##
+## This is what the appliance does instead of swinging rear doors. The van it replaced
+## had them and the real fire engine has none, so the flourish moved from the back of
+## the vehicle to the top of it. A no-op on anything without a ladder, which is
+## everything else.
+func raise_ladder() -> void:
+	if _ladder == null:
+		return
+	_ladder_wanted = 1.0
+	_ladder_hold_left = ladder_hold
+
+
+func _update_ladder(delta: float) -> void:
+	if _ladder == null:
+		return
+	# The ask expires rather than being cancelled. Nothing has to remember to put the
+	# ladder away -- a crew that stops working simply stops asking, and it comes down.
+	if _ladder_hold_left > 0.0:
+		_ladder_hold_left -= delta
+		if _ladder_hold_left <= 0.0:
+			_ladder_wanted = 0.0
+	if is_equal_approx(_ladder_raise, _ladder_wanted):
+		return
+	_ladder_raise = move_toward(_ladder_raise, _ladder_wanted,
+		delta / maxf(ladder_travel, 0.05))
+	# Pitched about its own origin, which the prefab puts at the rear turntable -- the
+	# same reason the doors are a plain yaw. Negative lifts the far end, because the
+	# ladder lies along +z and the chassis is yawed 180.
+	_ladder.transform.basis = _ladder_rest.rotated(
+		Vector3.RIGHT, -deg_to_rad(ladder_degrees) * _ladder_raise)
+
+
 # --- Movement interface ------------------------------------------------------
 
 ## [param final] says whether this point is where the journey ends or a waypoint on the
@@ -559,6 +730,7 @@ func _caller_trace() -> PackedStringArray:
 func _navigate_to(point: Vector3, may_turn_round := true) -> void:
 	move_target = point
 	_navigating = true
+	_path_at = 0
 	_off_road_target = _is_off_road(point)
 	_may_turn_round = may_turn_round
 	_agent.target_position = point
@@ -587,6 +759,7 @@ func _is_off_road(point: Vector3) -> bool:
 
 func stop_navigating() -> void:
 	_navigating = false
+	_blocked_time = 0.0
 	_reset_manoeuvre_state()
 
 
@@ -607,6 +780,7 @@ func respawn() -> void:
 	forward_speed = 0.0
 	_steer_angle = 0.0
 	_navigating = false
+	_blocked_time = 0.0
 	_reset_manoeuvre_state()
 
 
@@ -641,10 +815,6 @@ func _build_abilities() -> Array[Ability]:
 	# The ambulance still carries them (`stretchers`, load_casualty); it just no
 	# longer drives at them.
 	#
-	# Escort stays on the patrol car: the director only opens crime calls against a
-	# kerb, so the car can always pull up within its reach.
-	if service == Service.POLICE:
-		list.append(LoadSuspectAbility.new())
 	list.append(UnloadAbility.new())
 	list.append(StopAbility.new())
 	# Ambient traffic gets its abilities from here too, and a taxi has no station to go
@@ -683,20 +853,37 @@ func has_water() -> bool:
 	return carries_water and water > 0.0
 
 
+## Takes foam out of the tank. Charged against work done, exactly as water is.
+func draw_foam(amount: float) -> void:
+	foam = clampf(foam - amount / maxf(tank_capacity, 0.01), 0.0, 1.0)
+
+
+func has_foam() -> bool:
+	return carries_foam and foam > 0.0
+
+
 ## Refills while stood still beside a hydrant, or anywhere on the station forecourt.
 ## Standing still is required deliberately: an engine that topped up while driving
 ## past a hydrant would make the tank a formality rather than a reason to park.
 func _update_water(delta: float) -> void:
 	is_refilling = false
-	if not carries_water or water >= 1.0 or absf(forward_speed) > 0.5:
+	if absf(forward_speed) > 0.5:
+		return
+	var wants_water := carries_water and water < 1.0
+	var wants_foam := carries_foam and foam < 1.0
+	if not wants_water and not wants_foam:
 		return
 	var supply := Hydrant.nearest(self, global_position, hydrant_reach) != null
-	if not supply:
-		var home := get_tree().get_first_node_in_group(Station.GROUP) as Station
-		supply = home != null and home.is_home(global_position)
-	if supply:
+	var home := get_tree().get_first_node_in_group(Station.GROUP) as Station
+	var at_home := home != null and home.is_home(global_position)
+	if (supply or at_home) and wants_water:
 		is_refilling = true
 		water = minf(water + refill_per_second * delta, 1.0)
+	# **Foam only at the station.** A hydrant is a water main, and a crew standing beside
+	# one has no more foam than when they arrived.
+	if at_home and wants_foam:
+		is_refilling = true
+		foam = minf(foam + refill_per_second * delta, 1.0)
 
 
 # --- Transport ---------------------------------------------------------------
@@ -779,6 +966,14 @@ func _reset_manoeuvre_state() -> void:
 	_escape_time = 0.0
 	_failed_escapes = 0
 	_held_time = 0.0
+	_mounting = false
+	_returning = false
+	_return_time = 0.0
+	# **`_blocked_time` is deliberately not reset here.** This runs on every `navigate_to`,
+	# and a [MoveOrder] re-aims at each waypoint of its lane route -- so the journey kept
+	# wiping its own record of being stuck in traffic. Re-aiming at the next corner is not
+	# evidence that the wall in front has gone; stopping is, and [method stop_navigating]
+	# clears it there.
 
 
 # --- Frame -------------------------------------------------------------------
@@ -848,7 +1043,7 @@ func _update_autopilot(delta: float) -> void:
 
 	# Steer at the next corner of the navigation path rather than straight at the
 	# destination, so buildings and crates get driven around instead of into.
-	var steer_point := _agent.get_next_path_position()
+	var steer_point := _steer_point()
 	var to_point := steer_point - global_position
 	to_point.y = 0.0
 	if to_point.length() < 0.5:
@@ -862,6 +1057,21 @@ func _update_autopilot(delta: float) -> void:
 	# each other, so an autopilot that ignored them would simply drive into one.
 	var ceiling := _cruise_ceiling()
 	var blocker := _vehicle_in_the_way(forward)
+
+	# **A mount runs on its own clock once started**, like the escape manoeuvre and for the
+	# same reason. Recomputed from the blocker every frame it lasted 105 frames and climbed
+	# nothing: steering at the pavement swings the nose away from the queue, the queue leaves
+	# the 2.4m corridor, the blocker unlatches, and the licence granted for being stuck
+	# behind it is withdrawn. The mount cancelled itself by working.
+	if _mounting:
+		_mount_time += delta
+		if _mount_time > mount_window:
+			# Committing to a mount suppresses the reverse-and-retry manoeuvre, the car's
+			# only other answer, so one that cannot be completed must not run for ever. The
+			# licence is not merely dropped but spent: [member _blocked_time] goes back to
+			# nothing and must be earned again, giving the ordinary machinery a clear run.
+			_end_mount()
+
 	if blocker != null:
 		var pass_point := _passing_line(forward, blocker)
 		if pass_point == Vector3.INF:
@@ -885,6 +1095,106 @@ func _update_autopilot(delta: float) -> void:
 		is_avoiding = false
 		_held_time = _cooled(_held_time, delta)
 
+	# **How long the street ahead has been shut with this car going nowhere.** Two earlier
+	# signals were tried and both were defeated by the car's own manoeuvring:
+	# [member _held_time] only counts frames where no passing line was found *and* a blocker
+	# is latched, and never passed 0.15s on the junction that prompted this; keying on the
+	# latch alone topped out at 1.88s against a 2.50s bar, because swinging the nose takes
+	# the wall out of the 2.4m corridor and the timer bleeds off faster than it fills.
+	#
+	# [method road_is_blocked] survives both -- written for exactly this question, measured
+	# along the way the car is *trying* to go rather than the way it points, its reach set
+	# against a carriageway walled with four cars. **Signed speed, not `absf`**: reversing
+	# away from an obstruction at 6 m/s is not progress. **`is_avoiding` is deliberately not
+	# consulted** -- tried as a term, it failed both ways, neither fixing the junction case
+	# nor leaving the shut-street case alone (470 of 1278 crawling frames read as "avoiding"
+	# and the timer bled off between them).
+	if _navigating and forward_speed < mount_crawl \
+			and _clear_of_junctions() and road_is_blocked(move_target):
+		_blocked_time += delta
+	else:
+		# **Forgotten at half the rate [method _cooled] uses**, and that is the difference
+		# between this firing and not. `road_is_blocked` is a snapshot, and it flickers as a
+		# wedged car shuffles: measured behind a wall of three, only 397 of 1409 crawling
+		# frames read as blocked, so at the double-rate cooling the timer peaked at 2.33
+		# against a 2.50s bar and the manoeuvre never came due. Being blocked is a property
+		# of the street, not of this frame, so it is forgotten no faster than it is learned.
+		_blocked_time = maxf(_blocked_time - delta, 0.0)
+	# **And once it has gone on long enough, a vehicle on a shout takes the pavement.**
+	if not _mounting and not _returning and _navigating and is_responding() \
+			and _blocked_time >= mount_after:
+		# **Laid out along the way the car is trying to go, not the way it is pointing** --
+		# the same correction [method road_is_blocked] carries. By the time a car has earned
+		# this it has spent seconds backing out and swinging its nose, so "to the side"
+		# measured off the bonnet can point straight down the street; with the nose version
+		# the aim came back on-carriageway on both sides every time and no mount ever began.
+		var going := move_target - global_position
+		going.y = 0.0
+		_mount_point = _mount_line(going.normalized() if going.length() > 0.5 else forward)
+		if _mount_point == Vector3.INF:
+			# Nowhere to go: a wall, a car parked on the pavement, or a stretch with no
+			# pavement worth the name. Spend the licence rather than retry from the same spot
+			# on the very next frame.
+			_blocked_time = 0.0
+		else:
+			_mounting = true
+			_mount_time = 0.0
+
+	# **A live mount overrides whatever the block above decided.** It is a manoeuvre in
+	# progress rather than a reaction to what happens to be in front this frame, so it
+	# outlasts the blocker that licensed it -- which it must, because swinging the nose
+	# towards the kerb is exactly what takes that blocker out of the corridor.
+	if _mounting:
+		to_point = _mount_point - global_position
+		to_point.y = 0.0
+		if to_point.length() < mount_arrived:
+			_end_mount()
+		else:
+			# **Raised, not lowered.** Everywhere else in this function the ceiling comes
+			# *down*, and the stopped blocker's speed is nought -- a car doing nought never
+			# reaches the kerb it is being pointed at, because [method _climb_kerb] only
+			# fires with the step inside its 1.2m lookahead.
+			ceiling = maxf(ceiling, mount_speed)
+			is_avoiding = true
+
+	# **And the way back down, which is the other half of the manoeuvre.** Steered rather
+	# than navigated, for the reason written over [member _returning]: the agent would send
+	# it back the way it came.
+	# **Off the carriageway after a mount: come back down.** Only for a car that mounted --
+	# `_mount_point` is the breadcrumb -- so nothing here reaches ambient traffic, which
+	# never mounts, or a car deliberately sent onto a verge, which is `_off_road_target`.
+	if _navigating and not _mounting and not _off_road_target \
+			and _mount_point != Vector3.INF and not CityGrid.is_road(global_position) \
+			and not _returning:
+		var going := move_target - global_position
+		going.y = 0.0
+		if going.length() > 0.5:
+			_return_point = _return_line(going.normalized())
+			_returning = _return_point != Vector3.INF
+			_return_time = 0.0
+	if _returning:
+		_return_time += delta
+		if _return_time > return_window or CityGrid.is_road(global_position):
+			_returning = false
+			_return_time = 0.0
+			# Breadcrumb spent: down, and back on the road. Anything that puts this car off
+			# the carriageway again has to be a fresh mount.
+			if CityGrid.is_road(global_position):
+				_mount_point = Vector3.INF
+		else:
+			to_point = _return_point - global_position
+			to_point.y = 0.0
+			# **Raised rather than capped, and that was measured both ways.** Capping the
+			# recovery at [member mount_speed] reads better on paper -- a fire engine has no
+			# business doing 35 km/h along a footway -- and it fails: the cornering factor
+			# then holds the car at a measured 2.69 m/s, the recovery window expires with it
+			# still up on the pavement, restarts, and the journey that took 40.1s uncapped
+			# does not finish in sixty seconds. Exempting the manoeuvre from the arrival
+			# slowdown was tried alongside and moved the figure from 2.67 to 2.69. The car
+			# has to be allowed to get off the pavement briskly.
+			ceiling = maxf(ceiling, mount_speed)
+			is_avoiding = true
+
 	# Positive means the target is to the left, matching the sign of steer_input.
 	var heading_error := forward.signed_angle_to(to_point, Vector3.UP)
 
@@ -897,7 +1207,12 @@ func _update_autopilot(delta: float) -> void:
 	# and repeated -- 30 lifts in one journey, ending back on the road 5.3m short of a
 	# target it had already reached. The car is a few metres from a spot it can see, so
 	# it goes there.
-	if _off_road_target and distance < off_road_approach:
+	# **A mount is driven for the same reason, and it has to be.** Measured without this:
+	# 105 frames aimed at the pavement and not one climb, every frame refused because there
+	# was no step within the nose's 1.2m reach. Being blocked is what trips the escape, the
+	# escape reverses for a full second, and the mount had to re-earn its aim from a car
+	# pointing the wrong way. A mount that is not committed to is not a mount.
+	if _mounting or _returning or (_off_road_target and distance < off_road_approach):
 		_reversing = false
 		_escape_time = 0.0
 	if _reversing or _escape_time > 0.0:
@@ -1004,6 +1319,51 @@ func _passing_line(forward: Vector3, blocker: Vehicle) -> Vector3:
 	return Vector3.INF
 
 
+## Where to aim to get past a shut street **over the pavement**, or INF when there is
+## nowhere to put the car.
+##
+## The last resort, and a deliberate design decision rather than a fix: a real appliance on
+## a shout mounts the kerb to get round an obstruction, and this one may too. It is gated on
+## *being on a shout with the street shut*, which is a different question from the one
+## [member climb_escapes] asks -- that one is "has this car run out of answers", and a
+## wedged appliance never accumulates enough of those to matter while sitting behind traffic
+## for half a minute.
+##
+## **Not offered to routine driving, and never to the traffic.** A patrol car pottering back
+## to the station queues like everybody else, and ambient cars have [member avoids_vehicles]
+## off so they never accumulate a blocked time at all. Blue lights are the licence, and they
+## are the same signal the lightbar and the speed limit hang off.
+##
+## Checked with [method CityGrid.standable] *and* [method _is_off_road], because neither
+## alone is the question. `standable` is "outdoors ground", and a road is outdoors ground --
+## measured with that test alone the line was usually just another point on the carriageway,
+## giving 97 frames of mounting at a mean 4.38 m/s with not one step within reach of the
+## nose. The car was driving happily to somewhere it could already drive.
+func _mount_line(forward: Vector3) -> Vector3:
+	var right := forward.cross(Vector3.UP)
+	for side: float in [-1.0, 1.0]:
+		var aim := global_position + forward * mount_reach + right * side * mount_shift
+		var tile := CityGrid.tile_at(aim)
+		if not CityGrid.standable(tile.x, tile.y):
+			continue
+		if not _is_off_road(aim):
+			continue
+		# No blocker to name: by the time a mount is running, the queue that licensed it may
+		# well have left the corridor. Every vehicle is simply something not to aim at.
+		if _lane_occupied(aim, null):
+			continue
+		return aim
+	return Vector3.INF
+
+
+## Whether this car is out on a street rather than in the mouth of a junction, which is the
+## only place a mount makes any sense. See [member mount_clear_of_junction].
+func _clear_of_junctions() -> bool:
+	var centre := CityGrid.junction(CityGrid.junction_at(global_position))
+	return Vector2(centre.x - global_position.x,
+		centre.z - global_position.z).length() >= mount_clear_of_junction
+
+
 ## Whether anything on wheels is standing in a candidate passing line.
 func _lane_occupied(aim: Vector3, blocker: Vehicle) -> bool:
 	for node in get_tree().get_nodes_in_group(Unit.GROUP):
@@ -1088,6 +1448,80 @@ func _direction_after(path: PackedVector3Array, index: int) -> Vector3:
 		if walked >= corner_window:
 			return path[i] - start
 	return path[path.size() - 1] - start
+
+
+## The point the steering aims at: a **bounded** arc length along the path.
+##
+## `_agent.get_next_path_position()` is unbounded, and measured at the closest approach to
+## a junction it sat **past the corner on every test leg** -- which from the car's seat
+## looks 1 to 2 degrees off the nose. `heading_error` is therefore nearly zero, and
+## `steer_input` is `heading_error * steer_gain`, so the car applied **2.2 degrees of lock
+## out of 24.7 available** and drove straight at a point on the far side of the bend,
+## arcing across it: a 12.3m circle where its steering can describe 4.4m. Everything else
+## at that moment was innocent -- the car was obeying the corner planner and travelling
+## slower than allowed, and the yaw cap was nowhere near binding. It was not prevented
+## from turning; it was not trying.
+##
+## **Interpolated along the path, never snapped to a vertex.** Walking from the nearest
+## vertex stalls cars: that vertex is often behind, so the lookahead is spent getting back
+## to it and the point returned sits level with the bonnet. Measured, a car crawled home
+## at 1.8 m/s against a 12.0 limit and never parked.
+func _steer_point() -> Vector3:
+	var path := _agent.get_current_navigation_path()
+	if path.size() < 2:
+		return _agent.get_next_path_position()
+	var reach := clampf(absf(forward_speed) * steer_lookahead_time,
+		steer_lookahead_min, steer_lookahead_max)
+	var at := _closest_on_path(path)
+	var index := int(at.x)
+	var along := at.y
+	var remaining := reach
+	for i in range(index, path.size() - 1):
+		var a: Vector3 = path[i]
+		var span := path[i + 1] - a
+		span.y = 0.0
+		var length := span.length()
+		var start := along if i == index else 0.0
+		var left := length * (1.0 - start)
+		if left >= remaining and length > 0.001:
+			return a + span * (start + remaining / length)
+		remaining -= left
+	return path[path.size() - 1]
+
+
+## Where the car sits on its own path: which segment, and how far along it as a fraction.
+## Packed into a Vector2 because GDScript has no tuple and a Dictionary here would
+## allocate on every physics frame of every vehicle.
+##
+## **Searched forward only.** Taking the closest point on the whole polyline is the
+## obvious reading and it makes cars drive in circles: a route that comes back near
+## itself -- which an ambient car's does constantly, the district being a lattice -- lets
+## the search latch onto a segment the car has already driven, so the aim jumps backwards
+## and the car loops round to it. Measured, two of twenty-two ambient cars were doing
+## exactly that: **2.4m and 2.8m of net displacement in five seconds at 2.9 m/s**, not
+## held up and not yielding, simply going round.
+##
+## One segment of slack backwards, so a car shoved off its line by a collision can still
+## find itself, but no more than that.
+func _closest_on_path(path: PackedVector3Array) -> Vector2:
+	var best := Vector2(float(_path_at), 0.0)
+	var closest := INF
+	for i in range(maxi(_path_at - 1, 0), path.size() - 1):
+		var a := path[i]
+		var span := path[i + 1] - a
+		span.y = 0.0
+		var square := span.length_squared()
+		var along := 0.0
+		if square > 0.0001:
+			var offset := global_position - a
+			offset.y = 0.0
+			along = clampf(offset.dot(span) / square, 0.0, 1.0)
+		var gap := _flat_length(a + span * along - global_position)
+		if gap < closest:
+			closest = gap
+			best = Vector2(float(i), along)
+	_path_at = int(best.x)
+	return best
 
 
 func _flat_length(vector: Vector3) -> float:
@@ -1224,7 +1658,18 @@ func _climb_kerb() -> void:
 	#
 	# A car with a road destination still earns it the hard way, which is what keeps
 	# corners honest.
-	if not (_navigating and _off_road_target):
+	# **And the third way is being on a shout with the street shut** -- [member _mounting],
+	# set by the autopilot when it aims this car at a pavement spot to get round an
+	# obstruction. `climb_escapes` is unreachable in practice: an escape moves the car and
+	# movement zeroes `_failed_escapes`, so a shuffling appliance never accumulates two --
+	# measured at 1 on every junction leg, with ten escapes fired and no climb. A no-progress
+	# route through that gate was built and measured **byte-for-byte identical**, because the
+	# cars were not against kerbs at all. They were held behind other vehicles for 64-72% of
+	# their stuck frames, and where something *was* in front it was two metres tall, so
+	# lifting 0.22m still found it -- the third test below, doing its job. Nothing about the
+	# *stuck* gate could have fixed it; the car had to be pointed somewhere else first, and
+	# then the step in its way is an ordinary kerb.
+	if not (_navigating and (_off_road_target or _mounting)):
 		if _stuck_time < climb_after or _failed_escapes < climb_escapes:
 			return
 	var along := (global_basis.z if _reversing else -global_basis.z)
@@ -1260,7 +1705,11 @@ func _climb_kerb() -> void:
 	var footing := CityGrid.tile_at(global_position + along)
 	if not CityGrid.standable(footing.x, footing.y):
 		return
-	if not _off_road_target:
+	# A car mounting the kerb to pass a shut street is waived the same way an ordered one is,
+	# and for the same reason: the pavement is off the vehicle mesh by construction, so a
+	# landing test against that mesh refuses every mount there could ever be. What keeps it
+	# from stranding the car is [method _return_to_the_road], which brings it back down.
+	if not (_off_road_target or _mounting):
 		var landing := global_position + along
 		var map := get_world_3d().navigation_map
 		var path := NavigationServer3D.map_get_path(
@@ -1376,7 +1825,28 @@ func _take_damage(before: Vector3) -> void:
 	took_damage.emit(self, cost)
 
 
-## Whether the car is deliberately backing up to swing its nose round, as opposed to
+## Bills heat rather than impact. Charged in fractions of a pound per frame by a fire
+## standing too close, so it accumulates into a real number over a real fight.
+##
+## Separate from [method _take_damage] because that reads this frame's slide collisions
+## and asks how hard something was hit; there is no collision here and nothing is moving.
+## What they share is where the money lands, which is the whole point -- one repair
+## bill, one debrief row, whatever put the dents in.
+func scorch(amount: float) -> void:
+	if amount <= 0.0:
+		return
+	_scorch_owed += amount
+	# Whole pounds only, so the readout never flickers over a fraction and the signal
+	# fires at a rate a listener can do something with.
+	var due := int(_scorch_owed)
+	if due <= 0:
+		return
+	_scorch_owed -= float(due)
+	repair_bill += due
+	took_damage.emit(self, due)
+
+
+## Whether the car is deliberately backing up to swing its nose round## Whether the car is deliberately backing up to swing its nose round, as opposed to
 ## sitting behind something. Public because an order needs to tell the difference: a car
 ## halfway through a three-point turn is not making progress towards anything and must
 ## not be mistaken for one that has given up.
@@ -1396,8 +1866,66 @@ func held_up_for() -> float:
 	return _held_time
 
 
+## Ends the current mount, however it ended -- arrived, or out of time.
+##
+## The licence is **spent**, not merely dropped: [member _blocked_time] goes back to nothing
+## so the next mount has to be earned from scratch.
+func _end_mount() -> void:
+	_mounting = false
+	_mount_time = 0.0
+	_blocked_time = 0.0
+	# **The way back down is not decided here.** It was, and it never once fired: a mount
+	# ends within [member mount_arrived] of its spot, which is three metres short of a seven
+	# metre offset -- still over a road tile -- so the test said "already on the carriageway,
+	# nothing to do" and the car drifted off it immediately afterwards. Coming down is a
+	# *state of being off the carriageway*, not an epilogue to going up, so the autopilot
+	# watches for it every frame. [member _mount_point] is left set as the breadcrumb that
+	# says this car mounted, which is what keeps the behaviour off ambient traffic.
+
+
+## Where to rejoin the carriageway, or INF when nowhere ahead will do.
+##
+## Searched **forwards along the way the car is trying to go**, and only carriageway counts
+## -- [method _is_off_road] rather than [method CityGrid.standable], because standable is
+## true of the pavement the car is standing on. Steps further out if the first distance is
+## no good, so a long obstruction is cleared rather than rejoined halfway along.
+func _return_line(forward: Vector3) -> Vector3:
+	var right := forward.cross(Vector3.UP)
+	for ahead: float in [return_ahead, return_ahead * 1.6, return_ahead * 2.2]:
+		for across: float in [0.0, -mount_shift, mount_shift]:
+			var aim := global_position + forward * ahead + right * across
+			var tile := CityGrid.tile_at(aim)
+			if not CityGrid.standable(tile.x, tile.y):
+				continue
+			if _is_off_road(aim):
+				continue
+			if _lane_occupied(aim, null):
+				continue
+			return aim
+	return Vector3.INF
+
+
+## Whether the car is taking to the pavement to get round a shut street. Public because it
+## is the licence [method _climb_kerb] reads, and because a check that could only observe
+## the climb itself could not tell a mount from an ordinary stuck-car lift.
+func is_mounting() -> bool:
+	return _mounting
+
+
+## Whether the car is steering itself back off the pavement onto the carriageway.
+func is_returning() -> bool:
+	return _returning
+
+
 func is_turning_round() -> bool:
 	return _reversing
+
+
+## True while backing out of trouble under the stuck escape, which is a different thing
+## from [method is_turning_round] and reverses the car just as hard. Public because the
+## black box could not tell them apart and a reader drew the wrong conclusion from it.
+func is_escaping() -> bool:
+	return _escape_time > 0.0
 
 
 ## Schmitt trigger on the reverse manoeuvre: enter on a large heading error, leave

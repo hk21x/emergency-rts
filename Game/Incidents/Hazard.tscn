@@ -1,0 +1,46 @@
+; A pressure cylinder standing where a fire can reach it. Same collision arrangement as
+; Fire and Casualty: on layer 8 so the selection ray finds it, solid to nothing, and out
+; of the navigation bake.
+;
+; The body is a PolygonTown propane cylinder loaded by full path. build_map.gd resolves
+; bare prefab names against PolygonCity only, so anything from the Town pack has to be
+; named in full -- the same way Fire.tscn names its particle scenes.
+
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Game/Incidents/Hazard.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://Assets/PolygonTown/Prefabs/Props/SM_Prop_Propane_Tall_01.tscn" id="2_body"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pick"]
+size = Vector3(1.6, 1.8, 1.6)
+
+[sub_resource type="TorusMesh" id="TorusMesh_marker"]
+inner_radius = 0.95
+outer_radius = 1.12
+rings = 32
+ring_segments = 6
+
+; Amber rather than the casualty's red: this is a warning, not a loss. Hazard.gd drives
+; the colour toward red as it heats, so a cylinder about to go is visibly about to go.
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_marker"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.66, 0.15, 0.8)
+
+[node name="Hazard" type="StaticBody3D"]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_script")
+display_name = "Gas cylinder"
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("BoxShape3D_pick")
+
+[node name="Marker" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+material_override = SubResource("StandardMaterial3D_marker")
+cast_shadow = 0
+mesh = SubResource("TorusMesh_marker")
+
+[node name="Body" parent="." instance=ExtResource("2_body")]

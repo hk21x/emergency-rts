@@ -39,9 +39,19 @@ const CONTROL_GROUP_KEYS := [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KE
 ## Input.get_vector every frame, so those keys pan and rotate whether or not the event
 ## was consumed. F is focus, R is respawn, Esc disarms and 1-9 are control groups.
 ## G sits off the end of that row because the row ran out: seven keys, eight verbs. It
-## is the nearest free key to the cluster -- A S D F are camera and focus.
+## is the nearest free key to the cluster -- A S D F are camera and focus. L continues
+## the home row past K, and was added when the hazard's Cool verb needed a twelfth.
+## Ceiling on destination markers. Six units with long queues could otherwise put a
+## hundred nodes on the map, and past a couple of dozen the display is noise anyway.
+const MAX_MARKERS := 40
+## How much smaller a queued marker is than the one being driven at. The current order
+## keeps the bob and the spin; the rest sit still, which is the difference the eye reads
+## before it reads the size.
+const QUEUED_SCALE := 0.55
+
 const COMMAND_KEYS := [
-	KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B, KEY_N, KEY_M, KEY_G, KEY_H, KEY_J, KEY_K]
+	KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B, KEY_N, KEY_M, KEY_G, KEY_H, KEY_J, KEY_K, KEY_L,
+	KEY_T]
 
 @export var move_marker_path: NodePath
 @export var selection_box_path: NodePath
@@ -233,7 +243,15 @@ func _handle_order(screen_position: Vector2, queue: bool) -> void:
 	var target := Target.from_hit(_raycast(screen_position, exclude))
 	if target == null:
 		return
+	# **Slots are assigned by navigation layer, and by who is nearest.** Vehicles path on
+	# the carriageway and people on the pavement, so one formation for both would put a
+	# car on a kerb; and handing slots out in selection order makes eight units cross each
+	# other's paths on every group move.
+	var slots := _assign_slots(target.position)
 	for unit in selection:
+		var slot: Vector2i = slots.get(unit, Vector2i(0, 1))
+		target.slot_index = slot.x
+		target.slot_count = slot.y
 		var ability := unit.resolve(target)
 		if ability == null:
 			continue
@@ -264,7 +282,13 @@ func order_at_point(point: Vector3, queue := false) -> void:
 		return
 	var target := Target.new()
 	target.position = point
+	# Slots here too, or a minimap right-click stacks the group where a world one spreads
+	# it -- the same order given two ways should not behave two ways.
+	var slots := _assign_slots(point)
 	for unit in selection:
+		var slot: Vector2i = slots.get(unit, Vector2i(0, 1))
+		target.slot_index = slot.x
+		target.slot_count = slot.y
 		var ability := unit.resolve(target)
 		if ability:
 			unit.issue(ability.make_order(unit, target), queue)
@@ -402,14 +426,53 @@ func _prune_selection() -> void:
 
 ## One marker per selected unit that is heading somewhere, from a pool grown on
 ## demand by cloning the marker the map generator provided.
+## Hands every selected unit an index into a formation, grouped by what it can drive on.
+##
+## Returns unit -> (index, count). Everything else about the spread -- where the slots
+## actually sit, and whether one is reachable -- belongs to [MoveAbility], because that is
+## the only verb it means anything to.
+func _assign_slots(centre: Vector3) -> Dictionary:
+	var groups := {}
+	for unit in selection:
+		if not is_instance_valid(unit):
+			continue
+		var lane := 1 if unit is Vehicle else 0
+		if not groups.has(lane):
+			groups[lane] = []
+		groups[lane].append(unit)
+
+	var slots := {}
+	for lane in groups:
+		var members: Array = groups[lane]
+		# Nearest-first, so the unit closest to the point takes the nearest slot and the
+		# group does not turn itself inside out getting there.
+		members.sort_custom(func(a: Unit, b: Unit) -> bool:
+			return a.global_position.distance_squared_to(centre) \
+				< b.global_position.distance_squared_to(centre))
+		for i in members.size():
+			slots[members[i]] = Vector2i(i, members.size())
+	return slots
+
+
 func _update_markers() -> void:
 	if _marker == null:
 		return
+	# **The whole queue, not just the order in hand.** Shift-right-click has queued orders
+	# since phase 1 and nothing ever drew them, so a player who lined up three stops had
+	# no way to see what they had asked for -- or to notice they had queued one by
+	# accident. Walking `orders` instead of `current_order()` is the entire change.
 	var points: Array[Vector3] = []
+	var queued: Array[bool] = []
 	for unit in selection:
-		var order := unit.current_order()
-		if order and order.has_destination():
-			points.append(order.destination())
+		if not is_instance_valid(unit):
+			continue
+		for i in unit.orders.size():
+			if points.size() >= MAX_MARKERS:
+				break
+			var order := unit.orders[i]
+			if order and order.has_destination():
+				points.append(order.destination())
+				queued.append(i > 0)
 
 	while _markers.size() < points.size():
 		var clone := _marker.duplicate() as Node3D
@@ -423,8 +486,12 @@ func _update_markers() -> void:
 		node.visible = i < points.size()
 		if not node.visible:
 			continue
-		node.global_position = points[i] + Vector3.UP * bob
-		node.rotation.y = _elapsed * marker_spin_speed
+		# Told apart by size and stillness rather than colour: the marker is a duplicated
+		# scene, and recolouring one would mean its own material per copy.
+		var later: bool = queued[i]
+		node.global_position = points[i] + Vector3.UP * (bob if not later else marker_height)
+		node.rotation.y = 0.0 if later else _elapsed * marker_spin_speed
+		node.scale = Vector3.ONE * (QUEUED_SCALE if later else 1.0)
 
 
 # --- Picking -----------------------------------------------------------------

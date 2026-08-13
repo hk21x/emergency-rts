@@ -38,6 +38,10 @@ const CASUALTY_POINTS := 100
 ## Per suspect booked in at the station. Between the two: more than property, and
 ## a disturbance cannot be lost, so it never carries a casualty's stakes.
 const ARREST_POINTS := 75
+## Per gas cylinder cooled before it went off. Between a fire and an arrest: it is a
+## disaster prevented rather than a job finished, and the reward for preventing it is
+## mostly that the disaster did not happen.
+const HAZARD_POINTS := 60
 ## What a lost casualty costs. More than a delivery earns, so a shift that loses one
 ## for every save is running at a loss.
 const LOST_PENALTY := 150
@@ -53,6 +57,7 @@ var fires_out := 0
 var casualties_saved := 0
 var casualties_lost := 0
 var arrests := 0
+var hazards_made_safe := 0
 var elapsed := 0.0
 
 ## Freeplay. While true the incident-based win/lose rules are off: nothing is won by
@@ -61,6 +66,9 @@ var scoring := false
 var score := 0
 var calls_cleared := 0
 var calls_failed := 0
+## Crew of the player's own hurt badly enough to go down, and how they ended up.
+var crew_lost := 0
+var crew_recovered := 0
 ## Seconds each cleared call waited before a crew reached it, summed. The debrief
 ## divides it by [member calls_cleared] for the shift's average response.
 ##
@@ -122,11 +130,14 @@ func begin_scoring() -> void:
 	score = 0
 	calls_cleared = 0
 	calls_failed = 0
+	crew_lost = 0
+	crew_recovered = 0
 	response_total = 0.0
 	fires_out = 0
 	casualties_saved = 0
 	casualties_lost = 0
 	arrests = 0
+	hazards_made_safe = 0
 	earned = 0
 	elapsed = 0.0
 	is_new_best = false
@@ -167,6 +178,9 @@ func summary() -> String:
 	# Only a shift that made one mentions arrests; most debriefs have nothing to say.
 	if arrests > 0:
 		parts.append("%d arrest%s" % [arrests, "" if arrests == 1 else "s"])
+	if hazards_made_safe > 0:
+		parts.append("%d cylinder%s cooled"
+			% [hazards_made_safe, "" if hazards_made_safe == 1 else "s"])
 	return "   ·   ".join(parts)
 
 
@@ -216,10 +230,19 @@ func debrief_rows() -> Array[Dictionary]:
 		var owed := _station.outstanding_repairs()
 		rows.append({"label": "Repairs", "value": "-£%d" % _station.repairs_paid,
 			"note": "" if owed <= 0 else "£%d still owed" % owed, "muted": owed <= 0})
+	# Where losing your own people is said out loud. Not scored -- see `_on_resolved` --
+	# so if the debrief did not name it, the cost would be invisible until the player
+	# noticed the roster was short.
+	if crew_lost > 0 or crew_recovered > 0:
+		rows.append({"label": "Crew down", "value": str(crew_lost + crew_recovered),
+			"note": "" if crew_lost == 0 else "%d lost" % crew_lost,
+			"muted": crew_lost == 0})
 	if fires_out > 0:
 		rows.append({"label": "Fires out", "value": str(fires_out)})
 	if arrests > 0:
 		rows.append({"label": "Arrests", "value": str(arrests)})
+	if hazards_made_safe > 0:
+		rows.append({"label": "Cylinders cooled", "value": str(hazards_made_safe)})
 	return rows
 
 
@@ -294,11 +317,22 @@ func _on_resolved(incident: Incident, success: bool) -> void:
 				score += FIRE_POINTS
 				_pay(FIRE_POINTS)
 	elif incident is Casualty:
+		# **One of the player's own is scored differently: not at all.** Delivering a
+		# firefighter you got hurt should not pay £100 for the privilege, and losing one
+		# should not be fined on top of losing a unit the career paid for. The punishment
+		# is the write-off, and it is legible in the debrief. Same argument the Hazard
+		# arm below makes about not charging twice for one mistake.
+		var own := (incident as Casualty).was_crew
 		if success:
-			casualties_saved += 1
-			if scoring:
-				score += CASUALTY_POINTS
-				_pay(CASUALTY_POINTS)
+			if own:
+				crew_recovered += 1
+			else:
+				casualties_saved += 1
+				if scoring:
+					score += CASUALTY_POINTS
+					_pay(CASUALTY_POINTS)
+		elif own:
+			crew_lost += 1
 		else:
 			casualties_lost += 1
 			if scoring:
@@ -310,6 +344,15 @@ func _on_resolved(incident: Incident, success: bool) -> void:
 			if scoring:
 				score += ARREST_POINTS
 				_pay(ARREST_POINTS)
+	elif incident is Hazard:
+		# No failure arm on purpose. A cylinder that goes off costs the player through
+		# everything it does -- the call fails, the casualties it makes cost 150 each,
+		# and the fires it throws still have to be put out. Charging again here would be
+		# fining them twice for one mistake.
+		if success:
+			hazards_made_safe += 1
+			score += HAZARD_POINTS
+			_pay(HAZARD_POINTS)
 
 	progress_changed.emit()
 	_evaluate()

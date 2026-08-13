@@ -10,7 +10,7 @@ unmodified, though the POLYGON City pack was relocated on import — see `PROGRE
 ## Where this is up to
 
 **All 15 planned phases are done, plus 16 (the world reacts), 17 (audio), 18 (game
-framing), 19 (the fire service) and the career economy — half of phase 20.** 522
+framing), 19 (the fire service) and the career economy — half of phase 20.** 802
 automated checks, all passing.
 
 A 260m city district — twenty-five blocks of varied size, with parks, parking lots and
@@ -38,9 +38,11 @@ One thing is still missing and is not an oversight: street furniture is drawn wi
 collision, so units walk through benches — the hydrants are the exception, and only
 because a mechanic finally needed them. Audio is complete and **mostly synthesised**:
 the siren is a recording, and engine, crackle, radio and city bed are still written
-sample by sample, ready for recordings to replace them the same way. The **fire service** exists but wears borrowed clothes — the pack
-ships no appliance and no firefighter, so both are the police models in the pack's
-orange palette until a fire pack arrives. Everything under them is real.
+sample by sample, ready for recordings to replace them the same way. The **fire service**
+now has a real appliance — a POLYGON Town aerial, 3.11 x 2.84 x 8.82 against the van in
+orange paint it replaced — but its **crew is still borrowed**: no pack on disk contains a
+firefighter, so they remain police models repainted, and the paint check in the suite
+still guards them for exactly that reason. Everything under them is real.
 
 `PROGRESS.md` is the status document — what each phase cost and what it taught.
 `NEXT.md` is what is still to do. This file is the technical reference: how each system
@@ -64,14 +66,16 @@ Any Godot 4.6+ binary works (originally built on 4.6.3, verified on 4.7):
 | **Right click** | order the selection to go there |
 | **Right click a car** (people selected) | walk over and get in |
 | **Right click a fire** | walk into hose range and put it out |
+| **Right click a heating cylinder** (firefighter selected) | stand off it and hose it cool before it goes |
+| **Right click a trapped casualty** (firefighter selected) | lift the load off them so a paramedic can work |
 | **Right click a casualty** | kneel beside them and treat |
 | **Right click a stable casualty** (paramedic selected) | fetch the stretcher from the ambulance and wheel them aboard |
-| **Right click a suspect** (officer, then patrol car) | apprehend them; then send the car to escort them in |
+| **Right click a suspect** (officer) | apprehend them; right-click again once cuffed to walk them to a patrol car |
 | **Shift + right click** | queue that order behind the current one |
 | `Ctrl` + `1`–`9` | assign a control group |
 | `1`–`9` | recall a control group |
-| `Z` `X` `C` `V` `B` `N` `M` `G` `H` `J` `K` | the command tiles, left to right |
-| Command tile | `Move`, `Treat`, `Extinguish`, `Secure`, `Board`, `Collect` arm the cursor for a target click; `Stop`, `Unload` and `Return` fire at once; `Lights` (`J`) and `Siren` (`K`) are toggles — the tile turns blue while one is running |
+| `Z` `X` `C` `V` `B` `N` `M` `G` `H` `J` `K` `L` `T` | the command tiles, left to right |
+| Command tile | `Move`, `Treat`, `Extinguish`, `Cool`, `Secure`, `Board`, `Collect` arm the cursor for a target click; `Stop`, `Unload` and `Return` fire at once; `Lights` (`J`) and `Siren` (`K`) are toggles — the tile turns blue while one is running |
 | Roster chip | click to isolate that unit, `Ctrl`-click to drop it, double-click to follow |
 | `Esc` | cancel an armed ability |
 | `F1` (or the CONTROLS chip above the bar) | open or close the controls card |
@@ -83,6 +87,7 @@ Any Godot 4.6+ binary works (originally built on 4.6.3, verified on 4.7):
 | `F` | follow the selection |
 | `R` | respawn the selection at its start slot |
 | `F2` | start a freeplay shift (scored; see "Freeplay") |
+| `F5` | open the call spawner — pick any call kind instead of waiting for the roll |
 | `ENTER` / `SPACE` (title) | play — the session opens on the title card |
 | `P` | pause menu: resume, restart shift, settings (volume, shift length, call rate, time of day), quit to title |
 
@@ -269,6 +274,165 @@ at. `Game/probe_kerb.gd` measures all of it, one condition per process — runni
 conditions in one process measured the harness instead, with whichever ran second
 failing.
 
+### Traffic declines a tuck it has no room for
+
+`TrafficCar._update_pull_over` aims seven metres ahead and a couple across to nose into the
+kerb for a passing response. Near the district's boundary that lands outside it: reported
+from play as `Traffic3 was sent off the map, to (-86.2, 0.0, -131.0)` on a map that ends at
+130. `Vehicle.navigate_to`'s guard caught it, named the caller and clamped — which is that
+guard doing exactly the job it was written for — but clamping is the wrong answer here,
+because it aims the car at the boundary rather than at a kerb and it performs a tuck towards
+nothing while warning, with a stack trace, mid-play.
+
+The point is worked out **before** the manoeuvre is committed to, and the tuck is declined
+outright if it leaves the district. Declining is truer than clamping: a car with less than a
+tuck's length of district in front of it has nowhere to pull in, so it keeps driving and the
+responder passes it like any other obstruction.
+
+The check needs its **positive control** to be worth anything — asserting that an edge car
+does not pull over would pass just as happily if the manoeuvre were broken everywhere, which
+is the commonest way a check here turns out to be worthless. So the same car, with the same
+responder, is then moved into open district and must tuck.
+
+While fixing it, the suite's own staging turned out to be firing the same warning on every
+run: `_test_traffic_pulls_over_for_a_response` aimed a car 400m up the street to make a
+destination it could never reach, landing at z 402. The distance was never load-bearing — the
+test pins the car in place every frame — and a warning that fires by design is chaff that
+hides the ones that matter. It very nearly hid this one.
+
+### The shop is grouped by service
+
+Eight buyable types in one row ran off the side of the screen the moment the doctor and the
+doctor's car were added — measured, **1906 wide in a 1600 viewport**, with the paramedic's and
+the doctor's BUY buttons off the edge. A container that overflows *clips*; it does not wrap,
+so those two units were simply unbuyable.
+
+One row per service now, grouped off the `service` key every catalogue entry already carries,
+so a new unit lands in the right row without a second list to keep in step. Headings take the
+service's own light ink from `Palette.service()`, the same signal the roster and the selection
+rings use, so the row is read before the words are.
+
+Rows cost height, and three of them multiply every vertical saving by three: the first grouped
+pass came out 964 tall against 900, so the portrait dropped 96 → 72 and the separations moved
+onto the named scale. It measures 909 × 844 now.
+
+**Three checks, deliberately, because they say different things.** That every BUY is on screen
+and that the storefront fits are assertions about the *symptom*, and both would go green again
+if somebody merely shrank the cards. That each service's shelf holds exactly its own units is
+the assertion about the *feature* — without it the grouping could be deleted and only the
+sizes would complain.
+
+### Specialists inside a service, and the doctor
+
+`Unit.service` is identity — it decides the brand colour, the roster grouping and which
+calls a unit is considered for — and until August 2026 it was also the only thing that
+decided capability: `Person._build_abilities()` matched on it and nothing else. That made a
+*specialist* inexpressible. A doctor can do something a paramedic cannot, but a doctor is
+not a fourth emergency service, and inventing one would have been a lie the interface then
+had to carry into the palette, the roster and the call routing.
+
+So capability is now service **plus** `Person.speciality`. Empty means the ordinary member,
+which is what nearly every unit is. It deliberately does **not** feed `_build_abilities()`
+yet: the doctor's difference is what their treatment achieves, not a new command tile, and a
+hook with no caller is the kind of thing this project has had to delete before. The hazmat
+team is the one that will want it.
+
+The doctor is the first specialist. `Casualty.needs_doctor` marks a casualty beyond what a
+paramedic can finish; `Casualty.treat(amount, advanced)` takes *who is treating* as an
+argument, and a paramedic on one of these **holds the decline off** without ever
+accumulating towards stable. That in-between state — alive, and going nowhere — is the whole
+mechanic: the paramedic is how you buy time, and the answer to the question is a dispatch.
+The verb is deliberately the same one on both units, because a paramedic sent to a dying
+patient should still get to work; telling the player "you cannot even try" would be both
+unkind and untrue. `describe_state()` says `needs a doctor` so the readout, not a manual,
+teaches it.
+
+**The director gates `collapse` on owning a doctor**, on exactly the terms it gates building
+fires on owning an engine and a firefighter. A casualty nobody on the roster can stabilise
+is not a hard call, it is a broken one — paramedics would hold them indefinitely and the
+call would never close.
+
+**The doctor's car** is the patrol hull repainted, and it is what makes the specialist
+dispatchable at all — a doctor who walks the district arrives after the call has resolved
+itself. It carries **no stretcher**, deliberately: a rapid-response car that could also run
+the patient to hospital would quietly replace the ambulance and dissolve the bottleneck the
+doctor exists to be. It brings the doctor to the casualty; the ambulance still does the
+carrying.
+
+The paint is worth a paragraph because it has caught this project twice. An alt palette is a
+**texture atlas, not a colour** — each mesh's UVs index a swatch of it, so one palette paints
+two meshes two different colours. `04_A` is genuinely orange on the patrol-car hull
+(rgb .44/.32/.24) and is flat charcoal on the van and olive on a person; picking by name once
+shipped a black fire engine and dressed the firefighter in green for months. The check
+samples the built scene through the mesh's own UVs rather than trusting the path: sabotaged
+back to the stock blue material it reads −0.03 against +0.11 healthy.
+
+**The trap a specialist springs, which is worth reading before adding the next one.**
+`Station.type_of()` identified a unit by `(service, vehicle)`, which is exact only while
+each service has exactly one kind of person. The doctor made MEDICAL-and-not-a-vehicle match
+two catalogue entries; the scan returned the first. Neither symptom points anywhere near the
+cause: `write_off()` took a doctor off the books by decrementing the **paramedic** count, and
+`_alive()` counted every doctor as a paramedic, so the dispatch panel offered paramedics that
+did not exist and refused doctors that did. Units now carry the catalogue id they were bought
+as (`Unit.type_id`, stamped in `dispatch()`), and the scan survives only as a fallback for a
+unit nobody bought. Any specialist added from here would have re-broken it identically.
+
+A second, smaller one: `ShopPanel` read `config["portrait"]` unguarded while `Station` reads
+the same key with `has()`. One catalogue entry without a portrait threw inside `_ready`,
+which builds the whole shop, and took out every card and six unrelated checks with it.
+
+### Taking the pavement past a shut street, and getting back off it
+
+Right-clicking a verge is one way over a kerb; the other is **earned**, and it is what a
+vehicle on a shout does when the carriageway ahead is simply shut. It exists because a
+walled street was a journey that never finished: an appliance behind three vehicles abreast
+did not get past in sixty seconds, because nothing in the code could tell *queued* from
+*shut* and the kerb stayed as solid as it is for a car cornering.
+
+The licence is `road_is_blocked(move_target)` while crawling, accumulated into
+`_blocked_time`. Three other signals were tried and each was defeated by the car's own
+manoeuvring — `_held_time` peaked at 0.15s, the latched blocker at 1.88s, both against a
+2.50s bar — because turning the nose or backing off takes the obstruction out of whatever
+corridor was being watched. `road_is_blocked` measures along the way the car is *trying* to
+go, which is the one thing shuffling cannot fake, and `_blocked_time` is forgotten at **half**
+the rate `_cooled` uses: the test is a snapshot and it flickers (397 of 1409 crawling frames),
+so double-rate cooling kept it just under the bar for ever.
+
+Three terms then decide whether the manoeuvre is sane, and the third is the one that matters:
+the vehicle must be **on a shout** (`is_responding()`, which is also what the lightbar and the
+speed limit hang off, so routine driving and ambient traffic never qualify); the pavement spot
+must be standable **and** genuinely off the carriageway (`standable` alone is true of a road,
+and with only that test the car drove happily to somewhere it could already drive); and it
+must be **clear of a junction**. A kerb runs along a street, but a junction mouth is off the
+navigation mesh with *no step on it at all*, so a car mounting there drives onto flat tarmac
+and off its route — that one term is the difference between all three junction turns staying
+byte-identical to baseline and one of them going from 76.7s to unfinished in 150 seconds.
+
+Once started it is a **latched manoeuvre with its own clock**, like the escape it suppresses.
+Recomputed from the blocker each frame it cancelled itself by working, because swinging the
+nose towards the kerb is exactly what unlatches the blocker that licensed it. The aim is fixed
+in world space and laid out along the route rather than off the bonnet — measured off the
+bonnet, after seconds of manoeuvring the "side" of the car points down the street and the aim
+came back on-carriageway on both sides every time.
+
+**Going up is only half of it, and the other half is not optional.** From up on the pavement
+the navigation agent's nearest reachable point is the carriageway the car *just left* — on the
+**near** side of the obstruction. Left to the agent, a successful mount became a loop: 555
+frames off the carriageway, 161 of them turning round, driving back into the wall and mounting
+again, a 33.3s journey unfinished in sixty seconds. So `_returning` / `_return_line()` steers
+the car forwards past the obstruction and puts it down, and two plausible versions of that are
+wrong. Deciding it when the mount ends never fires, because a mount ends three metres short of
+a seven-metre offset and the car is still over a road tile — coming down is a *state of being
+off the carriageway*, watched every frame, gated on the `_mount_point` breadcrumb so it can
+never reach ambient traffic. And capping the recovery speed, which reads better on paper,
+lets the cornering factor hold the car at 2.69 m/s until the window expires with it still up
+there: 40.1s becomes a timeout. It has to be allowed off the pavement briskly.
+
+`Game/probe_mount.gd` is the fixture, and every part of it is load-bearing — three abreast
+(one is overtaken, two flap on a decimetre of spacing), an appliance (a patrol car squeezes
+through), and a destination under `CityGrid.LANE_ROUTE_MIN` (past that the order writes the
+shut street off and drives round the block, which is a perfectly good answer and not this one).
+
 Each `NavigationAgent3D` picks its mesh through matching `navigation_layers`. The
 meshes are sourced by **group** (`nav_source`) rather than by child nodes, because the
 same geometry has to feed both regions and a node can only have one parent. Measured
@@ -321,11 +485,42 @@ clock the player races.
   `spread_threshold` throws off a new fire every `spread_interval`, up to `max_fires`.
   Dousing it below the threshold makes it start building again before it can spread.
   Spread positions step by a golden angle rather than using a random number generator,
-  so a test run is reproducible.
+  so a test run is reproducible. Every one of those numbers comes from its **kind** —
+  see below.
+- **`Hazard`** is a pressure cylinder that cooks off if a fire is left burning beside
+  it. The first thing in the district that hurts back — see below.
 - **`Casualty`** has two separate quantities: `health` runs down on its own, and
   `treatment` is what a worker adds. Treatment stabilises; running out of health does
   not. That gap is the point — arrive late and they are lost, which is a failure the
-  player can feel.
+  player can feel. One can also be **trapped** under a load — treatable where they lie,
+  but unmovable until a fire crew works `Free` on them.
+- **`Suspect`** paces and gives it some mouth until an officer works `Apprehend` on
+  them, fights back while being worked, and is then walked to a patrol car on foot. One
+  can also **recruit**: left alone, a public-disorder suspect draws bystanders in until
+  somebody stands in it or a cordon goes up.
+- **`Cordon`** is the odd one — an officer's ring of cones, not something that gets
+  worse. Its only mechanical job is containing a disorder call; the crowd treats it the
+  way it treats a fire, and it is deliberately not solid.
+
+**Ask a civilian what it is wearing — never read its `scene_file_path`.** The two live one
+directory apart: `res://Game/Civilians/BusinessWoman.tscn` is the *unit*, and
+`res://Game/Characters/BusinessWoman.tscn` is the outfit inside it. `ResourceLoader.exists()`
+says yes to both, so passing the wrong one fails **silently**: `_wear_outfit()` instantiates
+an entire Civilian — script, collision and movement — as the incident's body, and that body
+then walks away under its own logic, leaving the incident with nothing to see.
+
+It shipped twice, in `Suspect._draw_one_in()` and `Hazard._hurt_people()`, and was found
+from play as *"the third person in a public disorder is invisible"* — third because a
+disorder starts with two and the third is the first recruit. `Civilian.outfit_scene()` is
+the answer, and asking the civilian beats mapping the paths by name because it stays right
+if the two folders ever stop mirroring each other.
+
+The check to copy for any future case is not "a body exists" but **"the body is one of
+`Incident.OUTFITS`"** — under the bug a body existed, it was just the wrong kind of thing.
+Sabotage also turned up a second-order effect worth knowing: a nested Civilian is a *live
+unit*, so `_draw_one_in()` could find and recruit one, and the disorder cascaded faster
+than its own table allowed.
+
 **The figures wear the crowd's clothes.** `Casualty` and `Suspect` ship with the
 Starter pack's grey-blue mannequin, which reads as a placeholder in a city full of
 dressed pedestrians, so both swap it in `_ready` for one of the seven civilian
@@ -453,9 +648,11 @@ Right-click meaning falls out of the numbers, with no branching in the controlle
 
 | Ability | Score | Offered by | So that… |
 | --- | --- | --- | --- |
+| `Free` | 32 | firefighters | somebody pinned blocks everything else at that scene, including their own treatment |
 | `Treat` / `Apprehend` | 30 | people | the person *is* the job: a casualty or a suspect beside a fire gets worked first |
+| `Cool` | 28 | firefighters | a warming cylinder outranks the fire beside it — the fire will still be there in ten seconds |
 | `Collect` | 25 | paramedics | a stable casualty means "run the stretcher" — see the casualty journey |
-| `Escort` | 25 | patrol cars | a detained suspect means "send the car" — crime is kerbside by construction |
+| `Escort` | 25 | officers | a detained suspect means "walk them to the car" — on foot since August 2026 |
 | `Extinguish` | 20 | people | a fire beats walking into it — how fast depends on who holds it, see below |
 | `Board` | 10 | people | a car with a free seat means "get in" |
 | `Move` | 0 | all | the universal fallback |
@@ -535,6 +732,434 @@ four. It worked and it was miserable — a one- or two-firefighter career simply
 the most interesting call in the game. The gate is back to an engine plus *one*
 firefighter, and the difficulty does the work. It is also the first thing in the project
 to answer NEXT.md's standing complaint that difficulty is one setting for everyone.
+
+### Fires have kinds
+
+A fire used to be a fire, and the only thing that varied was whatever the Director set
+on it at the call site: four call kinds each poking the same four fields inline. Which
+meant the *character* of a fire lived in the Director, where you could not see it, and
+adding a fifth kind meant a fifth block of field-setting.
+
+`Fire.Kind` — `BIN`, `VEHICLE`, `BUILDING` — with one `KINDS` table holding the plume,
+the rates, whether a hose is needed and the whole spread configuration. The Director
+now sets one field.
+
+| kind | plume | spreads | who can fight it |
+| --- | --- | --- | --- |
+| **Bin** | `FX_Fire_Small_01` | never — its threshold is put out of reach | anyone, quickly |
+| **Vehicle** | `FX_Fire_Medium_01` | rarely, short range | anyone, slowly |
+| **Building** | `FX_Fire_Large_01` | aggressively, crew-scaled | a hose only |
+
+Two traps, both paid for:
+
+- **`kind` needs a setter, not just an export.** `Director._spawn()` adds the incident
+  to the tree and *then* configures it, so a value applied only in `_ready` is applied
+  before the Director has said what it is. The setter re-applies when it is already in
+  the tree.
+- **The default matters.** Making `BUILDING` the export default reddened five existing
+  checks at once, because everything already on the map inherited building rates. The
+  default is `VEHICLE`, which carries the historical numbers the older checks were
+  written against.
+
+A spread fire inherits its parent's kind for free, because `_spread()` uses
+`duplicate()` — which is right: a building fire spreads building fire.
+
+### Different fires want different things put on them
+
+A fire used to yield to anyone with a hose, and the only question was how fast. Now each
+kind names the **agent** that touches it, and the wrong one does nothing at all — the
+same refusal `needs_hose` already uses, because "slower" is invisible at RTS zoom and a
+player who cannot tell refusal from slowness learns nothing from either.
+
+| kind | class | agent | who has it |
+| --- | --- | --- | --- |
+| Bin | A | water | the appliance, or a carried extinguisher |
+| Building | A | water, **and volume** — `needs_hose` | a crew on the appliance's hose |
+| Vehicle | B (fuel) | **foam** | the appliance's second tank, only |
+| Electrical | C | **dry powder** | **the patrol car, and nothing else** |
+
+Two things make this a decision rather than a lookup.
+
+**Foam is a separate finite tank, and a hydrant will not fill it.** Water is what the
+street supplies; foam is what the station stocks. Park by a hydrant and a crew can fight
+bins and buildings all day, but the fourth car fire of a shift sends the appliance home.
+The tank is the existing `water` plumbing duplicated, not reinvented — `carries_foam`,
+`draw_foam()`, `has_foam()`, and `_supply()` asks the tank the *fire* needs, so an
+appliance out of foam is still a perfectly good supply for a building.
+
+**The electrical fire inverts the roster.** Water on live electrics is worse than
+useless and the appliance carries no powder, so it is the one call the fire service
+cannot answer and the police can. Dry powder is genuinely multi-class, which is what
+lets an officer keep every fire they always had while gaining one nobody else can take
+— the change adds police work rather than quietly removing it. It is small and it does
+not spread, because a call that inverts the roster should be a puzzle and not a
+punishment.
+
+`describe_state()` appends `-- needs foam` / `-- needs dry powder`, and the board already
+renders that string on the call row, so the whole rule is discoverable for no interface
+work at all. Without it this would be a memory test: a crew drives across the district,
+finds the hose does nothing, and has no way to know why.
+
+**All three look different, and that is not decoration.** Water is thin ribbon streaks
+that fall (`WaterJet.tscn`, off the pack's rain material); foam is soft blobs that hang
+and swell (`FoamJet.tscn`, off `Dust_Soft_01`); powder is a short wide sulphur-tinted
+puff that snaps to full opacity and vanishes (`PowderJet.tscn`, off `Dust_01`). Three
+scenes rather than one recoloured, because a rule the player cannot see is a rule they
+have to be told.
+
+Powder borrowed the water jet for its first day and that was a genuine defect, not a
+missing polish: an officer fighting an **electrical** fire was drawn spraying water, on
+the one call whose entire rule is that water is the wrong thing to put on it. A visual
+that contradicts the mechanic is worse than no visual at all.
+
+The related bug underneath it is worth keeping: the jet was handed **`fire.agent`** — what
+the fire *wants* — when it should have been handed what the *unit is applying*. The two
+coincide often enough to hide, and they part company exactly where it matters: an officer
+on a bin fire carries dry powder whatever the bin would prefer. `_applied_agent()` is now
+a separate question from `_can_apply()`, and only the latter is about the fire.
+
+One trap worth recording. **`Kind.VEHICLE` is the default fire**, so making car fires
+want foam broke four existing checks at once — all of them measuring the *water* economy
+against a fire they had never named. The fix was to make those checks say which fire they
+stage rather than to weaken the rule; a check that leans on a default is measuring
+whichever row the table happens to hold.
+
+### A car fire bills what is parked in it
+
+A `VEHICLE` fire scorches any `Vehicle` within `scorch_range`, per second, scaled by
+intensity, straight into the `repair_bill` the career economy already reads. Nothing new
+was needed — `Vehicle.scorch()` accumulates fractional pounds and bills whole ones, and
+the `took_damage` signal, the readout and the debrief row all existed.
+
+It gives parking a consequence. Park the appliance nose-in beside a burning car and it
+costs you about £13 for three seconds; stand it off and it costs nothing. The suite
+pins both, and the second half matters as much as the first: a check that only asserts
+damage happens cannot tell you the radius is doing anything.
+
+### The water is visible
+
+Until August 2026 a firefighter fought a fire by standing near it playing a clip. The
+fire went down, so the mechanic worked; nothing said where the water was going.
+
+`Game/Units/WaterJet.tscn` is a stream of ribbon droplets fired along local -Z with
+enough gravity to droop. There is **no water in the particle pack** — what it has is
+rain, which is short ribbon streaks on a vertex-coloured unshaded material, so the
+material is the pack's `Rain_01` verbatim (vendor files are never edited) and the nozzle,
+spread, velocity and gravity above it are ours.
+
+`Person.spray_at(point)` is an **expiring ask**, the same shape as the appliance's
+ladder: an order calls it every frame it delivers water and simply stops calling it when
+it does not. Nothing has to remember to switch the jet off — which matters, because there
+are four ways to stop working (finished, shoved out of range, cancelled, target freed)
+and a latch would need releasing on all four. The jet is instanced lazily on first use
+rather than shipped in each character scene: there are eleven of those, all generated,
+and only a firefighter or an officer will ever want one.
+
+A firefighter **holds the appliance's own nozzle** while working —
+`SM_Veh_Firetruck_Hose_Nozzle`, already a part on the built engine, taken off the shelf.
+Its position is read off the skeleton's `RightHand` bone each frame rather than hung on a
+`BoneAttachment3D`, because an attachment would have to live *inside* the character
+scene, and those eleven scenes are generated by `build_character.gd` — anything added
+there is lost at the next rebuild. The water then leaves the muzzle, 0.52m down the
+barrel, rather than the grip: otherwise the first half-metre of the stream is inside the
+tool that is supposed to be producing it.
+
+An officer gets no tool at all. **There is no fire extinguisher in any pack** — 516 props
+and not one — and handing them the appliance's hose nozzle would say the wrong thing
+about what a patrol car carries. Their water comes from the chest and the tool stays
+implied, which is how the crew and the appliance themselves were handled before the Town
+pack arrived.
+
+Two details are load-bearing:
+
+- **The jet is `top_level`.** Its particles are in world space, so if the nozzle
+  inherited the person's transform, turning to face a second fire would swing the water
+  already in the air round with them.
+- **It is driven by water delivered, not by the order running.** Both call sites sit
+  *below* their "no supply" early return. A firefighter with no appliance in reach still
+  walks up and still plays the animation and still gets nowhere; an officer in front of a
+  building fire likewise. Drawing a jet in either case would say water is landing when
+  the whole point is that none is. The suite pins this from both sides — an officer on a
+  building fire shows nothing, the *same* officer on a bin fire sprays — because a check
+  that only asserts the absence cannot tell you the mechanism is connected at all.
+
+### Hover, and a spacing scale with a name
+
+Several things here stop the mouse and answer a click -- roster chips, call rows, dispatch
+rows, the CONTROLS chip -- and every one of them used to look exactly like the things that
+do not. `Game/UI/Hover.gd` brightens `modulate` on `mouse_entered` and restores it on exit.
+
+**Brightness rather than a stylebox swap, deliberately.** Half of these are bare containers
+with no panel at all -- a `UnitChip` is a `VBoxContainer` -- and giving one a stylebox
+changes its size. A control in the bar that changes size makes the bar taller, and a taller
+bar covers whatever floats above it. Six incidents deep, that is not a trade worth making
+for a hover effect, and a check asserts the bar does not move when something is hovered.
+
+The gaps are named in `Palette` -- `TIGHT SNUG STEP WIDE GAP` -- and the container defaults
+in `build_theme.gd` come from them. **The twenty-four existing `separation` overrides are
+untouched**, which is a deferral rather than an oversight: retuning a gap inside
+`CommandBlock` rewraps the tiles, grows the bar, and re-opens the trap above. Even deleting
+one that merely matches its default needs the container type read at each site. The
+`HFlowContainer` h_separation keeps its own number and is commented as load-bearing
+geometry, because it is what decides how many tiles fit a row.
+
+### Group orders spread, and queued ones are drawn
+
+Two things an RTS player notices in the first minute, both absent until August 2026.
+
+**Ten units ordered to a point all went to the same coordinate.** `MoveAbility.make_order`
+never saw the selection, so it could not do anything else. The seam is two fields on
+`Target` — `slot_index` and `slot_count` — filled by the controller before the per-unit
+loop and read only by `MoveAbility`. Every other ability ignores them, so the controller
+still never branches on a verb, which is the property the scoring ladder exists to protect.
+
+Slots are assigned **by navigation layer first** (vehicles path on the carriageway, people
+on the pavement, so one formation for both would put a car on a kerb) and then
+**nearest-first**, or eight units cross each other's paths on every order. The layout is a
+spiral of rings, six to a ring — what a crowd naturally takes around a thing they are all
+going to.
+
+A slot is checked twice: `CityGrid.standable()` first because it is cheap, then
+`Unit.can_reach()`, which is `map_get_path` **with the unit's own navigation layers**.
+That second test exists because `map_get_closest_point` takes no layer filter and both
+regions share one map — it answers "0.00m" for a spot in the middle of a pavement when
+asked about a car, and it has already produced one completely vacuous check here. A slot
+that fails either test falls back to the ordered point: stacking two units is much better
+than putting one inside a building, and a group order that silently dropped a unit would
+be worse than both.
+
+**A lone unit always gets the raw point**, which is why the terminal-approach figures the
+docs treat as a regression tripwire did not move by a byte: 4.2m off the centre line,
+stopping 13.0m clear of the building it was aimed into, before and after.
+
+**Queued orders now have markers.** Shift-right-click has queued since phase 1 and nothing
+ever drew it, so a player who lined up three stops could not see what they had asked for —
+or notice they had queued one by accident. `_update_markers()` walks `unit.orders` rather
+than `current_order()`; the current one keeps the bob and the spin at full size, the rest
+sit still at 0.55. Told apart by size rather than colour because the marker is a duplicated
+scene, and recolouring one would mean its own material per copy.
+
+### Your own people can be lost
+
+Until August 2026 nothing in the district could touch a unit the player had paid for.
+Damage existed only on `Vehicle`, and the blast that turned bystanders into casualties
+walked straight past the firefighter standing in it. Every scene was safe to walk into,
+which removes the one decision the genre is built on.
+
+A `Person` now has `health` and one entry point, `hurt()`, shaped like `Vehicle.scorch()`.
+At zero they go down: hidden, unselectable, and a `Casualty` is filed where they fell —
+carrying a back-reference and **wearing their own kit**. The whole medical chain then
+works unchanged: treat, stretcher, ambulance, hospital. Reaching hospital puts them back
+on the forecourt whole; not reaching it calls `Station.write_off()`, which is the only
+thing in the game that makes `owned` go **down**.
+
+**The downed person stays in the tree**, and that is the load-bearing decision.
+`Station._alive()` counts group membership, so a unit lying in the street still counts
+against `available()` — the player cannot dispatch a replacement for them. Freeing the
+person and spawning a bare casualty would have made being blown up *refund* a unit.
+
+Three guards in `hurt()`, each paid for:
+
+- **The crowd is not crew.** `Civilian extends Person`, so any `as Person` cast catches
+  shoppers. `Hazard._hurt_people()` tests `Civilian` **first**, and `hurt()` no-ops for
+  `Service.NONE` — otherwise a blast both converts a bystander and down-states them.
+- **A passenger is not standing there.** An aboard person rides at the carrier's
+  position, so without the `is_aboard` guard a blast beside the appliance took the crew
+  sitting safely inside it — measured at 0.17 health under sabotage.
+- **Already down cannot be hurt again**, or one blast files two casualties.
+
+A crew casualty scores **neither** arm: delivering a firefighter you got hurt should not
+pay £100 for the privilege, and losing one should not be fined on top of losing the asset.
+The punishment is the write-off, and the debrief names it. Same argument the hazard arm
+makes about not charging twice for one mistake.
+
+One ordering bug worth keeping. `Mission` read `casualty.crew` from the `resolved`
+handler and always saw null — settling clears it, and a written-off unit is freed, so
+there was either nothing or a dangling reference. `was_crew` is latched in `_finish()`
+before either happens.
+
+Two sources of harm ship: the hazard blast (`blast_harm 1.2`, scaled by the same falloff
+as the damage — at 0.85 the strongest possible hit left a firefighter standing on 0.22,
+so a cylinder in the face was survivable every time), and a resisting suspect, who costs
+the arresting officer condition per second. The second makes a lone arrest expensive
+rather than lethal, and turns "send two, or cordon first" into a decision.
+
+**Deferred deliberately:** standing near a big fire. `ExtinguishOrder` *holds* a
+firefighter at its work range, so a burn radius that overlaps it makes the fire service
+unplayable — and that would read as a balance bug rather than a feature. Measure the
+settled stand-off distance first, and cut the source if the two overlap.
+
+### An arrest is walked in, not teleported
+
+A patrol car used to drive to a cuffed suspect and they appeared inside it. Two things
+were wrong with that, and they are the same two the paramedic's stretcher run fixed years
+of phases earlier.
+
+**The car had to reach them.** A car only goes where the carriageway goes, so the pick-up
+reach was stretched to 5.5m purely to bridge the kerb — and that only worked because the
+director opens crime calls against a kerb *on purpose*. Anybody standing further off the
+road than that was uncollectable. Escort now belongs to the **officer**: feet go where
+wheels cannot, and the big wheels wait at the kerb.
+
+**And the loading was a teleport.** `LoadSuspectOrder` is now four beats — walk to them,
+take hold, walk them back, hand them over — with the suspect following a metre behind,
+visible and unpickable, the same arrangement `Casualty.is_carried` uses on a stretcher.
+
+The guard in `Stage.HANDOVER` is the load-bearing part and it exists because of a
+sabotage result: deleting `walk_with()` outright left **every loading check green**,
+because the handover put the suspect in the car from wherever they happened to be
+standing. The walk was decorative and the teleport was still there under a longer
+animation. Handover now refuses unless `suspect.escorted_by == unit`, and the same
+sabotage reddens four checks instead of one.
+
+A patrol car holds **two**. One was the shipped figure, and it made a second arrest at the
+same scene need a second car — which the disorder call turned from an occasional nuisance
+into the normal case, since that one produces three or more suspects at a single kerb by
+design.
+
+A detained suspect now **stands where they are**. They used to trudge back to the spot the
+call opened on, because that kerb was where the car's reach was measured from; nothing
+needs them at a particular place any more, and walking off would mean an officer sent to
+collect somebody arrives to find them somewhere else.
+
+### A crowd that turns
+
+A `Suspect` can **recruit**. Left alone, one draws in the nearest bystander every
+`recruit_interval` — taking the person who was standing there and the clothes they were
+wearing, the same thing a blast does to a civilian and for the same reason. Off by
+default, so the ordinary Disturbance is still the single mouthy individual it always was;
+only the `disorder` call turns it on.
+
+This is **the one call that gets worse for want of units rather than for want of time**.
+A fire spreads on its own schedule whatever you do. A disorder call spreads only while
+nobody is standing in it, so arriving *is* the intervention, and arriving late costs you
+the size of the job rather than a few seconds of it.
+
+**And it is the first job `Secure` has ever had.** Containment is an officer on foot
+within `police_reach`, *or* a raised `Cordon` over the spot. Until now nothing in the game
+required a ring of cones — NEXT.md carried "nothing yet requires a cordon" as a standing
+gap — and a verb that never matters is a verb the player correctly ignores. A patrol car
+parked at the scene does not count: it takes an officer out of it, which keeps the call
+about the roster rather than the fleet.
+
+Containment **resets** the countdown rather than pausing it, so a scene left half-attended
+cannot be picked up exactly where it was.
+
+`Director.DISORDER_SIZE` scales the starting group and the cap to the officers owned —
+`BUILDING_SIZE`'s rule again: the job fits whoever can be sent rather than being withheld
+until the roster is big enough. That was tried on building fires, it was miserable, and a
+one-officer career never seeing the interesting police call would be the same mistake in a
+different uniform.
+
+### Pinned under something
+
+A `Casualty` can be **trapped**. They can be treated where they lie — a paramedic kneels
+beside them either way — but nothing can move them until a fire crew lifts the weight off.
+
+This is the first call in the game that needs two services **in sequence** rather than in
+parallel. A rescue wants an engine and an ambulance at the same time; this wants the crew
+to have *finished* before the paramedic can start, so arriving in the wrong order costs
+real time instead of being a matter of taste. A paramedic who gets there first still has
+something useful to do — treating stabilises them, and a stable casualty stops declining —
+which is what keeps the wait from being dead time.
+
+`Free` (`T`) is the verb, and it is the odd one in the game: it heals nobody and puts
+nothing out. A firefighter cuts the casualty loose and then has no further part in the
+call. Fire service only — a paramedic who could free people would collapse the whole
+thing back into one unit.
+
+Three details worth keeping:
+
+- **`CollectAbility` declines rather than scoring low.** A paramedic right-clicking a
+  trapped casualty gets a **Move** and walks to them, which is the right thing to be
+  doing while the crew work — instead of standing over them running an order that cannot
+  finish.
+- **The load is a real prop**, `SM_Prop_Pallet_01` — and it was chosen for its **origin**
+  rather than its look. The first cut used a four-metre pipe, laid flat by a quarter turn
+  about X (the trick the held nozzle uses); but that mesh runs from its origin along +Y
+  with its AABB centre 2m out, so the whole length ended up beside the casualty with one
+  end resting on their shins. The pallet's mesh is centred on its origin, so it needs no
+  rotation and no offset: dropped at the body, it covers the body.
+
+  The check is the part worth keeping. It asserted only that a `Pin` node existed, which
+  a prop lying *next to* someone satisfies perfectly well — that is how the bug shipped.
+  It now transforms the mesh's AABB centre into world space and requires it within 0.6m
+  of the casualty: **0.00m** with the pallet, **2.00m** with the pipe restored.
+- **`describe_state()` says "trapped" first**, ahead of every other description including
+  "stable". Trapped is what stands between the call and its next step, and a board that
+  read "stable, needs an ambulance" over someone nobody can lift would send the player
+  for the wrong unit.
+
+The director opens these at weight 12 with `needs_fire_service`, and starts them
+declining at 0.6 of the usual rate — they are losing health the whole time they are
+pinned and nobody is treating them, so the sequencing the call exists to create would
+otherwise just be a way to lose people.
+
+### A cylinder that goes off
+
+`Hazard` gains `heat` while any active `Fire` is within `heat_range`, scaled by that
+fire's intensity so a fire being knocked down stops threatening it before it is out. It
+sheds heat on its own when nothing is burning near it — slowly, so walking away from a
+warm cylinder is not a plan, but not never, so putting the fire out first is a real
+answer and not merely a way of freezing the problem.
+
+At `heat >= 1.0` it goes: everything nearby takes damage falling off with distance,
+every civilian in range becomes a `Casualty` **wearing the clothes they were already
+wearing**, one or two new fires are thrown through the same `CityGrid.standable` test a
+spread uses, and a flash and dust cloud are freed on a timer. Then `_finish(false)` —
+an explosion is a job that was not done.
+
+There is no explosion in any pack on disk, so the blast is composed: the largest fire FX
+the particle pack ships, its dust, and a synthesised bang.
+
+**Beaten two ways**, which is what makes it a decision rather than a timer. Cool it with
+a hose — a firefighter standing still, doing nothing about the fire — or put the fire out
+first and let it cool itself. Both are right in different scenes.
+
+The hose is the new verb, `Cool` (`L`), scoring **28**: above Extinguish's 20, so a
+firefighter standing between a fire and a warming cylinder deals with the cylinder,
+which is the right default — the fire will still be there in ten seconds and the
+cylinder may not be. Below Treat and Apprehend at 30. Folding it into Extinguish was
+cheaper and was considered; a separate tile was chosen because "put this out" and "stop
+this exploding" are different decisions and the player should be able to see the choice.
+
+Two ordering traps here, both found by a check rather than by play:
+
+- **The blast is tested before anything is allowed to take heat off.** The first cut
+  cooled first and tested second, so a cylinder sitting at exactly 1.0 shed a fraction
+  and survived. In play the two happen in the same frame and it never showed.
+- **The hazard is freed by the time you read the result.** `_finish()` calls
+  `queue_free()`, so a test that reads `hazard.active` after the blast raises a runtime
+  error — which in this suite does not fail a check, it silently abandons the rest of
+  it. Four checks vanished and the run still said green. Take the outcome off the
+  `resolved` signal instead.
+
+### Spawning a call on demand — F5
+
+The director rolls from a weighted table, so seeing a particular call means opening a
+shift and waiting: `trapped` is 12 of about 166 weight, roughly one call in fourteen.
+Four kinds shipped in August 2026 that were never once looked at during the work that
+added them, and everything a check cannot judge about them — whether a blast reads,
+whether foam looks unlike water, whether a pinned casualty is legible at RTS zoom — can
+only be settled by looking.
+
+`CallSpawner` lists every row of `Director.KINDS` and opens the one you click. Three
+things about it are deliberate:
+
+- **It asks the director rather than placing anything.** `Director.open_kind()` was split
+  out of `_open_call()` for this, so a spawned call runs the same `_clear()` and
+  `_pick_pavement()` guards a rolled one does. Those are the single funnel enforcing that
+  nothing ever opens inside a property, and a spawner with its own placement could put a
+  fire in a wall and look like a bug in the game rather than in the tool.
+- **The list is built from the director's own table**, so a call kind added there appears
+  here without anyone remembering to list it twice. A check pins the count.
+- **It is inert until F5 is pressed** — nothing is built, watched or spawned before that.
+  The map ships quiet by design and a director that could start on its own breaks dozens
+  of checks at once. A check pins that too, and it is not theoretical: sabotaging the
+  spawner to build its panel in `_ready` put the panel on screen from frame one, where it
+  swallowed clicks and made the map-click checks miss by 84.9m.
+
+Third of the same shape as `F3` (force a black-box record) and `F4` (navigation overlay).
 
 ## Sound
 
@@ -630,6 +1255,21 @@ map**, which turned out to be the minimap converting an out-of-rect click into a
 destination outside the district. That is not a fault any staging would have found,
 because it was never a trap — it was an order to somewhere that does not exist.
 
+**A record says where things are, not just how far.** Each nearby unit carries a bearing
+off the car's nose (`90° left`, `dead ahead`, `behind`), and every record ends with a
+`touching:` line built from `get_slide_collision_count()`. Both were added in August 2026
+after three stalls that read *"on a road, full throttle, zero speed, nothing in front"*
+and could not be told apart — a car wedged against a vehicle, one wedged against scenery,
+and one whose trouble was entirely its own steering all produce that same block, because
+`holding behind` only ever names a vehicle in the *forward cone*. Range without bearing
+cannot be reconstructed into a geometry, so none of the three could be staged from.
+
+The record also separates **`turning round:`** from **`escaping:`**, because a car reverses
+under two unrelated mechanisms and `is_turning_round()` only ever reported one of them.
+Four records read `turning round: false` while the car was doing -5 m/s under a stuck
+escape, which reads as "no recovery is firing" when it was firing repeatedly and not
+helping — opposite conclusions wanting opposite fixes.
+
 ## Seeing what a car thinks it is doing — F4
 
 The black box answers "what was it doing when it stopped". It does not answer the other
@@ -690,10 +1330,11 @@ suspect to the **custody door**, an empty one **home** — both deliveries alrea
 automatically on arrival, so all that was missing was a way to say "take them in" without
 knowing which end of the district the right door is at.
 
-It is one tile because the command bar holds exactly **seven** before the
-`PanelContainer` grows and silently swallows the CONTROLS chip above it. An eighth took it
-from 148px to 176px. That trap has now caught this project five times; adding a command
-tile is never free.
+It is one tile because the command bar held exactly **seven** before the
+`PanelContainer` grew and silently swallowed the CONTROLS chip above it. An eighth took it
+from 148px to 176px. That trap has now caught this project six times; adding a command
+tile is never free. The bar is **two rows** as of August 2026 and the chip sits above
+that height — see "The interface" for what finally stopped it recurring.
 
 ## Damage and repairs
 
@@ -770,6 +1411,10 @@ The mix is a weighted table (`Director.KINDS`):
 | Vehicle fire (10) | Against the kerb of a street | Police (the extinguisher) |
 | Building fire (20) | A kerbside pavement tile | A firefighter on an engine's hose — **only drawn once the career owns both** |
 | Rescue (12) | A kerbside pavement tile | Engine, crew, paramedic **and** ambulance — the one call no single service finishes |
+| Gas leak (10) | A kerb | A firefighter on a hose — a cylinder with a bin fire beside it, cooking |
+| Electrical fire (12) | A pavement tile | **The police, and only the police** — the appliance carries no dry powder |
+| Person trapped (12) | A kerbside pavement tile | A crew to cut them free, **then** a paramedic and an ambulance — in that order |
+| Public disorder (12) | A kerb | Officers *standing in it*, or a cordon — it grows while nobody is |
 
 A medical call **takes a civilian** when the crowd can supply one: the director swaps
 a shopper for a casualty where they stand (`_spawn_medical`), so the collapse is
@@ -799,9 +1444,18 @@ meant no building fires at all. It is now the same rule asked of the *career*:
 draw. Generating a fire that is impossible to put out would still be the game lying
 about what it can be asked to do.
 
+A gas leak is a cylinder and a small fire placed four metres apart — close enough to be
+cooking it, far enough that a crew can work either without standing in the other. It is
+the one call with a **deadline you can see coming**: the board reads "warming", then
+"venting", then "about to go", and the bar on the row drains toward the blast rather
+than filling toward a finish. Two answers work — hose the cylinder, or put the fire out
+and let it cool itself — and choosing is the call.
+
 **Scoring is where calls become authoritative.** The mission's tallies: 50 a fire out,
-100 a casualty delivered, 75 an arrest booked in, −150 a casualty lost — a loss costs
-points, not the shift. On top, each call cleared pays a response bonus off
+100 a casualty delivered, 75 an arrest booked in, 60 a hazard made safe, −150 a casualty
+lost — a loss costs points, not the shift. A cylinder that goes off needs no explicit
+penalty: it fails its call, injures whoever was near it and lights fresh fires, all of
+which the existing table already costs. On top, each call cleared pays a response bonus off
 `Call.response_age` (the age at which its status first turned `ON_SCENE`): the full
 100 inside a 10-second grace, sliding linearly to a floor of 25%. Fast attendance is
 worth more than the fire it puts out, which is the game telling you what it is about.
@@ -979,8 +1633,8 @@ before the map has finished building.
 > the first chip attempt used themed Buttons whose stylebox padding grew the bar to
 > 191px, the *third* time this block sprang the same trap (pills at 190, command
 > tiles at 176). A `PanelContainer` grows to fit its contents, the bar grows with
-> it, and whatever sits above the bar silently stops being clickable. The 148px
-> height check catches it every time.
+> it, and whatever sits above the bar silently stops being clickable. It is no longer
+> a height check that catches it — see "The interface".
 
 ### A unit going home drives it properly
 
@@ -1024,9 +1678,9 @@ rule that applies to them.
 
 | Service | Verbs |
 | --- | --- |
-| **Police** — officers, patrol cars | Move, Apprehend, Extinguish, Secure, Board, Stop; Escort on the cars |
+| **Police** — officers, patrol cars | Move, Apprehend, Escort, Extinguish, Secure, Board, Stop — all on the officer; the car carries two |
 | **Medical** — paramedics, the ambulance | Move, Treat, Collect (the stretcher run), Board, Stop; the ambulance carries and delivers |
-| **Fire** — firefighters, the engine | Move, Extinguish, Board, Stop — one verb, done properly; the engine carries the crew and the hose |
+| **Fire** — firefighters, the engine | Move, Extinguish, Cool, Free, Board, Stop; the engine carries the crew and the hose |
 
 The gating is **hard**. An officer is not offered Treat at all, so right-clicking a
 casualty with one selected produces a **Move** order and nothing else. Sending the wrong
@@ -1041,7 +1695,15 @@ how many it can carry.
 
 Police keep the extinguisher a patrol car actually carries: enough for a bin or a
 vehicle. A building fire yields to nothing but a crew on an appliance's hose — an
-officer can stand in front of one all day and the intensity will not move.
+officer can stand in front of one all day and the intensity will not move. Since the
+agents landed they also have the **electrical** fire outright, which is the first job in
+the game that is police work *because* it is a fire rather than in spite of it.
+
+**Cool** is fire-only and stricter still. A hazard has no reduced rate for a crew who
+have walked away from the appliance: an extinguisher against a pressure vessel is not a
+slower answer, it is not an answer. The order still runs and the animation still plays,
+which is deliberately the same lesson a building fire teaches a patrol car — the game
+says no by doing nothing visible, not by refusing the click.
 
 ### Secure has to be armed
 
@@ -1137,7 +1799,7 @@ Freeplay is where calls become what the game is judged on — see "Freeplay".
 
 ## The interface
 
-An Emergency 4–style **docked bar** owns the bottom 148px: portrait, roster, command
+An Emergency 4–style **docked bar** owns the bottom 176px: portrait, roster, command
 tiles, dispatch. It is opaque and it stops the mouse, so a click that lands on it is a
 click on the interface and never also an order out in the world. Everything else —
 status strip, incident pills, minimap, controls, banner — floats over the 3D view and
@@ -1207,11 +1869,36 @@ whole danger of having one.
 
 The controls card draws the keyboard as keycaps (`Game/UI/Keys/`, from the pack's
 dark set), sectioned by function — SELECT, ORDER, CAMERA, MINIMAP, SHIFT — and ships
-closed: the CONTROLS chip above the bar (or F1) opens it. The command block is sized
-so the fattest selection's seven tiles fit **one row** — let them wrap and the
-PanelContainer grows, the bar grows with it, and whatever sits just above the bar is
-silently covered. That is the dispatch-pill trap again, and it ate the CONTROLS chip
-for a morning; a check now pins the bar's height with the ambulance selected.
+closed: the CONTROLS chip above the bar (or F1) opens it.
+
+### The bar is two rows, and the check pins the symptom
+
+For six phases the command block was sized so the tiles fit **one row**: let them wrap
+and the `PanelContainer` grows, the bar grows with it, and whatever sits just above is
+silently covered. A check pinned the bar at 148px ± 4 and caught it every time.
+
+Pinning the height was still wrong, and August 2026 is how that showed. The block was
+widened for a ninth tile; the height was untouched; a height check would have gone red
+for a change that was fine. So the check was rewritten to assert the **symptom** — that
+the CONTROLS chip is still visible and unoverlapped — which is what actually broke five
+times. A magic number is what would have let it break the sixth.
+
+Then the rewritten check found a bug that had been live all along. It selected one
+patrol car, whose tiles fit one row; the sabotage agent reverted the widening and the
+check stayed green, because the fault never reached the measurement. **A scenario that
+cannot provoke the fault is no better than an assertion that cannot see it.** Selecting
+*everything* is the real worst case, because `RTSController.available_abilities()`
+returns the **union** across the selection: a mixed box-select offers 14 tiles, wraps to
+two rows whatever the width, and put the chip under the bar. It had been unclickable
+that way since long before this tranche; nobody had box-selected across services and
+then reached for the chip.
+
+The fix is a bar that is two rows tall always, with the chip above that height. One more
+correction worth keeping, because it inverts the obvious reading: the `Bar`'s own
+`offset_top` is a *minimum*, so once the tiles wrap the content sets the height and the
+offset is inert — sabotaging it back to 148 changes nothing. It earns its place by
+stopping the bar changing height between selections, not by stopping the overlap. The
+chip's offsets are what do that.
 
 ### Service is identity, not capability
 
@@ -1791,7 +2478,7 @@ directly with `godot --path . res://Game/AnimationViewer.tscn`.
 `--fixed-fps 60` decouples the headless loop from the wall clock: same fixed-step
 physics, same checks, ~20 seconds instead of ~9 minutes.
 
-650 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
+802 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
 shift through the station (the map ships empty), and every bought unit is clickable
 from the opening view; the crowd strolls, runs from a fire and cannot be selected or
 picked through; traffic drives the roads and yields; units start parked, drive to a

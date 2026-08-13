@@ -27,6 +27,10 @@ const BANNER_SIZE := 54
 const CARD_RADIUS := 12
 const TILE_RADIUS := 8
 const PILL_RADIUS := 999
+## A slider's track has no size of its own -- it is drawn from the stylebox's vertical
+## content margin, so this *is* the track height.
+const TRACK_HEIGHT := 6
+const KNOB_RADIUS := 7
 
 
 func _init() -> void:
@@ -41,6 +45,7 @@ func _build() -> void:
 	_panels(theme)
 	_buttons(theme)
 	_containers(theme)
+	_sliders(theme)
 
 	var err := ResourceSaver.save(theme, OUT)
 	if err != OK:
@@ -66,9 +71,14 @@ func _labels(theme: Theme) -> void:
 	_label_variation(theme, "DimLabel", FONT_SIZE, Palette.TEXT_DIM, 0)
 	_label_variation(theme, "PillLabel", 13, Palette.TEXT, 0)
 	_label_variation(theme, "AlarmLabel", 13, Palette.CASUALTY_DEEP, 0)
-	# The banner has no card behind it, so it carries its own outline -- white, because
-	# everything else in this scheme is dark ink on a light ground.
+	# The banner has no card behind it, so it carries its own outline. Since the restyle
+	# that outline is near-black: the text is now near-white, and the ground it sits over
+	# is a lit Synty street rather than a card.
 	_label_variation(theme, "BannerLabel", BANNER_SIZE, Palette.TEXT, 10)
+	# **The radio log has no panel at all** -- four lines of dispatch chatter straight over
+	# the city. `DimLabel` cannot simply gain an outline, because it is also used inside
+	# cards where an outline is wrong; this is the same label with something behind it.
+	_label_variation(theme, "RadioLabel", FONT_SIZE, Palette.TEXT_DIM, 4)
 
 
 func _label_variation(theme: Theme, name: String, size: int, colour: Color,
@@ -134,29 +144,70 @@ func _buttons(theme: Theme) -> void:
 	theme.set_stylebox("focus", "Button", StyleBoxEmpty.new())
 	theme.set_color("font_color", "Button", Palette.TEXT)
 	theme.set_color("font_hover_color", "Button", Palette.TEXT)
+	# **The selected-and-hovered state.** Without it Godot falls back to `hover`, so
+	# running the mouse along the settings rows made the *chosen* option look unchosen --
+	# in all four toggle groups (shift length, call rate, time of day, weather).
+	theme.set_stylebox("hover_pressed", "Button",
+		_box(Palette.HOVER.lerp(Palette.PRESSED, 0.6), TILE_RADIUS, 8))
 	theme.set_color("font_pressed_color", "Button", Palette.MEDICAL_DEEP)
+	theme.set_color("font_hover_pressed_color", "Button", Palette.MEDICAL_DEEP)
 	theme.set_color("font_disabled_color", "Button", Palette.TEXT_DISABLED)
 	theme.set_font_size("font_size", "Button", FONT_SIZE)
+
+
+# --- Sliders -----------------------------------------------------------------
+
+## The volume slider was the one control in the game with no theme entry at all --
+## stock Godot, a mid-grey grabber, invisible until you went looking for it.
+func _sliders(theme: Theme) -> void:
+	theme.add_type("HSlider")
+	# **The track's height is its content margin**, which is the whole trap here. The
+	# first cut passed padding 0 -- correct for a card, meaningless for a slider -- and
+	# baked a track zero pixels high. The volume grabber floated on nothing, which is
+	# worse than the stock control it replaced.
+	theme.set_stylebox("slider", "HSlider", _box(Palette.WELL, TRACK_HEIGHT / 2, 0,
+		TRACK_HEIGHT / 2))
+	theme.set_stylebox("grabber_area", "HSlider",
+		_box(Palette.SELECTED, TRACK_HEIGHT / 2, 0, TRACK_HEIGHT / 2))
+	theme.set_stylebox("grabber_area_highlight", "HSlider",
+		_box(Palette.ACCENT, TRACK_HEIGHT / 2, 0, TRACK_HEIGHT / 2))
+	var knob := StyleBoxFlat.new()
+	knob.bg_color = Palette.TEXT
+	knob.set_corner_radius_all(PILL_RADIUS)
+	knob.content_margin_left = KNOB_RADIUS
+	knob.content_margin_right = KNOB_RADIUS
+	knob.content_margin_top = KNOB_RADIUS
+	knob.content_margin_bottom = KNOB_RADIUS
+	theme.set_stylebox("grabber", "HSlider", knob)
+	var lit := knob.duplicate() as StyleBoxFlat
+	lit.bg_color = Palette.SELECTED
+	theme.set_stylebox("grabber_highlight", "HSlider", lit)
 
 
 # --- Containers --------------------------------------------------------------
 
 func _containers(theme: Theme) -> void:
 	theme.add_type("HBoxContainer")
-	theme.set_constant("separation", "HBoxContainer", 8)
+	theme.set_constant("separation", "HBoxContainer", Palette.STEP)
 	theme.add_type("VBoxContainer")
-	theme.set_constant("separation", "VBoxContainer", 6)
+	theme.set_constant("separation", "VBoxContainer", Palette.SNUG)
 	theme.add_type("HFlowContainer")
+	# **The flow container keeps its own numbers.** Its h_separation is what decides how
+	# many command tiles fit a row, and therefore whether the bar is one row or two. It is
+	# not a spacing preference, it is load-bearing geometry.
 	theme.set_constant("h_separation", "HFlowContainer", 9)
-	theme.set_constant("v_separation", "HFlowContainer", 6)
+	theme.set_constant("v_separation", "HFlowContainer", Palette.SNUG)
 
 
-func _box(colour: Color, radius: int, padding: int) -> StyleBoxFlat:
+## [param vertical] defaults to [param padding]; a slider needs its two axes to differ,
+## because the horizontal margin insets the track's ends while the vertical one *is* its
+## height.
+func _box(colour: Color, radius: int, padding: int, vertical := -1) -> StyleBoxFlat:
 	var box := StyleBoxFlat.new()
 	box.bg_color = colour
 	box.set_corner_radius_all(radius)
 	box.content_margin_left = padding
 	box.content_margin_right = padding
-	box.content_margin_top = padding
-	box.content_margin_bottom = padding
+	box.content_margin_top = padding if vertical < 0 else vertical
+	box.content_margin_bottom = padding if vertical < 0 else vertical
 	return box

@@ -37,26 +37,35 @@ const VEHICLES := [
 		"seats": 2,
 		# A patrol car carries no stretcher, so Collect never offers itself on one.
 		"stretchers": 0,
+		# **Two in the back.** One was the shipped figure and it made a second arrest at
+		# the same scene need a second car -- which the disorder call turned from an
+		# occasional nuisance into the normal case, since that one produces three or more
+		# suspects at a single kerb by design.
+		"cells": 2,
 		"max_speed": 26.0,
 		# Measured from the hull's own vertices: the roof-peak cluster spans
 		# x[-0.52,0.52] y[1.63,1.74] z[-0.31,-0.06].
 		"siren": {"height": 1.78, "along": -0.19, "spread": 0.34},
 	},
-	# The fire engine, and an honest note about it: the City pack ships no appliance,
-	# so this is the **van** body in the pack's orange palette. It is a placeholder
-	# wearing the right shape and the right colour -- what makes it a fire engine is
-	# its service, the crew of four it carries, and being the thing a hose reaches
-	# from. Swap `prefab` for a real appliance when a pack provides one and nothing
-	# else here has to change.
+	# **A real appliance at last**, from the Town pack (August 2026). This entry spent
+	# two rounds as a placeholder and the note it used to carry ended "swap `prefab`
+	# for a real appliance when a pack provides one and nothing else here has to
+	# change" -- which turned out to be very nearly true. The history is worth keeping
+	# because the sizes explain the tuning below: the patrol-car hull (2.17 x 1.52 x
+	# 5.25) read as a saloon with an odd paint job, the van that replaced it (2.47 x
+	# 1.78 x 5.02) read as an appliance at RTS zoom, and this reads as a fire engine
+	# because it is one -- **3.11 x 2.84 x 8.82**, 76% longer than the van.
 	#
-	# It was the patrol car's hull until August 2026, which read as a saloon with an
-	# odd paint job. The van is 2.47 x 1.78 x 5.02 against the car's 2.17 x 1.52 x
-	# 5.25 -- 30cm wider and 26cm taller on a longer wheelbase -- so it reads as an
-	# appliance at RTS zoom, which a saloon never could. It also ships **rear doors**
-	# as separate meshes, the only body besides the ambulance that does, so the
-	# generator wires them up for free and a crew disembarking swings them open.
+	# That length is not free. Turn radius is `wheelbase / tan(steer)`, so the longest
+	# body on the map corners widest, in a district where wide cornering is already the
+	# known-worst behaviour (see NEXT.md). It was measured against a patrol car on the
+	# same junctions before this landed rather than after.
+	#
+	# It brings a ladder and a hose nozzle as separate meshes, and it carries **no
+	# separate doors** -- the van's rear doors are the one thing lost. `open_doors()`
+	# already no-ops on a body without them, which the patrol car has always proved.
 	{
-		"prefab": "SM_Veh_Car_Van_01",
+		"prefab": "res://Assets/PolygonTown/Prefabs/Vehicles/SM_Veh_Firetruck_01.tscn",
 		"out": "FireEngine.tscn",
 		"display": "Fire Engine",
 		"service": Unit.Service.FIRE,
@@ -66,6 +75,9 @@ const VEHICLES := [
 		# Heavy: it corners and accelerates like the ambulance rather than a car.
 		"max_speed": 21.0,
 		"water": true,
+		# The second tank. Same appliance, and the only thing on the map that carries
+		# foam at all -- a patrol car's extinguisher is dry powder.
+		"foam": true,
 		# Twenty tankfuls, from play feedback: fires were "still too difficult to put
 		# out", and the tank was the reason -- one building node cost 41% of it, so a
 		# call that had spread while the crew drove over ran the engine dry mid-fight
@@ -73,20 +85,53 @@ const VEHICLES := [
 		# the binding constraint; it still empties, and running dry still stops the
 		# hose dead, but it takes a genuinely bad scene to do it.
 		"tank_capacity": 20.0,
-		# **An alt palette is a texture atlas, not a colour**: a mesh's UVs index a
-		# swatch of it, so the same palette paints two bodies two different colours.
-		# 04_A -- the crew's orange, and the patrol-car hull's when it was the engine
-		# -- averages rgb(0.27,0.29,0.28) at the *van's* UVs, a flat charcoal, and the
-		# first build of this swap shipped a black appliance. 02_A is the warmest of
-		# the twelve on this body at rgb(0.44,0.30,0.27). Sampled, not eyeballed.
-		# Keep it in step with build_portraits.ALT_VAN_RED.
-		"palette": "res://Assets/Synty/PolygonCity/Materials/Alts/PolygonCity_02_A_mat.tres",
-		# Measured from the van's own hull, not inherited: its roof is a 3m flat box
-		# spanning z[-2.02,0.99] at y[1.91,2.03], where the car's was a small cluster.
-		# The beacons go over the **cab** -- the front is +z, where the steering wheel
-		# and front wheels are -- exactly as the ambulance's sit over its cab rather
-		# than over its box. Height clears the roof by the same 4cm the other two use.
-		"siren": {"height": 2.07, "along": 0.78, "spread": 0.52},
+		# **No palette, for the first time.** Every previous appliance was a generic body
+		# being recoloured, and the note here used to explain at length which alt to pick
+		# -- an alt palette is a texture atlas, not a colour, so 04_A was orange on the
+		# patrol car and flat charcoal on the van, and picking by name once shipped a
+		# black fire engine. None of that applies now: this body has its own texture,
+		# authored for a fire engine, and it is the wrong shape of question to ask which
+		# City swatch suits it. Sampled anyway rather than assumed -- see the paint check
+		# in smoke_test.gd, which measures the built scene.
+		#
+		# Measured off this hull in 1m slices along z, not inherited -- the van's 2.07
+		# would have put the beacons *inside* an appliance whose bodywork tops out at
+		# 3.01. The cab is the front two metres (z +2.4..+3.4), roofed at 2.82 and 2.79
+		# wide, with the nose dropping to 2.54 beyond it and the pump housing behind
+		# rising to 3.01. Beacons over the **cab** as on the other two -- the front is
+		# +z, where the steering wheel and front wheels are -- clearing its roof by the
+		# same 4cm the ambulance and patrol car use.
+		"siren": {"height": 2.86, "along": 2.90, "spread": 0.60},
+	},
+	{
+		# **The doctor's car: the patrol hull in orange.** A doctor who walks the district
+		# is a doctor who arrives after the call has resolved itself, and a specialist you
+		# cannot get to the scene is not a decision, it is a tax. This is the vehicle that
+		# makes the doctor dispatchable.
+		#
+		# **It carries no stretcher, deliberately.** A rapid-response car that could also
+		# take the patient to hospital would quietly replace the ambulance and dissolve the
+		# bottleneck the doctor exists to be. It brings the doctor to the casualty; the
+		# ambulance still does the carrying.
+		#
+		# 04_A on *this* hull is genuinely orange -- rgb(.44,.32,.24), sampled off its own
+		# UVs, and the one place in the pack where that palette does what its name suggests.
+		# The same swatch is flat charcoal on the van and olive on a person, which is how
+		# the fire service shipped a green firefighter for a while. Never trust the name
+		# here; the paint check in smoke_test.gd samples the built scene.
+		"prefab": "SM_Veh_Car_Police_01",
+		"out": "DoctorCar.tscn",
+		"display": "Doctor Car",
+		"service": Unit.Service.MEDICAL,
+		"palette": "res://Assets/Synty/PolygonCity/Materials/Alts/PolygonCity_04_A_mat.tres",
+		"seats": 2,
+		"stretchers": 0,
+		"cells": 0,
+		# A shade quicker than the patrol car it shares a body with, and a good deal
+		# quicker than the ambulance's 21 -- getting there first is the entire job.
+		"max_speed": 27.0,
+		# The same hull, so the same measured roof-peak cluster.
+		"siren": {"height": 1.78, "along": -0.19, "spread": 0.34},
 	},
 	{
 		"prefab": "SM_Veh_Car_Ambo_01",
@@ -190,8 +235,15 @@ func _build() -> void:
 	quit()
 
 
+## A bare name is looked up in the City pack, which is where all but one of these live.
+## A full `res://` path is taken as given, so a body can come from another pack without a
+## second global constant and without every other entry growing a field it does not need.
+func _prefab_path(prefab: String) -> String:
+	return prefab if prefab.begins_with("res://") else PREFABS + prefab + ".tscn"
+
+
 func _build_vehicle(config: Dictionary) -> bool:
-	var path: String = PREFABS + str(config["prefab"]) + ".tscn"
+	var path: String = _prefab_path(str(config["prefab"]))
 	if not ResourceLoader.exists(path):
 		push_error("missing prefab: %s" % path)
 		return false
@@ -281,8 +333,19 @@ func _build_vehicle(config: Dictionary) -> bool:
 	if chassis.has_node("DoorL") and chassis.has_node("DoorR"):
 		root.door_left_path = NodePath("Lean/Chassis/DoorL")
 		root.door_right_path = NodePath("Lean/Chassis/DoorR")
+	# And only the appliance ships a ladder. Found by name rather than configured,
+	# exactly as the doors are: the part keeps whatever the prefab called it, so this
+	# asks the body what it has instead of a table asserting what it should have. The
+	# main section is the one that pitches -- the base is the turntable it pivots on and
+	# stays put, and the fly section rides the main one.
+	for part in chassis.get_children():
+		if "Ladder_01" in part.name:
+			root.ladder_path = NodePath("Lean/Chassis/" + part.name)
+			break
 
 	root.carries_water = bool(config.get("water", false))
+	root.carries_foam = bool(config.get("foam", false))
+	root.cells = int(config.get("cells", 1))
 	root.tank_capacity = float(config.get("tank_capacity", 1.0))
 	root.display_name = str(config["display"])
 	# Ambient traffic inherits no service, so it stays NONE and the interface never
@@ -308,6 +371,13 @@ func _build_vehicle(config: Dictionary) -> bool:
 	var wheelbase := absf(front_z - rear_z)
 	root.wheel_radius = wheel_radius
 	root.wheelbase = wheelbase
+	# **Where the crew step out, sized off this body rather than fixed.** The default 3.2
+	# was measured on a 5m van whose tail sits 2.3m back, and it survived the ambulance
+	# for the same reason. The appliance's tail is 4.4m back, so a fixed number puts four
+	# firefighters *inside* the truck -- and nothing catches it, because a vehicle is a
+	# CharacterBody3D and so is absent from the baked navigation the dismount point snaps
+	# to. Half the body, plus however far the hull sits off centre, plus room to stand.
+	root.dismount_back = aabb.size.z * 0.5 + absf(aabb.get_center().z) + 0.9
 
 	# Reported before saving: _save() frees the node.
 	print("%-22s hull %.2f x %.2f x %.2f   wheelbase %.2f   wheel r %.2f" % [

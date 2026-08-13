@@ -158,9 +158,16 @@ func _write(vehicle: Vehicle, why: String) -> void:
 	lines.append("  aiming at (%.1f, %.1f), %.1fm away"
 		% [vehicle.move_target.x, vehicle.move_target.z,
 			_flat(vehicle.global_position - vehicle.move_target)])
-	lines.append("  order: %s   turning round: %s   passing: %s"
+	# **"Recovering" is not the same question as "turning round".** A car reverses under
+	# two different mechanisms -- the reverse latch, which `is_turning_round()` reports,
+	# and the stuck escape, which it does not. Four August 2026 records read
+	# `turning round: false` while the car was doing -4 to -5 m/s under an escape, and
+	# that read as "no recovery is firing" when in fact it was firing repeatedly and not
+	# helping. Those are opposite conclusions wanting opposite fixes, so the record now
+	# separates them rather than leaving the escape timer further down to be cross-read.
+	lines.append("  order: %s   turning round: %s   escaping: %s   passing: %s"
 		% [order.describe() if order else "none", vehicle.is_turning_round(),
-			vehicle.is_avoiding])
+			vehicle.is_escaping(), vehicle.is_avoiding])
 	# **The destination, not just the waypoint.** Two records were replayed from the
 	# waypoint alone and both drove it cleanly, because a waypoint out of context is a
 	# different question from the journey it belongs to. Without the end point and the
@@ -229,11 +236,54 @@ func _write(vehicle: Vehicle, why: String) -> void:
 			continue
 		found += 1
 		var speed := (other as Vehicle).forward_speed if other is Vehicle else 0.0
-		lines.append("    %-18s %5.1fm  speed %5.1f%s"
-			% [other.name, gap, speed, _traffic_note(other)])
+		lines.append("    %-18s %5.1fm %s  speed %5.1f%s"
+			% [other.name, gap, _bearing_note(vehicle, other), speed,
+				_traffic_note(other)])
 	if found == 0:
 		lines.append("    nothing -- it is not blocked by a unit")
+	lines.append("  touching: %s" % _contact_note(vehicle))
 	_write_line("\n".join(lines))
+
+
+## Where something is relative to the nose, not just how far. Range alone cannot be
+## reconstructed into a geometry: three records of a car at full throttle and zero speed
+## each listed a neighbour within 7m, and there was no way to tell whether it was in
+## front, alongside or behind -- so no way to stage the fault and no way to say whether
+## the forward-cone test that reported "nothing" was wrong or right.
+func _bearing_note(vehicle: Vehicle, other: Unit) -> String:
+	var offset := other.global_position - vehicle.global_position
+	offset.y = 0.0
+	if offset.length() < 0.01:
+		return "on top"
+	var nose := -vehicle.global_basis.z
+	nose.y = 0.0
+	var degrees := rad_to_deg(nose.signed_angle_to(offset, Vector3.UP))
+	var side := "left" if degrees > 0.0 else "right"
+	if absf(degrees) < 15.0:
+		return "dead ahead"
+	if absf(degrees) > 165.0:
+		return "behind   "
+	return "%3.0f° %-5s" % [absf(degrees), side]
+
+
+## What the car is actually in contact with.
+##
+## The one thing that separates the three readings a stalled record cannot tell apart:
+## a car pressed against another vehicle, a car pressed against scenery, and a car
+## touching nothing at all whose trouble is entirely in its own steering. All three
+## present identically as "on a road, full throttle, zero speed, nothing in front",
+## because `holding behind` only ever names a vehicle in the forward cone.
+func _contact_note(vehicle: Vehicle) -> String:
+	var names := PackedStringArray()
+	for i in vehicle.get_slide_collision_count():
+		var hit := vehicle.get_slide_collision(i)
+		if hit == null:
+			continue
+		var body := hit.get_collider() as Node
+		names.append(body.name if body else "?")
+	if names.is_empty():
+		return "nothing -- it is not wedged against anything"
+	return ", ".join(names)
 
 
 func _junction_note(vehicle: Vehicle) -> String:

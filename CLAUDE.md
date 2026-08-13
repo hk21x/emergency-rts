@@ -9,7 +9,8 @@ Read before working: `PROGRESS.md` (status + what each phase taught), `NEXT.md`
 the traps).
 
 All 15 planned phases are done, and so are 16 (the world reacts), 17 (audio), 18
-(game framing) and 19 (the fire service, in placeholder models). Phase 20 is half
+(game framing) and 19 (the fire service, on a real appliance since August 2026 --
+the crew is still a repainted police model). Phase 20 is half
 done: the career economy shipped, campaign scenarios have not. Everything else left
 is in NEXT.md.
 
@@ -29,9 +30,9 @@ check identical. Use it for every headless run except the generators below.
 
 ## Verification rules
 
-- **The suite is the arbiter.** 650 checks, exits non-zero on failure. A change to
+- **The suite is the arbiter.** 802 checks, exits non-zero on failure. A change to
   `Game/` is not done until it is green. It **reports its own total** —
-  `all checks passed (650)` — so take the count from a run rather than from here or
+  `all checks passed (802)` — so take the count from a run rather than from here or
   from memory; that number is why these documents have carried a stale figure twice.
 - **Do not run the suite inline — delegate it.** Ask the `godot-test-runner` agent
   and get one line back. A full run is ~550 lines of output, and output in the main
@@ -93,7 +94,10 @@ and civilians by their own `build_*.gd`. The rule for changes:
    vehicle scene and regenerating only *it* leaves the map loading the old values —
    silently, since the scene file on disk looks right.
 4. `HUD.tscn` is hand-authored — edit it directly.
-5. Never modify anything under `Assets/Synty/`.
+5. Never modify anything under `Assets/Synty/`, `Assets/PolygonTown/` or
+   `Assets/Particle_FX/`. They are vendor packs; the game adapts to them, not the
+   other way round. A prefab from a second pack is reached by giving `build_vehicles`
+   or `build_portraits` a full `res://` path instead of a bare name.
 
 ## Conventions
 
@@ -111,8 +115,10 @@ and civilians by their own `build_*.gd`. The rule for changes:
   same shape.
 - Adding a verb = a new `Ability` (+`Order`); it gets its command tile, hotkey and
   right-click meaning from the scoring ladder with no UI changes. Hotkeys `Z X C V
-  B N M G H J K` are the command keys; `W A S D Q E P F R F1 F2 F3 F4 Esc Enter Space 1-9`
-  are taken. `F3` files a black-box record, `F4` toggles the navigation overlay.
+  B N M G H J K L T` are the command keys; `W A S D Q E P F R F1 F2 F3 F4 F5 Esc Enter
+  Space 1-9` are taken. `F3` files a black-box record, `F4` toggles the navigation
+  overlay, and `F5` opens the call spawner -- pick any call kind instead of waiting
+  for the director's weighted roll.
 - Seeded randomness only: `RandomNumberGenerator` instances, never
   `Array.shuffle()` / global `randi()` in anything that must reproduce (the map
   build and the tests rely on it).

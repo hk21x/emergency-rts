@@ -46,6 +46,11 @@ const OUT_DIR := "res://Game/UI/Portraits/"
 ## the people who ride it now share one palette.
 const ALT_FIRE := "res://Assets/Synty/PolygonCity/Materials/Alts/PolygonCity_02_A_mat.tres"
 
+## The doctor's car. 04_A is the one palette in the pack that is orange on the patrol-car
+## hull -- see the table above, where it is also flat charcoal on the van and olive on a
+## person. It is safe *here* because it is only ever asked for on that hull.
+const ALT_DOCTOR := "res://Assets/Synty/PolygonCity/Materials/Alts/PolygonCity_04_A_mat.tres"
+
 const SIZE := 192
 ## Front three-quarter from slightly above -- the angle a vehicle is recognisable from.
 ## Straight side loses the face; straight front loses the length.
@@ -54,6 +59,11 @@ const VIEW := Vector3(0.78, 0.46, 0.72)
 ## Tight, because the avatar crops this square into a circle and every wasted pixel of
 ## margin is the subject shrinking away from the disc it is meant to fill.
 const MARGIN := 1.02
+
+## How far past the second-largest member the frame may stretch for the largest. Sized
+## so the appliance -- the only thing this bites on -- keeps its cab and pump in frame
+## while the cards it shares a group with keep their scale. See `_shoot_group`.
+const OVERFLOW := 1.35
 
 ## Everything the roster can show. Vehicles and characters are separate groups because
 ## they are scaled together within a group, and a person next to a van on one scale
@@ -65,20 +75,31 @@ const GROUPS := [
 			"SM_Veh_Car_Police_01", "SM_Veh_Car_Ambo_01", "SM_Veh_Car_Van_01",
 			"SM_Veh_Car_Sedan_01", "SM_Veh_Car_Taxi_01", "SM_Veh_Car_Small_01",
 			"SM_Veh_Car_Medium_01", "SM_Veh_Car_Muscle_01",
-			# The fire engine is the van repainted, so its portrait has to be shot the
-			# same way -- the stock white one would be a lie on the shop card. `out`
-			# names the file; `palette` repaints the bodywork. Keep this prefab in step
-			# with build_vehicles.VEHICLES: the shop must sell the vehicle that turns
-			# up on the forecourt.
-			{"prefab": "SM_Veh_Car_Van_01", "out": "FireEngine",
-				"palette": ALT_FIRE},
+			# The appliance comes from the Town pack and wears its own paint, so unlike
+			# every other entry here it needs no palette -- it is a fire engine rather
+			# than a body pretending to be one. Keep this prefab in step with
+			# build_vehicles.VEHICLES: the shop must sell the vehicle that turns up on
+			# the forecourt.
+			{"prefab": "res://Assets/PolygonTown/Prefabs/Vehicles/SM_Veh_Firetruck_01.tscn",
+				"out": "FireEngine"},
+			# The doctor's car, shot under its own name for exactly the reason the fire
+			# engine is: build_vehicles asks for `<out>.png` before falling back to the
+			# prefab's, so without this the orange car would wear the blue patrol car's
+			# avatar in the roster and the shop.
+			{"prefab": "SM_Veh_Car_Police_01", "out": "DoctorCar", "palette": ALT_DOCTOR},
 		],
 	},
 	{
 		"dir": CHARACTER_PREFABS,
 		"names": ["Character_Male_Police", "Character_Female_Police",
 			{"prefab": "Character_Male_Police", "out": "Firefighter",
-				"palette": ALT_FIRE}],
+				"palette": ALT_FIRE},
+			# The doctor, shot from the same shirted body Game/Doctor.tscn wears. No
+			# palette: this one is not a repaint, it is a different civilian body, chosen
+			# because a doctor and a paramedic share a service and therefore a
+			# selection-ring colour -- the silhouette is the only thing left to tell them
+			# apart on the map, and the roster should agree with it.
+			{"prefab": "Character_BusinessMan_Shirt", "out": "Doctor"}],
 		# A standing figure is far taller than it is wide, so framing on its full height
 		# leaves it a thread. Crop to head and shoulders instead: a frame about a third
 		# of the figure, aimed a quarter of its height above the middle. Aim any higher
@@ -158,15 +179,28 @@ func _shoot_group(group: Dictionary) -> int:
 	# Two passes. The frame size has to come from the whole group before any single
 	# member is shot, or each would be scaled to itself and the relative sizes lost.
 	var bounds := {}
-	var widest := 0.0
+	var sizes: Array[float] = []
 	for entry in names:
 		var name := _prefab_of(entry)
-		var box := _measure(dir + name + ".tscn")
+		var box := _measure(_prefab_path(dir, name))
 		if box.size == Vector3.ZERO:
 			_failed = true
 			continue
 		bounds[name] = box
-		widest = maxf(widest, maxf(box.size.x, maxf(box.size.y, box.size.z)))
+		sizes.append(maxf(box.size.x, maxf(box.size.y, box.size.z)))
+	sizes.sort()
+
+	# **One outlier must not shrink the whole roster.** Framing on the largest member is
+	# what keeps the relative sizes honest, and that held while the biggest vehicle was
+	# a 5.2m car. The 9m appliance broke it: framed on the group, the patrol car went
+	# from filling 82% of its card to 52%, and at the 38px avatar disc that is 31px of
+	# car down to 20px -- eight cards degraded to accommodate one. So the frame is capped
+	# a little above the *second* largest, and the appliance is allowed to overhang its
+	# own card. It is cropped at the tail, still unmistakably a fire engine, and every
+	# other vehicle keeps the size it had.
+	var widest: float = sizes[sizes.size() - 1] if sizes.size() > 0 else 0.0
+	if sizes.size() > 1:
+		widest = minf(widest, sizes[sizes.size() - 2] * OVERFLOW)
 
 	var frame := widest * MARGIN * float(group.get("height_ratio", 1.0))
 	var written := 0
@@ -174,10 +208,18 @@ func _shoot_group(group: Dictionary) -> int:
 		var name := _prefab_of(entry)
 		if not bounds.has(name):
 			continue
-		if await _shoot(dir + name + ".tscn", bounds[name], frame,
+		if await _shoot(_prefab_path(dir, name), bounds[name], frame,
 				float(group.get("raise", 0.0)), _out_of(entry), _palette_of(entry)):
 			written += 1
 	return written
+
+
+## A bare name sits in the group's own pack directory; a full `res://` path is taken as
+## given, so one subject can come from another pack without every other entry changing.
+## Mirrors `build_vehicles._prefab_path` -- the shop has to sell the vehicle that turns
+## up on the forecourt, so the two resolve a prefab the same way.
+func _prefab_path(dir: String, name: String) -> String:
+	return name if name.begins_with("res://") else dir + name + ".tscn"
 
 
 ## A subject is either a prefab name, or a dictionary naming a repainted variant of

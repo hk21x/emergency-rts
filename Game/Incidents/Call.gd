@@ -134,6 +134,7 @@ func describe() -> String:
 	var fires := 0
 	var hurt := 0
 	var rowdy := 0
+	var cylinders := 0
 	for incident in incidents:
 		if not is_instance_valid(incident) or not incident.active:
 			continue
@@ -142,6 +143,8 @@ func describe() -> String:
 			fires += 1
 		elif incident is Casualty:
 			hurt += 1
+		elif incident is Hazard:
+			cylinders += 1
 		elif incident is Suspect:
 			rowdy += 1
 
@@ -154,6 +157,8 @@ func describe() -> String:
 		parts.append("%d casualt%s" % [hurt, "y" if hurt == 1 else "ies"])
 	if rowdy > 0:
 		parts.append("%d suspect%s" % [rowdy, "" if rowdy == 1 else "s"])
+	if cylinders > 0:
+		parts.append("%d cylinder%s" % [cylinders, "" if cylinders == 1 else "s"])
 	return ", ".join(parts)
 
 
@@ -235,6 +240,11 @@ func _recentre() -> void:
 	for incident in incidents:
 		centre += incident.global_position
 		if incident is Fire:
+			burning = true
+		elif incident is Hazard:
+			# A cylinder counts as burning for triage. Put the fire out and leave the
+			# cylinder still hot and the call is emphatically not a medical one, which
+			# is where it fell through to before this line existed.
 			burning = true
 		elif incident is Casualty:
 			hurt = true

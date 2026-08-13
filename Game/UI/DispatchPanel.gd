@@ -41,6 +41,7 @@ func _ready() -> void:
 	_heading = get_parent().get_node_or_null("Heading") as Label
 	if _heading:
 		_heading.mouse_filter = Control.MOUSE_FILTER_STOP
+		Hover.attach(_heading)
 		_heading.gui_input.connect(_on_heading_input)
 		_heading.tooltip_text = "Open the unit shop"
 
@@ -63,6 +64,7 @@ func _build_row(config: Dictionary) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 	row.mouse_filter = Control.MOUSE_FILTER_STOP
+	Hover.attach(row)
 	row.custom_minimum_size = Vector2(126.0, 0.0)
 	row.set_meta(&"id", config["id"])
 	row.gui_input.connect(_on_row_input.bind(row))

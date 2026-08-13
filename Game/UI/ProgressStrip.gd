@@ -12,7 +12,10 @@ class_name ProgressStrip
 ## Drawn rather than themed, like [Glyph] and [CallMark], because it is two
 ## rectangles and a ProgressBar's stylebox chrome would have to be undone first.
 
-const TRACK := Color(1.0, 1.0, 1.0, 0.13)
+## The unfilled part of the bar. Sourced from the table rather than written here: as a
+## 13% white it was drawn onto a white card and was therefore **invisible** -- every call
+## row has been showing its fill against nothing.
+const TRACK := Palette.WELL
 ## Never draws as completely empty: a sliver says "this bar is a bar" rather than
 ## leaving the row looking like it failed to render.
 const MIN_FILL := 0.06

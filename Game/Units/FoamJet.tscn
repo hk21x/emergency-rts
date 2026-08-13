@@ -1,0 +1,63 @@
+; Foam off an appliance's hose, for a fuel fire.
+;
+; Deliberately not the water jet in another colour. Foam is the only thing that touches a
+; car fire, and a rule the player cannot see is a rule they have to be told -- so it has
+; to read as a *different substance* at RTS zoom, not a different tint. Water is thin
+; ribbon streaks that fall; this is soft expanding blobs that hang: wider cone, slower,
+; barely any gravity, and growing as they go.
+;
+; The material is the pack's Dust_Soft_01 verbatim (vendor files are never edited), which
+; is a soft billboarded blob with the fade already in it -- the nearest thing on disk to
+; foam, and much closer than the rain streaks the water jet borrows.
+
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Material" uid="uid://c0pjh58c2iyk5" path="res://Assets/Particle_FX/Materials/FX/Dust_Soft_01.tres" id="1_foam"]
+
+; Fades in and back out, so a blob neither pops into existence nor cuts off mid-air.
+[sub_resource type="Gradient" id="Gradient_foam"]
+offsets = PackedFloat32Array(0, 0.25, 1)
+colors = PackedColorArray(0.92, 0.96, 1, 0, 1, 1, 1, 0.85, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_foam"]
+gradient = SubResource("Gradient_foam")
+
+; Expands along its flight: a jet leaving the nozzle tight and opening into a blanket.
+[sub_resource type="Curve" id="Curve_swell"]
+_data = [Vector2(0, 0.25), 0.0, 0.0, 0, 0, Vector2(0.45, 0.85), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_swell"]
+curve = SubResource("Curve_swell")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_foam"]
+lifetime_randomness = 0.3
+particle_flag_rotate_y = true
+direction = Vector3(0, 0, -1)
+spread = 14.0
+initial_velocity_min = 7.0
+initial_velocity_max = 9.0
+angular_velocity_min = -60.0
+angular_velocity_max = 60.0
+gravity = Vector3(0, -2.5, 0)
+scale_min = 0.5
+scale_max = 1.0
+scale_curve = SubResource("CurveTexture_swell")
+color_ramp = SubResource("GradientTexture1D_foam")
+turbulence_enabled = true
+turbulence_noise_strength = 0.25
+turbulence_noise_scale = 1.6
+
+[sub_resource type="QuadMesh" id="QuadMesh_foam"]
+material = ExtResource("1_foam")
+
+; Ships not emitting, exactly as the water jet does. Person turns it on only while foam
+; is actually being delivered -- see Person.spray_at.
+[node name="FoamJet" type="GPUParticles3D"]
+cast_shadow = 0
+emitting = false
+amount = 90
+lifetime = 0.75
+visibility_aabb = AABB(-8, -8, -8, 16, 16, 16)
+process_material = SubResource("ParticleProcessMaterial_foam")
+draw_pass_1 = SubResource("QuadMesh_foam")

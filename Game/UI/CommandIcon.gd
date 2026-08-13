@@ -13,9 +13,17 @@ class_name CommandIcon
 
 signal pressed(ability: Ability)
 
-## Fraction of the tile the symbol occupies, leaving room for the hotkey letter.
-const GLYPH_RATIO := 0.28
+## Fraction of the tile the symbol occupies, leaving room for the hotkey letter and the
+## name beneath it.
+const GLYPH_RATIO := 0.24
 const CORNER := 8.0
+## Point size of the verb's name along the bottom of the tile.
+##
+## The tile carried a symbol and a hotkey letter and nothing else, which asks the player
+## to already know what a droplet means. The reference the restyle follows labels every
+## tile -- MOVE, STOP, SPRAY -- and naming the verb is the cheapest teaching this
+## interface has, since the alternative is hovering each one for a tooltip.
+const LABEL_SIZE := 9
 
 var ability: Ability
 ## Filled while this ability is waiting for a target click.
@@ -82,19 +90,29 @@ func _draw() -> void:
 		fill = Palette.HOVER
 	_rounded(fill)
 
-	# Light ink on the filled states, dark ink on the recessed one.
+	# Ink that reads on whichever fill won. On the recessed tile that is the ordinary
+	# text colour; on a filled one it is the card colour, which since the restyle is the
+	# dark slate rather than white.
 	var ink := Palette.CARD if armed or active else Palette.TEXT
-	Glyph.draw(self, ability.icon(), size * Vector2(0.5, 0.44),
+	Glyph.draw(self, ability.icon(), size * Vector2(0.5, 0.38),
 		minf(size.x, size.y) * GLYPH_RATIO, ink, fill)
+
+	var font := get_theme_default_font()
+	# The verb, along the bottom. Uppercased because at nine points a mixed-case word is
+	# a smudge, and centred so a four-letter verb and an eleven-letter one both sit right.
+	var name := ability.label().to_upper()
+	var name_width := font.get_string_size(
+		name, HORIZONTAL_ALIGNMENT_LEFT, -1, LABEL_SIZE).x
+	draw_string(font, Vector2((size.x - name_width) * 0.5, size.y - 7.0), name,
+		HORIZONTAL_ALIGNMENT_LEFT, -1, LABEL_SIZE,
+		Palette.dim(ink, 0.9 if armed or active else 0.7))
 
 	if ability.hotkey() == KEY_NONE:
 		return
-	var font := get_theme_default_font()
 	var key := OS.get_keycode_string(ability.hotkey())
-	var width := font.get_string_size(key, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x
-	draw_string(font, Vector2(size.x - width - 6.0, size.y - 6.0), key,
+	draw_string(font, Vector2(5.0, 13.0), key,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 11,
-		Palette.dim(ink, 0.75 if armed or active else 0.55))
+		Palette.dim(ink, 0.75 if armed or active else 0.5))
 
 
 ## Rounds the corners by filling four quarter-circles and the two spanning rectangles.

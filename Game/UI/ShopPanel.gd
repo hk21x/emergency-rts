@@ -16,6 +16,14 @@ const PORTRAITS := "res://Game/UI/Portraits/"
 
 var station: Station: set = _set_station
 
+## The shop's rows, in the order they are shown. Police first because it is the service a
+## fresh career starts with, fire last because it is the one it unlocks last.
+const SHELVES := [
+	[Unit.Service.POLICE, "POLICE"],
+	[Unit.Service.MEDICAL, "MEDICAL"],
+	[Unit.Service.FIRE, "FIRE"],
+]
+
 var _purse: Label
 ## Type id -> the pieces that need refreshing: the BUY chip and the owned line.
 var _cards := {}
@@ -36,10 +44,13 @@ func _ready() -> void:
 	centre.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(centre)
 	var panel := PanelContainer.new()
+	# Named so a check can find the storefront itself rather than guessing at child
+	# indices -- every card is a PanelContainer too, so a search by type finds nine.
+	panel.name = "Storefront"
 	panel.theme_type_variation = &"CardPanel"
 	centre.add_child(panel)
 	var body := VBoxContainer.new()
-	body.add_theme_constant_override("separation", 10)
+	body.add_theme_constant_override("separation", Palette.STEP)
 	panel.add_child(body)
 
 	var header := HBoxContainer.new()
@@ -59,11 +70,25 @@ func _ready() -> void:
 	_purse.add_theme_font_size_override("font_size", 26)
 	header.add_child(_purse)
 
-	var shelf := HBoxContainer.new()
-	shelf.add_theme_constant_override("separation", 10)
+	# **One row per service, rather than one shelf for everything.** Eight types in a single
+	# row ran off the side of the screen the moment the doctor and the doctor's car were
+	# added -- and a row that overflows does not wrap, it clips, so the last card bought was
+	# simply unreachable. Rows also read better than a wall: the player is nearly always
+	# shopping for *a service*, and the four medical types now sit together instead of
+	# being separated by a fire engine.
+	#
+	# Grouped off `config["service"]`, which every catalogue entry already carries, so a new
+	# unit lands in the right row without a second list to keep in step. That mattered
+	# immediately -- the doctor and the doctor's car were the first entries to be added
+	# since, and neither needed a line here.
+	var shelf := VBoxContainer.new()
+	shelf.add_theme_constant_override("separation", Palette.WIDE)
 	body.add_child(shelf)
-	for config in Station.TYPES:
-		shelf.add_child(_build_card(config))
+	for group: Array in SHELVES:
+		var kind: int = group[0]
+		var row := _build_shelf(str(group[1]), kind)
+		if row:
+			shelf.add_child(row)
 
 	var footer := HBoxContainer.new()
 	footer.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -74,6 +99,42 @@ func _ready() -> void:
 	close.custom_minimum_size = Vector2(180.0, 34.0)
 	close.pressed.connect(close_shop)
 	footer.add_child(close)
+
+
+## One service's row: a heading in that service's own colour, and its cards beneath.
+##
+## Returns null when a service has nothing to sell, so an empty heading can never be left
+## stranded over a blank strip -- which is what would happen if a service were ever removed
+## from the catalogue rather than added to it.
+func _build_shelf(heading: String, kind: int) -> Control:
+	var configs: Array[Dictionary] = []
+	for config: Dictionary in Station.TYPES:
+		if int(config.get("service", Unit.Service.NONE)) == kind:
+			configs.append(config)
+	if configs.is_empty():
+		return null
+
+	var row := VBoxContainer.new()
+	# Named after its heading so a check can ask what is in each service's row rather than
+	# counting children by index -- the layout is three deep and index-walking it would
+	# break on any tidy-up.
+	row.name = "Shelf" + heading
+	row.add_theme_constant_override("separation", Palette.SNUG)
+	var label := Label.new()
+	label.theme_type_variation = &"HeaderLabel"
+	label.text = heading
+	# The service's light ink rather than the header's default grey: it is the same signal
+	# the roster and the selection rings use, so the player reads the row before the words.
+	label.add_theme_color_override("font_color", Palette.service(kind)[2])
+	row.add_child(label)
+
+	var cards := HBoxContainer.new()
+	cards.name = "Cards"
+	cards.add_theme_constant_override("separation", Palette.STEP)
+	row.add_child(cards)
+	for config in configs:
+		cards.add_child(_build_card(config))
+	return row
 
 
 func _set_station(value: Station) -> void:
@@ -113,24 +174,33 @@ func _input(event: InputEvent) -> void:
 func _build_card(config: Dictionary) -> Control:
 	var card := PanelContainer.new()
 	var well := StyleBoxFlat.new()
-	well.bg_color = Color(0.11, 0.115, 0.125)
+	well.bg_color = Palette.WELL
 	well.set_corner_radius_all(6)
-	well.set_content_margin_all(10.0)
+	well.set_content_margin_all(float(Palette.STEP))
 	card.add_theme_stylebox_override("panel", well)
-	card.custom_minimum_size = Vector2(200.0, 0.0)
+	card.custom_minimum_size = Vector2(190.0, 0.0)
 
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 5)
+	box.add_theme_constant_override("separation", Palette.TIGHT)
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	card.add_child(box)
 
 	var portrait := TextureRect.new()
-	var picture := PORTRAITS + str(config["portrait"]) + ".png"
+	# `.get`, because the catalogue treats this key as optional and Station reads it that
+	# way too -- an unguarded lookup here threw inside `_ready`, which builds the whole shop,
+	# so one entry without a portrait took out every card and six unrelated checks with it.
+	var picture := PORTRAITS + str(config.get("portrait", "")) + ".png"
 	if ResourceLoader.exists(picture):
 		portrait.texture = load(picture)
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	portrait.custom_minimum_size = Vector2(120.0, 96.0)
+	# **Shorter than it was, and that is a measurement rather than a preference.** Grouping
+	# the shop into three service rows cured a horizontal overflow (one row of eight measured
+	# 1906 wide in a 1600 viewport) and bought a vertical one: the storefront came out 964
+	# tall against 900. Three rows multiply every vertical saving by three, and the portrait
+	# is where the height is -- at the old 96 the grouped storefront still measures 916, so
+	# this 24px is doing the work on its own. The rest came off the separations.
+	portrait.custom_minimum_size = Vector2(108.0, 72.0)
 	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(portrait)
 

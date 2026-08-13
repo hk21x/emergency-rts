@@ -183,8 +183,9 @@ func _run() -> void:
 	await _test_the_map_opens_quiet()
 	await _test_the_district_doubled_with_variety()
 	await _test_parked_cars_wear_different_paints()
-	await _test_the_appliance_is_van_bodied()
+	await _test_the_appliance_is_a_real_appliance()
 	await _test_the_fire_service_paint_is_warm()
+	await _test_the_doctors_car_is_orange_and_carries_nobody()
 	await _test_the_street_lights_ship_off()
 
 	# Belt and braces: the map ships quiet now, but every incident test spawns what it
@@ -211,6 +212,7 @@ func _run() -> void:
 	await _test_traffic_yields()
 	await _test_traffic_turns_back_at_a_cordon()
 	await _test_traffic_pulls_over_for_a_response()
+	await _test_traffic_at_the_map_edge_does_not_pull_over_off_it()
 	await _clear_ambient()
 
 	await _test_left_turns_round_the_apex()
@@ -226,13 +228,18 @@ func _run() -> void:
 	await _test_traffic_is_warned_in_time()
 	await _test_crawling_behind_someone_counts_as_stuck()
 	await _test_a_car_gives_up_on_a_blocked_street()
+	await _test_queued_orders_are_drawn()
+	await _test_a_group_move_spreads_out()
+	await _test_the_interface_can_be_read()
+	await _test_clickable_things_respond_to_the_pointer()
+	await _test_command_tiles_say_what_they_do()
 	await _test_a_stuck_unit_is_written_down()
 	await _test_an_order_cannot_leave_the_map()
 	await _test_a_knock_costs_money()
 	await _test_the_station_repairs_what_comes_home()
 	await _test_vehicles_slow_for_corners()
 	await _test_rain_makes_the_road_slippery()
-	await _test_vehicles_keep_to_the_roads()
+	await _test_vehicles_keep_out_of_the_buildings()
 	await _test_vehicles_cannot_drive_through_each_other()
 	await _test_a_vehicle_thrown_off_the_map_comes_back()
 	await _test_a_vehicle_drives_around_what_is_in_its_way()
@@ -278,6 +285,8 @@ func _run() -> void:
 	await _test_seats_are_limited()
 	await _test_the_navigation_overlay_is_off_until_asked()
 	await _test_a_car_sent_off_the_road_climbs_the_kerb()
+	await _test_a_shut_street_is_passed_over_the_pavement()
+	await _test_a_junction_queue_does_not_earn_the_pavement()
 	await _test_siren_runs_while_responding()
 	await _test_lights_switch_on_by_hand()
 	await _test_siren_is_the_audio_and_separate()
@@ -295,6 +304,10 @@ func _run() -> void:
 	await _test_casualty_is_prone()
 	await _test_casualty_declines()
 	await _test_paramedic_treats_a_casualty()
+	await _test_a_paramedic_holds_a_doctors_case_but_cannot_finish_it()
+	await _test_a_doctor_stabilises_what_a_paramedic_cannot()
+	await _test_a_collapse_is_only_offered_with_a_doctor_on_the_books()
+	await _test_two_specialists_in_one_service_stay_told_apart()
 	await _test_services_gate_their_verbs()
 	await _test_an_officer_secures_a_scene()
 	await _test_a_cordon_clears_the_public()
@@ -322,6 +335,22 @@ func _run() -> void:
 	await _test_the_director_escalates_late_in_the_shift()
 	await _test_an_rtc_reads_as_one_call()
 	await _test_a_vehicle_fire_burns_at_the_kerb()
+	await _test_a_cylinder_cooks_off()
+	await _test_a_cylinder_going_off_takes_the_street()
+	await _test_a_hose_beats_a_cylinder()
+	await _test_water_shows_where_it_is_landing()
+	await _test_a_fire_wants_the_right_stuff_on_it()
+	await _test_a_trapped_casualty_needs_cutting_free_first()
+	await _test_calls_can_be_spawned_on_demand()
+	await _test_a_cylinder_made_safe_finishes_the_job()
+	await _test_a_disorder_call_grows_until_it_is_contained()
+	await _test_a_patrol_car_takes_two_prisoners()
+	await _test_a_crew_member_can_be_lost()
+	await _test_a_passenger_is_not_caught_by_a_blast()
+	await _test_fires_have_character()
+	await _test_a_car_fire_scorches_what_is_near_it()
+	await _test_a_fire_looks_like_its_intensity()
+	await _test_the_appliance_raises_its_ladder()
 	await _test_the_fire_service_fights_fires()
 	await _test_building_fires_wait_for_a_fire_service()
 	await _test_the_appliance_runs_on_water()
@@ -344,6 +373,7 @@ func _run() -> void:
 	await _test_the_menu_restarts_a_shift()
 	await _test_settings_shape_the_shift_and_survive()
 	await _test_quit_to_title_stands_the_shift_down()
+	await _test_a_bad_shift_cannot_be_quit_away()
 	await _test_camera_pan_and_zoom()
 	await _test_respawn()
 	# Dead last, deliberately: it wipes the fleet the whole suite ran on.
@@ -605,9 +635,14 @@ func _test_parked_cars_wear_different_paints() -> void:
 ## Measured off the generated scene rather than read off the config, because the map
 ## bakes each instanced vehicle's properties -- regenerating build_vehicles.gd alone
 ## has silently changed nothing before, and the file on disk looked right the whole
-## time. Wheelbase is the sharpest single number: 3.31 on the van against 2.88 on the
-## patrol car.
-func _test_the_appliance_is_van_bodied() -> void:
+## time. Wheelbase is the sharpest single number: 4.46 on the appliance against 2.88 on
+## the patrol car.
+##
+## This checked for the *van's rear doors* until August 2026, which was the right proof
+## while the appliance was a van in orange paint. The real appliance has no separate
+## doors, so that assertion had to go with the placeholder it pinned -- and what
+## replaces it is the thing a fire engine has that nothing else on the map does.
+func _test_the_appliance_is_a_real_appliance() -> void:
 	var engine := (load("res://Game/Vehicles/FireEngine.tscn") as PackedScene).instantiate()
 	var patrol := (load("res://Game/Vehicles/PoliceCar.tscn") as PackedScene).instantiate()
 	var engine_base := (engine as Vehicle).wheelbase
@@ -615,16 +650,36 @@ func _test_the_appliance_is_van_bodied() -> void:
 	_check(engine_base > patrol_base + 0.3,
 		"the appliance rides a longer wheelbase than a patrol car (%.2f vs %.2f)"
 		% [engine_base, patrol_base])
-	# The van ships rear doors as separate meshes; the saloon does not. Free proof of
-	# which body is underneath, and the crew disembarking swings them.
-	_check(engine.get_node_or_null("Lean/Chassis/DoorL") != null
-			and engine.get_node_or_null("Lean/Chassis/DoorR") != null,
-		"and carries the van's rear doors, which the old hull had none of")
+	# A ladder, which is proof of the body underneath in a way no dimension is: no other
+	# prefab in any pack on disk has one, so this fails the moment `prefab` points
+	# somewhere else.
+	var ladder := 0
+	for part in engine.find_children("*Ladder*", "Node3D", true, false):
+		ladder += 1
+	_check(ladder >= 2, "and carries a ladder, which no other body on the map has (%d parts)"
+		% ladder)
+	# Bulk, from the collider the generator sized off the hull. The appliance is the
+	# largest thing the player drives and it should not be quietly swapped for a car.
+	var box := (engine.get_node("Collision") as CollisionShape3D).shape as BoxShape3D
+	var car := (patrol.get_node("Collision") as CollisionShape3D).shape as BoxShape3D
+	_check(box.size.z > car.size.z * 1.4 and box.size.y > car.size.y * 1.4,
+		"and is a size no car is (%.1f x %.1f against %.1f x %.1f)"
+		% [box.size.z, box.size.y, car.size.z, car.size.y])
+	# **Crew get out behind it, not inside it.** `dismount_back` was a fixed 3.2 that
+	# suited a 5m van, and on an 8.8m body it put four firefighters a metre inside the
+	# truck. Nothing caught it: a vehicle is a CharacterBody3D, so it is absent from the
+	# baked navigation the dismount point snaps to, and the crew simply appeared in the
+	# bodywork. It is derived from the hull now, and this is the number that says so.
+	var shape := engine.get_node("Collision") as CollisionShape3D
+	var tail: float = box.size.z * 0.5 + shape.position.z
+	_check(engine.dismount_back > tail + 0.5,
+		"and turns its crew out behind itself, not inside it (%.1fm back, tail at %.1fm)"
+		% [engine.dismount_back, tail])
 	engine.free()
 	patrol.free()
 
 
-## The fire service's paint reads warm on **both** bodies that wear it.
+## The **repainted** half of the fire service reads warm.
 ##
 ## The check that would have caught the two colour bugs this project has shipped. An
 ## alt palette is a texture atlas, not a colour: a mesh's UVs choose the swatch, so
@@ -632,11 +687,16 @@ func _test_the_appliance_is_van_bodied() -> void:
 ## the patrol car's hull, charcoal on the van's, and olive on the crew -- the appliance
 ## shipped black and the fire crew shipped green, and every existing check passed.
 ##
-## So this samples each body's own UVs against its own assigned albedo and asks whether
-## the average is warm. Nothing here knows or cares which palette is configured.
+## **The appliance left this test in August 2026 when it stopped being a repaint.** It is
+## now a purpose-built fire engine wearing its own texture, and this measure cannot say
+## anything useful about it: averaged over its own UVs a red-and-white livery reads
+## +0.03, under the bar, while a yellow taxi reads warmer than either. Averages are the
+## wrong question for two-tone bodywork. What guards the appliance instead is
+## `_test_the_appliance_is_a_real_appliance`, which pins the body itself rather than its
+## colour. The firefighter is still a repainted police model, so the fault this was
+## written for is still live for them, and here it stays.
 func _test_the_fire_service_paint_is_warm() -> void:
 	for subject in [
-		{"scene": "res://Game/Vehicles/FireEngine.tscn", "what": "appliance"},
 		{"scene": "res://Game/Firefighter.tscn", "what": "firefighter"},
 	]:
 		var node := (load(str(subject["scene"])) as PackedScene).instantiate()
@@ -656,6 +716,48 @@ func _test_the_fire_service_paint_is_warm() -> void:
 			"the %s's paint reads warm, not charcoal or olive (min(r-g,r-b) %+.2f)"
 			% [subject["what"], warmth])
 		node.free()
+
+
+## The doctor's car wears its own paint and cannot do the ambulance's job.
+##
+## **Sampled off the built scene, never taken from the palette name.** An alt palette is a
+## texture atlas rather than a colour, so the same swatch is orange on this hull, flat
+## charcoal on the van and olive on a person -- picking by name once shipped a black fire
+## engine and dressed the firefighter in green for months. The only honest test is to read
+## the pixels the mesh's own UVs land on, which is what [method _paint_warmth] does.
+##
+## The second half is a design constraint rather than a cosmetic one, and it is the more
+## important of the two: give this car a stretcher and it quietly becomes a second
+## ambulance, the patient never waits, and the bottleneck the doctor exists to be is gone.
+func _test_the_doctors_car_is_orange_and_carries_nobody() -> void:
+	var car := (load("res://Game/Vehicles/DoctorCar.tscn") as PackedScene).instantiate()
+	var mesh := _body_mesh(car)
+	if mesh == null:
+		_check(false, "the doctor's car has a body mesh to sample")
+		car.free()
+		return
+	var warmth := _paint_warmth(mesh)
+	# The same bar the fire service's paint clears, and set in the same place: measured,
+	# charcoal reads -0.02 and olive 0.00 on this scale, so 0.05 sits clear of both.
+	_check(warmth > 0.05,
+		"the doctor's car is painted warm, not the patrol car's blue (min(r-g,r-b) %+.2f)"
+			% warmth)
+
+	var vehicle := car as Vehicle
+	_check(vehicle != null and vehicle.service == Unit.Service.MEDICAL,
+		"it is a medical vehicle")
+	_check(vehicle != null and vehicle.stretchers == 0,
+		"and carries no stretcher, so it cannot do the ambulance's job (%d)"
+			% (vehicle.stretchers if vehicle else -1))
+	_check(vehicle != null and not vehicle.has_stretcher_space(),
+		"which Collect reads straight off, so it is never offered one")
+	# Faster than the ambulance, which is the entire point of a response car.
+	var ambulance := (load("res://Game/Vehicles/Ambulance.tscn") as PackedScene).instantiate()
+	_check(vehicle != null and vehicle.max_speed > (ambulance as Vehicle).max_speed,
+		"and gets there quicker than the ambulance (%.0f vs %.0f)"
+			% [vehicle.max_speed if vehicle else 0.0, (ambulance as Vehicle).max_speed])
+	ambulance.free()
+	car.free()
 
 
 ## The bodywork: the largest textured mesh under [param root].
@@ -916,14 +1018,37 @@ func _test_traffic_drives_the_roads() -> void:
 
 	var moved := 0
 	var on_road := 0
+	# **Say which ones, and why.** A bare count tells you two cars did not get going and
+	# nothing else, which is a poor thing to hand whoever has to find out why -- and this
+	# check has failed at exactly 20 of 22 while every neighbouring one passed. Naming
+	# them, with how far they got and whether they were waiting for somebody, costs a
+	# string and turns a shrug into a lead.
+	var stalled: Array[String] = []
+	var gaps: Array[float] = []
 	for i in traffic.size():
-		var here: Vector3 = (traffic[i] as Node3D).global_position
-		if here.distance_to(before[i]) > 3.0:
+		var car := traffic[i] as Vehicle
+		var here: Vector3 = car.global_position
+		var gap := here.distance_to(before[i])
+		gaps.append(gap)
+		if gap > 3.0:
 			moved += 1
+		else:
+			stalled.append("%s %.1fm at (%.0f,%.0f) held=%.1fs speed=%.1f yielding=%s"
+				% [car.name, gap, here.x, here.z, car.held_up_for(), car.forward_speed,
+					car.get("is_yielding")])
 		if _on_a_road(here):
 			on_road += 1
+	# The three shortest hops, always -- not only when it fails. The bar is 3m of net
+	# displacement in five seconds, and knowing whether the fleet clears it by a metre or
+	# by twenty is the difference between a real stall and a threshold sitting on a cliff.
+	gaps.sort()
+	var tightest := ""
+	for i in mini(3, gaps.size()):
+		tightest += "%s%.1f" % ["" if i == 0 else "/", gaps[i]]
 	_check(moved >= traffic.size() - 1,
-		"%d of %d traffic cars drove off" % [moved, traffic.size()])
+		"%d of %d traffic cars drove off (shortest hops %s)%s"
+		% [moved, traffic.size(), tightest,
+			"" if stalled.is_empty() else " -- " + "; ".join(stalled)])
 	# The whole point of routing them by CityGrid rather than by random navigation
 	# mesh points: they keep to the streets and to their own side of them.
 	_check(on_road == traffic.size(),
@@ -1218,6 +1343,83 @@ func _test_traffic_turns_back_at_a_cordon() -> void:
 	await _idle(6)
 
 
+## A car with no district left in front of it declines the tuck rather than aiming past
+## the edge of the world.
+##
+## Reported from play, once, as a warning with a stack trace: `Traffic3 was sent off the map,
+## to (-86.2, 0.0, -131.0)` on a district that ends at 130. The tuck aims seven metres ahead
+## plus a couple across, and near an edge that lands outside. `Vehicle.navigate_to` caught it
+## and clamped -- which is that guard doing exactly its job -- but clamping aims the car at
+## the boundary rather than at a kerb, so it performs a tuck towards nothing.
+##
+## **The second half is the important half.** Asserting only that an edge car does not pull
+## over would pass just as happily if the manoeuvre were broken everywhere, which is the
+## commonest way a check here turns out to be worth nothing. So the same car, at the same
+## moment, with the same responder, is then moved into open district and must pull over.
+func _test_traffic_at_the_map_edge_does_not_pull_over_off_it() -> void:
+	var traffic := _ambient("Traffic")
+	if traffic.is_empty():
+		_check(false, "a traffic car to place at the edge")
+		return
+	var car := traffic[0] as TrafficCar
+	car._tuck_cooldown = 0.0
+
+	# Nose to the southern boundary with less than a tuck's length in front of it. The
+	# manoeuvre reaches 7m ahead and 2.2m across, so 3m of district cannot contain it.
+	var edge := CityGrid.MAP_HALF
+	var outward := Vector3(0.0, 0.0, -1.0)
+	var facing := atan2(-outward.x, -outward.z)
+	await _place_unit(car, Vector3(-86.0, 0.1, -(edge - 3.0)), facing)
+	await _place_unit(_car, car.global_position - outward * 6.0, facing)
+	_car.lights_on = true
+	await _wait(20)
+
+	_check(not car.is_pulled_over,
+		"a car three metres from the boundary does not pull over")
+	var aim := car.move_target
+	_check(absf(aim.x) <= edge and absf(aim.z) <= edge,
+		"and is not aiming off the map (%.0f, %.0f of +/-%.0f)" % [aim.x, aim.z, edge])
+
+	# The control: same car, same responder, room to do it. Without this the two checks
+	# above would be green on a pull-over that never fires at all.
+	var from := Vector2i(2, 2)
+	var to := Vector2i(2, 3)
+	var start := CityGrid.junction(from)
+	var finish := CityGrid.junction(to)
+	var direction := start.direction_to(finish)
+	var lane := direction.cross(Vector3.UP) * CityGrid.LANE_OFFSET
+	car._tuck_cooldown = 0.0
+	await _place_unit(car, start.lerp(finish, 0.62) + lane,
+		atan2(-direction.x, -direction.z))
+	car._from = from
+	car._to = to
+	car._last_direction = direction
+	car._begin_leg()
+	await _place_unit(_car, start.lerp(finish, 0.15) + lane,
+		atan2(-direction.x, -direction.z))
+	_car.navigate_to(finish + direction * 25.0)
+	var tucked := false
+	for i in 600:
+		await physics_frame
+		if car.is_pulled_over:
+			tucked = true
+			break
+	_check(tucked, "but the same car in open district still pulls over")
+	# **Put back everything this disturbed, and `clear_orders` is not enough.** Two things
+	# leaked out of the first cut of this check and cost thirteen reds in unrelated places:
+	# `navigate_to` is not an order, so `clear_orders()` leaves the car still driving at a
+	# point 25m past a junction and the next navigation check finds it already under way;
+	# and the manual lightbar switch thrown above stays thrown, so every later check that
+	# asserts a dark bar reads a lit one. The suite has no teardown -- what a check touches,
+	# it hands back.
+	_car.stop_navigating()
+	_car.clear_orders()
+	_car.lights_on = false
+	car._release_tuck()
+	car._tuck_cooldown = 0.0
+	await _park_the_shift()
+
+
 func _test_traffic_pulls_over_for_a_response() -> void:
 	var traffic := _ambient("Traffic")
 	if traffic.is_empty():
@@ -1323,7 +1525,16 @@ func _test_traffic_pulls_over_for_a_response() -> void:
 	# cap, which is the thing under test.
 	var post := start.lerp(end, 0.55) + lane
 	var facing := atan2(-direction.x, -direction.z)
-	_car.navigate_to(post + direction * 400.0)
+	# **Unreachable, but on the map.** 400m along the street lands at z 402 on a district
+	# that ends at 130, so this tripped `navigate_to`'s off-map guard on every single run --
+	# a warning with a full stack trace, fired by design, in a suite whose whole value is
+	# that its output means something. It very nearly buried a real one: the guard caught a
+	# genuine off-map pull-over reported from play, and this was the noise it was sitting in.
+	# The distance was never load-bearing anyway -- `pin` below holds the car still every
+	# frame, so it cannot arrive at anything, however close.
+	var far := post + direction * 400.0
+	var edge := CityGrid.MAP_HALF
+	_car.navigate_to(Vector3(clampf(far.x, -edge, edge), far.y, clampf(far.z, -edge, edge)))
 	var pin := func() -> void:
 		_car.global_position = post
 		_car.rotation.y = facing
@@ -1731,6 +1942,320 @@ func _test_a_car_gives_up_on_a_blocked_street() -> void:
 	await _idle(6)
 
 
+
+## The interface's ink stays legible on the ground it is drawn on.
+func _test_the_interface_can_be_read() -> void:
+	# **A class of bug, not an instance of it.** Two colours have shipped written by hand
+	# at a call site, correct for the scheme at the time and wrong afterwards: a 13% white
+	# progress track that was invisible on a white card, and near-black shop wells left
+	# over from a dark scheme on a light one. Both were found by eye, months apart. A
+	# table of the pairs the interface actually uses catches the next one for free -- and
+	# it earned its place immediately, because the August 2026 restyle inverted the whole
+	# palette and every one of these pairs had to survive it.
+	#
+	# **Two tables, because these are two questions.** Ink on a ground has to be *read*,
+	# and 3.0 is the bar (rather than WCAG's 4.5 -- this is chrome and large glyphs, not
+	# body copy, and a bar too strict to pass is one that gets loosened rather than
+	# obeyed). Two adjacent *surfaces* only have to be told apart, which is a much lower
+	# bar and the reference does half of it with a border rather than with contrast.
+	#
+	# Splitting them was not a way to make a failing row pass: the surface row failed at
+	# 1.2:1 and the palette was changed to fix it. Folding it into the ink table at 3.0
+	# would have meant a tile brighter than the card it sits in.
+	var pairs := [
+		["text on a card", Palette.TEXT, Palette.CARD],
+		["dim text on a card", Palette.TEXT_DIM, Palette.CARD],
+		["text on the bar", Palette.TEXT, Palette.BAR],
+		["tile ink on an unarmed tile", Palette.TEXT, Palette.WELL],
+		["tile ink on an armed tile", Palette.CARD, Palette.MEDICAL],
+		["tile ink on a running toggle", Palette.CARD, Palette.POLICE],
+		["an alarm label on its wash", Palette.CASUALTY_DEEP, Palette.ALARM_WASH],
+		["police ink on its muted fill", Palette.POLICE_DEEP, Palette.POLICE_PALE],
+		["medical ink on its muted fill", Palette.MEDICAL_DEEP, Palette.MEDICAL_PALE],
+		["fire ink on its muted fill", Palette.FIRE_DEEP, Palette.FIRE_PALE],
+		["a progress fill against its track", Palette.GOOD, Palette.WELL],
+	]
+	var worst := INF
+	var worst_pair := ""
+	for pair: Array in pairs:
+		var ratio: float = Palette.contrast(pair[1] as Color, pair[2] as Color)
+		if ratio < worst:
+			worst = ratio
+			worst_pair = str(pair[0])
+	_check(worst >= 3.0,
+		"every ink reads on its ground (worst: %s at %.1f:1)" % [worst_pair, worst])
+
+	var surfaces := [
+		["a recessed tile against its card", Palette.WELL, Palette.CARD],
+		["a hovered tile against its card", Palette.HOVER, Palette.CARD],
+		["a card against the bar", Palette.CARD, Palette.BAR],
+	]
+	var flattest := INF
+	var flattest_pair := ""
+	for pair: Array in surfaces:
+		var ratio: float = Palette.contrast(pair[1] as Color, pair[2] as Color)
+		if ratio < flattest:
+			flattest = ratio
+			flattest_pair = str(pair[0])
+	_check(flattest >= 1.3,
+		"and every surface is told apart from the one behind it (worst: %s at %.2f:1)"
+		% [flattest_pair, flattest])
+
+	# **A slider's track is drawn from its stylebox's vertical content margin**, so a box
+	# built with zero padding -- which is right for a card and meaningless here -- bakes a
+	# track zero pixels high. That shipped: the volume grabber floated on nothing, which
+	# is worse than the stock control it replaced, and it was found by eye.
+	var theme := _scene.get_node_or_null("HUD/Root") as Control
+	var track: StyleBoxFlat = theme.theme.get_stylebox("slider", "HSlider") \
+		if theme and theme.theme else null
+	var height := (track.content_margin_top + track.content_margin_bottom) \
+		if track else 0.0
+	_check(track != null and height >= 4.0,
+		"the volume track has a height to draw (%.0fpx)" % height)
+
+
+## Every command tile names its verb.
+func _test_command_tiles_say_what_they_do() -> void:
+	_controller.select([_car])
+	await _idle(3)
+	var named := 0
+	var tiles := 0
+	for child in _grid.get_children():
+		var tile := child as CommandIcon
+		if tile == null or not tile.visible or tile.ability == null:
+			continue
+		tiles += 1
+		# The tile draws the label, so what is asserted is that it *has* one to draw --
+		# a verb with an empty label would render a blank strip and read as a bug.
+		if not tile.ability.label().strip_edges().is_empty():
+			named += 1
+	_check(tiles > 0 and named == tiles,
+		"every tile has a name to draw (%d of %d)" % [named, tiles])
+	_controller.select([])
+	await _idle(2)
+
+
+
+## Orders you queued are drawn, not just the one being driven at.
+func _test_queued_orders_are_drawn() -> void:
+	await _clear_calls()
+	_controller.select([_car])
+	await _idle(3)
+	# Three stops, queued. Shift-right-click has queued orders since phase 1 and nothing
+	# ever drew them: a player who lined three up had no way to see what they had asked
+	# for, or to notice they had queued one by accident.
+	var stops := [CityGrid.junction(Vector2i(2, 2)), CityGrid.junction(Vector2i(3, 2)),
+		CityGrid.junction(Vector2i(3, 1))]
+	_car.clear_orders()
+	for i in stops.size():
+		_car.issue(MoveOrder.new(stops[i]), i > 0)
+	await _idle(6)
+	_check(_car.orders.size() == 3, "three orders are queued (%d)" % _car.orders.size())
+
+	var shown: Array[Node3D] = []
+	for node in _controller._markers:
+		var marker := node as Node3D
+		if marker and marker.visible:
+			shown.append(marker)
+	_check(shown.size() >= 3, "and a marker stands at each (%d)" % shown.size())
+
+	# Every queued destination has a marker on it, so the display is the queue rather
+	# than a coincidence of the right count.
+	var unmatched := 0
+	for order in _car.orders:
+		var found := false
+		for marker in shown:
+			var offset := marker.global_position - order.destination()
+			offset.y = 0.0
+			if offset.length() < 1.0:
+				found = true
+		if not found:
+			unmatched += 1
+	_check(unmatched == 0,
+		"each marker sits on an order the unit is actually holding (%d adrift)" % unmatched)
+
+	# The one being driven at is told apart from the ones waiting -- by size, because the
+	# marker is a duplicated scene and recolouring would need a material per copy.
+	var sizes: Array[float] = []
+	for marker in shown:
+		sizes.append(marker.scale.x)
+	sizes.sort()
+	_check(sizes.size() >= 2 and sizes[0] < sizes[sizes.size() - 1] - 0.1,
+		"the current order stands taller than the queue (%.2f against %.2f)"
+		% [sizes[0], sizes[sizes.size() - 1]])
+
+	_car.clear_orders()
+	_controller.select([])
+	await _idle(3)
+
+
+
+## A group ordered to one point spreads instead of stacking on it.
+func _test_a_group_move_spreads_out() -> void:
+	await _clear_calls()
+	var fleet: Array[Unit] = []
+	for car in _cars:
+		if car and is_instance_valid(car):
+			fleet.append(car)
+	if fleet.size() < 3:
+		_check(false, "three vehicles to send somewhere together")
+		return
+	fleet = fleet.slice(0, 3)
+	var junction := CityGrid.junction(Vector2i(2, 2))
+	var along := CityGrid.junction(Vector2i(2, 3))
+	for i in fleet.size():
+		# Along the street between two junctions, so every start point is carriageway.
+		# Guessed offsets put one of them off the mesh, and it was still falling when a
+		# later check picked it up -- "on floor false, -3.7 m/s vertical", two tests away.
+		await _place_unit(fleet[i],
+			junction.lerp(along, 0.30 + 0.14 * float(i)) + Vector3.UP * 0.2)
+	_controller.select(fleet)
+	await _idle(4)
+
+	# **The fault, stated.** `MoveAbility.make_order` handed every selected unit the same
+	# coordinate, so ten units ordered to a point all navigated to one spot and shoved
+	# each other apart. It is the first thing an RTS player notices.
+	_controller.order_at_point(junction)
+	await _idle(6)
+	var aims: Array[Vector3] = []
+	for unit in fleet:
+		var order := unit.current_order()
+		if order and order.has_destination():
+			aims.append(order.destination())
+	_check(aims.size() == 3, "all three took the order (%d)" % aims.size())
+	var closest := INF
+	for i in aims.size():
+		for j in range(i + 1, aims.size()):
+			var offset := aims[i] - aims[j]
+			offset.y = 0.0
+			closest = minf(closest, offset.length())
+	_check(closest > 3.0,
+		"and each was sent somewhere of its own (%.1fm apart at the closest)" % closest)
+
+	# Every slot has to be somewhere the unit could actually get to, on **its own**
+	# navigation layer -- a car's slot on a pavement is no use to it.
+	var unreachable := 0
+	for i in fleet.size():
+		if not Unit.can_reach(fleet[i], aims[i], 3.0):
+			unreachable += 1
+	_check(unreachable == 0,
+		"every one of them somewhere it can drive to (%d adrift)" % unreachable)
+
+	# **Staged against a frontage on purpose.** In open street every offset is trivially
+	# fine and this check would pass without the fallback existing at all -- which is the
+	# shape of vacuity this project has shipped twice.
+	var block := CityGrid.junction(Vector2i(2, 2)) + Vector3(18.0, 0.0, 18.0)
+	_controller.order_at_point(block)
+	await _idle(6)
+	# The contract is **not** "never aim at a building" -- ordering a unit into a block is
+	# a thing the player may do, and the terminal approach already stops it short. It is
+	# that a *slot* never makes things worse: each unit is sent either somewhere it could
+	# stand, or to the exact point that was ordered, and never to an offset of its own
+	# invention that happens to be inside a wall.
+	var invented := 0
+	for unit in fleet:
+		var order := unit.current_order()
+		if order == null or not order.has_destination():
+			continue
+		var aim := order.destination()
+		var tile := CityGrid.tile_at(aim)
+		if CityGrid.standable(tile.x, tile.y):
+			continue
+		var drift := aim - block
+		drift.y = 0.0
+		if drift.length() > 0.5:
+			invented += 1
+	_check(invented == 0,
+		"and against a frontage each falls back to the point rather than inventing an "
+		+ "offset inside the wall (%d of %d)" % [invented, fleet.size()])
+
+	# **Reachability, measured on the hard order rather than the easy one.** The first
+	# version asserted this only after the junction order, where every ring offset is
+	# open carriageway and the answer is trivially yes -- the sabotage agent removed both
+	# validity tests and it stayed green. Against a frontage a slot is either somewhere
+	# the unit can genuinely path to, or the point it was given; nothing else is allowed.
+	var stranded := 0
+	for unit in fleet:
+		var order := unit.current_order()
+		if order == null or not order.has_destination():
+			continue
+		var aim := order.destination()
+		var drift := aim - block
+		drift.y = 0.0
+		if drift.length() <= 0.5:
+			continue
+		if not Unit.can_reach(unit, aim, 3.0):
+			stranded += 1
+	_check(stranded == 0,
+		"and no invented slot is one it could not path to (%d stranded)" % stranded)
+
+	for unit in fleet:
+		unit.clear_orders()
+	_controller.select([])
+	# **Put the fleet back.** This test moves the shared patrol cars, and a car left in
+	# the middle of a street is a fixture the next check inherits.
+	await _park_the_shift()
+	await _idle(3)
+
+
+
+## Things that answer a click look like they will.
+func _test_clickable_things_respond_to_the_pointer() -> void:
+	await _clear_calls()
+	_controller.select([])
+	await _idle(3)
+	# Roster chips, call rows, dispatch rows and the CONTROLS chip all stop the mouse and
+	# act on a click, and until August 2026 every one looked exactly like the things that
+	# do not. A player had to find them by trying.
+	var chip := _scene.get_node_or_null(
+		"HUD/Root/World/ControlsToggle") as Control
+	var subjects: Array[Control] = []
+	if chip:
+		subjects.append(chip)
+	for path in ["HUD/Root/Bar/Row/DispatchBlock/Body/Heading"]:
+		var found := _scene.get_node_or_null(path) as Control
+		if found:
+			subjects.append(found)
+	_check(subjects.size() >= 2,
+		"there are clickable controls to test (%d)" % subjects.size())
+
+	# **Counted separately.** A single tally cannot tell "never brightened" from "never
+	# went back", and both sabotages printed the same 0 of 2 -- so a future failure would
+	# say something broke without saying which half, which is most of the debugging the
+	# check exists to save.
+	var lifted := 0
+	var settled := 0
+	for control in subjects:
+		var before := control.modulate
+		control.mouse_entered.emit()
+		await _idle(2)
+		if control.modulate != before:
+			lifted += 1
+		control.mouse_exited.emit()
+		await _idle(2)
+		# It must go back, or the first thing the pointer touches stays lit for ever.
+		if control.modulate == before:
+			settled += 1
+	_check(lifted == subjects.size() and settled == subjects.size(),
+		"each brightens under the pointer and settles again (%d lit, %d settled, of %d)"
+		% [lifted, settled, subjects.size()])
+
+	# **Brightness, not a stylebox.** Half of these are bare containers with no panel, and
+	# giving one a panel changes its size -- which in the bar makes the bar taller, which
+	# covers whatever floats above it. Six incidents deep, that is not a trade worth
+	# making for a hover effect, so the hover must not move anything.
+	var bar_before := _bar.get_global_rect().size.y
+	if chip:
+		chip.mouse_entered.emit()
+	await _idle(3)
+	_check(absf(_bar.get_global_rect().size.y - bar_before) < 0.5,
+		"and none of it moves the bar (%.0f from %.0f)"
+		% [_bar.get_global_rect().size.y, bar_before])
+	if chip:
+		chip.mouse_exited.emit()
+	await _idle(2)
+
+
 ## The black box files a record when a unit stops getting anywhere.
 ##
 ## Worth a check because it is the only instrument for the faults that matter most --
@@ -1759,6 +2284,11 @@ func _test_a_stuck_unit_is_written_down() -> void:
 	_car.issue(MoveOrder.new(CityGrid.junction(Vector2i(3, 1))))
 	await _idle(4)
 	_car.set_physics_process(false)
+	# A neighbour at a **known bearing**, so the record can be asked whether it says
+	# where things are and not merely how far. Placed off the car's own basis rather
+	# than a world axis, because which way it ended up facing is the staging's business.
+	await _place_unit(_ambulance,
+		_car.global_position - _car.global_basis.x * 6.0 + Vector3.UP * 0.15)
 	for i in int(log.report_after * 60.0) + 120:
 		await physics_frame
 		if log.records() > before:
@@ -1768,8 +2298,53 @@ func _test_a_stuck_unit_is_written_down() -> void:
 	_check(log.records() > before,
 		"a unit that stopped getting anywhere was written down (%d records, was %d)"
 		% [log.records(), before])
+
+	# **What the record says, not just that there is one.** Three August 2026 stalls read
+	# "on a road, full throttle, zero speed, nothing in front" and could not be told
+	# apart -- wedged against a car, wedged against scenery, or trouble entirely of the
+	# car's own making. Range without bearing cannot be staged from, and the old record
+	# had no line at all for what the car was in contact with.
+	var text := _last_record(log)
+	_check("touching:" in text,
+		"and the record says what it is in contact with")
+	# **Scanned over the neighbour lines only.** The first cut searched the whole record
+	# for "behind", which every record already contains in `holding behind: nothing` --
+	# so the check passed with `_bearing_note` stubbed out to return nothing at all. The
+	# fault reached the measurement perfectly well; the assertion was simply looking at
+	# more text than the mechanism writes.
+	var neighbours: Array[String] = []
+	var bearings := 0
+	for line in text.split("\n"):
+		if not line.begins_with("    ") or not ("speed" in line):
+			continue
+		neighbours.append(line)
+		if "°" in line or "dead ahead" in line or "behind" in line:
+			bearings += 1
+	_check(not neighbours.is_empty() and bearings == neighbours.size(),
+		"and where its neighbours are, not just how far (%d of %d carry a bearing)"
+		% [bearings, neighbours.size()])
+	# The ambulance was put on the car's left, so a record that reads "right" has the
+	# sign inverted -- which would send the next investigation looking the wrong way.
+	var ambulance_line := ""
+	for line in text.split("\n"):
+		if _ambulance.name in line:
+			ambulance_line = line
+	_check("left" in ambulance_line,
+		"with the side it is actually on (%s)" % ambulance_line.strip_edges())
+
 	_car.clear_orders()
 	await _idle(6)
+
+
+## The text of the most recent block in the black box's log.
+func _last_record(log: StuckLog) -> String:
+	var file := FileAccess.open(log.log_path, FileAccess.READ)
+	if file == null:
+		return ""
+	var whole := file.get_as_text()
+	file.close()
+	var blocks := whole.split("--- ")
+	return blocks[blocks.size() - 1] if blocks.size() > 1 else whole
 
 
 ## An order can only ever be given to somewhere on the map.
@@ -1829,11 +2404,19 @@ func _test_a_knock_costs_money() -> void:
 	# frames does nothing: `_update_movement` recomputes it from the actual velocity on
 	# its first line, so both trials collided at the autopilot's own approach speed and
 	# billed the identical £117.
+	#
+	# **And pointed at the wall, which it was not until August 2026.** Started yawed 180
+	# the car spent its run-up turning round: the long trial billed 54.8m from the wall,
+	# 7.4m from where it began, having scraped something mid-manoeuvre and never reached
+	# the obstacle at all. Both trials therefore hit at the same 9 m/s and the ordering
+	# came down to which scrape happened to be worse -- it passed on luck, and any change
+	# to the steering flipped it. Facing the wall, the trials land 3.7m from it at 10 and
+	# 25 m/s, which is the thing this check has always claimed to measure.
 	var bills: Array[int] = []
 	var speeds: Array[float] = []
 	for run_up in [7.0, 60.0]:
 		_car.repair_bill = 0
-		await _place_unit(_car, Vector3(20.0, 0.15, -20.0 + run_up) + lane, PI)
+		await _place_unit(_car, Vector3(20.0, 0.15, -20.0 + run_up) + lane, 0.0)
 		_car.avoids_vehicles = false
 		_car.issue(MoveOrder.new(Vector3(20.0, 0.0, -32.0) + lane))
 		var fastest := 0.0
@@ -2005,19 +2588,34 @@ func _corner_apex() -> float:
 	return speed
 
 
-func _test_vehicles_keep_to_the_roads() -> void:
-	# The whole point of baking the vehicle mesh from road surfaces alone. Ordered
-	# into the middle of a block -- 30m of building, no navigation mesh anywhere near
-	# it -- the car should come to rest out on the street rather than driving at a
-	# wall or refusing the order.
+func _test_vehicles_keep_out_of_the_buildings() -> void:
+	# The whole point of baking the vehicle mesh from road surfaces alone. Ordered into
+	# the middle of a block -- 30m of building, no navigation mesh anywhere near it --
+	# the car must come to rest short of it rather than driving at a wall or refusing
+	# the order.
+	#
+	# **It used to have to stop on the road, and that stopped being right.** Measured
+	# along this block: the building is the middle 0-9m, the pavement ring is 10-14m,
+	# and the carriageway starts at 15m. Once a car could climb a kerb on an order sent
+	# somewhere off-road -- which is a verb the player asked for -- a car aimed at the
+	# block centre correctly mounts the pavement and stops at the building line. It now
+	# comes to rest around 12.8m, which the old bar read as failure and which is exactly
+	# what should happen.
+	#
+	# So the assertion moved to the guarantee that actually matters and has not changed:
+	# it never gets *inside*. `CityGrid.standable` is the line -- true on road and
+	# pavement, false on a building footprint -- and it is the same test that keeps
+	# fires and casualties out of people's houses.
 	await _place(Vector3(20.0, 0.15, 0.0))
 	_car.issue(MoveOrder.new(Vector3.ZERO))
 	await _await_arrival(1800)
 	var here := _car.global_position
-	_check(_on_a_road(here), "stopped on a road at (%.1f, %.1f), not inside the block"
+	var tile := CityGrid.tile_at(here)
+	_check(CityGrid.standable(tile.x, tile.y),
+		"stopped somewhere it may stand at (%.1f, %.1f), not inside the block"
 		% [here.x, here.z])
-	_check(_flat_distance(here, Vector3.ZERO) > 14.0,
-		"which is %.1fm out from the block centre it was aimed at"
+	_check(_flat_distance(here, Vector3.ZERO) > 10.0,
+		"which is %.1fm out, clear of the building it was aimed into"
 		% _flat_distance(here, Vector3.ZERO))
 
 
@@ -2337,15 +2935,84 @@ func _test_bar_is_docked_and_solid() -> void:
 	await _press_key(KEY_F1)
 	_check(_help.visible == visible_before, "and toggles it back")
 
-	# The bar must hold its height with the fattest selection aboard -- seven tiles
-	# once wrapped to a second row, the PanelContainer grew, and the CONTROLS chip
-	# above the bar silently stopped being clickable. The patrol car carries seven
-	# now (the ambulance dropped to six when Collect moved onto the paramedic).
-	_controller.select([_car])
+	# **The bar must not grow over the chip above it.** Tiles that wrap to a second row
+	# grow the PanelContainer, the bar grows upward with it, and the CONTROLS chip
+	# silently stops being clickable -- a trap this project has fallen into five times.
+	#
+	# This pinned a height of 148px until August 2026, and a magic number is what would
+	# have let it happen a sixth time: the block was widened for a ninth tile, the height
+	# was untouched, and a check on the number would have gone red for a change that was
+	# fine. What matters is not the figure, it is that the chip is still there. So the
+	# assertion is the overlap itself, measured against the fattest selection.
+	# **Every selectable unit at once**, because `available_abilities()` returns the
+	# *union* across the selection -- so a mixed box-select is the widest the bar ever
+	# gets, and it is wider than any one unit. The first cut of this selected a single
+	# patrol car, whose tiles fit one row at the old width: the sabotage agent reverted
+	# the widening and the check stayed green, because the fault never reached the
+	# measurement. A scenario that cannot provoke the fault is no better than an
+	# assertion that cannot see it.
+	var everyone: Array[Unit] = []
+	for node in get_nodes_in_group(Unit.GROUP):
+		var unit := node as Unit
+		if unit and unit.service != Unit.Service.NONE:
+			everyone.append(unit)
+	_controller.select(everyone)
 	await _idle(3)
-	_check(absf(_bar.get_global_rect().size.y - 148.0) < 4.0,
-		"seven command tiles fit the bar without growing it (%.0fpx tall)"
-		% _bar.get_global_rect().size.y)
+	# Stated rather than assumed: if the roster ever shrinks below the width the bar was
+	# built for, this check quietly stops testing anything and should say so.
+	# Tied to the union the controller actually offers, so the grid and the ladder cannot
+	# drift apart silently. The >= 9 floor stays beside it: a shrinking roster would make
+	# this stop testing anything, and it should say so rather than go quiet.
+	var offered := _controller.available_abilities().size()
+	# **Visible tiles, not children.** The grid pools -- `_tiles` grows to the high-water
+	# mark and the surplus is hidden rather than freed -- and it also carries an "empty"
+	# label. Counting children read 14 for 13 abilities and was measuring the pool.
+	var shown := 0
+	for child in _grid.get_children():
+		var tile := child as CommandIcon
+		if tile and tile.visible:
+			shown += 1
+	_check(shown == offered and offered >= 9,
+		"the fattest selection fills the bar (%d tiles for %d abilities)"
+		% [shown, offered])
+	var chip := _scene.get_node_or_null(
+		"HUD/Root/World/ControlsToggle") as PanelContainer
+	_check(chip != null, "there is a CONTROLS chip above the bar")
+
+	# **Everything that floats above the bar, not just the chip.** The bar is a
+	# PanelContainer and grows to fit its content; when it grows it covers whatever is
+	# over it, silently. That has caught this project six times -- the dispatch pills, and
+	# the CONTROLS chip twice -- and each time the fix pinned the *one* thing that had
+	# just been eaten. This asserts the whole floor, which is what would have caught all
+	# six rather than the sixth.
+	var bar_top := _bar.get_global_rect().position.y
+	var covered: Array[String] = []
+	var floating := _scene.get_node_or_null("HUD/Root/World") as Control
+	if floating:
+		for child in floating.get_children():
+			var panel := child as Control
+			# Guarded: a freed or non-Control child here would raise, and a runtime error
+			# inside a check abandons the rest of it while the suite still reads green.
+			if panel == null or not is_instance_valid(panel) or not panel.visible:
+				continue
+			if panel.get_global_rect().end.y > bar_top + 0.5:
+				covered.append(panel.name)
+	_check(covered.is_empty(),
+		"and the bar covers nothing floating above it (%s)"
+		% ("clear" if covered.is_empty() else ", ".join(covered)))
+
+	# The height must not depend on the selection either. `Bar.offset_top` is a *minimum*
+	# and goes inert the moment the tiles wrap, so nothing pinned this: a bar that changed
+	# height between selections would jump the world view and re-open the trap above.
+	var fat_height := _bar.get_global_rect().size.y
+	_controller.select([])
+	await _idle(3)
+	var lean_height := _bar.get_global_rect().size.y
+	_controller.select(everyone)
+	await _idle(3)
+	_check(absf(fat_height - lean_height) < 1.0,
+		"and stands the same height however much is selected (%.0f against %.0f)"
+		% [fat_height, lean_height])
 
 	# The visible route in: the card ships closed, the chip above the bar opens it.
 	_check(not _help.visible, "the controls card ships closed")
@@ -3376,6 +4043,166 @@ func _test_a_car_sent_off_the_road_climbs_the_kerb() -> void:
 	await _idle(5)
 
 
+## An appliance on a shout takes the pavement past a shut street -- **and comes back down.**
+##
+## The check above is the *ordered* climb: the player right-clicks a verge and the car goes
+## there. This is the earned one, and the two halves matter equally. Going up was built
+## first and on its own it is a trap: measured, an appliance that mounted successfully then
+## spent 555 frames off the carriageway, 161 of them *turning round*, because from up on the
+## pavement the navigation agent's nearest reachable point is the carriageway it just left,
+## on the **near** side of the obstruction. It drove back, met the wall, and mounted again.
+## A 33.3s journey did not finish in sixty seconds. So the assertion that matters most here
+## is the last one: the appliance ends up **on the road**.
+##
+## **What each assertion is worth, from the sabotage pass -- read this before adding more.**
+## Disabling the mount reddens all four, with no collateral. Disabling *only* the recovery
+## reddens exactly one: "steers itself back down". "Finishes the journey" stays green,
+## because the navigation agent also gets the car off the pavement eventually in this
+## fixture -- it is over-determined with respect to the recovery, and only goes red when
+## every route back down is removed. It is kept because it is the end-to-end statement and
+## it does go red when the mount is disabled, but **it is not evidence about the recovery**.
+## A third assertion, "ending on the carriageway", was written here and deleted: it
+## snapshotted `CityGrid.is_road()` on whichever frame the sample loop happened to exit and
+## read true under every sabotage, including one where the car was demonstrably stranded 23m
+## short. Bounding the off-road frame count instead does not discriminate either -- a
+## healthy run spends *more* frames up there (296) than a sabotaged one (201), because the
+## steered recovery is a deliberate excursion and the broken version simply mills about. The
+## count is printed for the reader and asserted on by nothing.
+##
+## **Three abreast, an appliance, and a short hop -- all three load-bearing.**
+## [method Vehicle._passing_line] finds a way round one vehicle every time and should; two
+## made the result flap between 0 and 21 mounting frames on a decimetre of spacing. A patrol
+## car is small enough to squeeze through the same wall (33.3s, mounting nothing), so the
+## mover has to be an appliance and the fixture has to buy one. And the destination is kept
+## under [constant CityGrid.LANE_ROUTE_MIN], because past that the order plans a lane route,
+## writes the shut street off after four seconds and drives round the block instead -- which
+## is a perfectly good answer, and not the one under test.
+func _test_a_shut_street_is_passed_over_the_pavement() -> void:
+	_controller.clear_selection()
+	# A straight street between two junctions on the same row: one heading throughout, so
+	# nothing in the result is a cornering artefact, and well clear of a junction mouth,
+	# which the feature requires and the check after this one is about.
+	var start := CityGrid.junction(Vector2i(1, 1))
+	var along := (CityGrid.junction(Vector2i(3, 1)) - start).normalized()
+	var across := along.cross(Vector3.UP)
+	var yaw := atan2(-along.x, -along.z)
+	var goal := start + along * 40.0
+
+	_station.purchase(&"engine")
+	var engine := _dispatch_to(&"engine", start + along * 6.0) as Vehicle
+	var wall: Array[Vehicle] = [_cars[1]]
+	for i in 2:
+		_station.purchase(&"patrol")
+		wall.append(_dispatch_to(&"patrol", start + along * 24.0) as Vehicle)
+	if engine == null or wall.has(null):
+		_check(false, "the fixture can put an appliance behind a shut street")
+		return
+	for i in wall.size():
+		await _place_unit(wall[i], start + along * 24.0 + across * (float(i) - 1.0) * 2.6,
+			yaw)
+	# The two left-over fixture units parked well clear, so nothing an earlier check left
+	# lying in this street gets to decide the answer.
+	await _place_unit(_ambulance, start - along * 14.0, yaw)
+	await _place_unit(_car, start - along * 20.0, yaw)
+	await _place_unit(engine, start + along * 6.0, yaw)
+	await _idle(20)
+
+	# An array, not an int: GDScript lambdas capture by value and a captured int stays at
+	# zero for ever. Written up at length over the ordered-climb check above.
+	var climbs := [0]
+	engine.climbed.connect(func(_v: Vehicle) -> void: climbs[0] += 1)
+	var mounted := false
+	var came_back := false
+	var off_road := 0
+	# The licence's own terms, reported whatever happens. A bare "it did not mount" sent this
+	# check round the houses twice; the peak against the bar says at a glance whether the
+	# manoeuvre was refused or simply never came due.
+	var peak := 0.0
+	var crawling := 0
+	var blocked_frames := 0
+	engine.issue(MoveOrder.new(goal))
+	for i in 60 * 45:
+		await _idle(1)
+		if engine.is_mounting():
+			mounted = true
+		if engine.is_returning():
+			came_back = true
+		if not CityGrid.is_road(engine.global_position):
+			off_road += 1
+		peak = maxf(peak, engine._blocked_time)
+		if engine.forward_speed < engine.mount_crawl:
+			crawling += 1
+			if engine.road_is_blocked(engine.move_target):
+				blocked_frames += 1
+		if not engine.is_navigating():
+			break
+
+	_check(mounted,
+		"an appliance on a shout takes the pavement when the street is shut (blocked peaked at %.2f of %.2f, %d of %d crawling frames with the street shut)"
+			% [peak, engine.mount_after, blocked_frames, crawling])
+	_check(int(climbs[0]) > 0,
+		"and gets up there over the kerb rather than round it (%d climbs)" % climbs[0])
+	_check(came_back,
+		"and steers itself back down off the pavement afterwards (%d frames off the road)"
+			% off_road)
+	_check(engine.global_position.distance_to(goal) < 8.0,
+		"and finishes the journey (%.0fm short of a target %.0fm past the wall)"
+			% [engine.global_position.distance_to(goal), 16.0])
+	_station.write_off(engine)
+	for i in range(1, wall.size()):
+		_station.write_off(wall[i])
+	await _park_the_shift()
+
+
+## And an appliance merely queueing at a junction does **not**.
+##
+## The other half of the same behaviour, and the more important half. A kerb runs along a
+## street; a junction is a crossing, and the ground at its mouth is off the vehicle
+## navigation mesh without having any step on it -- so a car that mounts there drives onto
+## flat tarmac, off its route, and has to find its way back. Measured with the junction
+## exclusion removed, a 76.7s journey became one the car had not finished in 150 seconds.
+## Nothing in the check above would have caught that.
+##
+## Walled in by the **same three abreast**, so the only difference between the two scenarios
+## is where the appliance is standing. A weaker wall here would make this a negative control
+## that proves nothing: of course a car that was never provoked did not mount.
+func _test_a_junction_queue_does_not_earn_the_pavement() -> void:
+	_controller.clear_selection()
+	var box := CityGrid.junction(Vector2i(1, 1))
+	var out := (CityGrid.junction(Vector2i(3, 1)) - box).normalized()
+	var across := out.cross(Vector3.UP)
+	var yaw := atan2(-out.x, -out.z)
+
+	_station.purchase(&"engine")
+	var engine := _dispatch_to(&"engine", box + out * 1.0) as Vehicle
+	var wall: Array[Vehicle] = [_cars[1]]
+	for i in 2:
+		_station.purchase(&"patrol")
+		wall.append(_dispatch_to(&"patrol", box + out * 7.0) as Vehicle)
+	if engine == null or wall.has(null):
+		_check(false, "the fixture can put an appliance in a junction")
+		return
+	for i in wall.size():
+		await _place_unit(wall[i], box + out * 7.0 + across * (float(i) - 1.0) * 2.6, yaw)
+	await _place_unit(_ambulance, box - out * 14.0, yaw)
+	await _place_unit(_car, box - out * 20.0, yaw)
+	await _place_unit(engine, box + out * 1.0, yaw)
+	await _idle(20)
+
+	var mounted := false
+	engine.issue(MoveOrder.new(box + out * 40.0))
+	for i in 60 * 12:
+		await _idle(1)
+		if engine.is_mounting():
+			mounted = true
+	_check(not mounted,
+		"an appliance queueing in a junction does not take the pavement")
+	_station.write_off(engine)
+	for i in range(1, wall.size()):
+		_station.write_off(wall[i])
+	await _park_the_shift()
+
+
 func _test_siren_runs_while_responding() -> void:
 	_controller.clear_selection()
 	await _place(ROAD)
@@ -3952,6 +4779,166 @@ func _test_paramedic_treats_a_casualty() -> void:
 	_check(not is_instance_valid(casualty) or casualty.is_stable,
 		"the casualty was stabilised")
 	await _clear_incidents()
+
+
+## A paramedic sent to a casualty beyond them **holds** them and never finishes.
+##
+## Both halves matter and they fail in opposite directions. Without the hold this is a unit
+## standing uselessly over someone who dies anyway, and the player learns to leave; without
+## the refusal there is no specialist and the doctor is decoration. The interesting state is
+## the one in between -- alive, and going nowhere -- because that is the state the player has
+## to answer by dispatching somebody else.
+##
+## **Long enough to have finished twice over.** `treat_per_second` is 0.2, so an ordinary
+## casualty stabilises in five seconds; ten proves the refusal rather than a slow rate.
+func _test_a_paramedic_holds_a_doctors_case_but_cannot_finish_it() -> void:
+	await _clear_incidents()
+	var casualty := _spawn_casualty(Vector3(20.0, 0.0, 14.0))
+	casualty.needs_doctor = true
+	await _place_unit(_paramedic, Vector3(21.2, 0.1, 14.0))
+	await _idle(10)
+
+	# **Read before the work, and read the health rather than the clock.** A casualty that
+	# was already stable, or already dead, would make every assertion below vacuous.
+	_check(not casualty.is_stable and casualty.health > 0.5,
+		"the casualty starts alive and unstable (health %.2f)" % casualty.health)
+	var opening := casualty.health
+	_paramedic.issue(TreatOrder.new(casualty))
+	for i in 60 * 10:
+		await _idle(1)
+		if not is_instance_valid(casualty) or casualty.is_stable:
+			break
+
+	_check(is_instance_valid(casualty) and not casualty.is_stable,
+		"a paramedic cannot stabilise a casualty who needs a doctor")
+	# The decline is 0.012/sec, so ten unheld seconds costs 0.12 -- an order of magnitude
+	# more than the rounding this allows for.
+	_check(is_instance_valid(casualty) and casualty.health > opening - 0.02,
+		"but holds them steady while they work (health %.2f, from %.2f)"
+			% [casualty.health if is_instance_valid(casualty) else 0.0, opening])
+	_check(is_instance_valid(casualty)
+			and casualty.describe_state().contains("doctor"),
+		"and the panel says what is needed ('%s')"
+			% (casualty.describe_state() if is_instance_valid(casualty) else "gone"))
+	_paramedic.clear_orders()
+	await _clear_incidents()
+
+
+## And a doctor finishes it. The same fixture, one unit swapped -- which is the claim.
+func _test_a_doctor_stabilises_what_a_paramedic_cannot() -> void:
+	await _clear_incidents()
+	_station.purchase(&"doctor")
+	var doctor := _dispatch_to(&"doctor", Vector3(26.0, 0.1, 14.0)) as Person
+	if doctor == null:
+		_check(false, "the career can buy a doctor")
+		return
+	_check(doctor.has_advanced_care(), "a doctor has advanced care")
+	_check(not _paramedic.has_advanced_care(), "and a paramedic does not")
+	# Same service, so the specialist is expressed *within* it rather than as a fourth
+	# emergency service -- which is the whole point of `speciality`.
+	_check(doctor.service == _paramedic.service,
+		"both are the same service (%d vs %d)" % [doctor.service, _paramedic.service])
+
+	var casualty := _spawn_casualty(Vector3(20.0, 0.0, 14.0))
+	casualty.needs_doctor = true
+	await _place_unit(doctor, Vector3(21.2, 0.1, 14.0))
+	await _idle(10)
+	doctor.issue(TreatOrder.new(casualty))
+	for i in 60 * 10:
+		await _idle(1)
+		if not is_instance_valid(casualty) or casualty.is_stable:
+			break
+	_check(is_instance_valid(casualty) and casualty.is_stable,
+		"a doctor stabilises the case a paramedic could only hold")
+
+	# And the rest of the chain is untouched: stable means liftable, which is what makes
+	# the doctor a bottleneck in an existing loop rather than a separate one.
+	_check(CollectAbility.new().score(_paramedic, _target_for(casualty))
+			!= Ability.NOT_APPLICABLE,
+		"and the paramedic can now lift them onto the stretcher")
+	doctor.clear_orders()
+	_station.write_off(doctor)
+	await _clear_incidents()
+
+
+## Two unit types in the same service stay told apart on the books.
+##
+## The check for a bug that cost an afternoon and whose symptoms point nowhere near it.
+## [method Station.type_of] used to identify a unit by (service, vehicle), which is exact
+## only while each service has exactly one kind of person. The doctor made MEDICAL-and-not-a-
+## vehicle match two catalogue entries, the scan returned the first, and so writing off a
+## doctor decremented the **paramedic** count while `_alive` counted every doctor as a
+## paramedic -- the dispatch panel then offered paramedics that did not exist and refused
+## doctors that did. Every specialist added from here on would have re-broken it identically,
+## which is why this is a check and not a comment.
+func _test_two_specialists_in_one_service_stay_told_apart() -> void:
+	var medics := _station.total(&"paramedic")
+	_station.purchase(&"doctor")
+	var doctor := _dispatch_to(&"doctor", Vector3(30.0, 0.1, 20.0)) as Person
+	if doctor == null:
+		_check(false, "the career can buy a doctor")
+		return
+	# **Stated as a difference, not as two identities.** Written as a pair of `== &"doctor"` /
+	# `== &"paramedic"` assertions, the second is inert: the bug returns `paramedic` for both,
+	# so it is green either way and cannot see the fault it is here for.
+	_check(Station.type_of(doctor) != Station.type_of(_paramedic),
+		"a doctor and a paramedic in one service are told apart ('%s' vs '%s')"
+			% [Station.type_of(doctor), Station.type_of(_paramedic)])
+	_check(Station.type_of(doctor) == &"doctor",
+		"and the doctor is identified as a doctor (got '%s')" % Station.type_of(doctor))
+	# **Not `available()`.** That is `owned - alive`, so one bought and one dispatched is
+	# correctly **zero**, and an assertion of `>= 1` here passed only while `_alive`
+	# miscounted the live doctor as a paramedic -- green under the bug, red once fixed. The
+	# sabotage pass caught it; it is the exact inversion this project keeps finding.
+	_check(_station.total(&"doctor") == 1 and _station.available(&"doctor") == 0,
+		"one bought and one out means none spare (%d owned, %d spare)"
+			% [_station.total(&"doctor"), _station.available(&"doctor")])
+
+	_station.write_off(doctor)
+	await _idle(2)
+	_check(_station.total(&"paramedic") == medics,
+		"and writing the doctor off leaves the paramedics alone (%d, was %d)"
+			% [_station.total(&"paramedic"), medics])
+	_check(_station.total(&"doctor") == 0,
+		"while the doctor comes off the books (%d)" % _station.total(&"doctor"))
+	# **Put the books back whatever happened above.** This test buys and writes off, and if
+	# its own assertions fail it fails *because* the roster ended up wrong -- so leaving it
+	# wrong contaminates everything downstream. Sabotaged, that cost four further reds and
+	# nine checks that never ran, none of them about specialists. The collapse test below
+	# cleans up after itself for the same reason.
+	_station.owned.erase(&"doctor")
+	_station.owned[&"paramedic"] = medics
+	await _clear_incidents()
+
+
+## The director never sets a collapse to a career with no doctor on the books.
+##
+## Same rule as building fires and an engine, and for the same reason: paramedics would hold
+## the casualty indefinitely, the call would never close, and it would read as a bug rather
+## than as a hard call. Rolled rather than reasoned about, because the gate lives in the
+## weighting and a check that read the table would pass with the filter deleted.
+func _test_a_collapse_is_only_offered_with_a_doctor_on_the_books() -> void:
+	var before := _station.owns(&"doctor")
+	_check(not before, "the fixture career owns no doctor to begin with")
+	var without := 0
+	for i in 400:
+		if _director._pick_kind() == &"collapse":
+			without += 1
+	_check(without == 0,
+		"a career with no doctor is never set a collapse (%d of 400 rolls)" % without)
+
+	_station.purchase(&"doctor")
+	var with_one := 0
+	for i in 400:
+		if _director._pick_kind() == &"collapse":
+			with_one += 1
+	# Weight 14 of roughly 190 offered: about 7%, so 400 rolls missing it entirely is a
+	# one-in-10^12 event. A zero here means the kind is unreachable, not unlucky.
+	_check(with_one > 0,
+		"and one that owns a doctor is (%d of 400 rolls)" % with_one)
+	# Bought but never dispatched, so there is no unit for `write_off` to take -- put the
+	# count back by hand rather than leave a doctor on the books for every later check.
+	_station.owned.erase(&"doctor")
 
 
 # --- Roles -------------------------------------------------------------------
@@ -5111,8 +6098,14 @@ func _test_a_disturbance_lives_before_the_law() -> void:
 		"without leaving it (radius %.1f)" % suspect.wander_radius)
 	_check(legal, "and keep to the pedestrian graph")
 
-	# Cuffed away from the spot, they walk back to it -- the kerb the escorting
-	# car's reach is measured from. Waited for mid-pace, or the check proves nothing.
+	# **Cuffed, they stand still.** They used to trudge back to the spot the call opened
+	# on, because that kerb was where the patrol car's reach was measured from -- the car
+	# came to them. Since the escort moved onto the officer's feet in August 2026 nothing
+	# needs them at a particular place, and walking off on their own would mean an officer
+	# sent to collect somebody arrives to find them somewhere else.
+	#
+	# Caught mid-pace, or the check proves nothing: a suspect who happened to be standing
+	# still anyway would pass it without the detained branch existing at all.
 	var away_now := 0.0
 	for i in 600:
 		await physics_frame
@@ -5123,20 +6116,1125 @@ func _test_a_disturbance_lives_before_the_law() -> void:
 		_check(false, "caught the suspect mid-pace to cuff them")
 	else:
 		suspect.detain(1.0)
-		var returned := false
+		var cuffed_at := suspect.global_position
+		var drifted := 0.0
 		for i in 600:
 			await physics_frame
-			if _flat_distance(suspect.global_position, spot) < 1.0:
-				returned = true
-				break
-		_check(returned,
-			"cuffed mid-pace, they walk back to the kerb the car can reach")
+			drifted = maxf(drifted, _flat_distance(suspect.global_position, cuffed_at))
+		_check(drifted < 0.5,
+			"cuffed, they stand where they are rather than wandering (%.2fm)" % drifted)
 	await _clear_calls()
 
 
 ## The fire service, end to end. Its shape is the point: one verb done properly, a
 ## rate that depends on standing near your own appliance, and a kind of fire nobody
 ## else can touch.
+## The appliance raises its ladder while its hose is being worked, and lowers it after.
+##
+## This is what the fire engine does instead of swinging rear doors. The van it replaced
+## had them as separate meshes and the real appliance has none, so the flourish moved
+## from the back of the vehicle to the top of it -- and it is wired to something true
+## rather than to a timer: `ExtinguishOrder` asks for it every frame it draws from this
+## appliance's tank, so an engine parked doing nothing keeps its ladder stowed and one
+## actually supplying a hose puts it up.
+## A fire's visuals answer to its intensity, sub-emitters included.
+##
+## Nothing pinned the fire's appearance at all until August 2026, in either direction:
+## the flame was a cone and two hand-built quad emitters, and a regression in any of it
+## would have gone unnoticed. That mattered when they were replaced by the particle
+## pack's, whose fire is not one emitter but three -- flame, embers and a ground spread
+## -- because `amount_ratio` does not inherit, and a fire barely alight would otherwise
+## still throw a full complement of embers.
+## Fires of different kinds behave differently, and a car fire costs you to park by.
+##
+## A fire was one thing with four fields the director set inline, and the only difference
+## it expressed was whether a hose was needed. Three kinds now carry their own rates,
+## plume and spread, and the table is the only place they are written down -- which is
+## worth pinning, because a table that drifts back into agreement is a table that stopped
+## doing anything.
+## A cylinder heats beside a fire, cools under a hose, and takes the street with it if
+## nobody deals with it.
+##
+## The first thing in the district that acts rather than waits. Everything else here gets
+## worse and eventually fails; this one damages what is parked near it, hurts whoever is
+## standing near it and throws fires of its own -- so it is worth pinning that it can be
+## beaten, and that the blast lands where a blast may land.
+func _test_a_cylinder_cooks_off() -> void:
+	await _clear_incidents()
+	# **Well away from (20, -20).** That is where the fire-service tests stage their own
+	# engine and crew, and an appliance left within `ExtinguishOrder.HOSE_REACH` of it
+	# becomes a supply for somebody else's check -- which made a building fire yield to a
+	# patrol car three tests later.
+	var spot := Vector3(-60.0, 0.0, 60.0)
+	var hazard := _spawn_hazard(spot)
+	await _idle(30)
+	_check(is_zero_approx(hazard.heat),
+		"a cylinder with nothing burning near it is cold (%.2f)" % hazard.heat)
+
+	var fire := _spawn_fire(spot + Vector3(3.0, 0.0, 0.0), 1.0)
+	fire.growth_per_second = 0.0
+	await _idle(120)
+	var warmed := hazard.heat
+	_check(warmed > 0.0, "a fire beside it starts cooking it (%.2f after 2s)" % warmed)
+
+	# Put the fire out and it sheds heat on its own -- which is what makes "deal with the
+	# fire first" a real answer rather than a race that is always lost.
+	fire.douse(2.0)
+	await _idle(120)
+	_check(hazard.heat < warmed,
+		"and it cools once the fire is out (%.2f from %.2f)" % [hazard.heat, warmed])
+	await _clear_incidents()
+
+
+## The blast, staged rather than waited for: what it costs, and where it puts its fires.
+func _test_a_cylinder_going_off_takes_the_street() -> void:
+	await _clear_incidents()
+	_buy(&"engine", 1)
+	var engine := _station.dispatch(&"engine") as Vehicle
+	if engine == null:
+		_check(false, "an engine to park beside it")
+		return
+	# **Well away from (20, -20).** That is where the fire-service tests stage their own
+	# engine and crew, and an appliance left within `ExtinguishOrder.HOSE_REACH` of it
+	# becomes a supply for somebody else's check -- which made a building fire yield to a
+	# patrol car three tests later.
+	var spot := Vector3(-60.0, 0.0, 60.0)
+	var hazard := _spawn_hazard(spot)
+	await _place_unit(engine, spot + Vector3(4.0, 0.2, 0.0))
+	engine.repair_bill = 0
+	await _idle(4)
+
+	# **The hazard is gone by the time this is read**, because `_finish()` frees it, so
+	# the outcome is taken off the signal rather than off the object. The first cut read
+	# `hazard.active` after the blast, which raises a runtime error -- and a runtime error
+	# in this suite does not fail a check, it silently abandons the rest of the test. All
+	# four checks below vanished and the run still reported green; only the count said so.
+	# An Array box rather than a captured bool: GDScript lambdas capture by value.
+	# Somebody standing in it, so the blast has a person to hurt. Without one the outfit
+	# check below reads "0 bodiless of 0" and proves nothing -- which is how it first
+	# went red, and a fair warning about staging a blast in an empty street.
+	var bystander := _nearest_civilian(spot)
+	if bystander:
+		await _place_unit(bystander, spot + Vector3(2.0, 0.0, 0.0))
+		await _idle(4)
+	var outcome: Array = []
+	hazard.resolved.connect(func(_incident: Incident, success: bool) -> void:
+		outcome.append(success))
+	hazard.heat = 1.0
+	await _idle(10)
+	_check(outcome == [false],
+		"a cylinder at full heat goes off, and the call is lost (%s)" % [outcome])
+	_check(engine.repair_bill > 0,
+		"and bills what was parked beside it (£%d)" % engine.repair_bill)
+
+	var lit := get_nodes_in_group(Fire.FIRE_GROUP)
+	_check(lit.size() > 0, "throwing fires of its own (%d)" % lit.size())
+	# The same rule every placement in this game funnels through. A blast that lit the
+	# inside of a building would be a call nobody could answer.
+	var indoors := 0
+	for node in lit:
+		var tile := CityGrid.tile_at((node as Node3D).global_position)
+		if not CityGrid.standable(tile.x, tile.y):
+			indoors += 1
+	_check(indoors == 0,
+		"and none of them inside a building (%d of %d)" % [indoors, lit.size()])
+
+	# **And the people it hurt have bodies.** `_hurt_people` dresses a new casualty in
+	# the civilian's outfit, and it had the same one-directory bug that made a recruited
+	# suspect invisible in play: `scene_file_path` is the *unit* scene, not the outfit,
+	# and `ResourceLoader.exists()` accepts both. That twin was uncovered when the first
+	# was found -- so this is here to stop the identical fault shipping twice.
+	var bodiless := 0
+	var hurt := 0
+	for node in get_nodes_in_group(Casualty.CASUALTY_GROUP):
+		var casualty := node as Casualty
+		if casualty == null:
+			continue
+		hurt += 1
+		var body := casualty.get_node_or_null("Character") as Node3D
+		if body == null or not (body.scene_file_path in Incident.OUTFITS):
+			bodiless += 1
+	_check(hurt > 0 and bodiless == 0,
+		"and whoever it hurt is wearing a real outfit (%d bodiless of %d)"
+		% [bodiless, hurt])
+
+	await _clear_incidents()
+	_dissolve(engine, &"engine")
+	await _idle(4)
+
+
+
+## The stream is a readout, not a flourish: it shows up exactly where water is landing.
+func _test_water_shows_where_it_is_landing() -> void:
+	await _clear_incidents()
+	_buy(&"engine", 1)
+	_buy(&"firefighter", 1)
+	_buy(&"officer", 1)
+	var engine := _station.dispatch(&"engine") as Vehicle
+	var crew := _station.dispatch(&"firefighter") as Person
+	var officer := _station.dispatch(&"officer") as Person
+	if engine == null or crew == null or officer == null:
+		_check(false, "an engine, a crew and an officer to send")
+		return
+	# Away from (20, -20), where the fire-service tests stage their own appliance.
+	var spot := Vector3(-60.0, 0.0, 60.0)
+	var fire := _spawn_fire(spot, 0.9)
+	fire.kind = Fire.Kind.BIN
+	fire.growth_per_second = 0.0
+	await _place_unit(engine, spot + Vector3(6.0, 0.2, 0.0))
+	await _place_unit(crew, spot + Vector3(2.0, 0.0, 0.0))
+	await _idle(4)
+
+	_check(_jet_of(crew) == null, "a firefighter walking about carries no jet")
+
+	crew.issue(ExtinguishOrder.new(fire))
+	await _idle(30)
+	var jet := _jet_of(crew)
+	_check(jet != null and jet.emitting, "and on the job the water is running")
+	if jet != null:
+		# The stream has to leave the person and travel to the fire. Both halves matter:
+		# a jet aimed correctly but emitted from the middle of the body reads as a
+		# firefighter steaming rather than hosing.
+		var chest := crew.global_position + Vector3.UP * Person.NOZZLE_HEIGHT
+		_check(jet.global_position.distance_to(chest) > 0.2,
+			"out of a nozzle in front of them (%.2fm)"
+			% jet.global_position.distance_to(chest))
+		# -Z is where a GPUParticles3D fires, so this is the aim itself rather than a
+		# proxy for it.
+		var aim := -jet.global_transform.basis.z.normalized()
+		var at_fire := (fire.global_position - jet.global_position).normalized()
+		_check(aim.dot(at_fire) > 0.98,
+			"and pointed at the fire (%.3f of 1.0)" % aim.dot(at_fire))
+
+	# The nozzle: the appliance's own, held in the hand the skeleton says is there.
+	var nozzle := crew.get_node_or_null("HeldNozzle") as Node3D
+	_check(nozzle != null and nozzle.visible, "a firefighter is holding a nozzle")
+	if nozzle != null and jet != null:
+		# In the hand, not floating at the middle of the body. Measured against the
+		# skeleton rather than against a guessed height, because the hand is what the
+		# code reads and a check on a constant would agree with itself.
+		var skel := crew.get_node_or_null(
+			"Character/Armature/GeneralSkeleton") as Skeleton3D
+		var bone := skel.find_bone(Person.HAND_BONE) if skel else -1
+		if bone >= 0:
+			var hand: Vector3 = skel.global_transform \
+				* skel.get_bone_global_pose(bone).origin
+			_check(nozzle.global_position.distance_to(hand) < 0.05,
+				"in the hand the skeleton reports (%.3fm off)"
+				% nozzle.global_position.distance_to(hand))
+		else:
+			_check(false, "a RightHand bone to hold it in")
+		# And the water leaves the muzzle rather than the grip, or the first half-metre
+		# of the stream is inside the tool making it.
+		var barrel := jet.global_position.distance_to(nozzle.global_position)
+		_check(absf(barrel - Person.NOZZLE_LENGTH) < 0.02,
+			"with the water leaving its muzzle (%.2fm down a %.2fm barrel)"
+			% [barrel, Person.NOZZLE_LENGTH])
+
+	# It expires on its own. Nothing tells it to stop -- the order simply stops asking,
+	# and the ask times out.
+	#
+	# The fire is put **out** rather than the order cleared, which the first cut of this
+	# did and which failed: a firefighter left standing beside a live fire with no orders
+	# auto-engages and picks it straight back up, so the water quite correctly kept
+	# running. That is the game working; the check was wrong.
+	fire.douse(5.0)
+	await _idle(45)
+	jet = _jet_of(crew)
+	_check(jet != null and not jet.emitting, "it stops when the work does")
+	var stowed := crew.get_node_or_null("HeldNozzle") as Node3D
+	_check(stowed != null and not stowed.visible, "and the nozzle goes away with it")
+
+	# **The design pin.** A building fire yields to nothing but a hose, and an officer
+	# in front of one achieves precisely nothing -- so they must not appear to be doing
+	# something. The jet is driven by water delivered, not by an order being run, and
+	# this is the check that says so.
+	var building := _spawn_fire(spot + Vector3(0.0, 0.0, 8.0), 0.8)
+	building.kind = Fire.Kind.BUILDING
+	building.growth_per_second = 0.0
+	await _place_unit(officer, spot + Vector3(2.0, 0.0, 8.0))
+	await _idle(4)
+	officer.issue(ExtinguishOrder.new(building))
+	await _idle(45)
+	var officer_jet := _jet_of(officer)
+	_check(officer_jet == null or not officer_jet.emitting,
+		"and an officer achieving nothing on a building fire shows no water")
+	# Not a vacuous pairing: the same officer on a fire they *can* fight does spray, so
+	# the check above is about this fire and not about officers.
+	officer.clear_orders()
+	var bin := _spawn_fire(spot + Vector3(0.0, 0.0, 16.0), 0.6)
+	bin.kind = Fire.Kind.BIN
+	bin.growth_per_second = 0.0
+	await _place_unit(officer, spot + Vector3(2.0, 0.0, 16.0))
+	await _idle(4)
+	officer.issue(ExtinguishOrder.new(bin))
+	await _idle(30)
+	officer_jet = _jet_of(officer)
+	_check(officer_jet != null and officer_jet.emitting,
+		"though the same officer on a bin fire does")
+	# **No pack has a fire extinguisher** -- 516 props and not one, so an officer works
+	# an implied tool rather than being handed the appliance's hose nozzle, which would
+	# say the wrong thing about what a patrol car carries.
+	_check(officer.get_node_or_null("HeldNozzle") == null,
+		"and carries no hose nozzle, which is the appliance's")
+
+	officer.clear_orders()
+	crew.clear_orders()
+	await _clear_incidents()
+	_dissolve(engine, &"engine")
+	_dissolve(crew, &"firefighter")
+	_dissolve(officer, &"officer")
+	await _idle(4)
+
+
+## The water jet a person has instanced, or null if they have never sprayed anything.
+func _jet_of(person: Person) -> GPUParticles3D:
+	if person == null or not is_instance_valid(person):
+		return null
+	for child in person.get_children():
+		var jet := child as GPUParticles3D
+		if jet:
+			return jet
+	return null
+
+
+
+## Different fires want different things put on them, and the wrong thing does nothing.
+func _test_a_fire_wants_the_right_stuff_on_it() -> void:
+	await _clear_incidents()
+	_buy(&"engine", 1)
+	_buy(&"firefighter", 1)
+	_buy(&"officer", 1)
+	var engine := _station.dispatch(&"engine") as Vehicle
+	var crew := _station.dispatch(&"firefighter") as Person
+	var officer := _station.dispatch(&"officer") as Person
+	if engine == null or crew == null or officer == null:
+		_check(false, "an engine, a crew and an officer to send")
+		return
+	# Away from (20, -20), which the fire-service tests stage their own appliance at.
+	var spot := Vector3(-60.0, 0.0, 60.0)
+	_check(engine.carries_foam, "the appliance carries foam as well as water")
+
+	# A car burns fuel, so it costs foam -- and only foam.
+	await _place_unit(engine, spot + Vector3(6.0, 0.2, 0.0))
+	await _place_unit(crew, spot + Vector3(2.0, 0.0, 0.0))
+	var car := _spawn_fire(spot, 0.9)
+	car.kind = Fire.Kind.VEHICLE
+	car.growth_per_second = 0.0
+	engine.water = 1.0
+	engine.foam = 1.0
+	crew.issue(ExtinguishOrder.new(car))
+	await _wait(60)
+	_check(engine.foam < 1.0 and is_equal_approx(engine.water, 1.0),
+		"a car fire drains the foam and not the water (foam %.3f, water %.3f)"
+		% [engine.foam, engine.water])
+	# The foam has to be visibly foam, or the rule is a memory test. A separate scene,
+	# not the water jet in another colour -- see FoamJet.tscn.
+	var foam_jet := crew.get_node_or_null("FoamJet") as GPUParticles3D
+	# Reads the node, so what it pins is that a **separate emitter** is built and
+	# running -- not that the pixels look like foam, which no check can judge. That
+	# distinction is the whole reason FoamJet.tscn is a second scene rather than the
+	# water jet recoloured, so it is worth pinning even in this weaker form.
+	_check(foam_jet != null and foam_jet.emitting,
+		"and it comes out of its own emitter, not the water one")
+	crew.clear_orders()
+
+	# **Out of foam, with a full water tank.** This is the decision the second tank
+	# exists to create: the crew are not dry, they are simply out of the only thing
+	# that touches this, and a hydrant will not help them.
+	engine.foam = 0.0
+	engine.water = 1.0
+	car.intensity = 0.9
+	crew.issue(ExtinguishOrder.new(car))
+	var before := car.intensity
+	await _wait(90)
+	_check(is_equal_approx(car.intensity, before),
+		"out of foam the hose does nothing to a car (%.2f -> %.2f)"
+		% [before, car.intensity])
+	crew.clear_orders()
+
+	# An officer's dry powder is genuinely multi-class, so they keep the fires they
+	# always had. Without this the change would have quietly taken work away from police.
+	await _place_unit(officer, spot + Vector3(-2.0, 0.0, 0.0))
+	officer.issue(ExtinguishOrder.new(car))
+	before = car.intensity
+	await _wait(90)
+	_check(car.intensity < before - 0.01,
+		"but an officer's powder still takes it (%.2f -> %.2f)"
+		% [before, car.intensity])
+	# On a fire that *wants* foam, an officer still sprays the powder they carry -- the
+	# jet follows the tool, not the target.
+	_check(officer.get_node_or_null("FoamJet") == null,
+		"and it is still powder, on a fire that wanted foam")
+	officer.clear_orders()
+
+	# The inversion: the one fire the appliance cannot fight and the patrol car can.
+	var elec := _spawn_fire(spot + Vector3(0.0, 0.0, 14.0), 0.7)
+	elec.kind = Fire.Kind.ELECTRICAL
+	elec.growth_per_second = 0.0
+	engine.water = 1.0
+	engine.foam = 1.0
+	await _place_unit(engine, spot + Vector3(6.0, 0.2, 14.0))
+	await _place_unit(crew, spot + Vector3(2.0, 0.0, 14.0))
+	crew.issue(ExtinguishOrder.new(elec))
+	before = elec.intensity
+	await _wait(90)
+	# **Guarded, because a fire that goes out frees itself.** Reading `.intensity` on a
+	# freed incident raises, and a runtime error in this suite does not fail a check --
+	# it abandons the rest of the test. A sabotage run proved it: five checks stopped
+	# running and the suite reported green at 698. Being freed is itself the failure
+	# here, so it is folded into the assertion rather than guarded around.
+	var still_burning := is_instance_valid(elec)
+	_check(still_burning and is_equal_approx(elec.intensity, before),
+		"a full appliance does nothing to live electrics (%.2f -> %s)"
+		% [before, "%.2f" % elec.intensity if still_burning else "put out"])
+	crew.clear_orders()
+
+	await _place_unit(officer, spot + Vector3(-2.0, 0.0, 14.0))
+	officer.issue(ExtinguishOrder.new(elec))
+	before = elec.intensity
+	await _wait(90)
+	# Out entirely is the best possible version of "took it", so a freed fire passes.
+	var left := elec.intensity if is_instance_valid(elec) else 0.0
+	_check(left < before - 0.01,
+		"and the patrol car is the right answer to it (%.2f -> %.2f)" % [before, left])
+	# **What comes out of the nozzle belongs to whoever is holding it.** Powder borrowed
+	# the water jet at first, so an officer on an electrical fire was drawn spraying the
+	# one substance the call exists to rule out. And the agent passed to the jet was the
+	# fire's rather than the unit's, so an officer on a bin fire hosed water they do not
+	# carry -- pinned below, because that one is silent rather than absurd.
+	var powder := officer.get_node_or_null("PowderJet") as GPUParticles3D
+	_check(powder != null and powder.emitting,
+		"and it is powder coming out of the officer, not water")
+	officer.clear_orders()
+
+	# Said out loud on the call row, or none of the above is discoverable.
+	_check("foam" in car.describe_state() and "powder" in elec.describe_state(),
+		"the board says what each wants (%s / %s)"
+		% [car.describe_state(), elec.describe_state()])
+
+	# **A hydrant is a water main.** Water comes back at the kerb; foam only at home,
+	# which is what makes a shift of car fires a reason to drive back.
+	var hydrant := get_nodes_in_group(Hydrant.GROUP).front() as Node3D
+	if hydrant != null:
+		engine.water = 0.2
+		engine.foam = 0.2
+		await _place_unit(engine, hydrant.global_position + Vector3(1.5, 0.2, 0.0))
+		engine.velocity = Vector3.ZERO
+		await _wait(90)
+		_check(engine.water > 0.25, "a hydrant puts water back (%.2f)" % engine.water)
+		_check(is_equal_approx(engine.foam, 0.2),
+			"and no foam at all (%.2f)" % engine.foam)
+	else:
+		_check(false, "a hydrant on the map to park beside")
+
+	await _clear_incidents()
+	_dissolve(engine, &"engine")
+	_dissolve(crew, &"firefighter")
+	_dissolve(officer, &"officer")
+	await _idle(4)
+
+
+
+## Someone pinned needs two services, and in an order.
+func _test_a_trapped_casualty_needs_cutting_free_first() -> void:
+	await _clear_incidents()
+	_buy(&"engine", 1)
+	_buy(&"firefighter", 1)
+	_buy(&"paramedic", 1)
+	_buy(&"ambulance", 1)
+	var crew := _station.dispatch(&"firefighter") as Person
+	var medic := _station.dispatch(&"paramedic") as Person
+	var ambulance := _station.dispatch(&"ambulance") as Vehicle
+	if crew == null or medic == null or ambulance == null:
+		_check(false, "a crew, a paramedic and an ambulance to send")
+		return
+	# Away from (20, -20), which the fire-service tests stage their own appliance at.
+	var spot := Vector3(-60.0, 0.0, 60.0)
+	var casualty := _spawn_casualty(spot)
+	casualty.trapped = true
+	casualty.decline_per_second = 0.0
+	await _place_unit(ambulance, spot + Vector3(8.0, 0.2, 0.0))
+	await _place_unit(medic, spot + Vector3(2.0, 0.0, 0.0))
+	await _place_unit(crew, spot + Vector3(-2.0, 0.0, 0.0))
+	await _idle(6)
+
+	# **Where it is, not merely that it exists.** The first version asserted only that a
+	# Pin node had been created, and was perfectly happy with a four-metre pipe whose
+	# origin is at one end -- which laid the whole length beside the casualty with one
+	# end on their shins. A prop lying *next to* someone satisfies "there is something
+	# lying on them" if nobody checks the geometry.
+	var pin := casualty.get_node_or_null("Pin") as Node3D
+	var over := INF
+	if pin:
+		var mesh := _first_mesh(pin)
+		if mesh and mesh.mesh:
+			var centre: Vector3 = mesh.global_transform * mesh.mesh.get_aabb().get_center()
+			var offset := centre - casualty.global_position
+			offset.y = 0.0
+			over = offset.length()
+	_check(pin != null and over < 0.6,
+		"there is something visibly lying on them (%.2fm off centre)" % over)
+	_check(_find_ability(crew, &"free") != null
+			and _find_ability(medic, &"free") == null,
+		"a firefighter is offered Free and a paramedic is not")
+	# **The gate that makes it a sequence.** A paramedic can treat them where they lie --
+	# that is the whole reason arriving first is not wasted -- but nothing can lift them.
+	casualty.treat(1.0)
+	await _idle(4)
+	_check(casualty.is_stable, "a paramedic can still treat someone who is pinned")
+	var at_them := Target.new()
+	at_them.position = casualty.global_position
+	at_them.collider = casualty
+	at_them.incident = casualty
+	_check(_find_ability(medic, &"collect") != null
+			and _find_ability(medic, &"collect").score(medic, at_them)
+				== Ability.NOT_APPLICABLE,
+		"but Collect declines a trapped casualty, so a right-click is a Move")
+
+	# The crew do their half.
+	crew.issue(FreeOrder.new(casualty))
+	var before := casualty.release
+	await _wait(120)
+	_check(casualty.release > before, "a firefighter shifts the weight (%.2f from %.2f)"
+		% [casualty.release, before])
+	for i in 30:
+		await _wait(20)
+		if not casualty.trapped:
+			break
+	_check(not casualty.trapped, "and gets them out (release %.2f)" % casualty.release)
+	_check(casualty.get_node_or_null("Pin") == null, "the load comes off with them")
+	crew.clear_orders()
+
+	# And only then is the ambulance any use.
+	await _idle(6)
+	_check(_find_ability(medic, &"collect").score(medic, at_them) > 0,
+		"now the stretcher run is on")
+
+	await _clear_incidents()
+	_dissolve(crew, &"firefighter")
+	_dissolve(medic, &"paramedic")
+	_dissolve(ambulance, &"ambulance")
+	_dissolve(_station.dispatch(&"engine") as Unit, &"engine")
+	await _idle(4)
+
+
+
+## The dev call spawner: inert until asked, and it asks the director rather than placing
+## anything itself.
+func _test_calls_can_be_spawned_on_demand() -> void:
+	await _clear_incidents()
+	var spawner := _scene.get_node_or_null("CallSpawner") as CallSpawner
+	if spawner == null:
+		_check(false, "the map carries a call spawner")
+		return
+	_check(true, "the map carries a call spawner")
+	# **Inert until a key is pressed.** The map ships quiet on purpose and a director that
+	# could start on its own breaks dozens of checks at once; this builds nothing, watches
+	# nothing and spawns nothing until asked.
+	var built := 0
+	for child in spawner.get_children():
+		if child is CanvasLayer:
+			built += 1
+	_check(built == 0, "and has built nothing before it is opened")
+
+	await _press_key(KEY_F5)
+	await _idle(4)
+	var layer: CanvasLayer = null
+	for child in spawner.get_children():
+		if child is CanvasLayer:
+			layer = child
+	_check(layer != null and layer.visible, "F5 opens it")
+	# Built from the director's own table, so a call kind added there cannot go missing
+	# from the tool because somebody forgot to list it twice.
+	var buttons := 0
+	for node in _descendants(layer):
+		if node is Button:
+			buttons += 1
+	_check(buttons == _director.KINDS.size(),
+		"with a row for every call the director knows (%d of %d)"
+		% [buttons, _director.KINDS.size()])
+	await _press_key(KEY_F5)
+	await _idle(2)
+
+	# And it actually opens one. Asked for by name, through the director.
+	_buy(&"engine", 1)
+	_buy(&"firefighter", 1)
+	spawner.spawn_call(&"trapped")
+	await _idle(8)
+	var pinned := 0
+	for node in get_nodes_in_group(Casualty.CASUALTY_GROUP):
+		var casualty := node as Casualty
+		if casualty and casualty.trapped:
+			pinned += 1
+	_check(pinned > 0, "and asking for a trapped casualty produces one (%d)" % pinned)
+
+	await _clear_incidents()
+	await _idle(4)
+
+
+## The first MeshInstance3D under [param root], for asking where a prop actually is
+## rather than where its node was put.
+func _first_mesh(root: Node) -> MeshInstance3D:
+	var mesh := root as MeshInstance3D
+	if mesh:
+		return mesh
+	for child in root.get_children():
+		var found := _first_mesh(child)
+		if found:
+			return found
+	return null
+
+
+## Every node under [param root], for counting widgets built at runtime.
+func _descendants(root: Node) -> Array[Node]:
+	var found: Array[Node] = []
+	if root == null:
+		return found
+	for child in root.get_children():
+		found.append(child)
+		found.append_array(_descendants(child))
+	return found
+
+
+
+## A cylinder made safe closes its call. This is the check that was missing.
+func _test_a_cylinder_made_safe_finishes_the_job() -> void:
+	await _clear_incidents()
+	var spot := Vector3(-60.0, 0.0, 60.0)
+	var hazard := _spawn_hazard(spot)
+	var fire := _spawn_fire(spot + Vector3(3.0, 0.0, 0.0), 0.8)
+	fire.kind = Fire.Kind.BIN
+	fire.growth_per_second = 0.0
+	var outcome: Array = []
+	hazard.resolved.connect(func(_incident: Incident, success: bool) -> void:
+		outcome.append(success))
+	await _wait(60)
+	_check(hazard.active and hazard.heat > 0.0,
+		"a cylinder beside a fire is a live job (%.2f)" % hazard.heat)
+
+	# Put the fire out and take the heat off: the two ways it is beaten, together.
+	fire.douse(5.0)
+	hazard.cool(2.0)
+	await _wait(60)
+	# **The exit that did not exist.** `_finish(false)` on the blast was the only way out
+	# of this incident until August 2026, so a gas leak beaten perfectly stayed on the
+	# board for ever, the shift could not end, and HAZARD_POINTS was unreachable. Three
+	# checks covered the hazard and every one tested a mechanism -- heats, cools, goes
+	# bang -- and none asked whether the job could be finished.
+	_check(outcome == [true],
+		"cooled, with the fire out, it counts as made safe (%s)" % [outcome])
+	_check(not is_instance_valid(hazard) or not hazard.active,
+		"and the job is closed")
+	await _clear_incidents()
+	await _idle(4)
+
+
+## A crowd turns unless somebody stands in it.
+func _test_a_disorder_call_grows_until_it_is_contained() -> void:
+	await _clear_incidents()
+	_buy(&"officer", 1)
+	var officer := _station.dispatch(&"officer") as Person
+	if officer == null:
+		_check(false, "an officer to send")
+		return
+	var spot := Vector3(-60.0, 0.0, 60.0)
+	# Parked far enough away that the officer is not containing it by accident.
+	await _place_unit(officer, spot + Vector3(40.0, 0.0, 0.0))
+
+	var ringleader := _spawn_suspect(spot)
+	ringleader.recruits = true
+	# **Room to grow throughout.** The first cut capped this at 3, and the group hit the
+	# cap during the first phase -- after which `_update_recruiting` returns at
+	# `_group_size() >= max_group` *before* it ever asks `_is_contained()`. Both
+	# containment checks then passed no matter what containment did, because the count
+	# they watch could not move either way. The assertions were sound; the scenario was
+	# saturated, which is a third way for a check to be worthless and the hardest to see.
+	ringleader.max_group = 12
+	ringleader.recruit_interval = 0.5
+	ringleader.recruit_distance = 8.0
+	# A bystander to draw in. Taken from the crowd rather than conjured, which is what
+	# the mechanism itself does -- the person who joins in is somebody who was there.
+	var bystander := _nearest_civilian(spot)
+	if bystander == null:
+		_check(false, "a bystander on the pavement to draw in")
+		return
+	await _place_unit(bystander, spot + Vector3(2.5, 0.0, 0.0))
+	await _idle(4)
+
+	var before := get_nodes_in_group(Suspect.SUSPECT_GROUP).size()
+	await _wait(90)
+	var after := get_nodes_in_group(Suspect.SUSPECT_GROUP).size()
+	_check(after > before, "left alone it draws a bystander in (%d from %d)"
+		% [after, before])
+
+	# **And they have a body.** A civilian's `scene_file_path` is the *unit* scene, one
+	# directory away from the outfit -- and `ResourceLoader.exists()` says yes to both,
+	# so passing the wrong one silently gave the recruit a whole Civilian as its body,
+	# script and all, which promptly walked off. The suspect was invisible; reported from
+	# play, because nothing here looked at what the new arrival was wearing.
+	var bodiless := 0
+	var checked := 0
+	for node in get_nodes_in_group(Suspect.SUSPECT_GROUP):
+		var joined := node as Suspect
+		if joined == null or joined == ringleader:
+			continue
+		checked += 1
+		var body := joined.get_node_or_null("Character") as Node3D
+		if body == null or not (body.scene_file_path in Incident.OUTFITS):
+			bodiless += 1
+	_check(checked > 0 and bodiless == 0,
+		"and each of them is wearing a real outfit (%d bodiless of %d)"
+		% [bodiless, checked])
+
+	# **Containment, and the reason Secure now matters.** An officer standing in it takes
+	# the heat out; so does a cordon, which until this call had no job in the game at all.
+	await _place_unit(officer, spot + Vector3(3.0, 0.0, 0.0))
+	await _idle(4)
+	var held := get_nodes_in_group(Suspect.SUSPECT_GROUP).size()
+	await _wait(120)
+	var now := get_nodes_in_group(Suspect.SUSPECT_GROUP).size()
+	# The headroom is asserted alongside the result, so this can never again pass because
+	# the group had simply run out of room to grow.
+	_check(now == held and held < ringleader.max_group,
+		"an officer standing in it stops the spread (%d, was %d, cap %d)"
+		% [now, held, ringleader.max_group])
+
+	# And the cordon does it with nobody there.
+	await _place_unit(officer, spot + Vector3(40.0, 0.0, 0.0))
+	var cordon := Cordon.new()
+	_scene.get_node("Incidents").add_child(cordon)
+	cordon.global_position = spot
+	cordon.raise_cordon()
+	var another := _nearest_civilian(spot)
+	if another:
+		await _place_unit(another, spot + Vector3(2.5, 0.0, 0.0))
+	await _idle(4)
+	held = get_nodes_in_group(Suspect.SUSPECT_GROUP).size()
+	await _wait(120)
+	now = get_nodes_in_group(Suspect.SUSPECT_GROUP).size()
+	_check(now == held and held < ringleader.max_group,
+		"and a cordon does it with nobody standing there (%d, was %d, cap %d)"
+		% [now, held, ringleader.max_group])
+	cordon.queue_free()
+
+	# The job fits the roster rather than being withheld from it -- BUILDING_SIZE's rule.
+	var sizes: Array = Director.DISORDER_SIZE
+	var one: Dictionary = sizes[0]
+	var many: Dictionary = sizes[sizes.size() - 1]
+	_check(int(many["max_group"]) > int(one["max_group"]),
+		"a bigger force gets a bigger job (%d against %d)"
+		% [int(many["max_group"]), int(one["max_group"])])
+
+	await _clear_incidents()
+	_dissolve(officer, &"officer")
+	await _idle(4)
+
+
+## The nearest ambient civilian to [param point], for a test that needs a bystander.
+func _nearest_civilian(point: Vector3) -> Civilian:
+	var best: Civilian = null
+	var closest := INF
+	for node in get_nodes_in_group(Unit.GROUP):
+		var civilian := node as Civilian
+		if civilian == null:
+			continue
+		var gap := civilian.global_position.distance_to(point)
+		if gap < closest:
+			closest = gap
+			best = civilian
+	return best
+
+
+
+## Two in the back of a patrol car, walked there one at a time.
+func _test_a_patrol_car_takes_two_prisoners() -> void:
+	await _clear_incidents()
+	# **A kerb the director itself would open a call on**, rather than a convenient-looking
+	# coordinate. The first cut of this staged at (-60, 60) -- fine for the earlier tests
+	# there, which only ever needed people to *stand* -- and the officer fell through the
+	# world on the first step, reaching y = -11012 while the order patiently reported
+	# "Escorting". Anything that has to walk needs ground the game vouches for.
+	var spot := _director._pick_pavement(true)
+	if spot == Vector3.INF:
+		_check(false, "a kerb to stage an arrest on")
+		return
+	_check(_car.cells == 2, "a patrol car has two cells (%d)" % _car.cells)
+	await _place_unit(_car, spot + Vector3(10.0, 0.2, 0.0))
+	await _place_unit(_officer, spot + Vector3(3.0, 0.0, 0.0))
+
+	var first := _spawn_suspect(spot)
+	var second := _spawn_suspect(spot + Vector3(2.0, 0.0, 0.0))
+	first.detain(1.0)
+	second.detain(1.0)
+	await _idle(6)
+
+	# One at a time, because an officer has one pair of hands. The point of the check is
+	# the *second* one: with a single cell the car was full after the first, and a scene
+	# with two arrests needed two cars -- which the disorder call made the normal case.
+	for suspect: Suspect in [first, second]:
+		var verb := _officer.resolve(_target_for(suspect))
+		if verb == null or verb.id() != &"escort":
+			_check(false, "an officer offered Escort for each of them (got '%s')"
+				% ("none" if verb == null else verb.id()))
+			return
+		_officer.issue(verb.make_order(_officer, _target_for(suspect)))
+		for i in 900:
+			await physics_frame
+			if suspect.is_loaded:
+				break
+	_check(first.is_loaded and second.is_loaded,
+		"both are walked in and both get in (%s, %s)"
+		% [first.is_loaded, second.is_loaded])
+	_check(_car.suspects.size() == 2, "the car is carrying two (%d)" % _car.suspects.size())
+
+	# And it stops at two. With nowhere left to put anybody, Escort declines and a
+	# right-click falls back to Move rather than starting a walk that cannot finish.
+	#
+	# **Every car, not just this one.** The first cut asserted a third was declined once
+	# `_car` was full, and it was offered Escort anyway -- correctly, because the suite
+	# owns more than one patrol car and `nearest_vehicle` found the other one. That is
+	# the game working; the check had quietly assumed a one-car world.
+	_check(not _car.has_cell_space(), "and is full")
+	var spare: Array[Vehicle] = []
+	for node in get_nodes_in_group(Unit.GROUP):
+		var other := node as Vehicle
+		if other and other != _car and not (other is TrafficCar) \
+				and other.service == Unit.Service.POLICE and other.cells > 0:
+			spare.append(other)
+			other.cells = 0
+	var third := _spawn_suspect(spot + Vector3(4.0, 0.0, 0.0))
+	third.detain(1.0)
+	await _idle(6)
+	var declined := _officer.resolve(_target_for(third))
+	_check(declined != null and declined.id() == &"move",
+		"with every cell full a third is declined (got '%s', %d spare cars emptied)"
+		% [("none" if declined == null else declined.id()), spare.size()])
+	for other in spare:
+		other.cells = 2
+
+	_officer.clear_orders()
+	await _clear_incidents()
+	_car.suspects.clear()
+	await _idle(4)
+
+
+
+## Your own people can be hurt, and losing one costs the career a unit.
+func _test_a_crew_member_can_be_lost() -> void:
+	await _clear_incidents()
+	# **Two, so the count has somewhere to fall.** `available()` reads the live roster; if
+	# the career owned exactly one firefighter and it went down, the count would be 0
+	# before and 0 after and the check would pass without the feature existing.
+	_buy(&"firefighter", 2)
+	var crew := _station.dispatch(&"firefighter") as Person
+	if crew == null:
+		_check(false, "a firefighter to put in harm's way")
+		return
+	var spot := _director._pick_pavement(true)
+	if spot == Vector3.INF:
+		_check(false, "a kerb to stage this on")
+		return
+	await _place_unit(crew, spot)
+	await _idle(4)
+	var owned_before := _station.total(&"firefighter")
+	var spare_before := _station.available(&"firefighter")
+
+	# A blast they are standing in.
+	var hazard := _spawn_hazard(spot + Vector3(1.5, 0.0, 0.0))
+	hazard.heat = 1.0
+	await _idle(12)
+	_check(crew.health < 1.0, "a blast hurts the crew standing in it (%.2f)" % crew.health)
+	_check(crew.is_down and not crew.is_selectable(),
+		"enough of it puts them down and out of the selection")
+	var fallen: Casualty = null
+	for node in get_nodes_in_group(Casualty.CASUALTY_GROUP):
+		var casualty := node as Casualty
+		if casualty and casualty.crew == crew:
+			fallen = casualty
+	_check(fallen != null, "and files a casualty where they fell")
+	if fallen == null:
+		return
+	# In their own kit -- the `Civilians/` vs `Characters/` path trap, which has bitten
+	# twice and is silent both times.
+	var body := _first_mesh_scene(fallen)
+	_check(body == crew.outfit_scene(),
+		"wearing their own kit, not a stranger's (%s)" % body.get_file())
+	# The unit is still on the books while they lie there, so the player cannot simply
+	# dispatch a replacement -- `Station._alive()` counts group membership, and that is
+	# the reason the person is not freed.
+	_check(_station.available(&"firefighter") == spare_before,
+		"they still count against the roster while down (%d, was %d)"
+		% [_station.available(&"firefighter"), spare_before])
+
+	# Losing them takes the unit off the books. Read everything *before* the free.
+	var outcome: Array = []
+	fallen.resolved.connect(func(_incident: Incident, ok: bool) -> void:
+		outcome.append(ok))
+	fallen.health = 0.0
+	await _idle(10)
+	_check(outcome == [false], "letting them die closes it as a loss (%s)" % [outcome])
+	_check(_station.total(&"firefighter") == owned_before - 1,
+		"and writes the unit off the books (%d, was %d)"
+		% [_station.total(&"firefighter"), owned_before])
+	_check(_mission.crew_lost >= 1, "the debrief counts it (%d)" % _mission.crew_lost)
+
+	await _clear_incidents()
+	await _idle(4)
+
+
+## A crew member riding in a vehicle is not standing in the street.
+func _test_a_passenger_is_not_caught_by_a_blast() -> void:
+	await _clear_incidents()
+	_buy(&"engine", 1)
+	_buy(&"firefighter", 1)
+	var engine := _station.dispatch(&"engine") as Vehicle
+	var crew := _station.dispatch(&"firefighter") as Person
+	if engine == null or crew == null:
+		_check(false, "an engine and a crew to ride in it")
+		return
+	var spot := Vector3(-60.0, 0.0, 60.0)
+	await _place_unit(engine, spot)
+	crew.board(engine)
+	await _idle(6)
+	# An aboard person rides at the carrier's position, so without the guard a blast
+	# beside the appliance would take out the crew sitting safely inside it.
+	var hazard := _spawn_hazard(spot + Vector3(1.0, 0.0, 0.0))
+	hazard.heat = 1.0
+	await _idle(12)
+	_check(is_equal_approx(crew.health, 1.0) and not crew.is_down,
+		"riding in the appliance keeps them out of it (%.2f)" % crew.health)
+	crew.disembark(spot + Vector3(4.0, 0.0, 0.0))
+	await _clear_incidents()
+	_dissolve(engine, &"engine")
+	_dissolve(crew, &"firefighter")
+	await _idle(4)
+
+
+## The scene file of the first mesh under an incident -- what it is actually wearing.
+func _first_mesh_scene(node: Node) -> String:
+	var body := node.get_node_or_null("Character") as Node3D
+	return body.scene_file_path if body else ""
+
+
+## A firefighter with a hose beats it; one without cannot.
+func _test_a_hose_beats_a_cylinder() -> void:
+	await _clear_incidents()
+	_buy(&"engine", 1)
+	_buy(&"firefighter", 1)
+	var engine := _station.dispatch(&"engine") as Vehicle
+	var crew := _station.dispatch(&"firefighter") as Person
+	if engine == null or crew == null:
+		_check(false, "an engine and a crew to send")
+		return
+	# **Well away from (20, -20).** That is where the fire-service tests stage their own
+	# engine and crew, and an appliance left within `ExtinguishOrder.HOSE_REACH` of it
+	# becomes a supply for somebody else's check -- which made a building fire yield to a
+	# patrol car three tests later.
+	var spot := Vector3(-60.0, 0.0, 60.0)
+	var hazard := _spawn_hazard(spot)
+	# **A fire burns beside it for both halves of this test.** Without one the first half
+	# was vacuous: the assertion is only "cooler than it was", and the hazard's own
+	# ambient shed satisfies that on its own -- the sabotage agent stubbed `cool()` out
+	# entirely and the check stayed green, because two different things could satisfy it
+	# and nothing distinguished them. Against a fire the cylinder is gaining heat every
+	# frame, so it can only get cooler if water is landing on it.
+	var cooker := _spawn_fire(spot + Vector3(3.0, 0.0, 0.0), 1.0)
+	cooker.growth_per_second = 0.0
+	cooker.spread_threshold = 2.0
+	hazard.heat = 0.6
+	await _place_unit(engine, spot + Vector3(6.0, 0.2, 0.0))
+	await _place_unit(crew, spot + Vector3(2.5, 0.0, 0.0))
+	await _idle(10)
+
+	_check(_find_ability(crew, &"cool") != null,
+		"a firefighter is offered Cool")
+	crew.issue(CoolOrder.new(hazard))
+	var before := hazard.heat
+	await _idle(120)
+	_check(hazard.heat < before,
+		"and on the hose the cylinder cools (%.2f from %.2f)" % [hazard.heat, before])
+
+	# Away from the appliance there is no hose, and an extinguisher against a pressure
+	# vessel is not a slower answer -- it is not an answer. Same fire, still cooking it.
+	crew.clear_orders()
+	await _place_unit(engine, spot + Vector3(60.0, 0.2, 0.0))
+	hazard.heat = 0.4
+	await _idle(10)
+	var stranded := hazard.heat
+	crew.issue(CoolOrder.new(hazard))
+	await _idle(120)
+	_check(hazard.heat > stranded,
+		"but off it the cylinder keeps heating anyway (%.2f from %.2f)"
+		% [hazard.heat, stranded])
+
+	await _clear_incidents()
+	_dissolve(engine, &"engine")
+	_dissolve(crew, &"firefighter")
+	await _idle(4)
+
+
+func _test_fires_have_character() -> void:
+	await _clear_incidents()
+	var bin := _spawn_fire(Vector3(20.0, 0.0, -20.0), 0.5)
+	bin.kind = Fire.Kind.BIN
+	var building := _spawn_fire(Vector3(-20.0, 0.0, 20.0), 0.5)
+	building.kind = Fire.Kind.BUILDING
+	await _idle(4)
+
+	_check(not bin.needs_hose and building.needs_hose,
+		"a bin fire yields to anyone and a building fire does not")
+	_check(bin.douse_per_second > building.douse_per_second,
+		"a bin goes out faster than a building (%.2f against %.2f)"
+		% [bin.douse_per_second, building.douse_per_second])
+	# The threshold is put out of reach rather than a second flag being added, so this
+	# reads the consequence: a bin fire can never arm its spread timer.
+	_check(bin.spread_threshold > 1.0 and building.spread_threshold <= 1.0,
+		"and a bin never spreads while a building does (%.1f against %.1f)"
+		% [bin.spread_threshold, building.spread_threshold])
+	# Different plumes, not one rescaled: the pack ships three and the small one has no
+	# ground-spread emitter at all.
+	var bin_fx := bin.get_node("Flames").scene_file_path
+	var building_fx := building.get_node("Flames").scene_file_path
+	_check(bin_fx != building_fx and "Small" in bin_fx and "Large" in building_fx,
+		"each wearing its own plume (%s, %s)"
+		% [bin_fx.get_file(), building_fx.get_file()])
+	await _clear_incidents()
+
+
+## A burning car bills what is parked beside it.
+##
+## The economy for this already existed -- `repair_bill`, the debrief row, the station's
+## books -- and all that was missing was something other than a collision to charge for.
+## What it buys is that where the appliance stops is a decision: nose-in beside a burning
+## car is the convenient place to park and the expensive one.
+func _test_a_car_fire_scorches_what_is_near_it() -> void:
+	await _clear_incidents()
+	_buy(&"engine", 1)
+	var engine := _station.dispatch(&"engine") as Vehicle
+	if engine == null:
+		_check(false, "an engine to park beside it")
+		return
+	var spot := Vector3(20.0, 0.0, -20.0)
+	await _place_unit(engine, spot + Vector3(2.0, 0.2, 0.0))
+	engine.repair_bill = 0
+	var fire := _spawn_fire(spot, 1.0)
+	fire.kind = Fire.Kind.VEHICLE
+	fire.growth_per_second = 0.0
+	await _idle(180)
+	var close := engine.repair_bill
+	_check(close > 0, "parking in a car fire costs money (£%d after 3s)" % close)
+
+	# Out of reach, and the same three seconds. Distance is the whole mechanic: a bill
+	# that applied across the district would just be a tax on attending at all.
+	await _place_unit(engine, spot + Vector3(14.0, 0.2, 0.0))
+	engine.repair_bill = 0
+	await _idle(180)
+	_check(engine.repair_bill == 0,
+		"and standing off it costs nothing (£%d)" % engine.repair_bill)
+
+	await _clear_incidents()
+	_dissolve(engine, &"engine")
+	await _idle(4)
+
+
+func _test_a_fire_looks_like_its_intensity() -> void:
+	await _clear_incidents()
+	var fire := _spawn_fire(Vector3(20.0, 0.0, -20.0), 1.0)
+	fire.growth_per_second = 0.0
+	await _idle(4)
+
+	# **Counted off the scene, not off `_particles`.** Reading the list the code under
+	# test iterates makes "all N of N" true by construction: the sabotage pass deleted
+	# the sub-emitter collection entirely and this check still passed, reading 2 of 2.
+	# Walking the tree is what lets it see an emitter that `_update_flame` never reached.
+	var emitters: Array[Node] = fire.find_children("*", "GPUParticles3D", true, false)
+	_check(emitters.size() >= 3,
+		"a fire runs the pack's emitters, sub-emitters and all (%d)" % emitters.size())
+	var lit := 0
+	for e in emitters:
+		if (e as GPUParticles3D).emitting:
+			lit += 1
+	_check(lit == emitters.size(), "all of them alight (%d of %d)" % [lit, emitters.size()])
+
+	# Read off the plume itself. There was an orange cone under these particles to be the
+	# readable silhouette at RTS zoom, and this measured that; the pack's fire made it
+	# redundant and it was removed, so the size of the fire is now the size of the fire.
+	var big: float = (fire.get_node("Flames") as Node3D).scale.x
+	fire.intensity = 0.15
+	fire.call("_update_flame")
+	await _idle(2)
+	var small: float = (fire.get_node("Flames") as Node3D).scale.x
+	_check(small < big, "a dying fire is a smaller one (%.2f against %.2f)" % [small, big])
+	# Scale lives on the roots alone, because a child inherits it: setting it on both
+	# squares it, and a fire at full intensity threw embers at 5.8x rather than 2.4x.
+	var embers := fire.get_node_or_null("Flames/FX_Fire_Embers_01") as Node3D
+	_check(embers == null or is_equal_approx(embers.scale.x, 1.0),
+		"and its sub-emitters ride the root's scale rather than squaring it (%.2f)"
+		% (embers.scale.x if embers else 1.0))
+	var thinned := 0
+	for e in emitters:
+		if (e as GPUParticles3D).amount_ratio < 0.9:
+			thinned += 1
+	_check(thinned == emitters.size(),
+		"and every emitter thins with it, not just the parent (%d of %d)"
+		% [thinned, emitters.size()])
+
+	await _clear_incidents()
+
+
+func _test_the_appliance_raises_its_ladder() -> void:
+	await _clear_incidents()
+	_buy(&"engine", 1)
+	_buy(&"firefighter", 1)
+	var engine := _station.dispatch(&"engine") as Vehicle
+	var crew := _station.dispatch(&"firefighter") as Person
+	if engine == null or crew == null:
+		_check(false, "an engine and a firefighter to send")
+		return
+	await _idle(4)
+
+	var ladder := engine.get_node_or_null(engine.ladder_path) as Node3D
+	_check(ladder != null, "the appliance carries a ladder it can raise")
+	if ladder == null:
+		_dissolve(engine, &"engine")
+		_dissolve(crew, &"firefighter")
+		return
+
+	# Measured as the height of the ladder's far end in the vehicle's own frame, so this
+	# says nothing about which axis the prefab happened to author it on.
+	var tip := func() -> float:
+		var box: AABB = (ladder as MeshInstance3D).get_aabb()
+		var far := box.position + Vector3(box.size.x * 0.5, box.size.y * 0.5, box.size.z)
+		return engine.to_local(ladder.to_global(far)).y
+
+	var spot := Vector3(20.0, 0.0, -20.0)
+	await _place_unit(engine, spot + Vector3(6.0, 0.2, 0.0))
+	await _place_unit(crew, spot + Vector3(2.0, 0.0, 0.0))
+	await _idle(10)
+	var stowed: float = tip.call()
+	_check(engine.get("_ladder_raise") == 0.0,
+		"which is stowed on an appliance doing nothing")
+
+	var fire := _spawn_fire(spot, 0.9)
+	fire.growth_per_second = 0.0
+	crew.issue(ExtinguishOrder.new(fire))
+	await _idle(150)
+	var raised: float = tip.call()
+	_check(raised > stowed + 1.0,
+		"and goes up while the crew work off its tank (%.1fm to %.1fm)" % [stowed, raised])
+
+	crew.clear_orders()
+	await _idle(240)
+	_check(tip.call() < stowed + 0.2,
+		"and comes back down when they stop (%.1fm)" % tip.call())
+
+	await _clear_incidents()
+	_dissolve(engine, &"engine")
+	_dissolve(crew, &"firefighter")
+	await _idle(4)
+
+
 func _test_the_fire_service_fights_fires() -> void:
 	await _clear_incidents()
 	_buy(&"engine", 1)
@@ -5164,7 +7262,12 @@ func _test_the_fire_service_fights_fires() -> void:
 	var spot := Vector3(20.0, 0.0, -20.0)
 	await _place_unit(engine, spot + Vector3(6.0, 0.2, 0.0))
 	await _place_unit(crew, spot + Vector3(2.0, 0.0, 0.0))
+	# **Staged as a water fire on purpose.** This measures the water economy -- the hose
+	# rate, the tank price, a dry engine -- and the default kind is VEHICLE, which since
+	# August 2026 burns fuel and draws the foam tank instead. A check that leaned on the
+	# default was measuring whichever agent the table happened to name.
 	var fire := _spawn_fire(spot, 0.9)
+	fire.kind = Fire.Kind.BIN
 	fire.growth_per_second = 0.0
 	var order := ExtinguishOrder.new(fire)
 	crew.issue(order)
@@ -5200,7 +7303,7 @@ func _test_the_fire_service_fights_fires() -> void:
 	fire.queue_free()
 	await _idle(4)
 	var building := _spawn_fire(spot, 0.8)
-	building.needs_hose = true
+	building.kind = Fire.Kind.BUILDING
 	building.growth_per_second = 0.0
 	await _place_unit(_officer, spot + Vector3(2.0, 0.0, 0.0))
 	_officer.issue(ExtinguishOrder.new(building))
@@ -5515,7 +7618,12 @@ func _test_the_appliance_runs_on_water() -> void:
 	# Hosing draws the tank down.
 	await _place_unit(engine, spot + Vector3(6.0, 0.2, 0.0))
 	await _place_unit(crew, spot + Vector3(2.0, 0.0, 0.0))
+	# **Staged as a water fire on purpose.** This measures the water economy -- the hose
+	# rate, the tank price, a dry engine -- and the default kind is VEHICLE, which since
+	# August 2026 burns fuel and draws the foam tank instead. A check that leaned on the
+	# default was measuring whichever agent the table happened to name.
 	var fire := _spawn_fire(spot, 0.9)
+	fire.kind = Fire.Kind.BIN
 	fire.growth_per_second = 0.0
 	engine.water = 1.0
 	crew.issue(ExtinguishOrder.new(fire))
@@ -5539,7 +7647,7 @@ func _test_the_appliance_runs_on_water() -> void:
 	fire.queue_free()
 	await _idle(4)
 	var building := _spawn_fire(spot, 0.8)
-	building.needs_hose = true
+	building.kind = Fire.Kind.BUILDING
 	building.growth_per_second = 0.0
 	engine.water = 0.0
 	crew.issue(ExtinguishOrder.new(building))
@@ -5712,10 +7820,15 @@ func _test_a_disturbance_is_arrested_and_delivered() -> void:
 		"an officer is offered Apprehend")
 	_check(_find_ability(_paramedic, &"apprehend") == null,
 		"a paramedic is not")
-	_check(_find_ability(_car, &"escort") != null,
-		"the patrol car is offered Escort")
-	_check(_find_ability(_ambulance, &"escort") == null,
-		"the ambulance is not")
+	# Escort moved from the patrol car to the officer in August 2026: an arrest is made
+	# on foot and the walk to the car is too, exactly as the stretcher run is the
+	# paramedic's rather than the ambulance's.
+	_check(_find_ability(_officer, &"escort") != null,
+		"an officer is offered Escort")
+	_check(_find_ability(_car, &"escort") == null,
+		"and the patrol car is not -- it no longer collects anybody")
+	_check(_find_ability(_paramedic, &"escort") == null,
+		"nor a paramedic")
 	var medic_verb := _paramedic.resolve(_target_for(suspect))
 	_check(medic_verb != null and medic_verb.id() == &"move",
 		"right-clicking the suspect with a paramedic means Move (got '%s')"
@@ -5769,20 +7882,28 @@ func _test_a_disturbance_is_arrested_and_delivered() -> void:
 	_check(not _board.open_calls().is_empty(),
 		"the call stays open until they are booked in")
 
-	# The pick-up, from a car parked a short drive away.
+	# The walk in, to a car parked a short way off. The car stays put: it is the officer
+	# who covers the ground now, which is the whole point of the move.
 	await _place_unit(_car, spot + Vector3(14.0, 0.0, 0.0), PI * 0.5)
-	var escort := _car.resolve(_target_for(suspect))
+	var escort := _officer.resolve(_target_for(suspect))
 	_check(escort != null and escort.id() == &"escort",
-		"right-clicking a detained suspect with the patrol car means Escort (got '%s')"
+		"right-clicking a detained suspect with an officer means Escort (got '%s')"
 		% ("none" if escort == null else escort.id()))
 	if escort != null:
-		_car.issue(escort.make_order(_car, _target_for(suspect)))
+		_officer.issue(escort.make_order(_officer, _target_for(suspect)))
+	# **Walked, not teleported.** Catch them in hand partway there: the old order put
+	# the suspect inside the car from five metres away, and a check that only looked at
+	# the end state could not tell the two apart.
+	var walked := false
 	var loaded := false
 	for i in 900:
 		await physics_frame
+		if suspect.escorted_by == _officer:
+			walked = true
 		if suspect.is_loaded:
 			loaded = true
 			break
+	_check(walked, "the officer takes them in hand and walks them")
 	_check(loaded, "the suspect gets in the back")
 
 	# The drive home. Placed rather than driven -- the route home has its own tests.
@@ -6275,6 +8396,68 @@ func _test_quit_to_title_stands_the_shift_down() -> void:
 	_reset_mission()
 
 
+
+## A shift you walk out on still costs you. Until August 2026 it did not.
+func _test_a_bad_shift_cannot_be_quit_away() -> void:
+	await _clear_calls()
+	var funds_before := _station.funds
+	_station.debt = 0
+	_car.repair_bill = 0
+
+	# **The exploit, stated.** Money banks on every `earn()`; the score only banks in
+	# `end_shift()`; and `repair_bill` lived on the vehicle and was never serialised. So
+	# abandoning at 90% kept the takings, dropped the score, escaped the lost-casualty
+	# penalty and wiped the damage. Quitting a bad shift beat finishing it.
+	_director.shift_length = 9999.0
+	_director.first_call_delay = 999.0
+	_director.begin_shift()
+	_car.repair_bill = 200
+	var spot := _director._pick_pavement(true)
+	if spot != Vector3.INF:
+		_spawn_fire(spot, 0.5)
+	await _idle(10)
+	var open_before := _board.open_calls().size()
+	var failed_before := _mission.calls_failed
+
+	_director.abandon_shift()
+	await _idle(8)
+	_check(_station.debt >= 200 and _car.repair_bill == 0,
+		"walking out sweeps the damage onto the house (£%d owed, £%d on the car)"
+		% [_station.debt, _car.repair_bill])
+	_check(open_before == 0 or _mission.calls_failed > failed_before,
+		"and the calls you left behind are failed, not forgotten (%d from %d, %d open)"
+		% [_mission.calls_failed, failed_before, open_before])
+	# The debrief already reads `outstanding_repairs()`, so the house figure reaches the
+	# player with no interface change at all.
+	_check(_station.outstanding_repairs() >= 200,
+		"the readout counts what the house is owed (£%d)"
+		% _station.outstanding_repairs())
+
+	# Debt comes off the top of earnings -- the sink the career has never had.
+	_station.debt = 100
+	var purse := _station.funds
+	_station.earn(100)
+	_check(_station.debt == 0 and _station.funds == purse,
+		"earnings pay the debt down before they reach the purse (£%d debt, £%d purse)"
+		% [_station.debt, _station.funds])
+	_station.earn(100)
+	_check(_station.funds == purse + 100,
+		"and reach it once the debt is clear (£%d)" % _station.funds)
+
+	# It survives the process, which is the whole point.
+	_station.debt = 175
+	_station._save_career()
+	_station.debt = 0
+	_station._load_career()
+	_check(_station.debt == 175, "the house account survives a reload (£%d)" % _station.debt)
+
+	_station.debt = 0
+	_station.funds = funds_before
+	_car.repair_bill = 0
+	_station._save_career()
+	_reset_mission()
+
+
 ## The settings card's hard reset: fleet dissolved, purse back to the starter
 ## budget. Destructive by design, which is why it runs dead last.
 func _test_reset_career_starts_over() -> void:
@@ -6322,6 +8505,55 @@ func _test_the_shop_previews_and_sells() -> void:
 	_check(shop._cards.size() == Station.TYPES.size() and missing == 0,
 		"every card shows the unit's rendered portrait (%d missing of %d)"
 		% [missing, shop._cards.size()])
+
+	# **And every one of them is reachable.** Reported from play once the doctor and the
+	# doctor's car took the catalogue to eight: a single row of cards ran off the side of
+	# the screen, and an overflowing container clips rather than wrapping, so the cards past
+	# the edge could not be clicked at all. The shop is grouped by service now, which fixes
+	# it for eight -- this is what stops the ninth quietly breaking it again.
+	#
+	# Asserted on the **BUY buttons**, not on the storefront's own rect, because a panel
+	# that fits while its contents hang out of it is exactly the shape of the bug. And
+	# against the viewport rather than the window: the project stretches canvas items, so
+	# the interface is laid out in a 1600x900 space whatever size the window happens to be.
+	var screen := Rect2(Vector2.ZERO, root.get_visible_rect().size)
+	var unreachable: Array[String] = []
+	for id in shop._cards:
+		var chip := shop._cards[id]["buy"] as Button
+		if not screen.encloses(chip.get_global_rect()):
+			unreachable.append(String(id))
+	_check(unreachable.is_empty(),
+		"and every BUY is on screen and clickable (%d off it%s)"
+			% [unreachable.size(),
+				"" if unreachable.is_empty() else ": " + ", ".join(unreachable)])
+	# **And the cards are grouped by service, which is the point of the layout.** These say
+	# something the fit assertions above cannot: those two describe a *symptom*, and would go
+	# green again the moment anybody made the cards small enough, grouped or not. Measured
+	# against the ungrouped layout all six fire together -- one row of eight comes out
+	# **1906 wide** in a 1600 viewport with the paramedic's and the doctor's BUY buttons off
+	# the screen entirely, which is precisely the bug reported from play.
+	var grouped := 0
+	for group: Array in ShopPanel.SHELVES:
+		var kind: int = group[0]
+		var wanted := 0
+		for config: Dictionary in Station.TYPES:
+			if int(config.get("service", Unit.Service.NONE)) == kind:
+				wanted += 1
+		var cards := shop.find_child("Shelf" + str(group[1]), true, false)
+		var holder := cards.get_node_or_null("Cards") if cards else null
+		var got: int = holder.get_child_count() if holder else -1
+		_check(got == wanted,
+			"the %s shelf holds its own %d units (got %d)" % [group[1], wanted, got])
+		grouped += maxi(got, 0)
+	_check(grouped == Station.TYPES.size(),
+		"and every unit in the catalogue sits on a shelf (%d of %d)"
+			% [grouped, Station.TYPES.size()])
+
+	var storefront := shop.find_child("Storefront", true, false) as Control
+	_check(storefront != null and screen.encloses(storefront.get_global_rect()),
+		"and the storefront itself fits the viewport (%s in %.0fx%.0f)"
+			% ["none" if storefront == null else str(storefront.get_global_rect().size),
+				screen.size.x, screen.size.y])
 
 	# Buying through the interface moves real money.
 	_station.funds = 10000
@@ -6458,6 +8690,13 @@ func _resolve_call(call: Call) -> void:
 		if suspect:
 			suspect.detain(1.0)
 			suspect.deliver()
+			continue
+		# A cylinder is made safe by being cold with nothing burning near it, and the
+		# fire beside it is dealt with by the Fire branch above -- so all this has to do
+		# is take the heat out.
+		var hazard := incident as Hazard
+		if hazard:
+			hazard.cool(2.0)
 
 
 ## Stands the director down and returns the mission to the scripted rules, so the
@@ -6566,6 +8805,20 @@ func _spawn_fire(position: Vector3, intensity: float) -> Fire:
 	return fire
 
 
+func _spawn_hazard(position: Vector3) -> Hazard:
+	var hazard: Hazard = (load("res://Game/Incidents/Hazard.tscn") as PackedScene).instantiate()
+	_incidents.add_child(hazard)
+	hazard.global_position = position
+	return hazard
+
+
+func _spawn_suspect(position: Vector3) -> Suspect:
+	var suspect: Suspect = (load("res://Game/Incidents/Suspect.tscn") as PackedScene).instantiate()
+	_incidents.add_child(suspect)
+	suspect.global_position = position
+	return suspect
+
+
 func _spawn_casualty(position: Vector3) -> Casualty:
 	var casualty: Casualty = (load("res://Game/Incidents/Casualty.tscn") as PackedScene).instantiate()
 	_incidents.add_child(casualty)
@@ -6636,6 +8889,13 @@ func _reset_mission() -> void:
 	_mission.score = 0
 	_mission.calls_cleared = 0
 	_mission.calls_failed = 0
+	# **The house account, or it follows the suite around.** Every shift exit now sweeps
+	# outstanding repair bills onto `Station.debt`, and a residual bill from one of the
+	# driving checks would otherwise ride along and fail an affordability check a long way
+	# from its cause -- the kind of failure nobody traces back.
+	_station.debt = 0
+	_mission.crew_lost = 0
+	_mission.crew_recovered = 0
 
 
 func _target_for(incident: Incident) -> Target:

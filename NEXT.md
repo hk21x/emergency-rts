@@ -55,6 +55,33 @@ because the cases where they come apart — lit and quiet at a scene — are wor
 What is still missing: voice acknowledgements ("on scene", "casualty aboard"), which
 would need either a voice pack or speech synthesis; and per-surface tyre noise.
 
+### The two asset packs, and what is left in them
+
+POLYGON Town and a particle pack landed in August 2026. The fire appliance and the
+fire/smoke FX were taken from them (see PROGRESS.md). What remains, and why it was not:
+
+- **The crew is still a repainted police model.** No pack on disk holds a firefighter --
+  Town's characters are a suburban family, a shopkeeper and two schoolchildren. The
+  paint-warmth check in the suite exists for exactly this and still guards them.
+- **Town's people cannot be used for the crowd.** They are skinned to a *different*
+  skeleton (`Ankle_L`, `Clavicle_L`, `Elbow_L`) from the City pack's humanoid rig
+  (`Hips`, `Spine`, `UpperChest`, `LeftShoulder`), and `Game/Rigs/ual_standard.tres` is
+  authored against the latter. Adding them is a retargeting project, not an asset swap.
+- **The pack's rain was left alone deliberately.** `FX_Rain_01` is 500 drops in a 1m box
+  with a `RibbonTrailMesh`, built for a small scene. The district's rain encodes a
+  hard-won fix -- a narrow box, small faint drops, `BILLBOARD_PARTICLES` -- and swapping
+  it risks relearning "the rain's first build put glass rods over the city".
+- **Untaken and cheap**: Town has playground equipment, a fountain, hedges and flower
+  patches that would make the district's parks read as parks (`_park_tile` in
+  `build_map.gd`), and seven more vehicle bodies (bus, school bus, pickup, delivery and
+  garbage trucks) for the ambient fleet. The traffic bodies want measuring first: a bus
+  is far longer than anything currently driving, and the driving checks are sensitive.
+- **Weight.** `Assets/PolygonTown` is 44MB, almost all of it buildings, props and
+  characters the game does not use. If the repo size ever matters, a `.gdignore` in its
+  `Scenes/` and `Prefabs/Buildings/` would cost nothing -- the pattern already exists at
+  `Assets/padding/.gdignore`. Do not ignore `Models/`, `Materials/` or `Textures/`: the
+  appliance's material chain runs through all three.
+
 ### Campaign scenarios — the last of the roadmap
 
 The freeplay director produces *rolled* shifts. What the game has never had is a
@@ -74,8 +101,10 @@ The two companion pieces it unblocks are still open, and both are cheap now the 
 can refill:
 
 - **Onlookers becoming casualties** — a spreading fire catching someone who stood
-  watching too long. The mechanism already exists; it is the same swap the collapse
-  uses, aimed at a civilian who is too close rather than one chosen at random.
+  watching too long. The mechanism is not merely available, it is **in use**:
+  `Hazard._hurt_people()` does exactly this swap when a cylinder goes off, taking the
+  person who was standing there and the clothes they were wearing. Pointing the same
+  code at a fire that has grown past a civilian is most of the work.
 - **Panic** — phase 16's crowd flees along the pavement graph and crosses at the
   zebras even while running, which is orderly to a fault. A crowd that scattered
   badly, blocked a stretcher or ran into the road would make a scene feel dangerous.
@@ -356,8 +385,154 @@ What is still known and unfixed:
   `CityGrid.standable`, so a car sent at a block centre can no longer climb the kerb into
   a building footprint.
 
-  Next attempt should keep the interpolating `_steer_point` and go after the three
-  stragglers individually rather than by moving one constant — the damage-ordering check
+  **Attempted again, August 2026: four failures down to one, and two of the three
+  stragglers turned out to be tests that had never measured what they claimed.**
+
+  - **The damage-ordering check was comparing two turn-round scrapes.** It starts the car
+    yawed 180 *away* from the wall, so the 60m run-up was spent turning round: the long
+    trial billed **54.8m from the wall, 7.4m from where it started**, having never
+    reached the obstacle. Both trials therefore hit at the same 9 m/s and the ordering
+    came down to which scrape was worse — it passed on luck, and any steering change
+    flipped it. Faced at the wall, both trials land 3.7m from it at **10 and 25 m/s**
+    (£133 against £315). Fixed and kept, independent of the steering work.
+  - **The block-centre check encoded the pre-kerb world.** Measured along that block, the
+    building is **0-9m**, the pavement ring **10-14m**, the carriageway **15m+**. A car
+    ordered at the block centre now correctly mounts the kerb and stops at the building
+    line around 12.8m — which is the verb the player asked for, working. The check now
+    asserts `CityGrid.standable` and >10m rather than on-a-road and >14m: same guarantee
+    (it never gets *inside*), updated for the fact that a pavement is somewhere a vehicle
+    may now legitimately be. Fixed and kept.
+  - **What is actually left is one check**: `20 of 22 traffic cars drove off`, against a
+    bar of 21. It is **deterministic — 20 every time, three runs of three** — and it is a
+    slow start rather than a stall: all 22 are on a road and all 22 are still moving at
+    25s, but two fail to clear 3m in the first 5s. In isolation the same measurement
+    gives **22 of 22 under both the bounded and the unbounded aim**, so it depends on the
+    suite's context — most likely a player vehicle the earlier tests left parked where it
+    blocks two cars pulling away. That is the one thing to chase next, and the way in is
+    to print each car's displacement and `is_yielding` at frame 300, which the check
+    currently throws away in favour of a bare count.
+
+  **It shipped.** `_steer_point` + `_closest_on_path` + three `steer_lookahead_*` exports
+  are in `Vehicle.gd`, the suite is green, and `probe_corner.gd` measures **60.4s against
+  a 76.4s baseline with all three legs at full lock** where the old aim managed 2.2
+  degrees. The traffic straggler resolved on the lookahead floor: at 4.0 two ambient cars
+  circled (**2.4m and 2.8m of net displacement in 5s at 2.9 m/s**, against a fleet minimum
+  of 13.9m), at 6.0 they clear it at 5.7m and 8.8m. That floor is not arbitrary — too near
+  an aim turns every kink into heading error, and `turn_factor` reads heading error as a
+  reason to slow.
+
+  **Two costs, stated rather than buried.** Response lane discipline reads **16%** over the
+  centre line against a baseline that varies 0–9%; inside the check's 20% bar, but worse.
+  And the two cars that were circling still travel less far than the fleet minimum did.
+
+  **Nothing in the suite pins this fix, and three attempts to write a check all failed
+  vacuously** — the sabotage agent caught every one. The first took the hardest lock over a
+  whole journey and caught the standing-start pivot (33.0° of 33.0° available, which is
+  only possible at zero speed). Gating at 4 m/s moved the loophole to 4 m/s, because lock
+  saturates at low speed. Sampling inside a junction above 6 m/s moved it to 6 m/s, with
+  `hardest` (28.9) exceeding `available` (28.7) — proof the two are read a frame apart.
+  Worse: **reverting the fix no longer reproduces the fault in the suite's scenario**, the
+  corner check reading 8.9 m/s / 5.6m circle sabotaged against 8.8 / 5.5 restored, nothing
+  like the documented 2.2° and 12.3m. A check cannot be seen to fail against a fault that
+  will not appear. If someone tries a fourth time: assert on the **median** lock across
+  junction samples rather than the max, so one saturated frame cannot carry it, and express
+  it as a fraction of `available` read on the *same* frame. `probe_corner.gd` is the
+  evidence in the meantime.
+
+  **Picked up again, August 2026, and the instrument was the answer rather than a fix.**
+  Two play sessions produced 37 records, **21 of them with nothing in front** — so not
+  the queueing fault. Three of those read identically: on a road, on the floor, **full
+  throttle, zero speed**, `turning round: false`, and a trail that shuffles back and
+  forth over five to eight metres. Reading the code against them turns up two real
+  structural defects:
+
+  - `_update_reverse_latch` arms on `distance < turn_round_range`, and that distance is
+    to the **final destination** while the heading error it is given is to the *steer
+    point* a few metres ahead. The three cars were 45.6m, 46.0m and 124.9m from their
+    destinations, so the latch was structurally unable to fire — two of them by under a
+    metre. The export's own comment believes the distance is to "whatever point is
+    currently being aimed at", which it has not been since the bounded-lookahead fix.
+  - `_update_escape` counts a car as stuck on `absf(forward_speed) < 0.3`, and a car
+    shuffling back and forth is never stationary, so `_stuck_time` resets for ever. The
+    black box already knows better — it measures progress toward the aim and says so in
+    its own comment — which is the only reason these records exist. **The game detects
+    the fault and does nothing about it.**
+
+  **And staging all three came out clean**: `Game/probe_stall.gd` replays each record's
+  exact start, heading and destination, and every car arrives — 16.1s, 13.8s and 5.2s,
+  the latch never needed. Which is this section's oldest lesson arriving again, so it was
+  not fixed on a theory. What every stalled record *did* have was something within 7m,
+  and the log recorded neighbours by **range only** — no bearing, and no line at all for
+  what the car was in contact with. Three readings that matter enormously (wedged against
+  a vehicle, wedged against scenery, or trouble entirely of its own steering) were
+  indistinguishable.
+
+  So the instrument was fixed instead: `StuckLog` now prints a bearing per neighbour and
+  a `touching:` line off `get_slide_collision_count()`.
+
+  **The first shift through the new instrument settled it, and corrected the diagnosis
+  above.** Five records, and every one of them is touching **road mesh and nothing else**
+  — `RoadNS_1`, `RoadEW_3`. Not a vehicle, not scenery, not a kerb. Two of the three
+  readings the instrument was built to separate are therefore dead: the car is not wedged
+  against anything, and the trouble is entirely its own. Bearings back it up — only two
+  neighbours anywhere near dead ahead, the rest off to the sides or behind.
+
+  And the second half is a **correction to what is written above**: `_update_escape` is
+  *not* failing to arm. Four of the five records carry an escape timer of 0.55-0.85 and a
+  speed of -0.5 to -5.3 m/s — the car is reversing under the escape, repeatedly. The
+  reason that was misread is that the record printed `turning round: false`, and
+  `is_turning_round()` reports only the reverse **latch**; the escape reverses just as
+  hard and had no field of its own. The record now prints `escaping:` beside it, and
+  `Vehicle.is_escaping()` exists for that reason.
+
+  So the live fault is **not** that recovery never fires. It is that the escape fires,
+  backs the car up, the car drives forward on the same failing approach, and it repeats:
+  the trails shuffle 7m west and 7m back east, or rock between two points and stop.
+
+  **Then a fifth attempt was built on that and reverted, and it is the most instructive of
+  the lot, because the reasoning was wrong three separate times.**
+
+  - *"The latch is gated on distance to the destination, and these cars were 45-153m
+    out."* **False.** `move_target` is the current **waypoint**, not the destination —
+    the record prints both and they were read across. Those three cars were 14.4m, 12.5m
+    and 35.4m from their aim, comfortably inside the 45m gate. The latch was never
+    prevented from arming by distance; what stops it is the *heading* condition, because
+    the bounded-lookahead steer point sits a few metres ahead and so is nearly always
+    within a couple of degrees of the nose.
+  - *"Escalate on `_failed_escapes`."* **Cannot fire.** That tally resets whenever the car
+    exceeds 0.3 m/s, and a car shuffling seven metres clears it easily — the same
+    instantaneous-speed trap the escape itself has, one level up. An escalation built on
+    progress instead was written, measured, and came out **byte-for-byte identical** to
+    baseline, because waiving a distance gate is irrelevant when the heading condition is
+    the one failing.
+  - *"Journeys are failing."* **They are not.** `Game/probe_journeys.gd` drives 24 seeded
+    cross-district journeys. At a 45s budget it read 17/24 and 13/24, which looked
+    damning; at an honest 120s budget it reads **23/24 and 24/24**. The budget was the
+    failure. A corner-limited car crossing 260m simply takes longer than 45s, and the
+    first cut of that probe was measuring its own patience.
+
+  What survives is the instrument and the metric. `probe_journeys.gd` is kept, and the
+  number on it worth watching is **escapes fired** — not arrivals: 55-78 per 24 journeys,
+  which is a great deal of shuffling for a fleet that does, in the end, arrive. An A/B of
+  the escalation against that metric was mixed (patrol 69 → 55, engine 64 → 78), which is
+  not a result, so it was reverted like the four before it.
+
+  **A further seven records, 12 August**, and they sharpen it slightly: all seven touching
+  road or pavement and nothing else, all seven with nothing ahead — and **five of the
+  seven had no recovery running at all**, neither latched nor escaping. That is the case
+  neither mechanism can see: the escape wants near-zero speed and a car circling has
+  plenty, while the latch wants a large heading error and the bounded steer point sits a
+  couple of degrees off the nose almost by construction. So the car goes four seconds
+  without closing on its aim while both safety nets sit quiet, which is a more specific
+  target than "it shuffles" and the one to aim any sixth attempt at.
+
+  The honest state: cars **do** get where they are sent; they sometimes shuffle for
+  several seconds first, and the black box quite rightly records it. That is a
+  slowness-and-ugliness fault, not a never-arrives one, and anything attempted next should
+  be measured on escape count with `probe_journeys.gd` before it is believed.
+
+  The older advice, still good: go after the stragglers individually rather than by moving
+  one constant — the damage-ordering check
   needs the 60m run-up to actually reach speed (measure the speed trace along it; the
   lookahead floor was assumed to be the cause and demonstrably is not, since 9 m/s
   survived every value tried), and the block-centre pair is a genuine conflict between
@@ -446,13 +621,36 @@ collision bodies for decoration alone would cost a navigation re-bake and buy no
 Phase 16 delivered the first round — five call kinds, escalation across the shift,
 a persistent best score. What the loop could still take:
 
-- **Calls that need Secure.** The Disturbance uses Apprehend; nothing yet *requires*
-  a cordon. A vehicle fire that spreads to a second car unless the road is closed,
-  or an RTC where traffic keeps driving through the scene, would make Secure part
-  of the score rather than a flourish.
+- ~~**Calls that need Secure.**~~ **Closed August 2026** by the disorder call: a raised
+  cordon contains a crowd that is otherwise recruiting, which is the first thing in the
+  game a ring of cones has ever done. The other two ideas are still open and still good —
+  a vehicle fire that spreads to a second car unless the road is closed, or an RTC where
+  traffic keeps driving through the scene.
 - **More set pieces.** The rescue (building fire + casualties) shipped; the shape
   generalises to anything worth two services at once — a collapse inside a cordon,
   an RTC that catches fire.
+- **The rest of the mission plan.** August 2026 built the first tranche — fires with
+  kinds, car fires that bill, and the gas-leak cylinder with the `Cool` verb. Four
+  more were sketched alongside it; two have since shipped:
+  - ~~**Public order**~~ — **shipped August 2026.** Suspects recruit bystanders unless
+    an officer stands in it or a cordon goes up, sized to the roster by
+    `Director.DISORDER_SIZE`. It also closed the "nothing requires a cordon" gap below.
+  - ~~**Trapped casualties**~~ — **shipped August 2026.** Pinned under a fallen
+    pallet, treatable where they lie, not stretcherable until a fire crew works `Free`
+    (`T`) off them. The thing it added that nothing else here had is **sequence**: two
+    services, one waiting on the other. See Game/README.md.
+  - **Missing persons** — a search *area* rather than a point. Genuinely a new shape
+    of call and the most interesting of the three, because nothing in the project
+    currently models a job without a fixed position.
+  - **Hazmat** — needs assets no pack on disk has. It would be signage and
+    improvisation; it should wait for a pack rather than be faked.
+
+  One thing the first tranche established and the rest should inherit: a hazard
+  **scales rather than gates** (`Director.BUILDING_SIZE`'s lesson), and anything new
+  must touch `Call.describe()`, `Mission._on_resolved`, `RadioLog` and `Civilian`'s
+  gather/flee triage or it degrades silently. Also still owed from tranche one: the
+  crowd does not yet flee a cylinder that is about to go — it was in the plan, and it
+  is the one place the existing panic would do the right thing if simply told.
 - **Difficulty beyond the call rate.** QUIET/STEADY/BUSY shipped and multiplies the
   director's intervals. Building fires now scale their own difficulty to the fire crew
   the career owns (`Director.BUILDING_SIZE`) — the first call kind whose *hardness*
@@ -490,6 +688,157 @@ would make the drive out part of the decision. It would need
 
 ## Working notes
 
+**"The fire engine keeps getting stuck on junctions as it is not mounting the kerbs"**
+— reported from play, 13 August, and the second half of it is wrong in a way worth
+keeping. `Game/probe_wedge.gd` drives the appliance round three junction turns and reports
+the climb gate's own terms:
+
+- Two of three legs **never arrive** in 45s: 407 and 506 frames under 0.3 m/s, six and ten
+  escapes fired. The complaint is real.
+- `climb_escapes` is **unreachable**. It needs 2 and peaks at **1** on every leg, because
+  an escape moves the car and `_update_escape` zeroes `_failed_escapes` the instant speed
+  exceeds 0.3. The stuck-car route into the kerb climb has therefore never once fired.
+- **Opening that gate changes nothing.** A no-progress route (the black box's own test,
+  which a shuffling car cannot fake) was built and measured **byte-for-byte identical**.
+- Because the cars are **not against kerbs**. They are held behind another vehicle for
+  **294 of 407** and **326 of 506** of their stuck frames; and where something *is* in
+  front, `_climb_kerb`'s third test — clear ground once risen — correctly refuses, because
+  the obstruction is two metres tall. It is another car.
+
+So the fix the report asks for is not a fix, it is a **design decision**: should an
+appliance on a shout mount the pavement to get past a queue? Real ones do. It is also
+exactly the thing `climb_escapes` was tuned to prevent, because gated loosely the climb
+put 423 of 2473 frames off the carriageway on a single corner. If it is taken, the gate
+should be *being on a shout and held*, not *being stuck* — a different question with a
+different answer, and `_blocker` and `_held_time` already exist to ask it.
+
+**The design decision was taken — "yes, on a shout and held up" — and it shipped**, in two
+halves, because the first half alone is a trap.
+
+`Game/probe_mount.gd` is the fixture it needed and `probe_wedge.gd` was not: a straight
+street clear of a junction, a wall of **three** vehicles abreast, an appliance behind it.
+Three, because `_passing_line` finds a way round one every time and two made the result flap
+between 0 and 21 mounting frames on a decimetre of spacing. An **appliance**, because a
+patrol car is small enough to squeeze through the same wall.
+
+**Going up**, each term forced by a measurement:
+
+- The licence is `road_is_blocked(move_target)` plus crawling, **not** the blocker latch and
+  not `_held_time`. `_held_time` only counts frames where no passing line was found at all
+  and peaked at 0.15s; the latch peaked at 1.88s against a 2.50s bar, because swinging the
+  nose takes the wall out of the 2.4m corridor faster than the timer fills. Signed speed,
+  not `absf` — reversing away at 6 m/s is not progress.
+- **It is forgotten at half the rate `_cooled` uses.** `road_is_blocked` is a snapshot and it
+  flickers as a wedged car shuffles: only 397 of 1409 crawling frames read as blocked, so at
+  the double rate the timer peaked at 2.33 against a 2.50 bar and the manoeuvre never came
+  due. Being blocked is a property of the street, not of one frame.
+- The aim is laid out **along the route, not off the bonnet**; with the nose version it came
+  back on-carriageway on both sides every time and no mount ever began.
+- `mount_shift` must clear the carriageway *and* `off_road_margin`. Measured by stepping
+  outward from a stopped appliance the edge is between 5 and 6 metres, so 5.4 read as road
+  and 7.0 works. `standable` is not the test — a road is standable.
+- The mount is a **latched manoeuvre with its own clock**, like `_escape_time`. Recomputed
+  per frame it cancelled itself by working: turning towards the kerb unlatches the blocker
+  that licensed it.
+- **`_clear_of_junctions()` is the most important term.** A junction mouth is off the vehicle
+  mesh with *no step on it*, so a car mounts onto flat tarmac, off its route. Without it the
+  junction leg went 76.7s → unfinished in 150. With it, all three legs are byte-identical to
+  baseline.
+- `is_avoiding` is **not** a useful term: it neither fixed the junction case nor left the
+  shut-street case alone.
+
+**Coming back down** — `_returning` / `_return_line()`, and the half that took the longest to
+understand. From up on the pavement the navigation agent's nearest reachable point is the
+carriageway the car *just left*, on the **near** side of the obstruction: measured, 555 frames
+off the carriageway, 161 of them turning round, driving back into the wall and mounting again.
+The agent cannot be asked this question; the car has to be steered forwards, past the
+obstruction, and put down. Two things that look right and are not, both measured:
+
+- **Deciding it at the end of the mount.** A mount ends within `mount_arrived` of its spot,
+  three metres short of a seven-metre offset — still over a road tile — so the test said
+  "already on the carriageway" and the car drifted off immediately afterwards. Coming down is
+  a *state of being off the carriageway*, watched for every frame.
+- **Capping the recovery speed.** A fire engine has no business doing 35 km/h along a footway,
+  but capped at `mount_speed` the cornering factor holds it at 2.69 m/s, the window expires
+  with it still up there, restarts, and a 40.1s journey does not finish in sixty seconds.
+  Exempting the manoeuvre from the arrival slowdown was tried alongside and moved 2.67 → 2.69.
+
+Measured, appliance, wall of three:
+
+| fixture | without | with |
+|---|---|---|
+| long journey past the wall | **never arrives in 60s** | **43.9s**, 5 climbs |
+| short hop 16m past the wall | 33.3s | 44.3s (47.4s with the recovery switched off) |
+| three junction turns | 76.7 / 33.3 / 57.0s | identical to the metre |
+
+The short hop costs time on a fixture where the manoeuvre is not needed; that is the price,
+and it is paid against a case that otherwise never finishes at all.
+
+**What the sabotage pass established, which matters for anyone extending the checks.**
+Disabling the mount reddens all four assertions with no collateral. Disabling *only* the
+recovery reddens exactly one — "steers itself back down" — because the agent does eventually
+get the car off the pavement in that fixture; "finishes the journey" is over-determined with
+respect to the recovery and only goes red when every route down is removed. A third
+assertion, "ending on the carriageway", was written and **deleted as vacuous**: it snapshotted
+`CityGrid.is_road()` on whichever frame the loop exited and read true even with the car
+stranded 23m short. Bounding the off-road frame count does not discriminate either — a
+healthy run spends *more* frames up there (296) than a sabotaged one (201), because the
+steered recovery is a deliberate excursion and the broken version mills about.
+
+Both probes are kept. `probe_wedge.gd` distinguishes "wedged on geometry" from "queued behind
+traffic"; `probe_mount.gd` is the only fixture here that shuts a street, and takes
+`PROBE_UNIT`, `PROBE_SHORT`, `PROBE_WALL`, `PROBE_WALL_SHIFT`, `PROBE_NO_RETURN`,
+`PROBE_MOUNT_AFTER` (absurdly high switches the licence off cleanly) and `PROBE_PATIENCE`.
+
+**Specialists: what shipped, and what it left behind.** The doctor is the first
+unit that is a specialist *within* a service rather than a service of its own, and the
+mechanism (`Person.speciality`) is deliberately narrow — it gates what treatment achieves,
+not which verbs appear. One follow-up, and one thing worth knowing about the generators:
+
+- **Running two generators in one shell command hangs.** `build_portraits.gd` chained ahead
+  of `godot --headless --path . --import` produced no output at all and sat there until it
+  was killed; run alone it finished in under a minute. Both windowed generators were run for
+  this increment (`build_vehicles.gd`, then `build_portraits.gd`) and the map deliberately
+  was **not** — player vehicles are not instanced in `Playground.tscn` at all, and the only
+  vehicle properties baked there belong to ambient traffic, which this did not touch. That
+  is measured, not assumed: every scene's checksum changed, but only because Godot randomises
+  resource ids on pack.
+- **`speciality` does not feed `_build_abilities()` yet**, on purpose: the doctor adds no verb,
+  and a hook with no caller gets deleted around here. The **hazmat team** is the specialist
+  that will want one — firefighters who can work inside a `Hazard`'s harm radius without
+  taking damage, which is the medical-side mirror of the foam/water split and reuses
+  `Hazard` and `Person.hurt()` as they stand.
+
+Two further medical ideas were costed and not taken: **treating en route** in the ambulance,
+and **a second hospital or bed capacity** — both are new machinery rather than configuration.
+The cheap ones that remain are pure config now that `needs_doctor` exists: a cardiac arrest
+(savage decline, short fuse), a collapse inside a crowd that physically obstructs the
+stretcher run, and a fall from height (casualty plus `trapped`).
+
+**An unexercised path, recorded rather than removed.** `Unit.can_reach()` is the
+layer-aware half of the group-move slot validation, and in every scenario staged so far
+`CityGrid.standable()` already rejects everything it would — the sabotage agent removed it
+alone and nothing in the suite moved. It is kept as defence in depth, because `standable`
+is a coarse grid test and the layer question is the honest one, but **no check currently
+exercises it on its own**. If a slot ever turns out standable-but-unreachable in play, that
+is the scenario this needs.
+
+**A third way for a check to be worthless: a saturated scenario.** August 2026, and it is
+the hardest of the three to see. Two containment checks in
+`_test_a_disorder_call_grows_until_it_is_contained` asserted that a suspect count did not
+grow while an officer stood in it. Both passed with the containment code deleted — and
+they were not vacuous (the assertion is fine) and not over-determined (nothing else
+supplies the result). The scenario had simply capped the quantity being measured: the
+group hit `max_group` during the *previous* phase, after which `_update_recruiting()`
+returns at the cap before it ever consults `_is_contained()`. The count could not move
+whichever way containment behaved.
+
+The diagnostic that found it was neither of the two usual ones. It was **removing the cap
+that pins the measurement while leaving the fault in place** — at which point the group
+grew 4 → 8 and the check went red immediately. The repair is headroom plus a guard: the
+cap was raised, and both checks now assert `held < max_group` alongside the result, so
+they can never again pass for want of room to grow.
+
 Anything picked up from here should follow what the rest of the project does:
 
 - **Two checks aborted partway for months and the suite read green throughout** — found
@@ -516,6 +865,31 @@ Anything picked up from here should follow what the rest of the project does:
   notices 647 where 650 was due. **Grep the run for `SCRIPT ERROR` from time to time**;
   it is the only signal that separates "all checks passed" from "all checks that still
   run passed".
+- **A third specimen of the same trap, August 2026 — and it was found by the count.**
+  `_test_a_cylinder_going_off_takes_the_street` read `hazard.active` after the blast, and
+  `Incident._finish()` frees the incident, so the check raised on its very first line and
+  abandoned the other three. **677 → 673**, reported green. What made it findable this
+  time was noticing the *number* had fallen rather than reading the failures, which is
+  the habit worth keeping: the four visible FAILs were contamination from an unrelated
+  cause, and chasing them first would have wasted the session. Take outcomes off the
+  `resolved` signal, into an `Array` box — GDScript lambdas capture ints by value.
+- **Two new checks failed to fail, in two different ways.** Both from the same tranche,
+  both caught by `godot-check-sabotage`, and they are worth separating because the fixes
+  are nothing alike:
+  - **Under-provoked scenario.** The CONTROLS-chip check selected one patrol car, whose
+    tiles fit one row — so reverting the widening it was written for changed nothing it
+    could measure. The assertion was fine. *A scenario that cannot provoke the fault is
+    no better than an assertion that cannot see it*, and only the sabotage ritual tells
+    them apart. Fixing it (select everything, which is the real worst case because
+    `available_abilities()` returns a **union**) immediately exposed a live bug: a mixed
+    box-select had been putting the chip under the bar all along.
+  - **Two satisfiers, one assertion.** "On the hose the cylinder cools" asserted only
+    `heat < before` — and a hazard sheds heat on its own, at exactly the rate that
+    satisfied it over the measured window. Stubbing the hose out entirely left it green.
+    The fix is not a tighter number but a **staging that removes the other satisfier**:
+    leave a fire burning beside the cylinder, so heat can only fall if water is landing
+    on it. Prefer that to a tolerance whenever the scenario allows it — a bound has to be
+    re-tuned every time a rate moves, a staging does not.
 - **One unexplained red, August 2026 — keep full suite logs.** A run printed
   `1 check(s) failed of 639` and then went green 18 consecutive times, twice under a
   restored tree in the sabotage agent's own runs. The FAIL line was lost to a `tail`,

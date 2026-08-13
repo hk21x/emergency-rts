@@ -42,6 +42,7 @@ var _station: Station
 
 
 func _ready() -> void:
+	Hover.attach(_controls_toggle)
 	# The visible route to the controls card; F1 is its shortcut, not its secret.
 	_controls_toggle.gui_input.connect(_on_controls_toggle)
 

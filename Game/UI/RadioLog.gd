@@ -54,7 +54,7 @@ func _ready() -> void:
 func say(text: String) -> void:
 	var line := Label.new()
 	line.text = text
-	line.theme_type_variation = &"DimLabel"
+	line.theme_type_variation = &"RadioLabel"
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(line)
 
@@ -148,3 +148,9 @@ func _on_incident_resolved(incident: Incident, success: bool) -> void:
 		say("MEDICAL — casualty delivered" if success else "MEDICAL — casualty lost")
 	elif incident is Suspect and success:
 		say("POLICE — suspect in custody")
+	elif incident is Hazard:
+		# The failure is worth saying out loud, unlike a fire's. A cylinder going off is
+		# the one outcome here that happens *to* the player rather than being something
+		# they failed to finish, and it is going to be followed by fires and casualties
+		# they did not ask for.
+		say("FIRE — cylinder made safe" if success else "FIRE — CYLINDER EXPLODED")

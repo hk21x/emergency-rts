@@ -19,6 +19,13 @@ signal orders_changed
 ## is, not what it can do.
 enum Service { NONE, POLICE, MEDICAL, FIRE }
 
+## Which catalogue entry this unit was bought from, stamped by [method Station.dispatch].
+##
+## Not exported: it belongs to the purchase, not to the scene, and a hand-placed unit that
+## nobody bought genuinely has no answer. See [method Station.type_of] for why guessing it
+## back from the service stopped working.
+var type_id := &""
+
 @export var display_name := "Unit"
 @export var service: Service = Service.NONE
 ## Rendered snapshot of this unit for the roster avatar, from `build_portraits.gd`.
@@ -186,6 +193,29 @@ func clear_orders() -> void:
 	_abandon_current()
 	orders.clear()
 	orders_changed.emit()
+
+
+## Whether [param unit] could actually path to [param point] on **its own** navigation
+## layer.
+##
+## Lifted out of `Vehicle._is_off_road` so people and vehicles can both be asked. The
+## layer argument is the entire point: `map_get_closest_point` takes no layer filter and
+## both navigation regions share one map, so it happily answers "0.00m away" for a spot in
+## the middle of a pavement when asked about a car. That call has already produced one
+## completely vacuous check in this project, and the only reason it was caught is that
+## adding it did not move the measurement by a single frame.
+static func can_reach(unit: Unit, point: Vector3, margin := 2.0) -> bool:
+	if unit == null or not is_instance_valid(unit):
+		return false
+	var agent := unit.get_node_or_null("NavigationAgent") as NavigationAgent3D
+	if agent == null:
+		return true
+	var path := NavigationServer3D.map_get_path(unit.get_world_3d().navigation_map,
+		unit.global_position, point, true, agent.navigation_layers)
+	if path.is_empty():
+		return false
+	var end := path[path.size() - 1]
+	return Vector2(end.x - point.x, end.z - point.z).length() <= margin
 
 
 func current_order() -> Order:

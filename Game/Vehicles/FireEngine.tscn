@@ -1,184 +1,179 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://Game/Units/Vehicle.gd" id="1_4sm87"]
-[ext_resource type="Texture2D" path="res://Game/UI/Portraits/FireEngine.png" id="2_vofvf"]
-[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_01.res" id="3_3w5p0"]
-[ext_resource type="Material" path="res://Assets/Synty/PolygonCity/Materials/Alts/PolygonCity_02_A_mat.tres" id="4_coy1t"]
-[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Door_l.res" id="5_rmha0"]
-[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Door_l_Glass.res" id="6_lskbr"]
-[ext_resource type="Material" path="res://Assets/Synty/PolygonCity/Materials/Misc/Glass_Vehicle_01_mat.tres" id="7_j8mv3"]
-[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Door_r.res" id="8_208mr"]
-[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Door_r_Glass.res" id="9_71hep"]
-[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Glass.res" id="10_bl6t6"]
-[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Plates.res" id="11_00plp"]
-[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_SteeringW.res" id="12_ojvwm"]
-[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Wheel_fl.res" id="13_ta87w"]
-[ext_resource type="Material" path="res://Assets/Synty/PolygonCity/Materials/Alts/PolygonCity_01_A_mat.tres" id="14_mqjg7"]
-[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Wheel_fr.res" id="15_48bq1"]
-[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Wheel_rl.res" id="16_r1piy"]
-[ext_resource type="ArrayMesh" path="res://Assets/Synty/PolygonCity/Models/extracted/SM_Veh_Car_Van_Wheel_rr.res" id="17_trvf3"]
+[ext_resource type="Script" path="res://Game/Units/Vehicle.gd" id="1_un3q7"]
+[ext_resource type="Texture2D" path="res://Game/UI/Portraits/FireEngine.png" id="2_si13u"]
+[ext_resource type="ArrayMesh" path="res://Assets/PolygonTown/Models/Vehicles/extracted/SM_Veh_Firetruck_01.res" id="3_4sm87"]
+[ext_resource type="Material" path="res://Assets/PolygonTown/Materials/PolygonTown_01_A_mat.tres" id="4_vofvf"]
+[ext_resource type="ArrayMesh" path="res://Assets/PolygonTown/Models/Vehicles/extracted/SM_Veh_Firetruck_Glass.res" id="5_3w5p0"]
+[ext_resource type="Material" path="res://Assets/PolygonTown/Materials/Misc/Veh_Glass_mat.tres" id="6_coy1t"]
+[ext_resource type="ArrayMesh" path="res://Assets/PolygonTown/Models/Vehicles/extracted/SM_Veh_Firetruck_Hose_Nozzle.res" id="7_rmha0"]
+[ext_resource type="ArrayMesh" path="res://Assets/PolygonTown/Models/Vehicles/extracted/SM_Veh_Firetruck_Ladder_01.res" id="8_lskbr"]
+[ext_resource type="ArrayMesh" path="res://Assets/PolygonTown/Models/Vehicles/extracted/SM_Veh_Firetruck_Ladder_02.res" id="9_j8mv3"]
+[ext_resource type="ArrayMesh" path="res://Assets/PolygonTown/Models/Vehicles/extracted/SM_Veh_Firetruck_Ladder_Base.res" id="10_208mr"]
+[ext_resource type="ArrayMesh" path="res://Assets/PolygonTown/Models/Vehicles/extracted/SM_Veh_Firetruck_SteeringW.res" id="11_71hep"]
+[ext_resource type="ArrayMesh" path="res://Assets/PolygonTown/Models/Vehicles/extracted/SM_Veh_Firetruck_Wheel_fl.res" id="12_bl6t6"]
+[ext_resource type="ArrayMesh" path="res://Assets/PolygonTown/Models/Vehicles/extracted/SM_Veh_Firetruck_Wheel_fr.res" id="13_00plp"]
+[ext_resource type="ArrayMesh" path="res://Assets/PolygonTown/Models/Vehicles/extracted/SM_Veh_Firetruck_Wheel_rl.res" id="14_ojvwm"]
+[ext_resource type="ArrayMesh" path="res://Assets/PolygonTown/Models/Vehicles/extracted/SM_Veh_Firetruck_Wheel_rr.res" id="15_ta87w"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_irj0w"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mqjg7"]
 shading_mode = 0
 albedo_color = Color(1, 0.13, 0.1, 1)
 
-[sub_resource type="SphereMesh" id="SphereMesh_2id0l"]
+[sub_resource type="SphereMesh" id="SphereMesh_48bq1"]
 radius = 0.115
 height = 0.2
 radial_segments = 10
 rings = 5
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4234k"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r1piy"]
 shading_mode = 0
 albedo_color = Color(0.16, 0.36, 1, 1)
 
-[sub_resource type="SphereMesh" id="SphereMesh_2hlkm"]
+[sub_resource type="SphereMesh" id="SphereMesh_trvf3"]
 radius = 0.115
 height = 0.2
 radial_segments = 10
 rings = 5
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ybvl2"]
-size = Vector3(2.3242533, 2.0274072, 4.8185744)
+[sub_resource type="BoxShape3D" id="BoxShape3D_irj0w"]
+size = Vector3(2.9235263, 3.0076137, 8.469932)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2o157"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2id0l"]
 transparency = 1
 shading_mode = 0
 albedo_color = Color(0.25, 1, 0.4, 0.85)
 
-[sub_resource type="TorusMesh" id="TorusMesh_8cuv7"]
-inner_radius = 2.3089
-outer_radius = 2.6089
+[sub_resource type="TorusMesh" id="TorusMesh_4234k"]
+inner_radius = 4.058509
+outer_radius = 4.358509
 rings = 48
 ring_segments = 8
 
-[node name="Vehicle" type="CharacterBody3D" unique_id=420687375]
+[node name="Vehicle" type="CharacterBody3D" unique_id=1794735637]
 collision_mask = 67
 platform_floor_layers = 1
-script = ExtResource("1_4sm87")
+script = ExtResource("1_un3q7")
 max_speed = 21.0
-wheelbase = 3.3121479749679565
+wheelbase = 4.458967
 siren_path = NodePath("Lean/Chassis/Siren")
-door_left_path = NodePath("Lean/Chassis/DoorL")
-door_right_path = NodePath("Lean/Chassis/DoorR")
+ladder_path = NodePath("Lean/Chassis/SM_Veh_Firetruck_Ladder_01")
 carries_water = true
+carries_foam = true
 tank_capacity = 20.0
 seats = 4
 stretchers = 0
-wheel_radius = 0.39758292
+dismount_back = 5.503164672851563
+wheel_radius = 0.5558691
 display_name = "Fire Engine"
 service = 3
-portrait = ExtResource("2_vofvf")
+portrait = ExtResource("2_si13u")
 selection_ring_path = NodePath("SelectionRing")
 
-[node name="Lean" type="Node3D" parent="." unique_id=2060370765]
+[node name="Lean" type="Node3D" parent="." unique_id=1946270821]
 
-[node name="Chassis" type="Node3D" parent="Lean" unique_id=1501309918]
+[node name="Chassis" type="Node3D" parent="Lean" unique_id=878460060]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
-[node name="Body" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1916645753]
-mesh = ExtResource("3_3w5p0")
-surface_material_override/0 = ExtResource("4_coy1t")
+[node name="Body" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1213615339]
+mesh = ExtResource("3_4sm87")
+surface_material_override/0 = ExtResource("4_vofvf")
 
-[node name="DoorL" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1543072461]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.806267, 1.0849798, -2.2893221)
-mesh = ExtResource("5_rmha0")
-surface_material_override/0 = ExtResource("4_coy1t")
+[node name="SM_Veh_Firetruck_Glass" type="MeshInstance3D" parent="Lean/Chassis" unique_id=314855241]
+mesh = ExtResource("5_3w5p0")
+surface_material_override/0 = ExtResource("6_coy1t")
 
-[node name="SM_Veh_Car_Van_Door_l_Glass" type="MeshInstance3D" parent="Lean/Chassis/DoorL" unique_id=158358354]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.41974542, 0.47708273, 0.1011703)
-mesh = ExtResource("6_lskbr")
-surface_material_override/0 = ExtResource("7_j8mv3")
+[node name="SM_Veh_Firetruck_Hose_Nozzle" type="MeshInstance3D" parent="Lean/Chassis" unique_id=287104452]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.11111505, 2.835529, 3.9157813)
+mesh = ExtResource("7_rmha0")
+surface_material_override/0 = ExtResource("4_vofvf")
 
-[node name="DoorR" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1439340452]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.80626863, 1.0849798, -2.2893221)
-mesh = ExtResource("8_208mr")
-surface_material_override/0 = ExtResource("4_coy1t")
+[node name="SM_Veh_Firetruck_Ladder_01" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1354788663]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8615716, -3.0736935)
+mesh = ExtResource("8_lskbr")
+surface_material_override/0 = ExtResource("4_vofvf")
 
-[node name="SM_Veh_Car_Van_Door_r_Glass" type="MeshInstance3D" parent="Lean/Chassis/DoorR" unique_id=1711959973]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4197462, 0.47708273, 0.1011703)
-mesh = ExtResource("9_71hep")
-surface_material_override/0 = ExtResource("7_j8mv3")
+[node name="SM_Veh_Firetruck_Ladder_02" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1617155679]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2981973, 1.325057)
+mesh = ExtResource("9_j8mv3")
+surface_material_override/0 = ExtResource("4_vofvf")
 
-[node name="SM_Veh_Car_Van_Glass" type="MeshInstance3D" parent="Lean/Chassis" unique_id=170574359]
-mesh = ExtResource("10_bl6t6")
-surface_material_override/0 = ExtResource("7_j8mv3")
+[node name="SM_Veh_Firetruck_Ladder_Base" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1367476666]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4881423, -3.018445)
+mesh = ExtResource("10_208mr")
+surface_material_override/0 = ExtResource("4_vofvf")
 
-[node name="SM_Veh_Car_Van_Plates" type="MeshInstance3D" parent="Lean/Chassis" unique_id=805413993]
-mesh = ExtResource("11_00plp")
-surface_material_override/0 = ExtResource("4_coy1t")
+[node name="SteeringWheel" type="MeshInstance3D" parent="Lean/Chassis" unique_id=439217290]
+transform = Transform3D(1, 0, 0, 0, 0.8393351, -0.5436144, 0, 0.5436144, 0.8393351, 0.65749586, 1.7470782, 3.2054272)
+mesh = ExtResource("11_71hep")
+surface_material_override/0 = ExtResource("4_vofvf")
 
-[node name="SteeringWheel" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1703555841]
-transform = Transform3D(1, 0, 0, 0, 0.35328916, 0.93551415, 0, -0.93551415, 0.35328916, 0.43126976, 1.2529176, 1.0940796)
-mesh = ExtResource("12_ojvwm")
-surface_material_override/0 = ExtResource("4_coy1t")
-
-[node name="Siren" type="Node3D" parent="Lean/Chassis" unique_id=1463358412]
+[node name="Siren" type="Node3D" parent="Lean/Chassis" unique_id=1287215469]
 visible = false
 
-[node name="Left" type="MeshInstance3D" parent="Lean/Chassis/Siren" unique_id=1950651579]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.52, 2.07, 0.78)
-material_override = SubResource("StandardMaterial3D_irj0w")
+[node name="Left" type="MeshInstance3D" parent="Lean/Chassis/Siren" unique_id=1600865411]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 2.86, 2.9)
+material_override = SubResource("StandardMaterial3D_mqjg7")
 cast_shadow = 0
-mesh = SubResource("SphereMesh_2id0l")
+mesh = SubResource("SphereMesh_48bq1")
 
-[node name="Lamp" type="OmniLight3D" parent="Lean/Chassis/Siren/Left" unique_id=724117153]
+[node name="Lamp" type="OmniLight3D" parent="Lean/Chassis/Siren/Left" unique_id=637061778]
 light_color = Color(1, 0.13, 0.1, 1)
 light_energy = 3.5
 omni_range = 10.0
 
-[node name="Right" type="MeshInstance3D" parent="Lean/Chassis/Siren" unique_id=2102277201]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52, 2.07, 0.78)
-material_override = SubResource("StandardMaterial3D_4234k")
+[node name="Right" type="MeshInstance3D" parent="Lean/Chassis/Siren" unique_id=106830130]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 2.86, 2.9)
+material_override = SubResource("StandardMaterial3D_r1piy")
 cast_shadow = 0
-mesh = SubResource("SphereMesh_2hlkm")
+mesh = SubResource("SphereMesh_trvf3")
 
-[node name="Lamp" type="OmniLight3D" parent="Lean/Chassis/Siren/Right" unique_id=1482609511]
+[node name="Lamp" type="OmniLight3D" parent="Lean/Chassis/Siren/Right" unique_id=1077916101]
 light_color = Color(0.16, 0.36, 1, 1)
 light_energy = 3.5
 omni_range = 10.0
 
-[node name="Wheels" type="Node3D" parent="." unique_id=1855885644]
+[node name="Wheels" type="Node3D" parent="." unique_id=344545623]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
-[node name="FL" type="Node3D" parent="Wheels" unique_id=734799480]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.81947315, 0.3975829, 1.8411695)
+[node name="FL" type="Node3D" parent="Wheels" unique_id=490061138]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9019006, 0.5558693, 2.1506045)
 
-[node name="Mesh" type="MeshInstance3D" parent="Wheels/FL" unique_id=1556787027]
-mesh = ExtResource("13_ta87w")
-surface_material_override/0 = ExtResource("14_mqjg7")
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/FL" unique_id=662563935]
+mesh = ExtResource("12_bl6t6")
+surface_material_override/0 = ExtResource("4_vofvf")
 
-[node name="FR" type="Node3D" parent="Wheels" unique_id=2007677773]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8194732, 0.3975829, 1.8411692)
+[node name="FR" type="Node3D" parent="Wheels" unique_id=1562568612]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.91488904, 0.5558693, 2.1506045)
 
-[node name="Mesh" type="MeshInstance3D" parent="Wheels/FR" unique_id=1586746340]
-mesh = ExtResource("15_48bq1")
-surface_material_override/0 = ExtResource("14_mqjg7")
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/FR" unique_id=802839982]
+mesh = ExtResource("13_00plp")
+surface_material_override/0 = ExtResource("4_vofvf")
 
-[node name="RL" type="Node3D" parent="Wheels" unique_id=1215411027]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.81947315, 0.3975829, -1.4709787)
+[node name="RL" type="Node3D" parent="Wheels" unique_id=1537300506]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9739195, 0.5558693, -2.3083627)
 
-[node name="Mesh" type="MeshInstance3D" parent="Wheels/RL" unique_id=900155751]
-mesh = ExtResource("16_r1piy")
-surface_material_override/0 = ExtResource("14_mqjg7")
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/RL" unique_id=1460958718]
+mesh = ExtResource("14_ojvwm")
+surface_material_override/0 = ExtResource("4_vofvf")
 
-[node name="RR" type="Node3D" parent="Wheels" unique_id=2143744346]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8194732, 0.3975829, -1.4709787)
+[node name="RR" type="Node3D" parent="Wheels" unique_id=952264377]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9739195, 0.5558693, -2.3083627)
 
-[node name="Mesh" type="MeshInstance3D" parent="Wheels/RR" unique_id=1962413621]
-mesh = ExtResource("17_trvf3")
-surface_material_override/0 = ExtResource("14_mqjg7")
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/RR" unique_id=223234598]
+mesh = ExtResource("15_ta87w")
+surface_material_override/0 = ExtResource("4_vofvf")
 
-[node name="Collision" type="CollisionShape3D" parent="." unique_id=1739656178]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1920929e-07, 1.0137036, -0.08672094)
-shape = SubResource("BoxShape3D_ybvl2")
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=312454542]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5038068, 0.19174194)
+shape = SubResource("BoxShape3D_irj0w")
 
-[node name="NavigationAgent" type="NavigationAgent3D" parent="." unique_id=1458274570]
+[node name="NavigationAgent" type="NavigationAgent3D" parent="." unique_id=1881622714]
 path_desired_distance = 2.0
 target_desired_distance = 2.2
 
-[node name="SelectionRing" type="MeshInstance3D" parent="." unique_id=1167340286]
+[node name="SelectionRing" type="MeshInstance3D" parent="." unique_id=1325417325]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
-material_override = SubResource("StandardMaterial3D_2o157")
+material_override = SubResource("StandardMaterial3D_2id0l")
 cast_shadow = 0
-mesh = SubResource("TorusMesh_8cuv7")
+mesh = SubResource("TorusMesh_4234k")

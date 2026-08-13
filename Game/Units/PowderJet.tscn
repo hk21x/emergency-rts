@@ -1,0 +1,67 @@
+; ABC dry powder out of a patrol car's extinguisher.
+;
+; The third agent needed its own scene for a reason sharper than variety: powder borrowed
+; the water jet at first, so an officer fighting an **electrical** fire was drawn spraying
+; falling water streaks — on the one call whose entire rule is that water is the wrong
+; thing to put on it. A visual that contradicts the mechanic is worse than no visual, and
+; this is the only fire in the game where a player could reasonably be shouting at the
+; screen about it.
+;
+; So it is built to read as a hand extinguisher rather than a hose: short throw, wide
+; cone, no arc worth speaking of, and a dense cloud that hangs briefly and vanishes. The
+; material is the pack's Dust_01 verbatim — additive, soft circles, already the right
+; substance — and the tint is the faint sulphur-yellow of monoammonium phosphate rather
+; than white, so it is not mistaken for foam either.
+
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Material" uid="uid://bhqrh83mjlfbk" path="res://Assets/Particle_FX/Materials/FX/Dust_01.tres" id="1_powder"]
+
+; Snaps to full opacity and then fades: a puff, not a stream. Foam swells in and lingers,
+; which is what keeps the two apart at a glance.
+[sub_resource type="Gradient" id="Gradient_powder"]
+offsets = PackedFloat32Array(0, 0.12, 1)
+colors = PackedColorArray(1, 0.98, 0.86, 0, 1, 0.97, 0.8, 0.9, 1, 0.96, 0.78, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_powder"]
+gradient = SubResource("Gradient_powder")
+
+; Opens out hard and immediately: an extinguisher cone is nearly all cone.
+[sub_resource type="Curve" id="Curve_bloom"]
+_data = [Vector2(0, 0.2), 0.0, 0.0, 0, 0, Vector2(0.3, 1), 0.0, 0.0, 0, 0, Vector2(1, 1.15), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_bloom"]
+curve = SubResource("Curve_bloom")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_powder"]
+lifetime_randomness = 0.35
+particle_flag_rotate_y = true
+direction = Vector3(0, 0, -1)
+spread = 22.0
+initial_velocity_min = 5.0
+initial_velocity_max = 6.5
+angular_velocity_min = -110.0
+angular_velocity_max = 110.0
+gravity = Vector3(0, -1, 0)
+scale_min = 0.45
+scale_max = 0.95
+scale_curve = SubResource("CurveTexture_bloom")
+color_ramp = SubResource("GradientTexture1D_powder")
+turbulence_enabled = true
+turbulence_noise_strength = 0.4
+turbulence_noise_scale = 2.2
+
+[sub_resource type="QuadMesh" id="QuadMesh_powder"]
+material = ExtResource("1_powder")
+
+; Ships not emitting, exactly as the other two do. Person turns it on only while powder
+; is actually being delivered -- see Person.spray_at.
+[node name="PowderJet" type="GPUParticles3D"]
+cast_shadow = 0
+emitting = false
+amount = 110
+lifetime = 0.5
+visibility_aabb = AABB(-6, -6, -6, 12, 12, 12)
+process_material = SubResource("ParticleProcessMaterial_powder")
+draw_pass_1 = SubResource("QuadMesh_powder")

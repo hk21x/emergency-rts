@@ -81,6 +81,17 @@ func _draw() -> void:
 	if unit == null:
 		return
 
+	# **Condition, once there is any to report.** A unit that can be lost needs a readout
+	# or the first the player knows about it is a body -- and the roster is where they are
+	# already looking. Drawn as an arc of the circumference rather than a bar because the
+	# badge is a disc at three different sizes and a bar would have to be placed three
+	# times. Absent at full health, so an ordinary shift shows nothing.
+	var person := unit as Person
+	if person and person.health < 1.0:
+		var span := TAU * clampf(person.health, 0.0, 1.0)
+		var tone: Color = Palette.BAD if person.health < 0.4 else Palette.WARN
+		draw_arc(centre, radius - 1.5, -PI * 0.5, -PI * 0.5 + span, 32, tone, 3.0, true)
+
 	if unit.portrait:
 		# Inset so the subject sits inside the disc rather than running off its edge.
 		# The render already carries its own margin, so this only has to clear the ring.

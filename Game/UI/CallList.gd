@@ -64,6 +64,7 @@ func _build_row() -> PanelContainer:
 	var pill := PanelContainer.new()
 	pill.theme_type_variation = &"PillPanel"
 	pill.mouse_filter = Control.MOUSE_FILTER_STOP
+	Hover.attach(pill)
 	pill.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	add_child(pill)
 

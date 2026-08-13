@@ -53,8 +53,17 @@ func _run() -> void:
 	_station.career_path = "user://probe-corner-career.cfg"
 	_station.funds = 999999
 	_station.owned = {}
-	_station.purchase(&"patrol")
-	_car = _station.dispatch(&"patrol") as Vehicle
+	# Which unit to drive. The appliance is the reason this exists in a second form: it
+	# is the longest body on the map, and turn radius is wheelbase over tan(steer), so
+	# it corners widest by construction rather than by accident.
+	var kind := StringName(OS.get_environment("PROBE_UNIT") if
+		OS.get_environment("PROBE_UNIT") != "" else "patrol")
+	_station.purchase(kind)
+	_car = _station.dispatch(kind) as Vehicle
+	if _car == null:
+		print("no such unit: %s" % kind)
+		quit()
+		return
 	# Swept from outside rather than edited into the source: `corner_window` is how far
 	# past a vertex the outgoing direction is sampled, so too long a window reads a right
 	# angle as a gentler bend than it is, and the planner books a speed for the bend it

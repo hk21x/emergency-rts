@@ -11,13 +11,106 @@ const FIRE_GROUP := &"fires"
 ## needing a random number generator -- so a test run is reproducible.
 const GOLDEN_ANGLE := 2.399963
 
+## What is burning. A fire is not one thing: a bin at the kerb, a car with a tank in
+## it and a building alight are three different jobs, and until August 2026 the only
+## difference the game expressed was `needs_hose` plus a couple of rates set inline at
+## four call sites in the director.
+##
+## The kind is what carries that now, and it survives a spread for free: `_spread()`
+## clones with `duplicate()`, so a building fire throws off building fire, which is
+## right.
+enum Kind {
+	## A bin, a skip, a pile of rubbish. Small, quick, goes out for anyone -- the job
+	## that teaches the verb without punishing a career for learning it.
+	BIN,
+	## A car at the kerb. Slow to knock down and **it damages what is parked near it**,
+	## which is the one fire that costs money to stand next to.
+	VEHICLE,
+	## A building. Only a crew on a hose touches it, and it spreads hard.
+	BUILDING,
+	## A substation, a junction box, a charging point. Water on live electrics is worse
+	## than useless, and the appliance carries no powder -- so this is the **one fire the
+	## fire service cannot fight and the police can**. It is small and it does not spread,
+	## because a call that inverts the roster should be a puzzle rather than a punishment.
+	ELECTRICAL,
+}
+
+## Everything that differs by kind, in one table rather than scattered across the
+## director's spawners. `flames` names the FX the plume instances; the pack ships three
+## severity tiers and the game used only the largest.
+## What actually puts this out.
+##
+## Not a rate table with an extra column: the wrong agent does **nothing**, the same way
+## a patrol car's extinguisher does nothing to a building. Gating is hard everywhere else
+## in this game and a fire is no place to start being coy about it -- "slower" is
+## invisible at RTS zoom, and a player who cannot tell refusal from slowness learns
+## nothing from either.
+##
+## POWDER is deliberately the broad one. A patrol car carries ABC dry powder, which is
+## genuinely multi-class, so the officer who could always take a bin or a kerbside car
+## still can. What powder cannot do is a building, and what *water* cannot do is a fuel
+## fire -- which is the inversion this brings: on an electrical fire the appliance is the
+## wrong tool and the patrol car is the right one.
+enum Agent { WATER, FOAM, POWDER }
+
+const AGENT_NAMES := {
+	Agent.WATER: "water", Agent.FOAM: "foam", Agent.POWDER: "dry powder",
+}
+
+const KINDS := {
+	Kind.BIN: {
+		"flames": "res://Assets/Particle_FX/Prefabs/FX/FX_Fire_Small_01.tscn",
+		"needs_hose": false, "growth": 0.03, "douse": 0.34, "spreads": false,
+		"max_flame_scale": 1.2, "agent": Agent.WATER,
+	},
+	Kind.VEHICLE: {
+		"flames": "res://Assets/Particle_FX/Prefabs/FX/FX_Fire_Medium_01.tscn",
+		"needs_hose": false, "growth": 0.05, "douse": 0.22, "spreads": true,
+		"spread_interval": 8.0, "spread_distance": 5.0, "max_flame_scale": 2.4,
+		"agent": Agent.FOAM,
+	},
+	Kind.BUILDING: {
+		"flames": "res://Assets/Particle_FX/Prefabs/FX/FX_Fire_Large_01.tscn",
+		"needs_hose": true, "growth": 0.07, "douse": 0.12, "spreads": true,
+		"spread_interval": 8.0, "spread_distance": 5.0, "max_flame_scale": 2.4,
+		"agent": Agent.WATER,
+	},
+	Kind.ELECTRICAL: {
+		"flames": "res://Assets/Particle_FX/Prefabs/FX/FX_Fire_Small_01.tscn",
+		"needs_hose": false, "growth": 0.04, "douse": 0.28, "spreads": false,
+		"max_flame_scale": 1.4, "agent": Agent.POWDER,
+	},
+}
+
 @export_group("Burning")
+## Which of the three this is. Settable at any point: the setter re-applies the table
+## when the node is already in the tree, so a caller cannot get the order wrong.
+##
+## It could have been a comment telling callers to set it before `add_child`, and that
+## was the first cut -- but `Director._spawn()` adds the node and *then* configures it,
+## so every building fire came out as the default and two checks went red saying so. A
+## rule that has to be remembered at four call sites is a rule that will be broken.
+##
+## **The middle tier is the default, and its row is deliberately the numbers the game
+## has always used.** A bare `Fire.tscn` is instantiated by the director, by the suite
+## and by `_spread()`, so a default that retuned every one of them would have changed a
+## dozen behaviours while claiming to add a feature. BIN is gentler than the fire this
+## game had; BUILDING is harsher; VEHICLE *is* it, plus the scorching.
+@export var kind: Kind = Kind.VEHICLE:
+	set(value):
+		kind = value
+		if is_inside_tree():
+			_apply_kind()
+			_fx = [$Flames, $Smoke]
+			_particles = _emitters()
 ## A building alight, rather than a bin or a car at the kerb. Only a firefighter on
 ## an appliance's hose brings one down -- a patrol car's extinguisher will not touch
 ## it -- and the freeplay director refuses to open one unless the career owns a fire
 ## crew, on the same principle that has always applied here: never set the district
 ## a job the roster cannot answer.
 @export var needs_hose := false
+## What will put this out. Set from the kind's row; see [enum Agent].
+var agent: Agent = Agent.WATER
 ## 0 to 1. Fires start small and build.
 @export var intensity := 0.3
 @export var growth_per_second := 0.05
@@ -37,6 +130,17 @@ const SPREAD_TRIES := 8
 ## Total cap across the map, so an unattended fire cannot run away forever.
 @export var max_fires := 8
 
+@export_group("Scorching")
+## How far a vehicle fire reaches to damage what is parked beside it, and what it costs
+## per second at full intensity.
+##
+## **The one fire that costs money to stand next to.** The repair economy, the readout
+## and the debrief row all existed already -- this only needed something new to bill.
+## What it buys is a reason to think about where the appliance stops: nose-in beside a
+## burning car is the convenient place to park and the expensive one.
+@export var scorch_range := 4.0
+@export var scorch_per_second := 9.0
+
 @export_group("Visuals")
 @export var min_flame_scale := 0.5
 @export var max_flame_scale := 2.4
@@ -44,8 +148,21 @@ const SPREAD_TRIES := 8
 ## The burn, looped and scaled by how much of it there is.
 const CRACKLE_STREAM := "res://Game/Audio/crackle.wav"
 
-@onready var _flame: Node3D = $Flame
-@onready var _particles: Array[GPUParticles3D] = [$Flames, $Smoke]
+## The two FX roots. Scale goes on these and **only** these: an emitter's scale is
+## inherited by its children, so scaling the roots and their sub-emitters both multiplies
+## -- a fire at full intensity would throw embers at 2.4 x 2.4.
+## Assigned in [method _ready] **after** the kind has swapped the plume, not `@onready`:
+## an onready var resolves before the body runs and would point at the FX that was
+## replaced.
+var _fx: Array[Node3D] = []
+## Every emitter under the two FX, **including their own sub-emitters**.
+##
+## `Flames` and `Smoke` are instanced from the particle pack and are not one node each:
+## the fire carries embers and a ground-spread beneath it. Listing the two roots would
+## leave those children at full amount on a fire barely alight, because `amount_ratio`
+## does not inherit. Collected rather than named so a pack update that adds an emitter
+## is picked up rather than silently ignored.
+var _particles: Array[GPUParticles3D] = []
 
 var _spread_timer := 0.0
 var _spread_index := 0
@@ -57,6 +174,9 @@ var _crackle: AudioStreamPlayer3D
 func _ready() -> void:
 	super()
 	add_to_group(FIRE_GROUP)
+	_apply_kind()
+	_fx = [$Flames, $Smoke]
+	_particles = _emitters()
 	# Built here rather than in the scene so every fire -- including the ones a
 	# spread clones -- has one without the .tscn having to carry it.
 	if ResourceLoader.exists(CRACKLE_STREAM):
@@ -81,6 +201,8 @@ func _physics_process(delta: float) -> void:
 	intensity = minf(intensity + growth_per_second * delta, 1.0)
 	_update_flame()
 
+	_scorch(delta)
+
 	if intensity < spread_threshold:
 		# Knocked back below the threshold, so it has to build again before spreading.
 		_spread_timer = 0.0
@@ -103,12 +225,20 @@ func douse(amount: float) -> void:
 	_update_flame()
 
 
+## Says **what it wants putting on it**, not merely how bad it is.
+##
+## Without this the agent rule is a memory test: a crew drives across the district, finds
+## the hose does nothing, and has no way to know why. The board already renders this
+## string on the call row, so naming the agent costs no interface at all -- and it is the
+## difference between a rule and a trap.
 func describe_state() -> String:
+	var wants := "" if agent == Agent.WATER else \
+		" -- needs %s" % AGENT_NAMES.get(agent, "?")
 	if intensity >= spread_threshold:
-		return "well alight" if not needs_hose else "building well alight"
+		return ("well alight" if not needs_hose else "building well alight") + wants
 	if intensity <= 0.3:
-		return "nearly out"
-	return "burning" if not needs_hose else "building alight"
+		return "nearly out" + wants
+	return ("burning" if not needs_hose else "building alight") + wants
 
 
 ## Knocking it down fills the bar.
@@ -168,12 +298,78 @@ func _reachable(spot: Vector3) -> bool:
 	return CityGrid.standable(tile.x, tile.y)
 
 
-func _update_flame() -> void:
-	if _flame == null:
+## Bills any vehicle standing too close to a burning car.
+##
+## Only [constant Kind.VEHICLE] does this. A bin fire is not going to cost anyone a
+## repair, and a building fire already has the crew standing off it -- billing there
+## would tax the correct way to fight one.
+func _scorch(delta: float) -> void:
+	if kind != Kind.VEHICLE:
 		return
+	for node in get_tree().get_nodes_in_group(Unit.GROUP):
+		var vehicle := node as Vehicle
+		if vehicle == null or vehicle.service == Unit.Service.NONE:
+			continue
+		var offset := vehicle.global_position - global_position
+		offset.y = 0.0
+		var gap := offset.length()
+		if gap > scorch_range:
+			continue
+		# Falls off with distance and scales with how big the fire is, so a car pulled
+		# up at the edge of a dying fire is charged pennies and one parked in it is not.
+		var bite := (1.0 - gap / scorch_range) * intensity * scorch_per_second * delta
+		vehicle.scorch(bite)
+
+
+## Reads the kind's row and applies it: the rates, whether a hose is needed, whether it
+## spreads at all, and which plume it wears.
+##
+## The plume is swapped rather than configured, because the pack ships three fires and
+## they differ in more than scale -- the small one has no ground-spread emitter. Guarded
+## on the path so a fire cloned by `_spread()`, which already carries the right plume,
+## does not free and rebuild one for nothing.
+func _apply_kind() -> void:
+	var row: Dictionary = KINDS.get(kind, KINDS[Kind.BUILDING])
+	needs_hose = bool(row["needs_hose"])
+	agent = row["agent"] as Agent
+	growth_per_second = float(row["growth"])
+	douse_per_second = float(row["douse"])
+	max_flame_scale = float(row["max_flame_scale"])
+	if bool(row["spreads"]):
+		spread_interval = float(row["spread_interval"])
+		spread_distance = float(row["spread_distance"])
+	else:
+		# Above 1.0, so the threshold can never be met and the timer never arms. Cheaper
+		# and harder to get wrong than a second flag every spread site would have to ask.
+		spread_threshold = 2.0
+
+	var plume := get_node_or_null("Flames") as Node3D
+	var wanted := str(row["flames"])
+	if plume != null and plume.scene_file_path == wanted:
+		return
+	var replacement := (load(wanted) as PackedScene).instantiate() as Node3D
+	replacement.name = "Flames"
+	if plume != null:
+		replacement.transform = plume.transform
+		plume.free()
+	add_child(replacement)
+
+
+## The emitters under this fire, roots first.
+func _emitters() -> Array[GPUParticles3D]:
+	var found: Array[GPUParticles3D] = []
+	for root in [$Flames, $Smoke]:
+		if root is GPUParticles3D:
+			found.append(root)
+		for child in (root as Node).find_children("*", "GPUParticles3D", true, false):
+			found.append(child as GPUParticles3D)
+	return found
+
+
+func _update_flame() -> void:
 	var scale := lerpf(min_flame_scale, max_flame_scale, intensity)
-	_flame.scale = Vector3(scale, scale, scale)
-	_flame.position.y = scale * 0.5
+	for fx in _fx:
+		fx.scale = Vector3(scale, scale, scale)
 
 	# The burn is as loud as the fire is big, so knocking one down is audible before
 	# it is visible.
@@ -181,7 +377,8 @@ func _update_flame() -> void:
 		_crackle.volume_db = -30.0 + intensity * 18.0
 
 	# Thin the plume out as the fire is knocked down, rather than having it stop dead
-	# the instant the last of the intensity goes.
+	# the instant the last of the intensity goes. Every emitter, sub-emitters included --
+	# `amount_ratio` is not inherited the way scale is, so a child left alone keeps
+	# throwing a full complement of embers off a fire that is nearly out.
 	for particles in _particles:
 		particles.amount_ratio = clampf(intensity, 0.12, 1.0)
-		particles.scale = Vector3(scale, scale, scale)

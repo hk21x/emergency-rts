@@ -129,13 +129,17 @@ anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("14_debrief")
 
+; Sits above the bar's fixed two-row height (176), not above its old one-row height.
+; Both numbers have to move together: they did not in August 2026, a mixed box-select
+; wrapped the tiles to a second row, and the chip went under the bar and stopped being
+; clickable. The suite now measures the overlap against the fattest selection.
 [node name="ControlsToggle" type="PanelContainer" parent="Root/World"]
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 22.0
-offset_top = -186.0
+offset_top = -214.0
 offset_right = 136.0
-offset_bottom = -160.0
+offset_bottom = -188.0
 grow_vertical = 0
 mouse_filter = 0
 theme_type_variation = &"PillPanel"
@@ -182,11 +186,23 @@ theme_override_font_sizes/font_size = 20
 
 ; The docked command bar. Opaque and mouse-stopping: it is the edge of the screen, and
 ; a click that lands on it is a click on the interface, not an order in the world.
+; **Two rows of command tiles, always.** 176 rather than the old 148, because
+; `RTSController.available_abilities()` returns the *union* across the selection, so a
+; mixed box-select offers every verb any of them has -- 14 tiles today, which is more
+; than one row of nine can hold at any width the row can spare.
+;
+; Be clear what this number does and does not do. It is a *minimum*: `Bar` is a
+; PanelContainer, so once the tiles wrap, the content's own height sets the top and this
+; offset is inert. Sabotaging it back to 148 changes nothing, which is how we know. What
+; it buys is that the bar is 176 tall for a one-row selection too, so it does not jump
+; height as the selection changes -- and the CONTROLS chip above keeps a constant gap
+; instead of drifting. The thing that actually stops the chip being covered is the
+; chip's own offsets below. At 560 wide the grid holds nine a row, so two rows seat 18.
 [node name="Bar" type="PanelContainer" parent="Root"]
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -148.0
+offset_top = -176.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_type_variation = &"BarPanel"
@@ -214,12 +230,18 @@ text = "UNITS UNDER COMMAND"
 size_flags_vertical = 3
 script = ExtResource("6_roster")
 
-; Wide enough for the fattest selection -- seven verbs, on an officer or a patrol
-; car -- in ONE row of tiles. Let them wrap and the PanelContainer grows, the bar
-; grows with it, and whatever sits just above the bar is silently covered. That is
-; the same trap the dispatch pills fell into, and it once ate the CONTROLS chip.
+; Wide enough for the fattest selection in ONE row of tiles. Let them wrap and the
+; PanelContainer grows, the bar grows with it, and whatever sits just above the bar is
+; silently covered -- the same trap the dispatch pills fell into, and it once ate the
+; CONTROLS chip.
+;
+; Widened from 460 to 560 in August 2026, for a ninth tile rather than a second row.
+; The width came out of RosterBlock, which is the only expanding block here and was
+; measured holding 546px for a roster that needs far less; the bar itself did not move,
+; so nothing above it could be covered. A tile is 54 wide with 6 between and 10 of card
+; margin each side, so N tiles want 60N + 14: seven fitted 460, nine fit 560.
 [node name="CommandBlock" type="PanelContainer" parent="Root/Bar/Row"]
-custom_minimum_size = Vector2(460, 0)
+custom_minimum_size = Vector2(560, 0)
 theme_type_variation = &"CardPanel"
 
 [node name="Body" type="VBoxContainer" parent="Root/Bar/Row/CommandBlock"]

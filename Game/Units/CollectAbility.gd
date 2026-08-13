@@ -43,6 +43,12 @@ func score(unit: Unit, target: Target) -> int:
 		return NOT_APPLICABLE
 	if not casualty.is_stable or casualty.is_loaded or casualty.is_carried:
 		return NOT_APPLICABLE
+	# **Nobody is lifting someone with a pipe across them.** Declining rather than
+	# scoring low, so a paramedic sent at a trapped casualty gets Move and goes to them
+	# -- which is the right thing to do while waiting for the crew -- instead of standing
+	# over them running an order that cannot finish.
+	if casualty.trapped:
+		return NOT_APPLICABLE
 	# No medical vehicle with a free slot anywhere means no stretcher to fetch, and
 	# an order that would walk off to collect nothing falls back to Move, honestly.
 	if StretcherOrder.nearest_vehicle(unit) == null:

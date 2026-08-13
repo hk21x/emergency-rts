@@ -14,18 +14,26 @@ godot --headless --fixed-fps 60 --path . --script res://Game/smoke_test.gd   # t
 
 ## Where it is
 
-All twenty planned phases have landed except the last half of one: the career economy
-shipped, **campaign scenarios have not**. What exists is a complete freeplay loop —
-open a shift, take the calls it rolls, get scored on it — plus the district, the fleet,
-the economy and the world that reacts to all three.
+Every planned phase has landed except the last half of one: the career economy shipped,
+**campaign scenarios have not**. What exists is a complete freeplay loop — open a shift,
+take the calls the director rolls, get scored on it — plus the district, the fleet, the
+economy, and a world that reacts to all three.
 
-**650 automated checks**, all passing. The suite reports its own total; take the number
+Ten kinds of call, three services, and fifteen verbs. Two of those calls need more than
+one service and need them **in order**: somebody pinned under a load has to be cut free
+before they can be moved, and a crowd turning has to be contained before it can be
+arrested.
+
+**766 automated checks**, all passing. The suite reports its own total; take the number
 from a run rather than from here.
 
-The one thing the tree knows is wrong: **vehicles corner too wide and sometimes overshoot
-a junction.** It is diagnosed down to the line — the steering aims at a point past the
-bend, so the car applies almost no lock and arcs across it — and a working fix exists that
-breaks three unrelated checks. All of it, with numbers, is in `NEXT.md`.
+The one thing the tree knows is untidy: **vehicles sometimes shuffle back and forth for a
+few seconds before getting where they are going.** They do arrive — 23 of 24 and 24 of 24
+across seeded cross-district journeys — so this is a slowness-and-ugliness fault rather
+than a functional one. Five attempts at it have been built, measured and reverted; the
+black box now carries enough detail to aim a sixth properly, and the metric to judge it by
+is escape count rather than arrivals. All of it, with numbers and the wrong turns, is in
+`NEXT.md`.
 
 ## The district
 
@@ -58,9 +66,9 @@ does not, so a patrol car cannot put out a building fire however long you point 
 Every verb is an `Ability`, and adding one gives it a command tile, a hotkey and a
 right-click meaning with no interface work. The current set:
 
-`Move` · `Stop` · `Treat` · `Apprehend` · `Extinguish` · `Collect` (stretcher) ·
-`Escort` (a suspect into the car) · `Secure` (a cordon) · `Board` · `Unload` ·
-`Return` · `Lights` · `Siren`
+`Move` · `Stop` · `Treat` · `Apprehend` · `Extinguish` · `Cool` (a hazard, before it
+goes) · `Free` (someone pinned) · `Collect` (stretcher) · `Escort` (walk a cuffed suspect
+to the car) · `Secure` (a cordon) · `Board` · `Unload` · `Return` · `Lights` · `Siren`
 
 Right-click does whatever scores highest on the thing under the cursor, so most play needs
 no tiles at all. Units within range of an incident get on with the job themselves.
@@ -74,18 +82,46 @@ a shout — it keeps to the limit and runs dark, which is the one order that doe
 Press **F2** and the district starts producing calls. Until then it idles: no scripted
 incidents, nothing to react to.
 
-Calls open on the street, not inside buildings. Fires spread to reachable ground only, and
-a building fire needs a hose and a water tank behind it — an appliance that runs dry has
-to be moved to a hydrant rather than waited out. Casualties are stabilised where they lie
+Calls open on the street, not inside buildings. Fires come in three kinds — a bin, a car,
+a building — and each burns, spreads and yields differently. A building fire needs a hose
+and a water tank behind it: an appliance that runs dry has to be moved to a hydrant rather
+than waited out. A car fire damages whatever is parked in it, including yours.
+
+**Different fires want different things put on them.** A car burns fuel, so it takes
+foam — and foam comes out of a second tank that only the station refills, so a shift of
+car fires sends the appliance home whatever the hydrant on the corner says. An electrical
+fire takes dry powder, which is what a patrol car carries and the appliance does not: the
+one call the fire service cannot answer and the police can. The board says what each fire
+wants, so none of it is guesswork.
+
+**Your own people can be lost.** A crew member caught in a blast, or one wrestling a
+suspect on their own, goes down and needs an ambulance like anyone else. Get them to
+hospital and they come back; don't, and the unit is off your books for good.
+
+**A crowd can turn.** A disturbance left unattended draws bystanders in until it is
+several people rather than one. An officer standing in it stops that, and so does a
+cordon — the first thing in the game that has ever needed one.
+
+**Someone can be pinned under the load.** A trapped casualty can be treated where they
+lie, but nobody moves them until a fire crew cuts them free — the first call that needs
+two services in sequence rather than at once, so turning up in the wrong order costs you.
+
+One call can hurt you back. A **gas leak** puts a pressure cylinder beside a burning bin;
+it heats while the fire burns and the board counts it down — *warming*, *venting*, *about
+to go*. Let it reach the limit and it takes the street: damage to everything near it,
+bystanders hurt, fresh fires thrown. Hose the cylinder, or put the fire out and let it
+cool itself. Both work; picking one is the call. Casualties are stabilised where they lie
 and then stretchered aboard; they are not saved until they reach the hospital. Suspects
-are detained and driven to the station.
+are detained, walked to a patrol car by the officer who arrested them, and driven to the
+station. A car takes two.
 
 The shift ends in a debrief and a score. Vehicles take damage from what you drive them
 into, and repairs come out of the same purse the fleet is bought from.
 
 ## Controls
 
-Also on **F1** in game, and on the CONTROLS chip beside it.
+Also on **F1** in game, and on the CONTROLS chip beside it. `F5` opens a call spawner for
+picking a specific call kind rather than waiting for the director to roll one.
 
 | | |
 | --- | --- |

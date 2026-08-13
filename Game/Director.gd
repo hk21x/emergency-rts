@@ -97,6 +97,24 @@ const KINDS := [
 	{"id": &"vehicle_fire", "weight": 10},
 	{"id": &"building", "weight": 20, "needs_fire_service": true},
 	{"id": &"rescue", "weight": 12, "needs_fire_service": true},
+	{"id": &"gas_leak", "weight": 10, "needs_fire_service": true},
+	# **No `needs_fire_service`, and that is the whole point.** Every other fire in this
+	# table either wants a crew or merely tolerates an officer; this one the appliance
+	# cannot touch at all, so it is the first call that is *police work because it is a
+	# fire* rather than in spite of being one.
+	{"id": &"electrical", "weight": 12},
+	# **Two services in sequence, which nothing else here asks for.** A rescue wants an
+	# engine and an ambulance at the same time; this wants the crew to have *finished*
+	# before the paramedic can start, so turning up in the wrong order costs real time.
+	{"id": &"trapped", "weight": 12, "needs_fire_service": true},
+	# **The one call that gets worse for want of units rather than for want of time.**
+	# Everything else here spreads on its own schedule; a disorder call spreads only
+	# while nobody is standing in it, so turning up is itself the intervention.
+	{"id": &"disorder", "weight": 12},
+	# **Gated on owning a doctor, on exactly the terms building fires are gated on owning an
+	# engine.** A casualty nobody on the roster can stabilise is not a hard call, it is a
+	# broken one: paramedics would hold them indefinitely and the call would never close.
+	{"id": &"collapse", "weight": 14, "needs_doctor": true},
 ]
 
 ## What a vehicle fire leaves at the kerb. Plain mesh prefabs straight from the pack:
@@ -148,10 +166,32 @@ func abandon_shift() -> void:
 	if not active:
 		return
 	active = false
+	# **The open calls fail before the scoring stops.** This used to switch scoring off
+	# first and then free the incidents, so every call on the board closed silently -- and
+	# since money banks on every `earn()` while the score only banks in `end_shift()`,
+	# abandoning a bad shift was strictly better than finishing it: you kept the takings,
+	# dropped the score, escaped the lost-casualty penalty and wiped the repair debt.
+	#
+	# Failing them first costs nothing that was earned -- `best_score` only ever rises --
+	# and it produces an honest debrief for a shift that went badly.
 	if _mission:
+		for call in _board.open_calls():
+			call.abandon()
+		_mission.end_shift()
 		_mission.scoring = false
 	for node in get_tree().get_nodes_in_group(Incident.GROUP):
 		node.queue_free()
+	_close_the_books()
+
+
+## Sweeps outstanding repair bills onto the house account.
+##
+## Called from **both** exits -- the shift running out and the shift being abandoned -- so
+## it reads as when the accounting happens rather than as a penalty for quitting.
+func _close_the_books() -> void:
+	var house := get_tree().get_first_node_in_group(Station.GROUP) as Station
+	if house:
+		house.settle_to_house()
 
 
 func shift_remaining() -> float:
@@ -182,6 +222,7 @@ func _process(delta: float) -> void:
 			active = false
 			if _mission:
 				_mission.end_shift()
+			_close_the_books()
 			shift_ended.emit()
 		return
 
@@ -221,11 +262,25 @@ func _on_call_closed(_call: Call, _success: bool) -> void:
 # --- Opening a call ----------------------------------------------------------
 
 func _open_call() -> void:
-	match _pick_kind():
+	open_kind(_pick_kind())
+
+
+## Opens one call of a named kind, through **every guard the rolled path uses**.
+##
+## Public so a tool can ask for a specific call without waiting on the dice -- see
+## [CallSpawner]. Split out rather than reimplemented on purpose: `_clear()` and
+## `_pick_pavement()` are the single funnel enforcing that nothing ever opens inside a
+## property, so a spawner that placed incidents itself could put a fire in a building and
+## show the player a scene that looks like a bug in the game rather than in the tool.
+## The only thing overridden here is which row of the table gets used.
+func open_kind(kind: StringName) -> void:
+	match kind:
 		&"fire":
 			var spot := _pick_pavement()
 			if spot != Vector3.INF:
-				_spawn_fire(spot)
+				# A bin at the kerb: the small job, and the one an officer can deal
+				# with on their own without the career owning a fire service yet.
+				_spawn_fire(spot, Fire.Kind.BIN)
 		&"rtc":
 			var junction := _pick_junction()
 			if junction.x >= 0:
@@ -242,6 +297,20 @@ func _open_call() -> void:
 			_spawn_building_fire()
 		&"rescue":
 			_spawn_rescue()
+		&"gas_leak":
+			_spawn_gas_leak()
+		&"trapped":
+			_spawn_trapped()
+		&"disorder":
+			_spawn_disorder()
+		&"collapse":
+			_spawn_collapse()
+		&"electrical":
+			var spot := _pick_pavement()
+			if spot != Vector3.INF:
+				var fire := _spawn_fire(spot, Fire.Kind.ELECTRICAL, 0.4)
+				if fire:
+					fire.flavour = "Electrical fire, water unsuitable"
 		_:
 			_spawn_medical()
 	# A tick with nowhere to put a call simply skips it; the timer has already been
@@ -253,6 +322,8 @@ func _pick_kind() -> StringName:
 	var total := 0
 	for kind in KINDS:
 		if kind.get("needs_fire_service", false) and not _can_fight_buildings():
+			continue
+		if kind.get("needs_doctor", false) and not _has_doctor():
 			continue
 		offered.append(kind)
 		total += int(kind["weight"])
@@ -282,6 +353,19 @@ func _pick_kind() -> StringName:
 ## gets a fire in two places that they can beat, four get the eight-node scene that was
 ## always the design. Beyond four it does not grow further -- the appliance seats four,
 ## and a fire that outran a full crew would just be the old problem again.
+## How big a disorder call starts, and how far it can grow, by the officers the career
+## owns. Same principle as [constant BUILDING_SIZE] and for the same reason: the job fits
+## whoever can be sent, rather than being withheld until the roster is big enough. That
+## was tried on building fires, it was miserable, and a one-officer career never seeing
+## the interesting police call would be the same mistake in a different uniform.
+const DISORDER_SIZE := [
+	{"officers": 1, "start": 2, "max_group": 3},
+	{"officers": 2, "start": 2, "max_group": 4},
+	{"officers": 3, "start": 3, "max_group": 6},
+	{"officers": 4, "start": 3, "max_group": 8},
+]
+
+
 const BUILDING_SIZE := [
 	{"crew": 1, "max_fires": 2, "spread_interval": 15.0},
 	{"crew": 2, "max_fires": 4, "spread_interval": 12.0},
@@ -293,6 +377,14 @@ const BUILDING_SIZE := [
 ## Whether the career could actually put a building out: an appliance to run the hose
 ## from, and somebody to hold it. Both, because either alone is no use -- and only one
 ## of each, because [constant BUILDING_SIZE] makes the fire fit whoever turns up.
+## Whether the career can finish a casualty that a paramedic cannot. The doctor alone is
+## enough -- unlike a building fire, which needs an appliance to reach it as well, a doctor
+## walks and any ambulance on the books can carry the patient once they are stable.
+func _has_doctor() -> bool:
+	var station := get_tree().get_first_node_in_group(Station.GROUP) as Station
+	return station != null and station.owns(&"doctor")
+
+
 func _can_fight_buildings() -> bool:
 	var station := get_tree().get_first_node_in_group(Station.GROUP) as Station
 	if station == null:
@@ -344,6 +436,32 @@ func _spawn_medical() -> void:
 		_spawn_casualty(fallback, "")
 
 
+## A collapse in the street: one casualty who is beyond a paramedic.
+##
+## Built on [method _spawn_medical]'s trick of taking a standing civilian and putting *them*
+## on the pavement in their own clothes, because the alternative -- a stranger fading in
+## beside the crowd they were not part of a moment ago -- is the thing that trick exists to
+## avoid. The decline is left at the ordinary rate: the pressure here is the dispatch, not
+## the clock, and doubling both at once would make the call unreadable rather than hard.
+func _spawn_collapse() -> void:
+	var spot := Vector3.INF
+	var worn := ""
+	var civilian := _pick_civilian()
+	if civilian:
+		spot = civilian.global_position
+		var body := civilian.get_node_or_null("Character")
+		if body:
+			worn = body.scene_file_path
+		civilian.queue_free()
+	else:
+		spot = _pick_pavement()
+	if spot == Vector3.INF:
+		return
+	var casualty := _spawn_casualty(spot, "Collapse -- beyond a paramedic", worn)
+	if casualty:
+		casualty.needs_doctor = true
+
+
 func _spawn_casualty(spot: Vector3, flavour: String, outfit := "") -> Casualty:
 	var casualty := _spawn("res://Game/Incidents/Casualty.tscn", outfit) as Casualty
 	if casualty:
@@ -372,7 +490,7 @@ func _spawn_vehicle_fire() -> void:
 	var kerb := _pick_kerb()
 	if kerb.is_empty():
 		return
-	var fire := _spawn_fire(kerb["spot"])
+	var fire := _spawn_fire(kerb["spot"], Fire.Kind.VEHICLE)
 	if fire == null:
 		return
 	fire.flavour = "Vehicle fire"
@@ -404,21 +522,47 @@ func _spawn_building_fire() -> void:
 	var spot := _pick_pavement(true)
 	if spot == Vector3.INF:
 		return
-	var fire := _spawn_fire(spot)
+	# Well alight on arrival: this is a job for a crew, not something an officer wanders
+	# past and deals with. Everything else -- needing a hose, growing faster than a
+	# kerbside fire, being slow enough to knock down that the tank matters -- now comes
+	# from the kind rather than being restated here.
+	var fire := _spawn_fire(spot, Fire.Kind.BUILDING, 0.55)
 	if fire == null:
 		return
 	fire.flavour = "Building fire"
-	fire.needs_hose = true
 	# How far it gets to spread is set by how many hands the career can send.
 	_size_to_crew(fire)
-	# Well alight on arrival, and it grows faster than a kerbside one: this is a job
-	# for a crew, not something an officer wanders past and deals with.
-	fire.intensity = 0.55
-	fire.growth_per_second = 0.07
-	# Slower to knock down than a bin, which is what gives the tank something to do:
-	# at the full hose rate this is about eleven seconds and two thirds of a tank,
-	# and a crew off the hose loses to it outright.
-	fire.douse_per_second = 0.12
+
+
+## A cylinder at the kerb with a fire beside it, and a clock the player can see.
+##
+## The job the fire service has not had: one where standing still is the right thing to
+## do. Every other fire rewards getting on the hose and staying there; this one asks
+## whether the crew should be fighting the fire at all, or turning the jet on the thing
+## that is about to take the street with it. Both answers work -- cool it, or put the
+## fire out and let it cool on its own -- and which is right depends on how far along
+## each of them is.
+##
+## Gated on the fire service like the building and the rescue, and for the same reason:
+## nothing but a hose cools a cylinder, so a career without one would be watching a
+## countdown it had no way to stop.
+func _spawn_gas_leak() -> void:
+	var kerb := _pick_kerb()
+	if kerb.is_empty():
+		return
+	var spot: Vector3 = kerb["spot"]
+	var hazard := _spawn("res://Game/Incidents/Hazard.tscn") as Hazard
+	if hazard == null:
+		return
+	hazard.global_position = spot
+	hazard.flavour = "Gas cylinder, fire nearby"
+
+	# Close enough to be cooking it, far enough that the crew can work either without
+	# standing in the other. Placed through _beside so a frontage facing the wrong way
+	# cannot put the fire inside the building.
+	var fire := _spawn_fire(_beside(spot, Vector3(4.0, 0.0, 1.0)), Fire.Kind.BIN, 0.45)
+	if fire == null:
+		return
 
 
 ## The set piece: a building alight with people hurt outside it. The first call the
@@ -434,14 +578,10 @@ func _spawn_rescue() -> void:
 	var spot := _pick_pavement(true)
 	if spot == Vector3.INF:
 		return
-	var fire := _spawn_fire(spot)
+	var fire := _spawn_fire(spot, Fire.Kind.BUILDING, 0.5)
 	if fire == null:
 		return
-	fire.needs_hose = true
 	_size_to_crew(fire)
-	fire.intensity = 0.5
-	fire.growth_per_second = 0.07
-	fire.douse_per_second = 0.12
 	# The flavour is carried by the fire because Call.title() takes the first one it
 	# finds, and this is the incident that names the job.
 	fire.flavour = "Building fire, casualties reported"
@@ -465,12 +605,70 @@ func _strip_collision(node: Node) -> void:
 
 ## A kerbside fire -- a bin, a skip, a parked car. Sized for the extinguisher a patrol
 ## car actually carries, and it will still spread if it is left to.
-func _spawn_fire(spot: Vector3) -> Fire:
+## A fire of a given character. The rates, the plume and whether it spreads all come
+## from [enum Fire.Kind] now -- this used to set four fields inline at four call sites,
+## and they drifted apart.
+func _spawn_fire(spot: Vector3, kind := Fire.Kind.BIN, intensity := 0.3) -> Fire:
 	var fire := _spawn("res://Game/Incidents/Fire.tscn") as Fire
-	if fire:
-		fire.global_position = spot
-		fire.intensity = 0.3
+	if fire == null:
+		return null
+	fire.kind = kind
+	fire.global_position = spot
+	fire.intensity = intensity
 	return fire
+
+
+## A crowd turning: several of them at one kerb, drawing bystanders in until an officer
+## stands in it or a cordon goes up.
+##
+## Sized to the roster on the way in, and capped on the way up, so a career with one
+## officer gets a job one officer can finish and a career with four gets one worth four.
+func _spawn_disorder() -> void:
+	var kerb := _pick_kerb()
+	if kerb.is_empty():
+		return
+	var spot: Vector3 = kerb["spot"]
+	var row := _disorder_size()
+	# Fanned along the kerb rather than stacked, or they spawn inside one another and the
+	# scene reads as one person with a stutter.
+	for i in int(row["start"]):
+		var offset := Vector3(1.6 * (float(i) - float(row["start"]) * 0.5), 0.0, 0.0)
+		var suspect := _spawn_suspect(spot + offset)
+		if suspect == null:
+			continue
+		suspect.flavour = "Public disorder"
+		suspect.recruits = true
+		suspect.max_group = int(row["max_group"])
+
+
+## The row of [constant DISORDER_SIZE] matching the officers on the books.
+func _disorder_size() -> Dictionary:
+	var station := get_tree().get_first_node_in_group(Station.GROUP) as Station
+	var officers := int(station.owned.get(&"officer", 0)) if station else 0
+	var row: Dictionary = DISORDER_SIZE[0]
+	for candidate: Dictionary in DISORDER_SIZE:
+		if officers >= int(candidate["officers"]):
+			row = candidate
+	return row
+
+
+## Someone pinned under a fallen load. One casualty, two services, and an order between
+## them: the crew cut them loose, then the paramedic can work.
+##
+## Takes a civilian where it can, exactly as a collapse does -- the person under the pipe
+## should be somebody who was walking past, not a stranger conjured for the occasion.
+func _spawn_trapped() -> void:
+	var spot := _pick_pavement(true)
+	if spot == Vector3.INF:
+		return
+	var casualty := _spawn_casualty(spot, "Person trapped under a load")
+	if casualty == null:
+		return
+	casualty.trapped = true
+	# They are declining the whole time they are pinned, and the crew are not treating
+	# them -- so this starts gentler than a plain collapse, or the sequencing the call
+	# exists to create would just be a way to lose people.
+	casualty.decline_per_second *= 0.6
 
 
 ## A collision at a crossroads: two casualties in the road, close enough that the board

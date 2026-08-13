@@ -23,6 +23,43 @@ const SUSPECT_GROUP := &"suspects"
 @export_group("Arrest")
 ## Fraction of the arrest completed per second of an officer's work.
 @export var detain_per_second := 0.25
+## Condition taken off the arresting officer, per second, while they are resisting.
+##
+## Small: a lone arrest is meant to be *expensive*, not lethal. What it buys is that
+## sending two officers, or putting a cordon up first, becomes a decision rather than a
+## flourish -- and it gives a disturbance a way to cost you something, which it has never
+## had. A suspect still cannot be lost; they can only make you pay.
+@export var fight_harm_per_second := 0.06
+
+## How far behind the officer an escorted suspect walks. Far enough not to stand inside
+## them, near enough to read as being taken somewhere rather than following by chance.
+const ESCORT_GAP := 1.0
+
+@export_group("Public order")
+## Whether this one draws others in. **Off by default**, so the ordinary Disturbance is
+## exactly the single mouthy individual it has always been; only the disorder call turns
+## it on. A default that recruited would have retuned every crime call in the game while
+## claiming to add a feature -- the same trap `Fire.kind`'s default sprang.
+@export var recruits := false
+## Seconds between one bystander deciding to join in.
+@export var recruit_interval := 9.0
+## How near a civilian has to be to get involved.
+@export var recruit_distance := 7.0
+## The most this can grow to, counting everyone already at the scene. Set by the director
+## from the roster: a job that outgrew the officers who could ever be sent would be the
+## unwinnable version, which this project has already built once and thrown away.
+@export var max_group := 4
+## How near an officer has to be to take the heat out of it. Comfortably further than
+## arrest reach -- an officer standing *among* them is what calms a crowd, and they
+## cannot be arresting more than one at a time.
+@export var police_reach := 9.0
+
+## Counts down to the next bystander joining. **Starts at a full interval**, set in
+## `_ready` because the export is not readable at declaration: at 0.0 the first one
+## joined on the very first uncontained frame, which is both wrong (a crowd does not turn
+## instantly) and unclearable -- a call that grew the moment it opened could never be
+## resolved faster than it recruited, and four shift-end checks went red saying so.
+var _recruit_left := 0.0
 
 @export_group("Pacing")
 ## How far from where the call opened they will wander. Small on purpose: a
@@ -50,6 +87,10 @@ var detain_progress := 0.0
 var is_detained := false
 ## Riding in a patrol car: hidden, unpickable, not yet booked in.
 var is_loaded := false
+## The officer walking them to the car, or null. While set they follow on foot: visible,
+## but not pickable, so nothing else can take a target off the officer mid-walk. The same
+## arrangement `Casualty.is_carried` uses for a stretcher, and for the same reason.
+var escorted_by: Unit
 ## True while resisting an arrest in progress. Derived from detain() being ticked:
 ## the work refreshes the heat, the heat decays, and no order has to remember to
 ## switch it off.
@@ -75,6 +116,7 @@ func _ready() -> void:
 	# Somebody off the pavement, not the pack's grey mannequin: a disturbance is a
 	# member of the public having a bad afternoon.
 	_animation = _wear_outfit()
+	_recruit_left = recruit_interval
 	_rng.seed = hash(name)
 
 
@@ -87,16 +129,25 @@ func _physics_process(delta: float) -> void:
 
 	_fight_heat = maxf(_fight_heat - delta, 0.0)
 	is_fighting = _fight_heat > 0.0 and not is_detained
+	_update_recruiting(delta)
 
 	if is_fighting:
 		_target = Vector3.INF
+		# They fight whoever has hands on them, and only them -- an officer walking past
+		# a scuffle is not in it.
+		var officer := arresting as Person
+		if officer:
+			officer.hurt(fight_harm_per_second * delta)
 		_brawl()
 		return
+	if escorted_by != null and is_instance_valid(escorted_by):
+		_walk_behind(escorted_by, delta)
+		return
 	if is_detained:
-		# Cuffed: back to the spot the call opened on -- the kerb the patrol car
-		# can actually reach -- then stand.
-		if _step_towards(_anchor, delta):
-			_loop(calmed_clip)
+		# Cuffed and nobody walking them: stand where they are. Until August 2026 they
+		# trudged back to the spot the call opened on, which was the kerb a patrol car
+		# could reach -- that was the *car* coming to them, and the car no longer does.
+		_loop(calmed_clip)
 		return
 
 	# The disturbance itself: pace a few metres, stop, give it some more mouth.
@@ -109,6 +160,135 @@ func _physics_process(delta: float) -> void:
 	_pause -= delta
 	if _pause <= 0.0:
 		_target = _pick_pace()
+
+
+## Draws a bystander in, unless somebody is containing it.
+##
+## This is the only thing in the game that gets **worse for want of units** rather than
+## for want of time. A fire spreads on its own schedule whatever you do; a disorder call
+## spreads only while nobody is standing in it, so arriving is itself the intervention
+## and arriving late costs you the size of the job rather than a few seconds of it.
+func _update_recruiting(delta: float) -> void:
+	if not recruits or is_detained or _group_size() >= max_group:
+		return
+	# **Contained, and two ways of doing it.** An officer in among them takes the heat
+	# out of it, and so does a cordon -- which is the first job `Secure` has ever had.
+	# Until now nothing in the game required a ring of cones, and a verb that never
+	# matters is a verb the player correctly ignores.
+	if _is_contained():
+		# Reset rather than pause: containment that merely held the clock would mean a
+		# scene could be left half-attended and picked up exactly where it was.
+		_recruit_left = recruit_interval
+		return
+	# Never longer than the interval currently set. `_ready` latches a full interval, so
+	# without this a caller that lowers `recruit_interval` afterwards waits out the old
+	# one first -- which is a surprise in play and made a check sit through a 9s countdown
+	# it thought it had shortened to half a second.
+	_recruit_left = minf(_recruit_left, recruit_interval)
+	_recruit_left -= delta
+	if _recruit_left > 0.0:
+		return
+	_recruit_left = recruit_interval
+	_draw_one_in()
+
+
+## An officer within reach, or a raised cordon over this spot.
+func _is_contained() -> bool:
+	for node in get_tree().get_nodes_in_group(Unit.GROUP):
+		var unit := node as Unit
+		if unit == null or unit.service != Unit.Service.POLICE:
+			continue
+		# A patrol car parked at the scene is not crowd control; it takes an officer on
+		# foot, which is what makes the call about the roster rather than the fleet.
+		if unit is Vehicle:
+			continue
+		var offset := unit.global_position - global_position
+		offset.y = 0.0
+		if offset.length() <= police_reach:
+			return true
+	for node in get_tree().get_nodes_in_group(Cordon.GROUP):
+		var cordon := node as Cordon
+		if cordon and cordon.contains(global_position):
+			return true
+	return false
+
+
+## Everyone already in it, so the group stops growing at [member max_group] rather than
+## every member growing their own.
+func _group_size() -> int:
+	var count := 0
+	for node in get_tree().get_nodes_in_group(SUSPECT_GROUP):
+		var other := node as Suspect
+		if other == null or not other.active:
+			continue
+		var offset := other.global_position - global_position
+		offset.y = 0.0
+		if offset.length() <= recruit_distance * 2.5:
+			count += 1
+	return count
+
+
+## Turns the nearest bystander into one more of them, wearing what they were wearing --
+## the same thing a blast does to the person standing in it, and for the same reason: the
+## crowd in this game is made of people, not spawn points.
+func _draw_one_in() -> void:
+	var parent := get_parent()
+	if parent == null:
+		return
+	var nearest: Civilian = null
+	var best := recruit_distance
+	for node in get_tree().get_nodes_in_group(Unit.GROUP):
+		var civilian := node as Civilian
+		if civilian == null:
+			continue
+		var offset := civilian.global_position - global_position
+		offset.y = 0.0
+		if offset.length() < best:
+			best = offset.length()
+			nearest = civilian
+	if nearest == null:
+		return
+	var joined := (load("res://Game/Incidents/Suspect.tscn") as PackedScene) \
+		.instantiate() as Suspect
+	if joined == null:
+		return
+	joined.outfit = nearest.outfit_scene()
+	joined.flavour = "Public disorder"
+	joined.recruits = true
+	joined.max_group = max_group
+	parent.add_child(joined)
+	joined.global_position = nearest.global_position
+	nearest.queue_free()
+
+
+## Taken in hand by an officer, to be walked to the car.
+func walk_with(officer: Unit) -> void:
+	if not active or not is_detained or is_loaded:
+		return
+	escorted_by = officer
+	# Not pickable while being walked, so a second order cannot take them off the
+	# officer halfway there and leave two units arguing over one suspect.
+	$Collision.set_deferred("disabled", true)
+
+
+## Let go, wherever they happen to be standing. Cancelling an escort has to leave a
+## suspect that is still detained and still collectable, not one stuck to a freed order.
+func let_go() -> void:
+	escorted_by = null
+	if active and not is_loaded:
+		$Collision.set_deferred("disabled", false)
+
+
+## Follows a step behind whoever is walking them.
+func _walk_behind(officer: Unit, delta: float) -> void:
+	var behind := officer.global_position
+	var back := officer.global_basis.z
+	back.y = 0.0
+	if back.length() > 0.01:
+		behind += back.normalized() * ESCORT_GAP
+	if _step_towards(behind, delta):
+		_face(officer.global_position)
+		_loop(calmed_clip)
 
 
 ## An officer's work. At 1 the suspect is in custody and ready for the car.

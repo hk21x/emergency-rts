@@ -55,6 +55,19 @@ const TYPES := [
 			"The stretcher lives in the back. Seats 2."],
 	},
 	{
+		# **The doctor's own car, and the reason the doctor is dispatchable at all.** On
+		# foot a specialist arrives after the call has resolved itself. It carries no
+		# stretcher on purpose -- a rapid-response car that could also run the patient to
+		# hospital would quietly replace the ambulance and dissolve the bottleneck the
+		# doctor exists to be.
+		"id": &"doctor_car", "label": "Doctor Car",
+		"scene": "res://Game/Vehicles/DoctorCar.tscn",
+		"service": Unit.Service.MEDICAL, "vehicle": true, "price": 500,
+		"portrait": "DoctorCar",
+		"blurb": ["Gets the doctor to the scene.",
+			"No stretcher -- that is the ambulance's job."],
+	},
+	{
 		"id": &"engine", "label": "Fire Engine",
 		"scene": "res://Game/Vehicles/FireEngine.tscn",
 		"service": Unit.Service.FIRE, "vehicle": true, "price": 1400,
@@ -86,6 +99,18 @@ const TYPES := [
 		"blurb": ["Treats casualties where they lie,",
 			"then wheels them to the ambulance."],
 	},
+	{
+		# **The first specialist within a service**, and priced to be scarce. A career that
+		# owns one doctor and three paramedics is the point: the doctor is a bottleneck you
+		# route around a call, and the paramedics are how you buy the time to do it. Two
+		# doctors and the decision goes away, which is why this costs more than the
+		# ambulance that carries their patients.
+		"id": &"doctor", "label": "Doctor", "scene": "res://Game/Doctor.tscn",
+		"service": Unit.Service.MEDICAL, "vehicle": false, "price": 600,
+		"portrait": "Doctor",
+		"blurb": ["Stabilises casualties too far gone",
+			"for a paramedic to finish."],
+	},
 ]
 
 ## Where a dispatched or returning unit stands. Two rows of four: the fleet can now
@@ -114,6 +139,13 @@ const TYPES := [
 var funds := STARTING_FUNDS
 ## Spent on repairs since the shift opened. The debrief reports it; nothing else reads it.
 var repairs_paid := 0
+## Repairs owed to the house, carried between shifts and between sessions.
+##
+## Damage used to live only on the vehicle that took it, and vanish with the process --
+## so the cheapest way to pay for a bad shift was to quit it. Swept off the fleet by
+## [method settle_to_house] whenever the books close, paid down off the top of every
+## [method earn], and persisted beside the purse.
+var debt := 0
 var owned := {}
 ## A var rather than a const so the test suite can point the career at a disposable
 ## file -- the same contract records_path and settings_path honour.
@@ -165,11 +197,59 @@ func purchase(id: StringName) -> bool:
 
 ## Banks earnings from a completed call. The mission decides the amounts; this is
 ## only the purse.
+##
+## **Debt comes off the top.** Repairs owed to the house are settled before anything
+## reaches the funds, which keeps the "empties the purse but never overdraws" property
+## `repair()` already has, and gives the career the ongoing sink it has never had -- until
+## now the money only ever went up.
 func earn(amount: int) -> void:
 	if amount <= 0:
 		return
-	funds += amount
+	var toward_debt := mini(amount, debt)
+	debt -= toward_debt
+	funds += amount - toward_debt
 	_save_career()
+	roster_changed.emit()
+
+
+## Moves every outstanding repair bill off the fleet and onto the house account.
+##
+## Called when the books close -- at the end of a shift **and** when one is abandoned.
+## That symmetry is the point: it is not a punishment for quitting, it is simply when the
+## accounting happens.
+##
+## Before this existed, `repair_bill` lived only on the `Vehicle` node and was never
+## serialised, so quitting mid-shift wiped whatever damage you had done. Money banked on
+## every `earn()`; the debt died with the process. Abandoning a bad shift was strictly
+## better than finishing it.
+func settle_to_house() -> int:
+	var swept := 0
+	for node in get_tree().get_nodes_in_group(Unit.GROUP):
+		var vehicle := node as Vehicle
+		if vehicle == null or vehicle is TrafficCar or vehicle.repair_bill <= 0:
+			continue
+		swept += vehicle.repair_bill
+		debt += vehicle.repair_bill
+		vehicle.repair_bill = 0
+	if swept > 0:
+		_save_career()
+		roster_changed.emit()
+	return swept
+
+
+## Takes a unit off the books for good: it was lost, not damaged.
+##
+## The one thing in the game that makes `owned` go **down**. Deliberately narrow -- only a
+## crew casualty that reaches the hospital dead calls this -- because a career that can
+## lose an asset it paid for is the difference between stakes and scenery.
+func write_off(unit: Unit) -> void:
+	if unit == null or not is_instance_valid(unit):
+		return
+	var id := type_of(unit)
+	if id != &"":
+		owned[id] = maxi(0, int(owned.get(id, 0)) - 1)
+	_save_career()
+	unit.queue_free()
 	roster_changed.emit()
 
 
@@ -181,6 +261,7 @@ func reset_career() -> void:
 			unit.queue_free()
 	owned = {}
 	funds = STARTING_FUNDS
+	debt = 0
 	_issued = {}
 	_save_career()
 	roster_changed.emit()
@@ -191,6 +272,7 @@ func _load_career() -> void:
 	if career.load(career_path) != OK:
 		return
 	funds = int(career.get_value("career", "funds", STARTING_FUNDS))
+	debt = int(career.get_value("career", "debt", 0))
 	var stored: Dictionary = career.get_value("career", "owned", {})
 	owned = {}
 	for config in TYPES:
@@ -202,6 +284,7 @@ func _load_career() -> void:
 func _save_career() -> void:
 	var career := ConfigFile.new()
 	career.set_value("career", "funds", funds)
+	career.set_value("career", "debt", debt)
 	var stored := {}
 	for id in owned:
 		stored[String(id)] = int(owned[id])
@@ -241,6 +324,8 @@ func dispatch(id: StringName) -> Unit:
 		return null
 
 	_issued[id] = int(_issued.get(id, 0)) + 1
+	# **Stamped, not inferred.** See [method type_of].
+	unit.type_id = id
 	unit.name = "%s%d" % [config["label"], _issued[id]]
 	unit.display_name = "%s %d" % [config["label"], _issued[id]]
 	# Crew portraits are assigned here -- the map no longer ships pre-placed units,
@@ -305,7 +390,7 @@ func repair(vehicle: Vehicle) -> int:
 ## What the whole fleet still owes. The dispatch panel reads it so a player can see the
 ## bill coming before it lands.
 func outstanding_repairs() -> int:
-	var total_owed := 0
+	var total_owed := debt
 	for node in get_tree().get_nodes_in_group(Unit.GROUP):
 		var vehicle := node as Vehicle
 		if vehicle and not (vehicle is TrafficCar):
@@ -326,9 +411,26 @@ func owns(id: StringName) -> bool:
 
 ## Which of the types a unit is. Derived from what it *is* rather than from a tag,
 ## so a unit standing in the yard and one out on a call are the same thing here.
+## Which catalogue entry a unit on the map was bought from.
+##
+## **Read off the unit, because it can no longer be worked out from what the unit is.** This
+## used to scan the catalogue for the first entry matching (service, vehicle), which was
+## exact only while each service had exactly one kind of person. The doctor broke that in
+## August 2026 -- MEDICAL and not a vehicle now matches both the paramedic and the doctor --
+## and the scan quietly returned the paramedic for both. It is worth being precise about
+## what that cost, because neither symptom points anywhere near here: [method write_off]
+## took a doctor off the books by decrementing the *paramedic* count, and [method _alive]
+## counted every doctor as a paramedic, so the dispatch panel offered paramedics that were
+## not there and refused doctors that were. Any specialist added from here on would have
+## re-broken it the same way.
+##
+## The scan survives as a fallback for a unit nobody bought -- a fixture placed by hand, or
+## a scene dropped into the map -- where it is a guess and says so.
 static func type_of(unit: Unit) -> StringName:
 	if unit == null or unit.service == Unit.Service.NONE:
 		return &""
+	if unit.type_id != &"":
+		return unit.type_id
 	var vehicle := unit is Vehicle
 	for config in TYPES:
 		if config["service"] == unit.service and config["vehicle"] == vehicle:
