@@ -183,6 +183,8 @@ func _run() -> void:
 	await _test_the_map_opens_quiet()
 	await _test_the_district_doubled_with_variety()
 	await _test_parked_cars_wear_different_paints()
+	await _test_the_district_is_dressed_from_a_wide_vocabulary()
+	await _test_terraces_do_not_all_stand_the_same_height()
 	await _test_the_appliance_is_a_real_appliance()
 	await _test_the_fire_service_paint_is_warm()
 	await _test_the_doctors_car_is_orange_and_carries_nobody()
@@ -285,6 +287,7 @@ func _run() -> void:
 	await _test_seats_are_limited()
 	await _test_the_navigation_overlay_is_off_until_asked()
 	await _test_a_car_sent_off_the_road_climbs_the_kerb()
+	await _test_a_narrow_street_u_turn_completes()
 	await _test_a_shut_street_is_passed_over_the_pavement()
 	await _test_a_junction_queue_does_not_earn_the_pavement()
 	await _test_siren_runs_while_responding()
@@ -603,6 +606,68 @@ func _test_civilians_flee_a_fire() -> void:
 	await _clear_incidents()
 	await _wait(40)
 	_check(not civilian.is_fleeing, "and settles once the fire is out")
+
+
+## The street dressing draws on the pack rather than on a handful of favourites.
+##
+## Reported from play as the district looking bland and reusing the same assets, and the
+## count agreed: the generator named **22 of the 174 props the pack ships**, so the same
+## bench and the same bin appeared down every street. Buildings were never the problem --
+## those were already at 51 of 75 -- it was the street furniture, which is what a player
+## actually looks at from the RTS camera.
+##
+## Counted off the **built scene**, not off the generator's tables, so it measures what was
+## placed rather than what was listed. A name in a table that never survives a placement
+## rule is exactly the sort of thing that would make a table-reading check lie.
+func _test_the_district_is_dressed_from_a_wide_vocabulary() -> void:
+	var props := {}
+	for node in _scene.find_children("*", "MultiMeshInstance3D", true, false):
+		var batch := node as MultiMeshInstance3D
+		if batch.multimesh == null or batch.multimesh.mesh == null:
+			continue
+		var path := batch.multimesh.mesh.resource_path
+		if "SM_Prop_" in path:
+			props[path] = true
+	# 22 before the widening, 45 after. A floor between the two, nearer the new figure, so
+	# this fails if the vocabulary is narrowed again without failing on one prop moving.
+	_check(props.size() >= 35,
+		"the district places a wide spread of props (%d distinct)" % props.size())
+
+
+## And the terraces are not all one height per kind.
+##
+## The other half of "too much of a grid". Every block of a kind used to stand at exactly
+## its kit's height -- twenty-one terraces sharing **three** silhouettes, in rows -- which
+## reads as a lattice from above however irregular the block spacing is.
+##
+## Measured off the colliders rather than the facades on purpose: the collider is the thing
+## that must agree with what was built, and reading it here means this check also fails if
+## the two ever drift apart. The two blocks with a forecourt are excluded from the variation
+## at source and stay at kit height, because raising the station wall put it between the
+## opening camera and every unit parked on its own apron.
+func _test_terraces_do_not_all_stand_the_same_height() -> void:
+	var heights := {}
+	var buildings := _scene.get_node_or_null("World/Buildings")
+	if buildings == null:
+		_check(false, "the map has a Buildings node to measure")
+		return
+	for node in buildings.get_children():
+		if not String(node.name).begins_with("Block_"):
+			continue
+		var body := node as StaticBody3D
+		var shape := body.get_node_or_null("Shape") as CollisionShape3D
+		var box := shape.shape as BoxShape3D if shape else null
+		if box == null:
+			continue
+		heights[snappedf(box.size.y, 0.01)] = true
+	# Two of the twenty-one blocks are round towers on a CylinderShape3D and are skipped
+	# here by construction. Note for anyone sabotaging this: flattening the colliders also
+	# reddens the prisoner-loading scenario, which walks suspects through that geometry --
+	# that is a real consequence of moving thirteen building walls, not a check reaching
+	# too far. Collapsing only the singleton heights isolates it if you want one red.
+	_check(heights.size() >= 6,
+		"terraces stand at a spread of heights (%d distinct across %d blocks)"
+			% [heights.size(), buildings.get_child_count()])
 
 
 ## The district's cars are not all blue. The pack paints every body off one atlas
@@ -4203,6 +4268,64 @@ func _test_a_junction_queue_does_not_earn_the_pavement() -> void:
 	await _park_the_shift()
 
 
+## A car sent to a point dead behind it, on a street, turns round and arrives.
+##
+## The navigation block already proves "reached a target directly behind it" -- on the
+## station forecourt, which is open ground where a single full-lock loop fits. A street
+## is the case that spent a year broken: the carriageway is narrower than the turning
+## circle, so the manoeuvre must be a multi-point turn, and the machinery for that used
+## to be a latch that released into arcs that did not fit the road plus a blind timed
+## escape -- eight escapes in thirty seconds on this stage, never arriving. The bounded
+## turn (Vehicle._begin_turn / _plan_turn_leg) plans each leg against the road instead.
+##
+## **What this can and cannot guard, established by two rounds of sabotage.** It cannot
+## see the *quality* of the manoeuvre: the year-old faulty release was restored under it
+## and the whole suite stayed green -- on a lightly-trafficked street that fault arrives
+## *faster*, by sweeping, and excursion measured identical (4.4m) under both. Quality
+## lives in the probes: `probe_orbit.gd` (zero escapes on every staged case) and
+## `probe_journeys.gd` (fleet escapes 75 -> 31). What it does guard, with the redundancy
+## mapped by measurement rather than assumed:
+##
+## - "starts a turn-round" reds only when **both** arming paths die -- the latch and the
+##   escape-conversion each arm this stage alone (killing just the latch left it green
+##   while two *other* driving checks went red). It guards the class, not one path.
+## - "by the designed release" is the line with teeth: the turn has one designed exit
+##   (a rolling forward leg inside the exit angle, which leaves Vehicle._turn_rest at
+##   zero) and two fallbacks (abandon, plan-failure), both of which arm the rest.
+##   Killing the designed release alone still arrives -- the plan-failure exit frees the
+##   car within a second of when the release would -- but it arrives *resting*, which is
+##   what this asserts against. Killing all three exits strands the car outright
+##   (18.1m off, 30s) and takes nine other driving checks with it.
+func _test_a_narrow_street_u_turn_completes() -> void:
+	_controller.clear_selection()
+	var j := CityGrid.junction(Vector2i(1, 1))
+	var east := Vector3(1, 0, 0)
+	await _place(j + east * 10.0, atan2(-east.x, -east.z))
+	await _idle(10)
+	var aim := j - east * 10.0
+
+	var turned := false
+	var elapsed := 0.0
+	_car.issue(MoveOrder.new(aim))
+	for i in 60 * 30:
+		await _idle(1)
+		elapsed += 1.0 / 60.0
+		if _car.is_turning_round():
+			turned = true
+		if not _car.is_navigating():
+			break
+
+	var gap := Vector2(_car.global_position.x - aim.x,
+		_car.global_position.z - aim.z).length()
+	_check(turned, "a dead-behind order on a street starts a turn-round")
+	_check(gap < 4.0 and elapsed < 29.0 and is_zero_approx(_car._turn_rest),
+		"and it arrives by the designed release, not a fallback (%.1fm off, %.1fs, rest %.1f)"
+			% [gap, elapsed, _car._turn_rest])
+	_car.clear_orders()
+	_car.stop_navigating()
+	await _park_the_shift()
+
+
 func _test_siren_runs_while_responding() -> void:
 	_controller.clear_selection()
 	await _place(ROAD)
@@ -5114,10 +5237,17 @@ func _test_a_career_buys_its_fleet() -> void:
 			and _station.funds == Station.STARTING_FUNDS - kit_price,
 		"buying the kit moves money into fleet (£%d left)" % _station.funds)
 
-	# Broke: the officer costs more than what is left.
+	# Broke, **stated rather than inherited**. This used to lean on the leftover after the
+	# starter kit happening to be smaller than an officer, which was true at a £2,000 purse
+	# and stopped being true the moment it went to £3,200 for the doctor: £1,250 remained,
+	# the officer was affordable, the purchase went through, and two checks went red for a
+	# reason that had nothing to do with affordability. A check about being broke should say
+	# how broke, not depend on a constant three screens away.
+	_station.funds = _station.price(&"officer") - 1
 	var before := _station.funds
 	_check(not _station.purchase(&"officer"),
-		"an unaffordable purchase is refused")
+		"an unaffordable purchase is refused (£%d for a £%d unit)"
+			% [before, _station.price(&"officer")])
 	_check(_station.funds == before and _station.total(&"officer") == 1,
 		"and neither purse nor fleet moved (£%d, %d officers)"
 		% [_station.funds, _station.total(&"officer")])

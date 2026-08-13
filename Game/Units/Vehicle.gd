@@ -90,10 +90,32 @@ const FLOOR_FLOOR := -3.0
 ## Beyond this heading error the car reverses to swing its nose around instead of
 ## driving a long loop. A car cannot turn on the spot.
 @export var reverse_angle_degrees := 115.0
-## Reversing stops once the nose is within this much of the target. Deliberately far
-## below [member reverse_angle_degrees]: without that gap the car would flip between
-## reversing and driving forward every few frames near the threshold.
-@export var reverse_exit_angle_degrees := 55.0
+## The turn releases the car once the nose is within this much of the target, from a
+## forward leg that is already rolling. Deliberately far below
+## [member reverse_angle_degrees], or the car would flip between manoeuvring and driving
+## near the threshold.
+##
+## **20, not the 55 it shipped at for a year, and the number is geometry.** Released at
+## 55 degrees of error, ordinary driving's full-lock arc drifts sideways by
+## R(1 - cos 55) -- 1.9m on the patrol car, 3m on the engine -- which does not fit the
+## half-carriageway beside it, so the car ran onto the kerb face and stopped dead, and
+## the blind escape backed it 4m into the same failing approach for thirty seconds at a
+## time. That loop is the shuffle the black box has been recording all along.
+@export var reverse_exit_angle_degrees := 20.0
+## Speed the turn's legs are driven at, both directions. Gentle on purpose: legs end
+## against kerbs and at planned stops, and 4 m/s is a nudge where the old full-throttle
+## reverse arrived at 9 and billed the career for the scrape.
+@export var shuttle_speed := 4.0
+
+## The bounded turn's own limits: legs per manoeuvre, seconds per manoeuvre, and the
+## re-entry rest after an abandoned one -- the valve that stops a car the manoeuvre
+## cannot help from being owned by it forever.
+const TURN_MAX_LEGS := 8
+const TURN_MAX_TIME := 10.0
+const TURN_REST := 3.0
+## A planned leg shorter than this is not worth driving: at 4 m/s it is gone in a third
+## of a second and the flip overhead dominates.
+const TURN_MIN_ARC := 1.2
 ## Only worth reversing when the target is close; further out, driving round is faster.
 ##
 ## This is measured against the point currently being **aimed at**, which on a lane
@@ -434,6 +456,19 @@ var _off_road_target := false
 ## wanted.
 var _may_turn_round := true
 var _reversing := false
+## The bounded turn's live state: the world-space point the current leg was planned to
+## end at (INF plans a fresh leg), the leg's drive direction and fixed steer, how many
+## legs this manoeuvre has used, its clock, the current leg's stall timer and budget,
+## and the re-entry rest. All planned against the road surface before a wheel turns --
+## see [method _plan_turn_leg].
+var _turn_stop := Vector3.INF
+var _turn_dir := 1.0
+var _turn_steer := 0.0
+var _turn_legs := 0
+var _turn_clock := 0.0
+var _turn_stall := 0.0
+var _turn_leg_budget := 0.0
+var _turn_rest := 0.0
 ## Seconds spent held below cruising speed by a vehicle it cannot get past.
 var _held_time := 0.0
 ## Seconds spent going nowhere with the street ahead shut -- the licence for
@@ -962,6 +997,12 @@ func _dismount_point(index: int) -> Vector3:
 
 func _reset_manoeuvre_state() -> void:
 	_reversing = false
+	_turn_stop = Vector3.INF
+	_turn_legs = 0
+	_turn_clock = 0.0
+	_turn_stall = 0.0
+	# `_turn_rest` deliberately survives: `navigate_to` runs this on every waypoint, and
+	# a rest that a new aim could wipe is no rest at all.
 	_stuck_time = 0.0
 	_escape_time = 0.0
 	_failed_escapes = 0
@@ -1199,6 +1240,24 @@ func _update_autopilot(delta: float) -> void:
 	var heading_error := forward.signed_angle_to(to_point, Vector3.UP)
 
 	_update_escape(delta)
+	_turn_rest = maxf(_turn_rest - delta, 0.0)
+	# **An escape that fires with the nose well off the aim becomes a bounded turn.**
+	# The escape's trigger is honest -- 0.8s of going nowhere -- but its remedy, a 1s
+	# blind reverse, is right for a car wedged behind something on its line and wrong for
+	# one stalled against a kerb mid-turn: it backs 4m, drives the same failing arc, and
+	# repeats. The crooked nose tells the two apart. Mount and return keep the blind
+	# escape -- their designs depend on it backing the car off an obstruction.
+	# And not into a shut street: a stalled car with a wall of vehicles ahead is
+	# *queueing*, and the queue is owned by the passing logic and the pavement mount --
+	# whose licence accumulates only under 2 m/s, so a turn's 4 m/s legs actively starve
+	# it. Measured: with the turn loose in the queue the mount licensed at 2.73s of a
+	# 2.50 bar instead of promptly, the whole shut-street sequence slid ~5s later, and
+	# the suite's fixture timed out mid-descent.
+	if _escape_time > 0.0 and not _reversing and not _mounting and not _returning \
+			and _turn_rest <= 0.0 and absf(heading_error) > deg_to_rad(45.0) \
+			and not road_is_blocked(move_target):
+		_escape_time = 0.0
+		_begin_turn()
 	_update_reverse_latch(heading_error, distance)
 	# **The last few metres onto a verge are driven, not manoeuvred.** Everything that
 	# swings a nose round or backs out of trouble is built for streets, and none of it
@@ -1215,14 +1274,18 @@ func _update_autopilot(delta: float) -> void:
 	if _mounting or _returning or (_off_road_target and distance < off_road_approach):
 		_reversing = false
 		_escape_time = 0.0
-	if _reversing or _escape_time > 0.0:
-		# Back out under opposite lock to swing the nose round, like a three-point
-		# turn, rather than driving a wide loop to reach something just behind.
+	if _reversing:
+		_drive_turn(delta, heading_error, distance)
+		if _reversing:
+			return
+		# The turn just released the car pointing the right way; fall through and drive.
+	if _escape_time > 0.0:
+		# Back out under opposite lock to swing the nose round -- the recovery from
+		# being genuinely wedged behind something, unchanged.
 		steer_input = clampf(-heading_error * steer_gain, -1.0, 1.0)
 		throttle_input = -1.0
 		handbrake_input = false
 		return
-
 	steer_input = clampf(heading_error * steer_gain, -1.0, 1.0)
 
 	# Ease off for the turn being taken now, for the ones coming up, and for the
@@ -1544,6 +1607,12 @@ func _flat_angle(from: Vector3, to: Vector3) -> float:
 ## whatever it was and this never armed. Being off the floor with somewhere to be
 ## counts too.
 func _update_escape(delta: float) -> void:
+	# Not while the bounded turn runs: its legs *end* at planned stops and kerbs by
+	# design, and the escape reading each leg-end as being stuck was measured barging
+	# a 1s timed reverse into the middle of the manoeuvre.
+	if _reversing:
+		_stuck_time = 0.0
+		return
 	var going_nowhere := absf(forward_speed) < 0.3
 	if _escape_time > 0.0:
 		_escape_time -= delta
@@ -1917,6 +1986,128 @@ func is_returning() -> bool:
 	return _returning
 
 
+## Starts a bounded multi-point turn: the car is about to manoeuvre, and every leg of
+## the manoeuvre will be planned against the road surface before it is driven.
+##
+## This replaces two things that were measured failing together for a year: a reverse
+## latch that backed up and then released into forward arcs that did not fit the
+## carriageway, and a timed escape that backed 4m regardless of what the geometry
+## needed. The anatomy came from the black box -- 42 records from real play, batch-read
+## against the capture bound L >= 2R sin(bearing) -- and from a per-frame trace of a
+## 20m dead-behind order: kerb hit, blind reverse, same kerb, eight escapes, never
+## arrived. A reactive fix (flip direction on stall) was measured first and traded one
+## guarded behaviour for another on four different guards, because its legs only
+## discovered the edge of the road by hitting things -- and at junction mouths there is
+## nothing to hit. These legs *know* where the road ends, because they ask.
+func _begin_turn() -> void:
+	_reversing = true
+	# Alternation starts by flipping, so the first planned leg is the reverse one -- the
+	# nose points the wrong way, and backing is the leg that turns it.
+	_turn_dir = 1.0
+	_turn_stop = Vector3.INF
+	_turn_legs = 0
+	_turn_clock = 0.0
+	_turn_stall = 0.0
+
+
+## Runs the turn for one frame: releases the car when a rolling forward leg has the nose
+## inside the exit angle, abandons on the caps, and otherwise plans and drives legs.
+func _drive_turn(delta: float, heading_error: float, distance: float) -> void:
+	_turn_clock += delta
+	# Done: pointing near enough, moving forward, under way. Ordinary driving from this
+	# state stays inside its lane -- that is what the 20-degree release buys.
+	if _turn_dir > 0.0 and forward_speed > 1.0 \
+			and absf(heading_error) < deg_to_rad(reverse_exit_angle_degrees):
+		_reversing = false
+		return
+	# Abandoned: out of legs, out of time, or the aim has moved right away. The rest
+	# stops the manoeuvre re-arming off the same signal it just failed against.
+	var trigger := turn_round_range if _may_turn_round else reverse_trigger_distance
+	if _turn_clock > TURN_MAX_TIME or _turn_legs > TURN_MAX_LEGS \
+			or distance > trigger * 1.6:
+		_reversing = false
+		_turn_rest = TURN_REST
+		return
+	if _turn_stop == Vector3.INF:
+		if not _plan_turn_leg(heading_error):
+			# No direction offers even a metre of road: genuinely wedged, which is the
+			# blind escape's job, not this manoeuvre's.
+			_reversing = false
+			_turn_rest = TURN_REST
+			return
+	# Leg over? Planned stop reached, budget spent, or stalled against something the
+	# plan could not see (a vehicle moved in; the sample line is the car's centre, so a
+	# kerb can still catch a corner of the body). The next frame plans the next leg.
+	_turn_leg_budget -= delta
+	var gap := _turn_stop - global_position
+	gap.y = 0.0
+	if absf(forward_speed) < 0.3:
+		_turn_stall += delta
+	else:
+		_turn_stall = 0.0
+	if gap.length() < 0.8 or _turn_leg_budget <= 0.0 or _turn_stall > 0.4:
+		_turn_stop = Vector3.INF
+		return
+	steer_input = _turn_steer
+	_hold_speed(_turn_dir * shuttle_speed)
+	handbrake_input = false
+
+
+## Plans one leg of the turn as an arc sampled against the road, and returns whether any
+## leg worth driving exists.
+##
+## The arc is the bicycle model's own circle at full lock: radius wheelbase/tan(lock),
+## centred beside the car, walked in half-metre steps. Each sample must be carriageway
+## ([method CityGrid.is_road]) and inside the map. The walk stops at the first sample
+## that is not, or once the nose would be rotated as far as it needs to go -- so a leg
+## can never be planned across a junction mouth or out through the boundary, which is
+## precisely where the reactive version's legs went: mouths are off the vehicle mesh
+## with **no kerb on them**, so nothing physical ends a leg there.
+##
+## Directions alternate, and both are tried before giving up: a car against a wall of
+## traffic has no forward leg but usually a reverse one, and vice versa.
+func _plan_turn_leg(heading_error: float) -> bool:
+	var lock := deg_to_rad(max_steer_degrees)
+	var radius := wheelbase / tan(lock)
+	var forward := -global_basis.z
+	forward = Vector3(forward.x, 0.0, forward.z).normalized()
+	var aim_side := signf(heading_error) if not is_zero_approx(heading_error) else 1.0
+	var need := clampf(absf(heading_error), 0.0, PI)
+	var edge := CityGrid.MAP_HALF - 1.0
+
+	_turn_dir = -_turn_dir
+	for attempt in 2:
+		var direction := _turn_dir
+		# Forward legs steer toward the aim; reverse legs steer away from it. Both
+		# rotate the nose the same way, which is what makes each leg keep the rotation
+		# the last one gained -- the essence of a three-point turn.
+		var steer := aim_side * direction
+		var centre := global_position + Vector3.UP.cross(forward) * radius * steer
+		var spoke := global_position - centre
+		var best := Vector3.INF
+		var good_arc := 0.0
+		var arc := 0.0
+		while arc < need * radius:
+			arc += 0.5
+			# Heading rotation after this much arc, signed the way the wheels turn it.
+			var swung := direction * steer * arc / radius
+			var sample := centre + spoke.rotated(Vector3.UP, swung)
+			if not CityGrid.is_road(sample) \
+					or absf(sample.x) > edge or absf(sample.z) > edge:
+				break
+			best = sample
+			good_arc = arc
+		if best != Vector3.INF and good_arc >= TURN_MIN_ARC:
+			_turn_stop = best
+			_turn_steer = steer
+			_turn_leg_budget = good_arc / shuttle_speed + 1.0
+			_turn_legs += 1
+			_turn_stall = 0.0
+			return true
+		_turn_dir = -_turn_dir
+	return false
+
+
 func is_turning_round() -> bool:
 	return _reversing
 
@@ -1931,14 +2122,16 @@ func is_escaping() -> bool:
 ## Schmitt trigger on the reverse manoeuvre: enter on a large heading error, leave
 ## only once the nose is well round or the target is no longer close.
 func _update_reverse_latch(heading_error: float, distance: float) -> void:
-	var trigger := turn_round_range if _may_turn_round else reverse_trigger_distance
+	# Arm-only since the bounded turn arrived: the manoeuvre decides its own end (a
+	# rolling forward leg inside [member reverse_exit_angle_degrees]), because the exit
+	# living here was the fault -- it released on a bare angle, whichever way the car was
+	# driving, into arcs that did not fit the road.
 	if _reversing:
-		if absf(heading_error) < deg_to_rad(reverse_exit_angle_degrees) \
-				or distance > trigger * 1.6:
-			_reversing = false
-	elif absf(heading_error) > deg_to_rad(reverse_angle_degrees) \
-			and distance < trigger:
-		_reversing = true
+		return
+	var trigger := turn_round_range if _may_turn_round else reverse_trigger_distance
+	if absf(heading_error) > deg_to_rad(reverse_angle_degrees) \
+			and distance < trigger and _turn_rest <= 0.0:
+		_begin_turn()
 
 
 func _arrive() -> void:

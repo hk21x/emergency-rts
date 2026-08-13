@@ -531,6 +531,76 @@ What is still known and unfixed:
   slowness-and-ugliness fault, not a never-arrives one, and anything attempted next should
   be measured on escape count with `probe_journeys.gd` before it is believed.
 
+  **The sixth attempt (August 2026) diagnosed the mechanism completely, built a fix that
+  wins the fleet metric by half, and reverted it for breaking two guarded behaviours.**
+  Everything below is measured; attempt seven starts here, not from the code.
+
+  *The diagnosis, now settled.* All 42 black-box records from real play were batch-parsed
+  against the pure-pursuit capture bound — a fixed point at distance L and bearing a is
+  reachable only when **L >= 2R sin(a)**, R being `wheelbase / tan(33°)`: 4.44m for the
+  patrol car, 5.10m the ambulance, 6.87m the engine (which owns 17 of the 42 records, at
+  aim distances of 6-14m — demands its geometry cannot answer). `probe_orbit.gd` then
+  staged the states cleanly and a per-frame trace (`PROBE_TRACE=1`) closed it: the shuffle
+  is a **kerb-bounded multi-point turn that loses its gains**. The latch reverses until
+  the nose is 55° off, releases, and the full-lock forward arc drifts sideways by
+  R(1 − cos 55°) — 1.9m on the patrol, 3m on the engine — which does not fit the
+  half-carriageway available, so the car stops dead on the kerb face. The blind escape
+  then reverses ~4m on a timer (throttle −1 for 1.0s), the forward arc fails identically,
+  and the cycle repeats — while **both safety nets are structurally blind to it**: the
+  escape wants |speed| < 0.3 and a shuffling car has plenty, the latch wants 115° of error
+  to a steer point that sits near the nose by construction. On an **empty** street the
+  baseline machinery completes every staged case, including a 20m dead-behind turn; the
+  pathology needs traffic or kerb context, which is why five prior staged reproductions
+  came out clean.
+
+  *The fix that measured, and why it is not in the tree.* Rebuilding the latch as a real
+  shuttle — legs that flip direction on a 0.25s stall, steering that rotates the nose the
+  same way in both phases, exit only from a rolling forward leg under 25° — plus
+  converting crooked-nose escapes (>30°) into shuttles, took `probe_journeys` from **75
+  escapes / 23-of-24 (engine) to 20 / 24-of-24**, patrol similar. It also: put 78 frames
+  of one corner leg off the carriageway (deterministic, both runs identical — the
+  post-exit drive cuts the kerbless junction mouth); broke the suite's shut-street mount
+  check (0 climbs — behind a wall of vehicles the conversion turns queueing stalls into
+  weaving); and cost one ambient car its drive-off. Four guards were then measured —
+  junction clearance (killed the fix: 109 escapes, the shuffles live near junctions), a
+  2.5m road-edge flip on the legs (fixed one corner leg, kept 35/29 escapes), a
+  shut-street veto (broke the mount licence a second way), and a contact-list
+  discriminator (`touching:` world-vs-vehicle, byte-identical result). Every guard traded
+  one guarded behaviour for another. The suite is the arbiter; the tree is baseline and
+  green at 804.
+
+  *Attempt seven built exactly that and it shipped, same day.* `Vehicle._begin_turn` /
+  `_drive_turn` / `_plan_turn_leg`: each leg of the manoeuvre is planned as a full-lock
+  arc walked in half-metre samples against `CityGrid.is_road` and the map bounds before
+  a wheel turns, so a leg can never cross a kerbless junction mouth or the boundary --
+  which is precisely where the reactive flips went. The latch arms it (115°), a
+  crooked-nose escape (>45°, not queueing, not mount/return) converts into it, it owns
+  its own exit -- a rolling forward leg inside 20° -- and it abandons on caps (8 legs /
+  10s) into a 3s re-entry rest so it can never own a car it cannot help. All four gates
+  passed: `probe_orbit` all vehicles all cases 4.6-8.9s with **zero escapes**;
+  `probe_corner` 68.4s (baseline 71.4) with **zero frames off the carriageway** and leg
+  3's lane depth improved 2.33m -> 0.30m; `probe_journeys` engine **24/24 at 31 escapes
+  against 23/24 at 75**, patrol 24/24 at 14; suite green including the shut-street mount
+  trio. Two late findings mattered: the conversion must not fire into a shut street
+  (`road_is_blocked`) because the mount licence accumulates only under 2 m/s and turn
+  legs at 4 m/s starve it -- that one term was the difference between the mount fixture
+  timing out and passing -- and an off-road arrival guard written for a plausible
+  mechanism measured byte-identical and was removed rather than shipped on a theory.
+  The suite check `_test_a_narrow_street_u_turn_completes` carries the full sabotage map
+  in its comment, including what it *cannot* see (release quality -- the probes carry
+  that) and the redundancy structure of what it can.
+
+  *Instrument notes.* `probe_orbit.gd` is kept; its first cut fired nine escapes against
+  an easy target because the aim was **off the map's southern edge** (the boundary wall),
+  and a second aim landed inside the block ring — check aims against MAP_HALF and
+  `is_road` before believing a leg. Probe legs run sequentially, so any change in one
+  leg's duration shifts every later leg's **ambient-traffic phase**; probe_orbit now
+  empties Traffic and Crowd first, and any probe that does not must be A/B'd
+  same-session, both ways, before a difference is believed. And `probe_mount.gd`'s
+  documented 43.9s is stale on the redressed map — baseline now *times out* on that
+  fixture while the suite's own pinned fixture stays green, which is one more reason the
+  suite, not a probe, is the arbiter.
+
   The older advice, still good: go after the stragglers individually rather than by moving
   one constant — the damage-ordering check
   needs the 60m run-up to actually reach speed (measure the speed trace along it; the

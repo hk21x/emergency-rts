@@ -1330,7 +1330,34 @@ and declining it when there is no district left to tuck into. The suite's own fi
 firing the same warning on every run for a destination it deliberately never reached; that is
 gone too, because a diagnostic that cries wolf every run is worse than no diagnostic.
 
-**802 automated checks**, all passing. Run them with any Godot 4.6+ binary
+The starting purse went from £2,000 to £3,200 when the doctor arrived. The old figure bought
+the four-unit starter crew and left £50 — a specialist nobody can afford until several shifts
+in is one most players never meet, and medical is the service a career is most likely to open
+with. It still buys one of everything essential and nothing spare: £3,050 of the £3,200.
+
+The district got dressed. It was reported as looking bland and reusing the same assets, and
+the count was the sharper version of that: the generator named 22 of the 174 props the pack
+ships, all buildings being fine at 51 of 75. Kerbside furniture is now drawn from a table
+keyed on the block's kind — shops put out a hotdog stand, flats put out bins and bags, the
+service yards put out cones and pallets — and the district places 45 distinct props. Terrace
+heights vary per block too, so twenty-one terraces stand at eight silhouettes instead of
+three. The two blocks with a forecourt are held at kit height, because raising the station
+wall hid every unit parked on its own apron from the opening camera.
+
+**The driving shuffle is fixed** — the fault the black box spent a year recording, five
+attempts bounced off, and the file finally carried as "wants a different signal". The
+diagnosis came from reading all 42 real-play records against the turning geometry rather
+than staging guesses: aims demanding turns tighter than the vehicle's radius, a latch
+releasing into arcs that did not fit the street, and a blind escape recycling the failure.
+The fix is a bounded multi-point turn whose every leg is sampled against the road surface
+before it is driven. Fleet measure: the engine went from 23-of-24 arrivals with 75
+escape manoeuvres to **24-of-24 with 31**; corners unchanged to slightly better, with
+zero frames off the carriageway. A first, reactive version of the same idea won the same
+fleet numbers and was thrown away for walking out of kerbless junction mouths — the
+difference between the two is that the shipped legs *ask* where the road ends instead of
+finding out by collision.
+
+**806 automated checks**, all passing. Run them with any Godot 4.6+ binary
 (`--fixed-fps 60` decouples the loop from the wall clock — ~20s instead of ~9min):
 
     godot --headless --fixed-fps 60 --path . --script res://Game/smoke_test.gd

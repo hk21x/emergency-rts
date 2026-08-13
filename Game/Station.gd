@@ -28,9 +28,16 @@ signal repaired(vehicle: Vehicle, cost: int)
 
 const GROUP := &"stations"
 
-## A fresh career's purse. Deliberately tight: it buys roughly one patrol car, one
-## officer, one ambulance and one paramedic, with change for nothing.
-const STARTING_FUNDS := 2000
+## A fresh career's purse. Deliberately tight: it buys roughly one patrol car, one officer,
+## one ambulance, one paramedic, a doctor and the doctor's car -- £3,050 of the £3,200 --
+## with change for nothing.
+##
+## **Raised from £2,000 when the doctor arrived**, because the old purse bought the four-unit
+## starter crew and left £50. A specialist nobody can afford until several shifts in is a
+## specialist most players never meet, and the medical service is the one this career is
+## most likely to open with. The intent is unchanged -- the purse still buys one of
+## everything essential and nothing spare.
+const STARTING_FUNDS := 3200
 
 ## Where the crew portraits live; vehicles carry theirs in their own scenes.
 const PORTRAITS := "res://Game/UI/Portraits/"

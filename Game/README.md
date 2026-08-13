@@ -10,7 +10,7 @@ unmodified, though the POLYGON City pack was relocated on import — see `PROGRE
 ## Where this is up to
 
 **All 15 planned phases are done, plus 16 (the world reacts), 17 (audio), 18 (game
-framing), 19 (the fire service) and the career economy — half of phase 20.** 802
+framing), 19 (the fire service) and the career economy — half of phase 20.** 806
 automated checks, all passing.
 
 A 260m city district — twenty-five blocks of varied size, with parks, parking lots and
@@ -274,6 +274,39 @@ at. `Game/probe_kerb.gd` measures all of it, one condition per process — runni
 conditions in one process measured the harness instead, with whichever ran second
 failing.
 
+### Dressing the district, and why height is decoration everywhere but two blocks
+
+Reported from play as the city looking bland and reusing the same assets. The count agreed,
+and it pointed somewhere more specific than "bland": the generator named **22 of the 174
+props the pack ships**. Buildings were never the problem — those were already at 51 of 75.
+It was the street furniture, which is what the RTS camera actually looks at.
+
+`_kerb_prop` is now fifteen ways rather than twelve. Ten are the civic staples it always
+had, unchanged; four hand the slot to `_street_litter`, which draws from a table keyed on
+the **block's kind**. A parade of shops puts a hotdog stand and a cash machine out, flats
+put bins and bags out, a car park and the tower service yards put cones, pallets and a skip
+out, a park puts a table and a deckchair out. Two neighbouring blocks no longer collect
+identical litter. The district places **45 distinct prop meshes** now.
+
+**Every offset in that table is measured.** A one-off script dumped the AABBs, and the
+numbers matter: `SM_Prop_ATM_01` sits centred on its origin (min y −0.77) and needs lifting
+or it is buried to the waist; `SM_Prop_Billboard_01` floats 0.72 above its origin because it
+expects a pole; `SM_Prop_TrafficLight_01` runs min −0.90 to max 0.00 because it is a signal
+head meant to hang off a mast arm. That last one is why the junction signs use
+`Sign_Stop_01` instead, and the same trap is written up there.
+
+**Heights vary per block, from a generator keyed on the block rather than a draw.** Facades
+and colliders are built in two separate passes, and a shared random stream hands the two
+passes different answers depending on how many draws happened in between — a collider
+standing proud of its building eats the clicks aimed in front of it. Twenty-one terraces used
+to share **three** silhouettes; they now stand at eight.
+
+**Except the two blocks with a forecourt**, which keep the kit's height exactly. Raised a
+storey, the police station's wall put itself between the opening camera and every unit parked
+on its own apron, and all seven became unclickable at the start of a career. The suite named
+it in one line — "ray stops on Block_13" for all seven — and it is the reason height is
+decoration everywhere on this map except the two places vehicles park.
+
 ### Traffic declines a tuck it has no room for
 
 `TrafficCar._update_pull_over` aims seven metres ahead and a couple across to nose into the
@@ -380,6 +413,42 @@ unit nobody bought. Any specialist added from here would have re-broken it ident
 A second, smaller one: `ShopPanel` read `config["portrait"]` unguarded while `Station` reads
 the same key with `has()`. One catalogue entry without a portrait threw inside `_ready`,
 which builds the whole shop, and took out every card and six unrelated checks with it.
+
+### The bounded turn: manoeuvres planned against the road
+
+The shuffle the black box spent a year recording — a car rocking back and forth over
+seven metres, full throttle, nothing in front of it — is fixed, and the diagnosis is
+worth more than the code. 42 records from real play, batch-read against the pure-pursuit
+capture bound (a point at distance L and bearing a needs **L ≥ 2R·sin(a)**; R is 4.44m
+for the patrol car, 6.87m for the engine, which owned 17 of the 42), plus a per-frame
+trace of a 20m dead-behind order, settled it: the manoeuvre machinery was a reverse
+latch that released at 55° of error into full-lock forward arcs that drift sideways by
+R(1−cos 55°) — 1.9–3m, more than the half-carriageway available — so the car stopped
+dead on the kerb face, and a blind 1s escape backed it 4m into the same failing arc.
+Both safety nets were structurally blind: the escape wants near-zero speed (a shuffling
+car has plenty), the latch wants 115° of error to a steer point that sits near the nose
+by construction. On an empty street it all works, which is why five earlier staged
+reproductions came out clean — the pathology needs traffic or kerb context.
+
+`_begin_turn` / `_drive_turn` / `_plan_turn_leg` replace it with a **bounded multi-point
+turn**: each leg is a full-lock arc walked in half-metre samples against
+`CityGrid.is_road` and the map bounds *before it is driven*, so a leg can never cross a
+kerbless junction mouth or the boundary — exactly where a first, reactive version's legs
+went (a flip-on-stall shuttle discovers the edge of the road only by hitting things, and
+at junction mouths there is nothing to hit). Legs alternate direction, both rotating the
+nose the same way; the latch arms the turn, a crooked-nose escape (>45°, not queueing,
+not owned by the mount or return) converts into it, and it exits on its own terms — a
+rolling forward leg inside 20° — or abandons on caps (8 legs / 10s) into a 3s re-entry
+rest, so it can never own a car it cannot help. The one interaction that mattered: the
+conversion must not fire into a shut street, because the pavement mount's licence
+accumulates only under 2 m/s and turn legs at 4 m/s starve it.
+
+Measured: `probe_orbit` (all three vehicles, overshoots, dead-behind) arrives everything
+in 4.6–8.9s with zero escapes; `probe_corner` 68.4s against 71.4 baseline with zero
+frames off the carriageway; `probe_journeys` engine **24/24 at 31 escapes against 23/24
+at 75**, patrol 24/24 at 14. The suite check's comment carries the sabotage map — what
+it guards, what only the probes can see, and the measured redundancy of the arming and
+exit paths.
 
 ### Taking the pavement past a shut street, and getting back off it
 
@@ -2478,7 +2547,7 @@ directly with `godot --path . res://Game/AnimationViewer.tscn`.
 `--fixed-fps 60` decouples the headless loop from the wall clock: same fixed-step
 physics, same checks, ~20 seconds instead of ~9 minutes.
 
-802 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
+806 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
 shift through the station (the map ships empty), and every bought unit is clickable
 from the opening view; the crowd strolls, runs from a fire and cannot be selected or
 picked through; traffic drives the roads and yields; units start parked, drive to a

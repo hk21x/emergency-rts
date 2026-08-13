@@ -1,4 +1,4 @@
-[gd_resource type="Environment" load_steps=3 format=3 uid="uid://bje25xl0qlm2x"]
+[gd_resource type="Environment" format=3 uid="uid://bje25xl0qlm2x"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_hbon4"]
 resource_name = "Default-Skybox"

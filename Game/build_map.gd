@@ -176,6 +176,39 @@ const FACADES := {
 ## three sides. This is what makes a station somewhere vehicles can actually park.
 const APRONS := {"hospital": "south", "police": "north"}
 
+## What each kind of block keeps at its kerb. See [method _street_litter].
+const LITTER := {
+	"shops": ["SM_Prop_HotdogStand_01", "SM_Prop_ATM_01", "SM_Prop_Newspaper_02",
+		"SM_Prop_SidewalkPoles_01", "SM_Prop_PotPlant_02", "SM_Prop_Trashbin_02",
+		"SM_Prop_ParkingMeter_02", "SM_Prop_Umbrella_01"],
+	"apartments": ["SM_Prop_TrashBag_01", "SM_Prop_TrashBag_02", "SM_Prop_TrashBag_03",
+		"SM_Prop_Trashbin_01", "SM_Prop_Trashbin_02", "SM_Prop_CardboardBox_01",
+		"SM_Prop_CardboardBox_02", "SM_Prop_PotPlant_01"],
+	"parking": ["SM_Prop_Cone_01", "SM_Prop_Cone_02", "SM_Prop_Barrier_01",
+		"SM_Prop_Skip_02", "SM_Prop_Pallet_01", "SM_Prop_PowerBox_01"],
+	"park": ["SM_Prop_Table_02", "SM_Prop_Deckchair_01", "SM_Prop_PotPlant_01",
+		"SM_Prop_PotPlant_02", "SM_Prop_Trashbin_01"],
+	# The towers and the civic buildings keep a tidier frontage: planting and railings
+	# rather than bins and pallets.
+	"civic": ["SM_Prop_PotPlant_02", "SM_Prop_SidewalkPoles_01",
+		"SM_Prop_SidewalkPoles_02", "SM_Prop_ParkingMeter_02"],
+	"hospital": ["SM_Prop_PotPlant_01", "SM_Prop_SidewalkPoles_02",
+		"SM_Prop_Trashbin_01"],
+	"police": ["SM_Prop_Barrier_01", "SM_Prop_Cone_01", "SM_Prop_SidewalkPoles_02"],
+	"tower": ["SM_Prop_PowerBox_01", "SM_Prop_PotPlant_02", "SM_Prop_SidewalkPoles_01",
+		"SM_Prop_Trashbin_02"],
+	"tower_old": ["SM_Prop_Skip_02", "SM_Prop_Pallet_01", "SM_Prop_CardboardBox_01",
+		"SM_Prop_Trashbin_01"],
+	"tower_round": ["SM_Prop_PotPlant_02", "SM_Prop_SidewalkPoles_01",
+		"SM_Prop_ParkingMeter_02"],
+	"tower_octagon": ["SM_Prop_PowerBox_01", "SM_Prop_PotPlant_01",
+		"SM_Prop_SidewalkPoles_02"],
+}
+
+## Litter too wide for a corner slot -- measured footprints of 1.4m to 2.4m across.
+const BULKY := ["SM_Prop_Skip_02", "SM_Prop_HotdogStand_01", "SM_Prop_Pallet_01",
+	"SM_Prop_SidewalkPoles_01", "SM_Prop_Barrier_01", "SM_Prop_PowerBox_01"]
+
 ## Roof cap thickness, added to a terrace's collider so it matches the silhouette.
 const ROOF_CAP := 0.8
 ## Measured tops of the two monolithic buildings: the CityHall mesh, and the office
@@ -375,7 +408,8 @@ func _build_block(bx: int, bz: int) -> void:
 			# costs a few hidden segments a block and closes the roof over the lot.
 			var plot_x := _edge_sign(bc, 1, span_x - 2)
 			var plot_z := _edge_sign(br, rows.x, rows.y)
-			_facade(centre, plot_x, plot_z, FACADES[kind])
+			_facade(centre, plot_x, plot_z, FACADES[kind],
+				_block_storeys(FACADES[kind], kind, bx, bz))
 
 	if monolith:
 		_landmark(_block_centre(bx, bz), kind, bx, bz)
@@ -426,6 +460,39 @@ func _park_tile(centre: Vector3, bc: int, br: int, span_x: int, span_z: int) -> 
 						_rng.randf_range(-1.8, 1.8))))
 		_:
 			pass
+
+
+## The clutter a block of this kind keeps at its kerb.
+##
+## The staples above say *city*; these say what **this** street is for, which is the half
+## that was missing. A parade of shops puts a hotdog stand and a cash machine out; flats put
+## bins and bags out; a car park and the tower service yards put cones, pallets and a skip
+## out; a park puts a table and a deckchair out. Two neighbouring blocks of different kinds
+## no longer collect identical litter.
+##
+## **Every offset here is measured, not guessed** (`tmp_measure_props.gd`, since deleted).
+## Almost all of these stand on their own origin and drop straight onto the pavement; the
+## two that do not are corrected in place and say so. Getting this wrong is not subtle --
+## `SM_Prop_TrafficLight_01` measures min y -0.90, max y 0.00, because it is a signal head
+## meant to hang off a mast arm, and dropping one on a kerb buries it completely. That is
+## why it is absent here, and the same trap is written up over the junction signs above.
+func _street_litter(lifted: Vector3, facing: float, step: int, kind: String) -> void:
+	var table: Array = LITTER.get(kind, LITTER["apartments"])
+	var pick: String = table[_rng.randi() % table.size()]
+	# The bulky pieces need the middle of an edge, the way the bus stop does -- a 2.4m skip
+	# on a corner slot overhangs the crossing.
+	if pick in BULKY and absf(step) > 1:
+		pick = "SM_Prop_Trashbin_01"
+	var lift := 0.0
+	match pick:
+		# Centred on its own origin rather than standing on it: measured min y -0.77.
+		"SM_Prop_ATM_01":
+			lift = 0.77
+		# Measured min y -0.29.
+		"SM_Prop_Umbrella_01":
+			lift = 0.29
+	_batch(pick, Transform3D(Basis(Vector3.UP, facing),
+		lifted + Vector3(0.0, lift, 0.0)))
 
 
 ## One interior parking-lot tile. The ParkingLines piece is **two tiles wide**
@@ -513,7 +580,8 @@ func _sidewalk_tile(centre: Vector3, out_x: int, out_z: int) -> void:
 ##
 ## An interior segment -- one facing nothing, in the middle of the plot -- is laid the
 ## same way. Only its roof is ever seen.
-func _facade(centre: Vector3, out_x: int, out_z: int, kit: Dictionary) -> void:
+func _facade(centre: Vector3, out_x: int, out_z: int, kit: Dictionary,
+		storeys: int) -> void:
 	var outward := Vector3(out_x, 0.0, out_z)
 	var corner := out_x != 0 and out_z != 0
 	var yaw := 0.0
@@ -521,8 +589,6 @@ func _facade(centre: Vector3, out_x: int, out_z: int, kit: Dictionary) -> void:
 		yaw = _corner_yaw(outward)
 	elif out_x != 0 or out_z != 0:
 		yaw = _yaw(outward)
-	var storeys: int = kit["storeys"]
-
 	_batch(kit["ground_corner"] if corner else _pick(kit["ground"]),
 		_kit_transform(centre, yaw))
 	for i in storeys:
@@ -678,7 +744,8 @@ func _build_block_surfaces(pavements: Node, buildings: Node, bx: int, bz: int) -
 	var near := centre.z + TILE * (rows.x - (span_z - 1) * 0.5 - 0.5)
 	var far := centre.z + TILE * (rows.y - (span_z - 1) * 0.5 + 0.5)
 	_wall(buildings, "Block_%s" % tag, Vector3(centre.x, 0.0, (near + far) * 0.5),
-		Vector2(inner_x * 2.0, far - near), _terrace_height(FACADES[kind]))
+		Vector2(inner_x * 2.0, far - near),
+		_terrace_height(_block_storeys(FACADES[kind], kind, bx, bz)))
 
 
 ## A solid cylindrical obstruction, for the one building that is round. Same rules as
@@ -745,8 +812,35 @@ func _wall(parent: Node, node_name: String, centre: Vector3, size: Vector2,
 
 ## How tall a terrace built from [param kit] comes out: its street-level course, its
 ## repeats, and the roof cap on top.
-func _terrace_height(kit: Dictionary) -> float:
-	return STOREY * (int(kit["storeys"]) + 1) + ROOF_CAP
+func _terrace_height(storeys: int) -> float:
+	return STOREY * (storeys + 1) + ROOF_CAP
+
+
+## How many upper storeys this block's terrace carries.
+##
+## **Its own seeded generator, keyed on the block, not a draw from `_rng`.** Facades and
+## colliders are built in two separate passes over the blocks, and a shared stream would
+## hand the two passes different answers depending on how many draws happened in between --
+## a collider standing proud of its building eats the clicks aimed in front of it, and one
+## standing short lets them through into the street behind. Keyed on the block, both passes
+## ask the same question and get the same answer however they got there.
+##
+## Every block of a kind used to stand at exactly the kit's height, which is a good part of
+## why the district read as a grid from above: twenty-five plots and five heights, in rows.
+## One storey either way is enough to break the skyline without a block losing the
+## silhouette that says what it is.
+## **A block with a forecourt keeps the kit's height exactly.** The two that have one are
+## the station and the hospital, and both have vehicles parked against them: raised a storey,
+## the station wall put itself between the opening camera and every unit standing on its own
+## apron, and all seven became unclickable at the start of a career. The suite caught it in
+## one line -- "ray stops on Block_13" for all seven, Block_13 being the police block. Height
+## is decoration everywhere else on the map and load-bearing here.
+func _block_storeys(kit: Dictionary, kind: String, bx: int, bz: int) -> int:
+	if APRONS.has(kind):
+		return int(kit["storeys"])
+	var rng := RandomNumberGenerator.new()
+	rng.seed = _rng.seed + bx * 101 + bz * 211
+	return maxi(1, int(kit["storeys"]) + rng.randi_range(-1, 1))
 
 
 func _build_bounds(parent: Node) -> void:
@@ -905,7 +999,7 @@ func _build_props() -> void:
 					# gutter instead of standing in the middle of the pavement.
 					var spot := centre + outward * (outer + KERB_INSET) \
 						+ along * (step * TILE)
-					_kerb_prop(spot, outward, step)
+					_kerb_prop(spot, outward, step, kind)
 
 			_sign_for(kind, centre, apron, bz)
 
@@ -933,10 +1027,14 @@ func _build_props() -> void:
 ## One piece of street furniture at a kerbside slot. Which one is decided by the slot
 ## so the same block never comes out twice the same, and so a build is repeatable.
 ## Everything in the table stands on its own origin (measured) except the trash can.
-func _kerb_prop(spot: Vector3, outward: Vector3, step: int) -> void:
+func _kerb_prop(spot: Vector3, outward: Vector3, step: int, kind: String) -> void:
 	var facing := _yaw(-outward)
 	var lifted := spot + Vector3(0.0, KERB, 0.0)
-	match _rng.randi() % 12:
+	# **Fifteen ways, not twelve.** Ten are the civic staples below, unchanged; four hand
+	# the slot to whatever this block's character keeps outside (see [method _street_litter]);
+	# one is left bare, where two used to be. The district placed 22 of the 174 props the
+	# pack ships and it looked it -- the same bench and the same bin down every street.
+	match _rng.randi() % 15:
 		0:
 			_batch("SM_Prop_Hydrant_01", Transform3D(Basis(Vector3.UP, facing), lifted))
 			# A hydrant is the one piece of kerbside furniture with a *mechanic*
@@ -979,6 +1077,8 @@ func _kerb_prop(spot: Vector3, outward: Vector3, step: int) -> void:
 			else:
 				_batch("SM_Prop_ParkingMeter_01",
 					Transform3D(Basis(Vector3.UP, facing), lifted))
+		10, 11, 12, 13:
+			_street_litter(lifted, facing, step, kind)
 		_:
 			pass
 
