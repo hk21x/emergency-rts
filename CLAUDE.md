@@ -30,9 +30,9 @@ check identical. Use it for every headless run except the generators below.
 
 ## Verification rules
 
-- **The suite is the arbiter.** 806 checks, exits non-zero on failure. A change to
+- **The suite is the arbiter.** 846 checks, exits non-zero on failure. A change to
   `Game/` is not done until it is green. It **reports its own total** —
-  `all checks passed (806)` — so take the count from a run rather than from here or
+  `all checks passed (846)` — so take the count from a run rather than from here or
   from memory; that number is why these documents have carried a stale figure twice.
 - **Do not run the suite inline — delegate it.** Ask the `godot-test-runner` agent
   and get one line back. A full run is ~550 lines of output, and output in the main

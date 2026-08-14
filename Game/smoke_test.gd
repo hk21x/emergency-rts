@@ -288,6 +288,7 @@ func _run() -> void:
 	await _test_the_navigation_overlay_is_off_until_asked()
 	await _test_a_car_sent_off_the_road_climbs_the_kerb()
 	await _test_a_narrow_street_u_turn_completes()
+	await _test_a_routed_car_brakes_for_the_junction_turn()
 	await _test_a_shut_street_is_passed_over_the_pavement()
 	await _test_a_junction_queue_does_not_earn_the_pavement()
 	await _test_siren_runs_while_responding()
@@ -337,6 +338,8 @@ func _run() -> void:
 	await _test_the_director_breathes_after_a_close()
 	await _test_the_director_escalates_late_in_the_shift()
 	await _test_an_rtc_reads_as_one_call()
+	await _test_a_bus_collision_scales_to_the_medical_roster()
+	await _test_a_bus_collision_grows_with_the_roster()
 	await _test_a_vehicle_fire_burns_at_the_kerb()
 	await _test_a_cylinder_cooks_off()
 	await _test_a_cylinder_going_off_takes_the_street()
@@ -344,6 +347,8 @@ func _run() -> void:
 	await _test_water_shows_where_it_is_landing()
 	await _test_a_fire_wants_the_right_stuff_on_it()
 	await _test_a_trapped_casualty_needs_cutting_free_first()
+	await _test_a_shed_load_shuts_the_street()
+	await _test_a_crew_clears_a_shed_load()
 	await _test_calls_can_be_spawned_on_demand()
 	await _test_a_cylinder_made_safe_finishes_the_job()
 	await _test_a_disorder_call_grows_until_it_is_contained()
@@ -364,6 +369,8 @@ func _run() -> void:
 	await _test_a_rescue_needs_every_service()
 	await _test_a_disturbance_lives_before_the_law()
 	await _test_a_disturbance_is_arrested_and_delivered()
+	await _test_a_drunk_call_can_be_just_a_collapse()
+	await _test_a_drunk_call_can_turn_into_an_arrest()
 	await _test_scoring_rewards_a_fast_response()
 	await _test_a_slow_response_scores_at_the_floor()
 	await _test_a_lost_casualty_costs_points_not_the_shift()
@@ -4326,6 +4333,59 @@ func _test_a_narrow_street_u_turn_completes() -> void:
 	await _park_the_shift()
 
 
+## A car on a lane route slows for the junction turn before it gets there.
+##
+## The junction overshoot two F3s from play pinned on the fast cars, fixed at the root:
+## the corner planner used to read corners off the agent path, and with
+## junction-to-junction waypoints that path **ends at the junction** -- the turn onto the
+## next street does not exist in it until the 7m waypoint switch, far too late to brake
+## from 26 m/s. Every apparent corner it did read was the car's own off-line position
+## swinging the measured vector. The route now annotates its aim with the turn's exact
+## angle ([member Vehicle.turn_at_aim], set in MoveOrder._aim from the lattice), and the
+## turn's cap holds while the car is in the box ([member Vehicle.turn_here]).
+##
+## The bar is generous -- holdable for this car is 7.9 m/s and unfixed entries measured
+## 14-20 -- so ambient traffic slowing the car further can only make it pass. Arrival is
+## asserted so a car that never reaches the corner cannot pass by absence.
+func _test_a_routed_car_brakes_for_the_junction_turn() -> void:
+	_controller.clear_selection()
+	var a := CityGrid.junction(Vector2i(1, 1))
+	var b := CityGrid.junction(Vector2i(3, 1))
+	var east := (b - a).normalized()
+	# South off junction b, far enough that the route must turn there.
+	var goal := b + Vector3(0, 0, 1) * 35.0
+	await _place(a + east * 6.0, atan2(-east.x, -east.z))
+	await _idle(10)
+
+	# **Measured on both worlds before the bar was set** (tmp probe, since deleted, same
+	# stage, empty district): fixed, the braked car corner-cuts and never appears within
+	# 5m of the box centre at all; sabotaged (annotation zeroed), it barrels through the
+	# middle at 13.3 m/s while overshooting the turn line. An 8m ring was tried first and
+	# was arithmetic-blind: the fix's own braking curve legitimately crosses it at 14-16,
+	# so the check failed on the healthy tree. The 5m/10.0 pair separates cleanly, and a
+	# car forced through the middle *slowly* by traffic still passes, as it should.
+	var centre_peak := 0.0
+	var reached := false
+	_car.issue(MoveOrder.new(goal))
+	for i in 60 * 40:
+		await _idle(1)
+		var gap := Vector2(_car.global_position.x - b.x,
+			_car.global_position.z - b.z).length()
+		if gap < 8.0:
+			reached = true
+		if gap < 5.0:
+			centre_peak = maxf(centre_peak, absf(_car.forward_speed))
+		if not _car.is_navigating():
+			break
+	_check(reached, "the routed car reaches the turning junction")
+	_check(reached and centre_peak < 10.0,
+		"and is never at speed through the middle of the box (fastest within 5m: %.1f m/s; the unbraked world reads 13+)"
+			% centre_peak)
+	_car.clear_orders()
+	_car.stop_navigating()
+	await _park_the_shift()
+
+
 func _test_siren_runs_while_responding() -> void:
 	_controller.clear_selection()
 	await _place(ROAD)
@@ -5992,7 +6052,9 @@ func _test_the_director_opens_calls_where_they_belong() -> void:
 	var known := true
 	for title in titles:
 		if title not in ["Medical emergency", "Fire", "Road traffic collision",
-				"Disturbance", "Vehicle fire"]:
+				"Disturbance", "Vehicle fire", "Electrical fire, water unsuitable",
+				"Bus collision, multiple casualties", "Shed load blocking the road",
+				"Person collapsed, drink suspected"]:
 			known = false
 	_check(known and titles.size() >= 2,
 		"the mix drew %d kinds, all of them answerable by the roster (%s)"
@@ -6081,6 +6143,86 @@ func _test_an_rtc_reads_as_one_call() -> void:
 		_check(_flat_distance(open[0].position, CityGrid.junction(cell)) < 5.0,
 			"and placed at the crossroads (%.1fm out)"
 			% _flat_distance(open[0].position, CityGrid.junction(cell)))
+	await _clear_calls()
+
+
+## The RTC grown into a mass-casualty scene: sized by the medical roster, gentled so it
+## reads as triage rather than a massacre, wearing a bus, and still one call.
+func _test_a_bus_collision_scales_to_the_medical_roster() -> void:
+	await _clear_calls()
+	# A bare medical roster for the bottom BUS_SIZE row. The fixture fleet owns three
+	# medical hands (an ambulance and two paramedics), which is already the middle row.
+	var kept_ambulances := int(_station.owned.get(&"ambulance", 0))
+	var kept_paramedics := int(_station.owned.get(&"paramedic", 0))
+	_station.owned[&"ambulance"] = 0
+	_station.owned[&"paramedic"] = 0
+	_director._rng.seed = 5
+	_director._spawn_bus_rtc(Vector2i(2, 1))
+	_station.owned[&"ambulance"] = kept_ambulances
+	_station.owned[&"paramedic"] = kept_paramedics
+	await _idle(6)
+
+	var bodies: Array[Casualty] = []
+	for node in get_nodes_in_group(Casualty.CASUALTY_GROUP):
+		bodies.append(node as Casualty)
+	_check(bodies.size() == 3,
+		"a bus collision on a bare roster is three casualties (%d)" % bodies.size())
+	var open := _board.open_calls()
+	_check(open.size() == 1, "grouped as a single call (%d)" % open.size())
+	if not open.is_empty():
+		_check(open[0].title() == "Bus collision, multiple casualties",
+			"titled by what happened ('%s')" % open[0].title())
+	var gentled := not bodies.is_empty()
+	for body in bodies:
+		if body.decline_per_second > 0.011:
+			gentled = false
+	_check(gentled, "every casualty declines at the gentled rate")
+
+	# The bus itself: a stripped Town-pack prop among the bodies, not an incident.
+	var wreck: Node3D = null
+	for child in _incidents.get_children():
+		if not (child is Incident) and str(child.scene_file_path).contains("Bus"):
+			wreck = child
+	_check(wreck != null, "and a bus lies at the junction")
+
+	# Resolve the whole scene from code: the wreck leaves with the *last* casualty.
+	# **The flag is latched before the delivery, not read after it.** A freed object
+	# compares equal to null, so `wreck != null` after the free is false and the check
+	# would fail on exactly the behaviour it exists to confirm.
+	var had_wreck := wreck != null
+	for body in bodies:
+		body.treat(1.0)
+		body.deliver()
+	await _idle(6)
+	_check(had_wreck and not is_instance_valid(wreck),
+		"the bus goes with the last of them")
+	await _clear_calls()
+
+
+## The same scene against fatter rosters: more medical hands, more patients.
+func _test_a_bus_collision_grows_with_the_roster() -> void:
+	await _clear_calls()
+	# The fixture fleet's three medical hands are the middle BUS_SIZE row.
+	_director._rng.seed = 9
+	_director._spawn_bus_rtc(Vector2i(3, 2))
+	await _idle(6)
+	var middle := get_nodes_in_group(Casualty.CASUALTY_GROUP).size()
+	_check(middle == 4,
+		"a bus collision on the fixture roster is four casualties (%d)" % middle)
+	await _clear_calls()
+
+	# Four extra paramedics on the books -- bought, never dispatched -- takes the
+	# medical hands to seven, the top row.
+	_buy(&"paramedic", 4)
+	_director._rng.seed = 9
+	_director._spawn_bus_rtc(Vector2i(3, 2))
+	await _idle(6)
+	var full := get_nodes_in_group(Casualty.CASUALTY_GROUP).size()
+	_check(full == 5,
+		"and five against a full medical roster (%d)" % full)
+	_station.owned[&"paramedic"] = int(_station.owned.get(&"paramedic", 0)) - 4
+	_station._save_career()
+	_station.roster_changed.emit()
 	await _clear_calls()
 
 
@@ -6748,6 +6890,115 @@ func _test_a_trapped_casualty_needs_cutting_free_first() -> void:
 	_dissolve(_station.dispatch(&"engine") as Unit, &"engine")
 	await _idle(4)
 
+
+## The shed load shuts the street three ways, and each has its own witness: the board
+## reads it as a scene hazard, the traffic-facing cordon stands raised without cones,
+## and a vehicle's own road_is_blocked sees it -- which is what buys the reroute.
+func _test_a_shed_load_shuts_the_street() -> void:
+	await _clear_calls()
+	await _park_the_shift()
+	_stand_down()
+	_director._rng.seed = 13
+	_director._spawn_shed_load()
+	await _idle(6)
+
+	var piles := get_nodes_in_group(Debris.DEBRIS_GROUP)
+	if piles.size() != 1:
+		_check(false, "a shed load on the map (%d)" % piles.size())
+		_stand_to()
+		return
+	var debris := piles[0] as Debris
+	var open := _board.open_calls()
+	_check(not open.is_empty() and open[0].kind == Call.Kind.FIRE,
+		"the board reads it as a scene hazard, not a medical call")
+	_check(not open.is_empty() and open[0].title() == "Shed load blocking the road",
+		"and names the job ('%s')" % (open[0].title() if not open.is_empty() else "no call"))
+	var cordon := debris.get_node_or_null("Cordon") as Cordon
+	_check(cordon != null and cordon.raised and cordon.get_child_count() == 0,
+		"a raised cordon turns the traffic, with no cones -- the boxes are the visual")
+
+	# The player's own routing sees it too. Pure cone math, so the street's axis does
+	# not matter: the car sits 10m one side of the pile, the aim 10m past the other.
+	var spot := debris.global_position
+	await _place_unit(_car, spot + Vector3(10.0, 0.2, 0.0))
+	var aim := spot - Vector3(10.0, 0.0, 0.0)
+	_check(_car.road_is_blocked(aim), "a vehicle aimed past it reads the street as blocked")
+	debris.clear(2.0)
+	await _idle(6)
+	_check(not _car.road_is_blocked(aim), "and clear again once the load is shifted")
+	_stand_to()
+	await _clear_calls()
+
+
+## The Clear verb: both boots-on-the-ground services carry it, the medical service does
+## not, and working it reopens the street and pays like a disaster prevented.
+func _test_a_crew_clears_a_shed_load() -> void:
+	await _clear_calls()
+	await _park_the_shift()
+	_buy(&"firefighter", 1)
+	var crew := _station.dispatch(&"firefighter") as Person
+	if crew == null:
+		_check(false, "a firefighter to send")
+		return
+	_mission.begin_scoring()
+	_director._rng.seed = 21
+	_director._spawn_shed_load()
+	await _idle(6)
+
+	var piles := get_nodes_in_group(Debris.DEBRIS_GROUP)
+	if piles.size() != 1:
+		_check(false, "a shed load on the map (%d)" % piles.size())
+		_dissolve(crew, &"firefighter")
+		await _end_freeplay()
+		return
+	var debris := piles[0] as Debris
+	var target := _target_for(debris)
+	_check(_find_ability(_officer, &"clear") != null
+			and _find_ability(_officer, &"clear").score(_officer, target) > 0,
+		"an officer is offered Clear on a shed load")
+	_check(_find_ability(crew, &"clear") != null
+			and _find_ability(crew, &"clear").score(crew, target) > 0,
+		"and so is a firefighter -- box-lugging is not specialist work")
+	_check(_find_ability(_paramedic, &"clear") == null,
+		"a paramedic is not")
+	var verb := _officer.resolve(target)
+	_check(verb != null and verb.id() == &"clear",
+		"right-clicking the load with an officer means Clear (got '%s')"
+		% ("none" if verb == null else verb.id()))
+	if verb == null:
+		_dissolve(crew, &"firefighter")
+		await _end_freeplay()
+		return
+
+	# The work. Sped up so the check measures the loop, not seven seconds of lugging.
+	debris.clear_per_second = 0.9
+	await _place_unit(_officer, debris.global_position + Vector3(4.0, 0.0, 0.0))
+	_officer.issue(verb.make_order(_officer, target))
+	var opened := false
+	for i in 600:
+		await physics_frame
+		if not is_instance_valid(debris) or not debris.active:
+			opened = true
+			break
+	_check(opened, "the officer works the load off the road")
+	await _idle(8)
+	_check(_board.open_calls().is_empty(), "the call closes with the street")
+	_check(_mission.lanes_cleared == 1,
+		"the debrief counts it (%d)" % _mission.lanes_cleared)
+	# **Exact, not a floor.** The response bonus alone is 100, so a `>= 60` bound stayed
+	# green with the whole Debris scoring arm deleted -- measured, via the sabotage run.
+	# The disturbance test's equality is the precedent: scoring began at zero, the
+	# officer is standing at the scene, so the sum is deterministic.
+	_check(_mission.score == Mission.DEBRIS_POINTS + Mission.RESPONSE_BONUS,
+		"scored like a disaster prevented plus the response bonus (%d, expected %d)"
+		% [_mission.score, Mission.DEBRIS_POINTS + Mission.RESPONSE_BONUS])
+	# A consistency assertion: deleting score and pay together keeps it green by
+	# construction (both sides move). Its sabotage is dropping `_pay` alone, which
+	# reddened it in isolation.
+	_check(_mission.earned == _mission.score,
+		"an obstruction pays what it scores (£%d)" % _mission.earned)
+	_dissolve(crew, &"firefighter")
+	await _end_freeplay()
 
 
 ## The dev call spawner: inert until asked, and it asks the director rather than placing
@@ -8073,6 +8324,120 @@ func _test_a_disturbance_is_arrested_and_delivered() -> void:
 	await _clear_calls()
 
 
+## A collapse with a bottle beside it, and the assessment comes back medical: the call
+## carries on exactly as any other casualty, and the not-knowing is all it cost.
+func _test_a_drunk_call_can_be_just_a_collapse() -> void:
+	await _clear_calls()
+	await _park_the_shift()
+	_stand_down()
+	_director._rng.seed = 31
+	_director._spawn_drunk()
+	await _idle(6)
+
+	var bodies := get_nodes_in_group(Casualty.CASUALTY_GROUP)
+	if bodies.size() != 1:
+		_check(false, "a drunk call is one casualty (%d)" % bodies.size())
+		_stand_to()
+		return
+	var casualty := bodies[0] as Casualty
+	_check(casualty.needs_assessment, "flagged as needing assessment")
+	var propped := false
+	for child in casualty.get_children():
+		if str(child.scene_file_path).contains("SM_Item_"):
+			propped = true
+	_check(propped, "with the drink lying beside them")
+	_check(casualty.describe_state() == "unresponsive -- cause unknown",
+		"the readout commits to nothing ('%s')" % casualty.describe_state())
+	var open := _board.open_calls()
+	_check(not open.is_empty() and open[0].title() == "Person collapsed, drink suspected",
+		"and the board says only what was called in")
+
+	# Force the roll medical, then work past the assessment threshold.
+	casualty.turns_rowdy = false
+	casualty.treat(0.5)
+	await _idle(4)
+	_check(is_instance_valid(casualty) and casualty.active
+			and not casualty.needs_assessment,
+		"the assessment comes back medical and the casualty stays a casualty")
+	_check(get_nodes_in_group(Suspect.SUSPECT_GROUP).is_empty(),
+		"nobody stood up swinging")
+	casualty.treat(1.0)
+	_check(casualty.is_stable, "and they stabilise like anyone else")
+	_stand_to()
+	await _clear_calls()
+
+
+## The other half of the roll: they were never hurt at all. The suspect stands up in the
+## casualty's own clothes, the *same* call flips to crime rather than closing, and
+## nobody is paid or penalised for a patient that never existed.
+func _test_a_drunk_call_can_turn_into_an_arrest() -> void:
+	await _clear_calls()
+	await _park_the_shift()
+	_stand_down()
+	_director._rng.seed = 37
+	_director._spawn_drunk()
+	await _idle(6)
+
+	var bodies := get_nodes_in_group(Casualty.CASUALTY_GROUP)
+	if bodies.size() != 1:
+		_check(false, "a drunk call is one casualty (%d)" % bodies.size())
+		_stand_to()
+		return
+	var casualty := bodies[0] as Casualty
+	var call: Call = null
+	if not _board.open_calls().is_empty():
+		call = _board.open_calls()[0]
+	var worn := str(casualty.get_node("Character").scene_file_path)
+	var spot := casualty.global_position
+	var saved_before := _mission.casualties_saved
+	var lost_before := _mission.casualties_lost
+	var arrests_before := _mission.arrests
+
+	casualty.turns_rowdy = true
+	casualty.treat(0.5)
+	await _idle(8)
+
+	_check(not is_instance_valid(casualty),
+		"the casualty is gone -- there was never a patient")
+	var suspects := get_nodes_in_group(Suspect.SUSPECT_GROUP)
+	if suspects.size() != 1:
+		_check(false, "one suspect stood up (%d)" % suspects.size())
+		_stand_to()
+		await _clear_calls()
+		return
+	var suspect := suspects[0] as Suspect
+	_check(_flat_distance(suspect.global_position, spot) < 1.0,
+		"where the casualty lay (%.1fm off)"
+		% _flat_distance(suspect.global_position, spot))
+	_check(str(suspect.get_node("Character").scene_file_path) == worn,
+		"wearing the same clothes")
+	# **The call survives the swap.** The deferred-adopt trap pinned: the suspect must
+	# be in the call's list before the casualty leaves it, or the list empties and the
+	# call closes RESOLVED -- banking a cleared call and a response bonus for a job
+	# nobody did. Sabotage map: reddened by re-staging the swap retire-first (suspect
+	# spawned frames after the free); deleting only the frame-wait keeps it green,
+	# because the add-before-retire ordering alone holds the list non-empty -- the
+	# wait is margin, not the mechanism.
+	var held := call != null and is_instance_valid(call) and call.is_open()
+	_check(held, "the same call is still open")
+	_check(held and call.kind == Call.Kind.CRIME, "and now reads as crime")
+	_check(held and call.title() == "Drunk and disorderly",
+		"under its new name ('%s')" % (call.title() if held else "?"))
+	_check(_mission.casualties_saved == saved_before
+			and _mission.casualties_lost == lost_before,
+		"and the medical ledger never moved")
+
+	# Book them in from code -- the walk and the drive have their own tests.
+	suspect.detain(1.0)
+	suspect.deliver()
+	await _idle(6)
+	_check(_board.open_calls().is_empty(), "the arrest closes the call")
+	_check(_mission.arrests == arrests_before + 1,
+		"and is tallied (%d)" % _mission.arrests)
+	_stand_to()
+	await _clear_calls()
+
+
 func _test_scoring_rewards_a_fast_response() -> void:
 	await _clear_calls()
 	await _park_the_shift()
@@ -9026,6 +9391,7 @@ func _reset_mission() -> void:
 	_station.debt = 0
 	_mission.crew_lost = 0
 	_mission.crew_recovered = 0
+	_mission.lanes_cleared = 0
 
 
 func _target_for(incident: Incident) -> Target:

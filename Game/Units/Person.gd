@@ -221,17 +221,18 @@ func _build_abilities() -> Array[Ability]:
 			# stretcher run is the paramedic's rather than the ambulance's.
 			return [MoveAbility.new(), ApprehendAbility.new(),
 				LoadSuspectAbility.new(), ExtinguishAbility.new(),
-				SecureAbility.new(), BoardAbility.new(), StopAbility.new(),
-				ReturnAbility.new()]
+				SecureAbility.new(), ClearAbility.new(), BoardAbility.new(),
+				StopAbility.new(), ReturnAbility.new()]
 		Service.FIRE:
 			# A firefighter still cannot treat, arrest or cordon. What they have is the
 			# hose -- at a rate the police extinguisher cannot touch, and the only thing
 			# that touches a *building* -- Cool, which is the same hose pointed at
 			# something that has not caught yet, and Free, which is the odd one: it
 			# helps nobody they can help, and exists to unblock the paramedic.
+			# Clear is shared with the police: box-lugging is not specialist work.
 			return [MoveAbility.new(), ExtinguishAbility.new(), CoolAbility.new(),
-				FreeAbility.new(), BoardAbility.new(), StopAbility.new(),
-				ReturnAbility.new()]
+				FreeAbility.new(), ClearAbility.new(), BoardAbility.new(),
+				StopAbility.new(), ReturnAbility.new()]
 		_:
 			return [MoveAbility.new(), BoardAbility.new(), StopAbility.new()]
 

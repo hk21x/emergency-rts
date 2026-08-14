@@ -30,6 +30,7 @@ const CORNER_ZONE := 16.0
 var _scene: Node3D
 var _station: Node
 var _car: Vehicle
+var _dumped := false
 
 
 func _init() -> void:
@@ -107,6 +108,12 @@ func _turn(from_cell: Vector2i, to_cell: Vector2i) -> void:
 	var corner := _sharpest_corner(from, to)
 
 	_car.issue(MoveOrder.new(to))
+	if OS.get_environment("PATH_DUMP") == "1":
+		var order := _car.orders[0] as MoveOrder
+		var pts: Array[String] = []
+		for w: Vector3 in order._route:
+			pts.append("(%.0f,%.0f)" % [w.x, w.z])
+		print("    ROUTE: %s -> dest (%.0f,%.0f)" % [" ".join(pts), to.x, to.z])
 	var frames := 0
 	var worst := 0.0
 	var off := 0
@@ -232,6 +239,27 @@ func _trace() -> void:
 			* _car.corner_brake_ratio * travelled)
 		seen.append("[v%d %.0f° at %.0fm -> hold %.1f, allows %.1f]"
 			% [i, rad_to_deg(turn), travelled, through, allows])
+	# The shipped planner's own reads, alongside: corrected scan start, symmetric windows.
+	var start2 := mini(index, int((_car.call("_closest_on_path", path) as Vector2).x))
+	var travelled2 := 0.0
+	var prev2 := _car.global_position
+	var seen2: Array[String] = []
+	for i in range(start2, path.size() - 1):
+		var pt: Vector3 = path[i]
+		travelled2 += _flat(pt - prev2)
+		prev2 = pt
+		if travelled2 > _car.corner_lookahead:
+			break
+		var turn2: float = _car.call("_flat_angle",
+			_car.call("_direction_before", path, i),
+			_car.call("_direction_after", path, i))
+		if turn2 < deg_to_rad(_car.corner_min_degrees):
+			continue
+		seen2.append("[v%d %.0fdeg at %.0fm]" % [i, rad_to_deg(turn2), travelled2])
+	print("      route turn at aim %.0fdeg   turn here %.0fdeg"
+		% [rad_to_deg(_car.turn_at_aim), rad_to_deg(_car.turn_here)])
+	print("      new: start %d of %d  %s" % [start2, path.size(),
+		" ".join(seen2) if seen2.size() else "NO CORNER SEEN"])
 	print("    idx %d/%d  spd %.1f  %s"
 		% [index, path.size(), _car.forward_speed,
 			" ".join(seen) if seen.size() > 0 else "NO CORNER SEEN"])

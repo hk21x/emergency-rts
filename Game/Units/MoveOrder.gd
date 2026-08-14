@@ -234,10 +234,42 @@ func _aim(unit: Unit) -> void:
 	_no_progress = 0.0
 	var may_turn := _turn_round_next_aim
 	_turn_round_next_aim = false
+	# People run MoveOrders too -- the vehicle-only corner annotation below must not
+	# touch them. Left unguarded it was a Nil write on every officer sent walking, and
+	# a runtime error inside a check silently truncates it: seven checks were quietly
+	# abandoned while the suite read green, caught only by the SCRIPT ERROR sweep.
+	var vehicle := unit as Vehicle
 	if _at >= _route.size():
 		unit.navigate_to(point, may_turn or _route.is_empty())
+		if vehicle:
+			vehicle.turn_at_aim = 0.0
 	else:
 		unit.navigate_to(_route[_at], may_turn)
+		if vehicle == null:
+			return
+		# **Tell the vehicle how hard the route turns at this waypoint.** The corner
+		# planner's only other source is the agent's path, which ends at the junction:
+		# the turn onto the next street lives in the next waypoint's path and appears
+		# only at the 7m switch -- far too late to brake from speed, which is the
+		# junction overshoot two F3s from play pinned on the fast cars. The route knows
+		# its own geometry exactly, so the angle is computed here, once, from the legs
+		# either side of the aim.
+		# The turn at the waypoint just passed keeps constraining until the car is
+		# through it -- see [member Vehicle.turn_here].
+		if _at > 0:
+			vehicle.turn_here = vehicle.turn_at_aim
+			vehicle.turn_here_at = _route[_at - 1]
+		var here := _route[_at - 1] if _at > 0 else unit.global_position
+		var beyond := _route[_at + 1] if _at + 1 < _route.size() else point
+		var incoming := _route[_at] - here
+		var onward := beyond - _route[_at]
+		incoming.y = 0.0
+		onward.y = 0.0
+		var turn := 0.0
+		if incoming.length() > 0.5 and onward.length() > 0.5:
+			turn = absf(Vector2(incoming.x, incoming.z)
+				.angle_to(Vector2(onward.x, onward.z)))
+		vehicle.turn_at_aim = turn
 
 
 ## Whether this order is mostly a **turn round** rather than a journey.

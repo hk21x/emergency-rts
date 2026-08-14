@@ -37,6 +37,18 @@ const CASUALTY_GROUP := &"casualties"
 ## lapses on its own the moment they stop, so nothing has to notice the order ending.
 const CARE_HOLD := 0.25
 
+@export_group("Assessment")
+## Nobody at the scene yet knows what this collapse *is*. A paramedic's first working
+## seconds settle it -- into an ordinary casualty, or into somebody who was never hurt
+## at all and does not want the attention. Until then the readout commits to nothing.
+@export var needs_assessment := false
+## The hidden truth, rolled by the director's seeded RNG at spawn and surfaced only when
+## the assessment reaches it. Never shown to the player before that: the not-knowing is
+## the call.
+var turns_rowdy := false
+## How much treatment work it takes to know which of the two this is.
+const ASSESS_AT := 0.4
+
 @export_group("Trapped")
 ## Pinned under something. They can be treated where they lie -- a paramedic kneels
 ## beside them either way -- but they **cannot be moved** until a fire crew lifts it off.
@@ -173,6 +185,11 @@ func treat(amount: float, advanced := false) -> void:
 		_care_hold = CARE_HOLD
 		return
 	treatment = minf(treatment + amount, 1.0)
+	if needs_assessment and treatment >= ASSESS_AT:
+		needs_assessment = false
+		if turns_rowdy:
+			_stand_up_swinging()
+			return
 	if treatment >= 1.0:
 		# Stable, not saved. The incident stays open until they reach hospital, which
 		# is what makes the ambulance trip part of the job rather than a formality.
@@ -210,6 +227,34 @@ func _finish(success: bool) -> void:
 	super(success)
 
 
+## The assessment came back: not a patient. A suspect stands up where the casualty lay,
+## wearing the same clothes, and the casualty retires **silently** -- no `resolved`
+## emission in either polarity, because `false` fails the whole call and `true` pays
+## £100 for a patient nobody delivered. **The order is the load-bearing part**: the
+## suspect goes in before the casualty leaves, because retired the other way round the
+## call's list empties and it closes RESOLVED, banking a cleared call for a job nobody
+## did -- measured, by re-staging the swap retire-first. The frame-wait below is margin
+## on top of that ordering, not the mechanism: adoption is deferred, and the wait keeps
+## the retire clear of the same end-of-frame window rather than racing it.
+func _stand_up_swinging() -> void:
+	var packed := load("res://Game/Incidents/Suspect.tscn") as PackedScene
+	if packed == null:
+		return
+	var suspect := packed.instantiate() as Suspect
+	# The outfit is the Character child's scene path -- after _wear_outfit() that child
+	# *is* the outfit scene -- so the one who stands up is dressed as the one who lay
+	# down. Set before add_child, as everywhere.
+	suspect.outfit = get_node("Character").scene_file_path
+	suspect.flavour = "Drunk and disorderly"
+	get_parent().add_child(suspect)
+	suspect.global_position = global_position
+	await get_tree().physics_frame
+	if not active or not is_inside_tree():
+		return
+	active = false
+	queue_free()
+
+
 func describe_state() -> String:
 	# **Said first, and said even when they are stable.** Trapped is the thing standing
 	# between this call and its next step, so it outranks every other description --
@@ -231,6 +276,10 @@ func describe_state() -> String:
 	if needs_doctor:
 		return "held by the crew -- needs a doctor" if _care_hold > 0.0 \
 			else "critical -- needs a doctor"
+	# Before the treatment arm: an unassessed collapse must not read as progress towards
+	# a stable that may never be coming. It reads as the unknown it is.
+	if needs_assessment:
+		return "being assessed" if treatment > 0.0 else "unresponsive -- cause unknown"
 	if treatment > 0.0:
 		return "under treatment"
 	return "critical" if health < 0.35 else "hurt"

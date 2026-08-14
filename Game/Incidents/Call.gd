@@ -135,6 +135,7 @@ func describe() -> String:
 	var hurt := 0
 	var rowdy := 0
 	var cylinders := 0
+	var blocked := 0
 	for incident in incidents:
 		if not is_instance_valid(incident) or not incident.active:
 			continue
@@ -147,6 +148,8 @@ func describe() -> String:
 			cylinders += 1
 		elif incident is Suspect:
 			rowdy += 1
+		elif incident is Debris:
+			blocked += 1
 
 	if live.size() == 1:
 		return live[0].describe_state()
@@ -159,6 +162,8 @@ func describe() -> String:
 		parts.append("%d suspect%s" % [rowdy, "" if rowdy == 1 else "s"])
 	if cylinders > 0:
 		parts.append("%d cylinder%s" % [cylinders, "" if cylinders == 1 else "s"])
+	if blocked > 0:
+		parts.append("%d blocked lane%s" % [blocked, "" if blocked == 1 else "s"])
 	return ", ".join(parts)
 
 
@@ -222,11 +227,20 @@ func _finish(final: Status, success: bool) -> void:
 
 
 ## Drops incidents that have been freed, so nothing here holds a dangling reference.
+##
+## When something actually left, the scene is re-read: kind derives from what is at the
+## scene, and until this line it was only derived on adopt -- so a call whose casualty
+## stood up swinging stayed MEDICAL with only a suspect left on it.
 func _prune() -> void:
 	var alive: Array[Incident] = []
 	for incident in incidents:
 		if is_instance_valid(incident):
 			alive.append(incident)
+	if alive.size() < incidents.size():
+		incidents = alive
+		_recentre()
+		changed.emit(self)
+		return
 	incidents = alive
 
 
@@ -234,11 +248,18 @@ func _prune() -> void:
 ## that catches fire becomes a rescue without anyone having to say so.
 func _recentre() -> void:
 	var centre := Vector3.ZERO
+	var counted := 0
 	var burning := false
 	var hurt := false
 	var rowdy := false
 	for incident in incidents:
+		# An adopt can land while a just-freed incident is still awaiting its prune,
+		# and reading one is a crash -- surfaced by a sabotage run that reordered the
+		# drunk-call swap. Freed incidents say nothing about the scene either way.
+		if not is_instance_valid(incident):
+			continue
 		centre += incident.global_position
+		counted += 1
 		if incident is Fire:
 			burning = true
 		elif incident is Hazard:
@@ -246,12 +267,16 @@ func _recentre() -> void:
 			# cylinder still hot and the call is emphatically not a medical one, which
 			# is where it fell through to before this line existed.
 			burning = true
+		elif incident is Debris:
+			# The same argument as the cylinder: a shut street is a scene hazard, and
+			# without this line it fell through to MEDICAL and wore a cross.
+			burning = true
 		elif incident is Casualty:
 			hurt = true
 		elif incident is Suspect:
 			rowdy = true
-	if not incidents.is_empty():
-		position = centre / incidents.size()
+	if counted > 0:
+		position = centre / counted
 		place = CityGrid.place_name(position)
 
 	# A disturbance only names the job while it is the whole job: anything burning or

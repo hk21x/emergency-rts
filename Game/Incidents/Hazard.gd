@@ -36,7 +36,8 @@ const HAZARD_GROUP := &"hazards"
 ## Everything within this takes the full effect, falling off to nothing at twice it.
 @export var blast_range := 9.0
 ## Repair cost to a vehicle at the centre of it.
-@export var blast_damage := 260.0
+## A tenth of the 260.0 it shipped at -- rescaled with damage_rate, see Vehicle.gd.
+@export var blast_damage := 26.0
 ## Condition taken off a crew member at the centre of it, falling off the same way.
 ##
 ## **Above 1.0 on purpose**, because it is scaled by the same distance falloff as the

@@ -1357,7 +1357,42 @@ fleet numbers and was thrown away for walking out of kerbless junction mouths �
 difference between the two is that the shipped legs *ask* where the road ends instead of
 finding out by collision.
 
-**806 automated checks**, all passing. Run them with any Godot 4.6+ binary
+**Junction overshoot on the fast cars is fixed at the root.** Two F3s from play showed the
+doctor car sweeping 90° turns at 16 m/s; the cause was architectural — the corner planner
+read corners off the agent's path, and that path *ends at the junction*, so the turn onto
+the next street was invisible until 7m out. The route now annotates each aim with its exact
+turn angle from the lattice, the cap holds while the car is in the box, and the in-path
+scan is honest at last. Doctor-car lane intrusion fell to a seventh on the best leg, the
+ambulance's 60s corner-probe timeout became 22.9s, and both flagged geometries replay
+clean. The braking is visible in play: response cars now shed speed on the approach and
+take the box near walking-the-turn speed.
+
+Money-damage was rescaled to a tenth across the board — impact rate and cap, fire scorch,
+cylinder blast — after play showed a shift's ordinary contact outbilling what the shift
+paid: the repair sink read as a fine for driving rather than a cost for crashing. The
+mechanics are untouched (a hard knock still costs ten times a scrape, the cylinder still
+bills what parks beside it); only the scale moved.
+
+**Three call kinds from the asset shelf** (August 2026), all configuration over existing
+machinery rather than new systems. The **bus collision** is the RTC at triage size: a
+Town-pack bus on its side and three to five gentled casualties (scaled to the medical
+roster, `DISORDER_SIZE`-style), so an ambulance with two stretchers is finally asked *who
+rides first*. The **shed load** is the first call whose patient is the road — a `Debris`
+incident that shuts the street to ambient traffic (raised coneless cordon), to physics (a
+deliberate `Blocker` solid, the one strip-collision exception) and to the player's own
+routing (`road_is_blocked` scans the debris group), cleared by a new two-service `Clear`
+verb on officers and firefighters alike. The **drunk collapse** is the first call
+dispatched on genuinely incomplete information: a 50/50 seeded roll hidden behind
+"unresponsive — cause unknown" until a paramedic's assessment either leaves an ordinary
+patient or stands a suspect up swinging in the casualty's own clothes — the same call
+flipping MEDICAL → CRIME on the board via the prune-time kind re-read that ripple added.
+The sabotage pass earned its keep twice here: it caught a `>= 60` score bound the
+response bonus satisfied on its own (tightened to equality), and proved the swap's
+frame-wait is margin while the add-before-retire *ordering* is the load-bearing part —
+and surfaced a latent crash in `Call._recentre` (adopt reading a freed incident) that is
+now guarded.
+
+**846 automated checks**, all passing. Run them with any Godot 4.6+ binary
 (`--fixed-fps 60` decouples the loop from the wall clock — ~20s instead of ~9min):
 
     godot --headless --fixed-fps 60 --path . --script res://Game/smoke_test.gd

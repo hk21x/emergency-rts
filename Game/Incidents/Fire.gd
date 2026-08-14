@@ -139,7 +139,9 @@ const SPREAD_TRIES := 8
 ## What it buys is a reason to think about where the appliance stops: nose-in beside a
 ## burning car is the convenient place to park and the expensive one.
 @export var scorch_range := 4.0
-@export var scorch_per_second := 9.0
+## A tenth of the 9.0 it shipped at -- rescaled with the impact damage_rate, see the
+## note there; an appliance working a car fire was billing more than the call paid.
+@export var scorch_per_second := 0.9
 
 @export_group("Visuals")
 @export var min_flame_scale := 0.5

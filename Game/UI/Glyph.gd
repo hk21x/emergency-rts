@@ -74,6 +74,7 @@ static func _fallback(target: CanvasItem, key: StringName, at: Vector2, r: float
 		&"car": _car(target, at, r, ink, Color.TRANSPARENT)
 		&"ambulance": _car(target, at, r, ink, accent)
 		&"person": _person(target, at, r, ink)
+		&"box": _box(target, at, r, ink)
 		&"beacon": _beacon(target, at, r, ink)
 		&"horn": _horn(target, at, r, ink)
 		_: _unknown(target, at, r, ink)
@@ -190,6 +191,18 @@ static func _door(target: CanvasItem, at: Vector2, r: float, ink: Color,
 		tip + Vector2(r * 0.30 * way, 0.0),
 		tip + Vector2(0.0, -r * 0.28),
 		tip + Vector2(0.0, r * 0.28)]), ink)
+
+
+## An open cardboard box: a solid body with two splayed flaps, the Clear verb's cargo.
+## The flaps are what keep it from reading as a plain square at tile size.
+static func _box(target: CanvasItem, at: Vector2, r: float, ink: Color) -> void:
+	var thickness := maxf(r * 0.16, 1.5)
+	target.draw_rect(Rect2(at + Vector2(-r * 0.68, -r * 0.2), Vector2(r * 1.36, r * 1.05)),
+		ink, true)
+	target.draw_line(at + Vector2(-r * 0.68, -r * 0.2), at + Vector2(-r * 0.98, -r * 0.78),
+		ink, thickness)
+	target.draw_line(at + Vector2(r * 0.68, -r * 0.2), at + Vector2(r * 0.98, -r * 0.78),
+		ink, thickness)
 
 
 ## A roof beacon: dome on a base bar, with rays coming off it so it reads as a light

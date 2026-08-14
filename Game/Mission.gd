@@ -42,6 +42,9 @@ const ARREST_POINTS := 75
 ## disaster prevented rather than a job finished, and the reward for preventing it is
 ## mostly that the disaster did not happen.
 const HAZARD_POINTS := 60
+## Per shed load cleared off the carriageway. The cylinder's number and the cylinder's
+## reasoning: an obstruction removed is a disaster prevented, not a job finished.
+const DEBRIS_POINTS := 60
 ## What a lost casualty costs. More than a delivery earns, so a shift that loses one
 ## for every save is running at a loss.
 const LOST_PENALTY := 150
@@ -58,6 +61,7 @@ var casualties_saved := 0
 var casualties_lost := 0
 var arrests := 0
 var hazards_made_safe := 0
+var lanes_cleared := 0
 var elapsed := 0.0
 
 ## Freeplay. While true the incident-based win/lose rules are off: nothing is won by
@@ -138,6 +142,7 @@ func begin_scoring() -> void:
 	casualties_lost = 0
 	arrests = 0
 	hazards_made_safe = 0
+	lanes_cleared = 0
 	earned = 0
 	elapsed = 0.0
 	is_new_best = false
@@ -181,6 +186,9 @@ func summary() -> String:
 	if hazards_made_safe > 0:
 		parts.append("%d cylinder%s cooled"
 			% [hazards_made_safe, "" if hazards_made_safe == 1 else "s"])
+	if lanes_cleared > 0:
+		parts.append("%d shed load%s cleared"
+			% [lanes_cleared, "" if lanes_cleared == 1 else "s"])
 	return "   ·   ".join(parts)
 
 
@@ -243,6 +251,8 @@ func debrief_rows() -> Array[Dictionary]:
 		rows.append({"label": "Arrests", "value": str(arrests)})
 	if hazards_made_safe > 0:
 		rows.append({"label": "Cylinders cooled", "value": str(hazards_made_safe)})
+	if lanes_cleared > 0:
+		rows.append({"label": "Shed loads cleared", "value": str(lanes_cleared)})
 	return rows
 
 
@@ -353,6 +363,14 @@ func _on_resolved(incident: Incident, success: bool) -> void:
 			hazards_made_safe += 1
 			score += HAZARD_POINTS
 			_pay(HAZARD_POINTS)
+	elif incident is Debris:
+		# No failure arm because there is no failure: a shed load cannot be lost, only
+		# left sitting there with the street shut around it.
+		if success:
+			lanes_cleared += 1
+			if scoring:
+				score += DEBRIS_POINTS
+				_pay(DEBRIS_POINTS)
 
 	progress_changed.emit()
 	_evaluate()

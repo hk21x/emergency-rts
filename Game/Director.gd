@@ -115,6 +115,19 @@ const KINDS := [
 	# engine.** A casualty nobody on the roster can stabilise is not a hard call, it is a
 	# broken one: paramedics would hold them indefinitely and the call would never close.
 	{"id": &"collapse", "weight": 14, "needs_doctor": true},
+	# **The RTC at the size where dispatch order matters.** One ambulance carries two
+	# stretchers, so three-plus casualties force the triage question the two-body RTC
+	# never asks: who rides first? Sized by the medical roster, gentled per casualty.
+	{"id": &"bus_rtc", "weight": 8},
+	# **The one call whose patient is the road.** Nothing burns and nobody is hurt;
+	# the street itself is shut until a crew clears it, and the district's own traffic
+	# reacts. Ungated: officers and firefighters both carry the verb, and every career
+	# owns at least one of one of them.
+	{"id": &"shed_load", "weight": 10},
+	# **The call the board cannot diagnose.** Half are medical, half are police work,
+	# and only a paramedic's assessment tells them apart -- so it is dispatched on the
+	# not-knowing, which no other call asks the player to do.
+	{"id": &"drunk", "weight": 12},
 ]
 
 ## What a vehicle fire leaves at the kerb. Plain mesh prefabs straight from the pack:
@@ -124,6 +137,20 @@ const WRECKS := [
 	"res://Assets/Synty/PolygonCity/Prefabs/Vehicles/SM_Veh_Car_Small_01.tscn",
 	"res://Assets/Synty/PolygonCity/Prefabs/Vehicles/SM_Veh_Car_Medium_01.tscn",
 	"res://Assets/Synty/PolygonCity/Prefabs/Vehicles/SM_Veh_Car_Muscle_01.tscn",
+]
+
+## Town-pack bodies for the bigger scenes, named in full: build_map's bare-name
+## resolution covers PolygonCity only, and so does everything else that loads by name.
+const BUS_WRECKS := [
+	"res://Assets/PolygonTown/Prefabs/Vehicles/SM_Veh_Bus_01.tscn",
+	"res://Assets/PolygonTown/Prefabs/Vehicles/SM_Veh_SchoolBus_01.tscn",
+]
+const SHED_TRUCK := "res://Assets/PolygonTown/Prefabs/Vehicles/SM_Veh_Truck_Delivery_01.tscn"
+const DRINK_PROPS := [
+	"res://Assets/PolygonTown/Prefabs/Items/SM_Item_Alcohol_01.tscn",
+	"res://Assets/PolygonTown/Prefabs/Items/SM_Item_Alcohol_02.tscn",
+	"res://Assets/PolygonTown/Prefabs/Items/SM_Item_Alcohol_03.tscn",
+	"res://Assets/PolygonTown/Prefabs/Items/SM_Item_BeerCup_01.tscn",
 ]
 
 var active := false
@@ -311,6 +338,14 @@ func open_kind(kind: StringName) -> void:
 				var fire := _spawn_fire(spot, Fire.Kind.ELECTRICAL, 0.4)
 				if fire:
 					fire.flavour = "Electrical fire, water unsuitable"
+		&"bus_rtc":
+			var junction := _pick_junction()
+			if junction.x >= 0:
+				_spawn_bus_rtc(junction)
+		&"shed_load":
+			_spawn_shed_load()
+		&"drunk":
+			_spawn_drunk()
 		_:
 			_spawn_medical()
 	# A tick with nowhere to put a call simply skips it; the timer has already been
@@ -371,6 +406,23 @@ const BUILDING_SIZE := [
 	{"crew": 2, "max_fires": 4, "spread_interval": 12.0},
 	{"crew": 3, "max_fires": 6, "spread_interval": 10.0},
 	{"crew": 4, "max_fires": 8, "spread_interval": 8.0},
+]
+
+## How many people a bus collision puts on the road, by the medical hands the career
+## owns -- ambulances and paramedics together, since both are what the scene consumes.
+## Same principle as the two tables above: the job fits whoever can be sent.
+const BUS_SIZE := [
+	{"medics": 0, "casualties": 3},
+	{"medics": 3, "casualties": 4},
+	{"medics": 5, "casualties": 5},
+]
+
+## Where the bodies lie around the junction, first N taken. All within a few metres of
+## the centre: [constant Call.GROUPING_RADIUS] is 14 and measured to a centroid that
+## moves as each one is adopted, and a scene that strays past it splits into two calls.
+const BUS_SPOTS := [
+	Vector3(-1.8, 0.0, 1.2), Vector3(2.0, 0.0, -1.5), Vector3(-3.2, 0.0, -2.4),
+	Vector3(3.4, 0.0, 2.6), Vector3(0.4, 0.0, 3.8),
 ]
 
 
@@ -679,6 +731,125 @@ func _spawn_rtc(cell: Vector2i) -> void:
 	_spawn_casualty(centre + Vector3(2.0, 0.0, -1.5), "Road traffic collision")
 
 
+## The RTC grown to the size the medical roster can face: a bus on its side of the
+## junction and three to five people on the road around it. The depth is triage -- an
+## ambulance carries two stretchers, so the player is choosing who rides first -- which
+## is why every casualty declines at the trapped call's gentler rate. Pressure, not a
+## mass grave.
+func _spawn_bus_rtc(cell: Vector2i) -> void:
+	var centre := CityGrid.junction(cell)
+	# The wreck lies along one of the junction's own streets, like something that
+	# arrived down it.
+	var exits := CityGrid.neighbours(cell)
+	var yaw := 0.0
+	if not exits.is_empty():
+		var toward: Vector2i = exits[_rng.randi_range(0, exits.size() - 1)]
+		var direction := (CityGrid.junction(toward) - centre).normalized()
+		yaw = atan2(direction.x, direction.z)
+	var wreck: Node3D = null
+	var parent := get_node_or_null(incidents_path)
+	if parent:
+		wreck = (load(str(BUS_WRECKS[_rng.randi_range(0, BUS_WRECKS.size() - 1)])) \
+			as PackedScene).instantiate() as Node3D
+		_strip_collision(wreck)
+		parent.add_child(wreck)
+		wreck.global_position = centre + Vector3(sin(yaw), 0.0, cos(yaw)) * 4.0
+		wreck.rotation.y = yaw
+
+	var placed: Array[Casualty] = []
+	for i in int(_bus_size()["casualties"]):
+		var casualty := _spawn_casualty(_beside(centre, BUS_SPOTS[i]),
+			"Bus collision, multiple casualties")
+		if casualty == null:
+			continue
+		casualty.decline_per_second *= 0.6
+		placed.append(casualty)
+	if wreck == null:
+		return
+	# The wreck leaves with the *last* casualty, so a half-worked scene keeps its bus.
+	# The lambda scans the captured Array -- captured by reference, where an int counter
+	# would be a copy -- and the departing casualty reads as already out of the tree.
+	for casualty in placed:
+		casualty.tree_exited.connect(func() -> void:
+			if not is_instance_valid(wreck):
+				return
+			for other in placed:
+				if is_instance_valid(other) and other.is_inside_tree():
+					return
+			wreck.queue_free())
+
+
+## The row of [constant BUS_SIZE] matching the medical hands on the books.
+func _bus_size() -> Dictionary:
+	var station := get_tree().get_first_node_in_group(Station.GROUP) as Station
+	var medics := 0
+	if station:
+		medics = station.total(&"ambulance") + station.total(&"paramedic")
+	var row: Dictionary = BUS_SIZE[0]
+	for candidate: Dictionary in BUS_SIZE:
+		if medics >= int(candidate["medics"]):
+			row = candidate
+	return row
+
+
+## A delivery run gone wrong: the truck at the kerb, its cargo across the carriageway,
+## and the street shut until somebody shifts it. The one call whose patient is the road.
+func _spawn_shed_load() -> void:
+	var kerb := _pick_kerb()
+	if kerb.is_empty():
+		return
+	var debris := _spawn("res://Game/Incidents/Debris.tscn") as Debris
+	if debris == null:
+		return
+	debris.global_position = kerb["centre"]
+	debris.flavour = "Shed load blocking the road"
+	var parent := get_node_or_null(incidents_path)
+	if parent == null:
+		return
+	var truck := (load(SHED_TRUCK) as PackedScene).instantiate() as Node3D
+	_strip_collision(truck)
+	parent.add_child(truck)
+	truck.global_position = kerb["spot"]
+	truck.rotation.y = kerb["yaw"]
+	debris.tree_exited.connect(func() -> void:
+		if is_instance_valid(truck):
+			truck.queue_free())
+
+
+## Somebody flat out with a bottle beside them, and no way to tell from the board which
+## call this really is. A paramedic's first working seconds settle it: half are exactly
+## what they look like, half stand up swinging and become police work. The roll is made
+## here on the shift's own seed and hidden until the assessment surfaces it.
+func _spawn_drunk() -> void:
+	var spot := Vector3.INF
+	var worn := ""
+	var civilian := _pick_civilian()
+	if civilian:
+		spot = civilian.global_position
+		var body := civilian.get_node_or_null("Character")
+		if body:
+			worn = body.scene_file_path
+		civilian.queue_free()
+	else:
+		spot = _pick_pavement()
+	if spot == Vector3.INF:
+		return
+	var casualty := _spawn_casualty(spot, "Person collapsed, drink suspected", worn)
+	if casualty == null:
+		return
+	casualty.needs_assessment = true
+	casualty.turns_rowdy = _rng.randf() < 0.5
+	# The bottle. Cosmetic, stripped, and a child of the body so it leaves with them
+	# whichever way the assessment goes.
+	for i in 1 + _rng.randi() % 2:
+		var prop := (load(str(DRINK_PROPS[_rng.randi_range(0, DRINK_PROPS.size() - 1)])) \
+			as PackedScene).instantiate() as Node3D
+		_strip_collision(prop)
+		casualty.add_child(prop)
+		var angle := _rng.randf() * TAU
+		prop.position = Vector3(sin(angle), 0.0, cos(angle)) * 0.6
+
+
 func _spawn(scene_path: String, outfit := "") -> Node3D:
 	var parent := get_node_or_null(incidents_path)
 	if parent == null:
@@ -730,10 +901,12 @@ func _pick_kerb() -> Dictionary:
 		var end := CityGrid.junction(leg["b"])
 		var direction := (end - start).normalized()
 		var side := 1.0 if _rng.randf() < 0.5 else -1.0
-		var spot := start.lerp(end, _rng.randf_range(0.35, 0.65)) \
-			+ direction.cross(Vector3.UP) * side * KERB_OFFSET
+		var along := start.lerp(end, _rng.randf_range(0.35, 0.65))
+		var spot := along + direction.cross(Vector3.UP) * side * KERB_OFFSET
 		if _clear(spot):
-			return {"spot": spot, "yaw": atan2(direction.x, direction.z)}
+			# "centre" is the same point before the kerb offset -- mid-carriageway, for
+			# the one caller that wants the road itself rather than its edge.
+			return {"spot": spot, "yaw": atan2(direction.x, direction.z), "centre": along}
 	return {}
 
 

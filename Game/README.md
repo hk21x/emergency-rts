@@ -10,7 +10,7 @@ unmodified, though the POLYGON City pack was relocated on import — see `PROGRE
 ## Where this is up to
 
 **All 15 planned phases are done, plus 16 (the world reacts), 17 (audio), 18 (game
-framing), 19 (the fire service) and the career economy — half of phase 20.** 806
+framing), 19 (the fire service) and the career economy — half of phase 20.** 846
 automated checks, all passing.
 
 A 260m city district — twenty-five blocks of varied size, with parks, parking lots and
@@ -71,11 +71,12 @@ Any Godot 4.6+ binary works (originally built on 4.6.3, verified on 4.7):
 | **Right click a casualty** | kneel beside them and treat |
 | **Right click a stable casualty** (paramedic selected) | fetch the stretcher from the ambulance and wheel them aboard |
 | **Right click a suspect** (officer) | apprehend them; right-click again once cuffed to walk them to a patrol car |
+| **Right click a shed load** (officer or firefighter) | lug the spilled cargo off the carriageway until the street reopens |
 | **Shift + right click** | queue that order behind the current one |
 | `Ctrl` + `1`–`9` | assign a control group |
 | `1`–`9` | recall a control group |
 | `Z` `X` `C` `V` `B` `N` `M` `G` `H` `J` `K` `L` `T` | the command tiles, left to right |
-| Command tile | `Move`, `Treat`, `Extinguish`, `Cool`, `Secure`, `Board`, `Collect` arm the cursor for a target click; `Stop`, `Unload` and `Return` fire at once; `Lights` (`J`) and `Siren` (`K`) are toggles — the tile turns blue while one is running |
+| Command tile | `Move`, `Treat`, `Extinguish`, `Cool`, `Secure`, `Clear`, `Board`, `Collect` arm the cursor for a target click; `Stop`, `Unload` and `Return` fire at once; `Lights` (`J`) and `Siren` (`K`) are toggles — the tile turns blue while one is running. `Clear` shares `J` with `Lights`: one lives on foot rosters, the other on vehicles, so they never meet |
 | Roster chip | click to isolate that unit, `Ctrl`-click to drop it, double-click to follow |
 | `Esc` | cancel an armed ability |
 | `F1` (or the CONTROLS chip above the bar) | open or close the controls card |
@@ -261,7 +262,7 @@ switched off**, because they are built for streets and understand nothing that i
 one: a car that had just climbed up promptly reversed off at 8 m/s, drove round, and
 climbed again. With all three: up at 1.4s, two lifts, order complete in 2.4s, parked on
 the pavement. `_take_damage` also excuses non-vehicle contacts on that approach — a kerb
-taken on purpose at 9 m/s billed £38, and charging for obeying an order is a bill the
+taken on purpose at 9 m/s billed £38 at the original rate, and charging for obeying an order is a bill the
 player can only avoid by not using the verb.
 
 Two traps in here have now caught things twice each. `map_get_closest_point` takes **no
@@ -413,6 +414,40 @@ unit nobody bought. Any specialist added from here would have re-broken it ident
 A second, smaller one: `ShopPanel` read `config["portrait"]` unguarded while `Station` reads
 the same key with `has()`. One catalogue entry without a portrait threw inside `_ready`,
 which builds the whole shop, and took out every card and six unrelated checks with it.
+
+### Corner braking comes from the route, not the path
+
+The junction overshoot on the fast cars — two F3s from play, the doctor car sweeping a
+90° turn at 16.1 m/s and sailing ten metres past another — is fixed at its root, and the
+root is architectural: with junction-to-junction waypoints, **the agent's path ends at
+the junction**. The turn onto the next street lives in the *next* waypoint's path and
+does not exist in this one until the 7m waypoint switch — far too late to brake from
+26 m/s. Every corner the old planner appeared to read out of the path was an artifact of
+the car's own off-line position swinging the measured vector (one vertex read 15° at 16m
+and 132° a moment later), which is why four rounds of speed tuning over the file's
+history changed nothing: the planner was braking for corners it could not actually see,
+at strengths set by where the car happened to sit.
+
+So the corner now comes from the thing that genuinely knows it: **the route annotates
+its aim with the turn's exact angle** (`Vehicle.turn_at_aim`, set in `MoveOrder._aim`
+from the legs either side of the waypoint — the district is a lattice, the angle is
+exact and costs one subtraction), and the planner brakes on plain distance-to-aim. Two
+companion pieces made it land: the turn's cap **holds while the car is in the box**
+(`turn_here` — without it the 7m switch handed the aim onward and erased the constraint
+with the car still seven metres short, asks bottoming at 13.1 against a holdable 7.9),
+and the in-path scan was rebuilt honest (symmetric windows about each vertex, scan from
+the car's true vertex rather than the agent's racing index, and the anti-creep floor
+capped by `_turn_speed(PI/2)` so it can never out-ask the physics).
+
+Measured: the doctor car's lane intrusion fell from 3.65/2.86/2.23m to 2.66/1.17/0.46m
+across the three probe legs with two legs *faster* (slower in, cleaner line, faster
+out); the ambulance's leg-one **60-second timeout became 22.9s**; both F3 geometries
+replay clean with zero escapes; and on the empty-district A/B the braked car never
+enters within 5m of the box centre at all where the unbraked one crosses it at 13.3 m/s
+— which is the suite check's assertion, seen to fail at exactly that number. One
+pedestrian landmine on the way: people run MoveOrders too, and the first cut of the
+annotation wrote to `unit as Vehicle` unguarded — seven checks were silently truncated
+by the Nil write while the suite read green, caught only by the SCRIPT ERROR sweep.
 
 ### The bounded turn: manoeuvres planned against the road
 
@@ -1203,6 +1238,73 @@ Two ordering traps here, both found by a check rather than by play:
   it. Four checks vanished and the run still said green. Take the outcome off the
   `resolved` signal instead.
 
+### A bus on its side — the RTC at triage size
+
+`bus_rtc` is the two-body road traffic collision grown to the size where dispatch order
+becomes the game: a Town-pack bus (or school bus) lying along one of the junction's own
+streets, and three to five casualties fanned across the carriageway around it. The
+count comes from `Director.BUS_SIZE`, keyed on the medical hands the career owns
+(ambulances plus paramedics) in the `DISORDER_SIZE` mould — the job fits whoever can be
+sent. Every casualty declines at the trapped call's gentled 0.6× rate, because the
+point is *triage pressure*: an ambulance carries two stretchers, so five patients is at
+least three hospital runs and a standing question about who rides first — not a race to
+save anyone at all.
+
+Two traps are load-bearing here. The five body spots all sit within a few metres of the
+junction centre because `Call.GROUPING_RADIUS` (14m) is measured against a centroid
+that moves as each casualty is adopted — spread them wider and the board splits one
+scene into two calls. And the wreck is freed by a lambda on each casualty's
+`tree_exited` that **scans a captured Array** for anyone still in the tree — a captured
+int counter would be a copy (GDScript captures ints by value), and the bus would either
+leave early or never.
+
+### A shed load, and the street it shuts
+
+`shed_load` is the one call whose patient is the road: a delivery truck at the kerb,
+cardboard boxes strewn mid-lane (a `Debris` incident), and the street genuinely shut
+until somebody shifts them. Nothing is burning and nobody is hurt — on the board it
+deliberately reads with the fire palette via the same `_recentre` arm the gas cylinder
+uses, because a shut street is a scene hazard and a cross would send the wrong service.
+
+Shutting a street honestly takes three mechanisms, because three different consumers
+need telling:
+
+- a **raised `Cordon` child** (raised directly, never via `raise_cordon()` — that would
+  cone the scene, and the boxes are the visual) turns the ambient traffic back;
+- a **solid `Blocker`** body on layer 1 — the one deliberate exception to the
+  strip-collision rule — actually stalls a vehicle that drives at it, because both
+  consumers of `road_is_blocked` only fire on a stalled vehicle;
+- a **debris scan in `Vehicle.road_is_blocked`** lets the stalled vehicle's own
+  machinery see the pile, which is what unlocks the street write-off, the reroute and
+  the pavement mount that already existed for walls of traffic.
+
+The verb is `Clear` (`J`), a `WorkOrder` in the Free mould, and unusually it belongs to
+**two services** — officers and firefighters both — because box-lugging is not
+specialist work. Its `REACH` of 3.6 is load-bearing: the Blocker's face is 2.75m from
+the debris origin and a person's capsule holds them ~0.3m off that, so the first cut's
+2.6 left the officer pushing the boxes forever. Clearing scores `DEBRIS_POINTS` (60) on
+the cylinder's reasoning: a disaster prevented, not a job finished.
+
+### The collapse nobody can diagnose
+
+`drunk` is the call the board cannot tell you the truth about, because nobody at the
+scene knows it either. Somebody is flat out on the pavement with a bottle beside them
+(a civilian taken where possible, in their own clothes), the row says "Person
+collapsed, drink suspected", and the readout commits to nothing: "unresponsive — cause
+unknown". The truth — `Casualty.turns_rowdy`, rolled 50/50 on the director's seeded RNG
+at spawn — stays hidden until a paramedic's treatment crosses `ASSESS_AT` (0.4).
+
+Half the time it is exactly what it looks like and carries on as an ordinary medical
+call. The other half, the patient **stands up swinging**: a `Suspect` in the casualty's
+own outfit appears where they lay, the casualty retires *silently* — no `resolved`
+emission in either polarity, because failure fails the whole call and success pays £100
+for a patient nobody delivered — and the same call flips MEDICAL → CRIME on the board
+(kind is re-derived when `_prune` drops the departed casualty). The swap's ordering is
+the load-bearing part: suspect in the call's list first, casualty out second, or the
+list empties and the call closes RESOLVED for a job nobody did. It is the first call
+dispatched on genuinely incomplete information — sending a paramedic *and* an officer
+is insurance, and the assessment is what the paramedic's first seconds buy.
+
 ### Spawning a call on demand — F5
 
 The director rolls from a weighted table, so seeing a particular call means opening a
@@ -1841,7 +1943,10 @@ board would be eight jobs when it is plainly still one. An incident joins the ne
 open call within `GROUPING_RADIUS` (14m) and only opens a new one when there is nothing
 near — so a spreading fire stays a single line, and a casualty beside it silently
 upgrades that line from **Fire** to **Fire, casualty reported**. Kind and position are
-both re-read from whatever the call holds, so nothing has to announce the change.
+both re-read from whatever the call holds, so nothing has to announce the change — and
+since the drunk call arrived, the re-read also happens when something *leaves*: a
+call whose casualty stood up swinging flips to **Disturbance** the frame the prune
+drops them, by the same mechanism.
 
 `CallBoard` is passive in exactly the way `Mission` is: it watches
 `SceneTree.node_added` rather than being told, so anything appearing later is picked up
@@ -2547,7 +2652,7 @@ directly with `godot --path . res://Game/AnimationViewer.tscn`.
 `--fixed-fps 60` decouples the headless loop from the wall clock: same fixed-step
 physics, same checks, ~20 seconds instead of ~9 minutes.
 
-806 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
+846 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
 shift through the station (the map ships empty), and every bought unit is clickable
 from the opening view; the crowd strolls, runs from a fire and cannot be selected or
 picked through; traffic drives the roads and yields; units start parked, drive to a

@@ -88,6 +88,19 @@ func _run() -> void:
 	var east := Vector3(1, 0, 0)
 	var south := Vector3(0, 0, 1)
 
+	# A bespoke case from the environment, for replaying a black-box record's exact
+	# geometry: PROBE_AT="x,z,yaw_deg" PROBE_AIM="x,z". The player's F3 on a wedged
+	# engine at the map's east rim is the case this was added for.
+	if OS.get_environment("PROBE_AT") != "":
+		var at := OS.get_environment("PROBE_AT").split(",")
+		var to := OS.get_environment("PROBE_AIM").split(",")
+		var here := Vector3(float(at[0]), 0.0, float(at[1]))
+		var yaw := deg_to_rad(float(at[2]))
+		await _leg("bespoke", here, Vector3(sin(yaw), 0.0, -cos(yaw)) * -1.0,
+			Vector3(float(to[0]), 0.0, float(to[1])))
+		quit()
+		return
+
 	for case: Array in [
 			# Overshot the southward turn by 6m: aim 8m down the cross street.
 			# Bearing ~127, L ~10 -- the patrol record at junction 3,3 exactly.

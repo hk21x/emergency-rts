@@ -590,6 +590,24 @@ What is still known and unfixed:
   in its comment, including what it *cannot* see (release quality -- the probes carry
   that) and the redundancy structure of what it can.
 
+  *First contact with real play, same evening.* Five records in one session against a
+  comparable-session history of a dozen-plus, and one carried the player's own F3. Three
+  of the five show `turning round: true` -- the manoeuvre recorded mid-flight by a black
+  box that arms at 4s of no progress, which a legitimate multi-point turn can exceed;
+  noise of success, not failure. The F3 one was real: the engine wedged **on the east
+  perimeter road, mid-turn** -- a turning body sweeps its half-diagonal (4.7m on the
+  engine), and the leg planner's 1m rim margin let legs plan whose samples were legal
+  while the rotating hull clipped the boundary wall the samples cannot see. The planner
+  now refuses samples within **5m of the rim** (`_plan_turn_leg`, the sweep math is in
+  the comment): the flagged case, replayed exactly via `PROBE_AT`/`PROBE_AIM` on
+  `probe_orbit.gd`, went from 25.9s and seven escapes to 20.3s and three. **Still ugly,
+  and honestly so**: a car pinned lengthwise at a full-height wall cannot rotate, the
+  turn rightly refuses to try, and the escapes that free it take ~15s -- traced, the
+  remaining time is hull-against-wall physics, not logic. Bounded now, rare
+  (rim-adjacent only), and the replay is the fixture if anyone wants the last 15s. An
+  arm-side rim gate was built on a theory about rest-cycle thrash, measured
+  byte-identical, and reverted the same hour.
+
   *Instrument notes.* `probe_orbit.gd` is kept; its first cut fired nine escapes against
   an easy target because the aim was **off the map's southern edge** (the boundary wall),
   and a second aim landed inside the block ring — check aims against MAP_HALF and
@@ -600,6 +618,21 @@ What is still known and unfixed:
   documented 43.9s is stale on the redressed map — baseline now *times out* on that
   fixture while the suite's own pinned fixture stays green, which is one more reason the
   suite, not a probe, is the arbiter.
+
+  **Resolved, August 2026, root and all — see Game/README.md "Corner braking comes from
+  the route, not the path".** The whole line of work above was chasing corners in a path
+  that structurally cannot contain them: with junction-to-junction waypoints the agent's
+  path ends AT the junction, and every angle the planner read out of it was the car's own
+  position swinging the vector. The route annotates its aims with exact turn angles now
+  (`Vehicle.turn_at_aim` / `turn_here`), the in-path scan is honest (symmetric windows,
+  true-vertex start, physics-capped floor), and the suite pins it with a
+  measured-both-ways check. Residuals, stated: the patrol's middle probe leg wobbles
+  (3.72m lane depth on one run against 2.25 baseline — single-leg phase noise to watch,
+  not yet chased); and the engine's journeys escape count read 68 on this build against
+  31 on the previous one — that metric has swung 20-109 across builds with identical
+  interior behaviour, it is traffic-phase-sensitive, and the one failed journey was a
+  box-in by three yielding ambient cars, a traffic-deadlock shape unrelated to corners.
+  Watch it across future builds rather than believing any single reading.
 
   The older advice, still good: go after the stragglers individually rather than by moving
   one constant — the damage-ordering check
@@ -758,6 +791,24 @@ would make the drive out part of the decision. It would need
 
 ## Working notes
 
+**A freed object compares equal to null — a check failed on the exact behaviour it
+existed to confirm** (August 2026, from the bus-collision wreck check). The assertion
+was `wreck != null and not is_instance_valid(wreck)`: once the wreck was correctly
+freed, `wreck != null` evaluated **false** (GDScript's `==` treats a freed instance as
+equal to null), so the check reddened on success and stayed green on nothing. Two probes
+of the feature passed before the assertion was suspected — the feature was never broken.
+The pattern that survives: latch a `had_wreck := wreck != null` **before** the free, and
+never read `x != null` on a reference that may have been freed since it was taken —
+`is_instance_valid` is the only honest question there.
+
+**A `>= floor` score assertion can be satisfied by a different payer** (August 2026,
+from the shed-load scoring check). `score delta >= 60` stayed green with the whole
+Debris scoring arm deleted, because the response bonus alone is 100. Not vacuous, not
+over-determined, not saturated — a **redundant payer**: two independent sources feed the
+measured quantity and the bound only needs one. The fix is the disturbance test's
+pattern: assert exact equality against the deterministic sum (`DEBRIS_POINTS +
+RESPONSE_BONUS`), which the sabotage then reddens at 100 ≠ 160.
+
 **"The fire engine keeps getting stuck on junctions as it is not mounting the kerbs"**
 — reported from play, 13 August, and the second half of it is wrong in a way worth
 keeping. `Game/probe_wedge.gd` drives the appliance round three junction turns and reports
@@ -883,7 +934,10 @@ Two further medical ideas were costed and not taken: **treating en route** in th
 and **a second hospital or bed capacity** — both are new machinery rather than configuration.
 The cheap ones that remain are pure config now that `needs_doctor` exists: a cardiac arrest
 (savage decline, short fuse), a collapse inside a crowd that physically obstructs the
-stretcher run, and a fall from height (casualty plus `trapped`).
+stretcher run, and a fall from height (casualty plus `trapped`). Three from the same cheap
+tier shipped in August 2026 — the bus-scale RTC (`bus_rtc`), the shed load (`shed_load`,
+first obstruction call, new two-service `Clear` verb) and the drunk collapse (`drunk`,
+first call dispatched on hidden information) — see PROGRESS.md and the README sections.
 
 **An unexercised path, recorded rather than removed.** `Unit.can_reach()` is the
 layer-aware half of the group-move slot validation, and in every scenario staged so far

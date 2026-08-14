@@ -469,6 +469,22 @@ var _turn_clock := 0.0
 var _turn_stall := 0.0
 var _turn_leg_budget := 0.0
 var _turn_rest := 0.0
+## The turn the route makes AT the current aim, in radians -- zero when the order does
+## not know or there is no turn. Set by [method MoveOrder._aim] from the route's own
+## geometry, which knows every junction angle exactly at plan time; cleared with the
+## navigation state. This exists because the corner planner's only other source, the
+## agent's path, **ends at the junction** -- the turn onto the next street lives in the
+## next waypoint's path and appears only at the 7m switch, far too late to brake from
+## speed. Every earlier reading of that turn out of the path was an artifact of the
+## car's own position swinging the measured vector.
+var turn_at_aim := 0.0
+## The turn being driven *right now*: the angle and the junction it happens at, kept
+## from the moment the waypoint switch advances the aim past it. Without this the
+## constraint vanished at the 7m switch -- measured, the planner's ask bottomed at 13.1
+## m/s against an 7.9 holdable, because the aim (and its turn) moved on while the car
+## was still seven metres short of the box. Cleared once the car is clear of the spot.
+var turn_here := 0.0
+var turn_here_at := Vector3.INF
 ## Seconds spent held below cruising speed by a vehicle it cannot get past.
 var _held_time := 0.0
 ## Seconds spent going nowhere with the street ahead shut -- the licence for
@@ -794,6 +810,9 @@ func _is_off_road(point: Vector3) -> bool:
 
 func stop_navigating() -> void:
 	_navigating = false
+	turn_at_aim = 0.0
+	turn_here = 0.0
+	turn_here_at = Vector3.INF
 	_blocked_time = 0.0
 	_reset_manoeuvre_state()
 
@@ -1464,26 +1483,64 @@ func _corner_speed_limit() -> float:
 
 	var limit := max_speed
 	var travelled := 0.0
-	var previous := global_position
 	var decel := brake_deceleration * corner_brake_ratio
 	var floor_speed := max_speed * corner_speed_ratio
 
-	for i in range(index, path.size() - 1):
+	# **Scan from the vertex the car is actually beside, not the agent's index.** The
+	# agent's index races ahead -- traced going 2 -> 5 -> 7 in a fraction of a second
+	# against vertices twelve metres apart -- so a scan started there was reading the
+	# road *past* the corner while the car was still approaching it, and honestly
+	# reporting nothing ahead. `_closest_on_path` is the same projection the steer point
+	# uses, so the two agree about where the car is.
+	var start := mini(index, int(_closest_on_path(path).x))
+	var previous := global_position
+
+	for i in range(start, path.size() - 1):
 		var point := path[i]
-		var incoming := point - previous
-		travelled += _flat_length(incoming)
+		travelled += _flat_length(point - previous)
 		previous = point
 		if travelled > corner_lookahead:
 			break
-		var turn := _flat_angle(incoming, _direction_after(path, i))
+		# **The corner's angle is a property of the path, not of where the car sits.**
+		# This used to measure `incoming` from the car's own position to the vertex, and
+		# a car a lane's width off the centre line swings that vector round as the gap
+		# closes: traced, one vertex read 15 degrees at 16m, 47 at 5m and 132 a moment
+		# later -- gentlest exactly when there was room to brake, admitting to a right
+		# angle with three metres left. Both windows are walked along the path itself,
+		# symmetric about the vertex, so the corner reads the same from any seat.
+		var turn := _flat_angle(_direction_before(path, i), _direction_after(path, i))
 		if turn < deg_to_rad(corner_min_degrees):
 			continue
 		# v^2 = u^2 + 2as, solved for the speed that decays to `through` over
 		# `travelled` metres of braking.
 		var through := _turn_speed(turn)
 		limit = minf(limit, sqrt(through * through + 2.0 * decel * travelled))
-	# Never plan slower than the in-corner floor, or a long string of bends creeps.
-	return maxf(limit, floor_speed)
+	# **The corner the path cannot contain: the route's own turn at the current aim.**
+	# The order computed it from the lattice at plan time, so it is exact and visible
+	# from the whole leg, not from the 7m waypoint switch. Charged at the distance to
+	# the aim less a few metres, so the car is *at* corner speed entering the box rather
+	# than reaching it in the middle.
+	if turn_at_aim >= deg_to_rad(corner_min_degrees):
+		var to_aim := _flat_length(move_target - global_position)
+		var braking := maxf(to_aim - 4.0, 0.0)
+		if braking <= corner_lookahead:
+			var through_turn := _turn_speed(turn_at_aim)
+			limit = minf(limit,
+				sqrt(through_turn * through_turn + 2.0 * decel * braking))
+	# And the turn being driven right now holds its cap until the car is out of the box:
+	# the switch handed the aim onward, not the corner.
+	if turn_here >= deg_to_rad(corner_min_degrees) and turn_here_at != Vector3.INF:
+		if _flat_length(turn_here_at - global_position) < CityGrid.TILE * 2.0:
+			limit = minf(limit, _turn_speed(turn_here))
+		else:
+			turn_here = 0.0
+			turn_here_at = Vector3.INF
+	# Never plan slower than the in-corner floor, or a long string of bends creeps --
+	# **but the floor must never out-ask the physics.** Bare, it is
+	# `max_speed * corner_speed_ratio`, which on a 26 m/s patrol car is 9.1 against a
+	# right angle its steering holds at 7.88: the floor was capable of vetoing the
+	# geometry, so it is capped by the tightest real corner the car can take.
+	return maxf(limit, minf(floor_speed, _turn_speed(PI * 0.5)))
 
 
 ## Speed a corner of [param turn] radians can be held at, taken from the car's own
@@ -1503,6 +1560,24 @@ func _turn_speed(turn: float) -> float:
 ## through as 47 plus 31 degrees over two and a half metres. Taken one bend at a time
 ## each reads as gentle, the car never slows for the corner it is actually about to
 ## take, and it arrives at the junction at 20 m/s needing 27 metres of road to turn in.
+## Where the path came *from* over the [member corner_window] metres before vertex
+## [param index] -- the mirror of [method _direction_after], and the other half of
+## reading a corner's angle off the path alone. Falls back to the path's first segment
+## when the vertex is too near the start to fill the window; a path that begins at the
+## corner has no better answer, and the first segment is at least *on* the path rather
+## than wherever the car happens to be.
+func _direction_before(path: PackedVector3Array, index: int) -> Vector3:
+	var end := path[index]
+	var walked := 0.0
+	for i in range(index - 1, -1, -1):
+		walked += _flat_length(path[i + 1] - path[i])
+		if walked >= corner_window:
+			return end - path[i]
+	if index > 0:
+		return end - path[0]
+	return path[1] - path[0]
+
+
 func _direction_after(path: PackedVector3Array, index: int) -> Vector3:
 	var start := path[index]
 	var walked := 0.0
@@ -1834,6 +1909,20 @@ func road_is_blocked(aim: Vector3) -> bool:
 			continue
 		if absf(right.dot(offset)) <= blocked_width:
 			return true
+	# A shed load shuts a street the way a wall of cars does. Without this scan the
+	# debris was invisible here -- a car stalled against the blocker could never earn
+	# the street write-off or the pavement mount, and shuffled forever instead.
+	for node in get_tree().get_nodes_in_group(Debris.DEBRIS_GROUP):
+		var debris := node as Debris
+		if debris == null or not debris.active:
+			continue
+		var offset := debris.global_position - global_position
+		offset.y = 0.0
+		var ahead := forward.dot(offset)
+		if ahead <= 0.0 or ahead > reach:
+			continue
+		if absf(right.dot(offset)) <= blocked_width:
+			return true
 	return false
 
 
@@ -1854,10 +1943,16 @@ signal took_damage(vehicle: Vehicle, cost: int)
 ## of parking are not accidents, and charging for them would mean charging for driving.
 @export var damage_floor := 3.0
 ## Pounds per m/s of closing speed above that floor.
-@export var damage_rate := 18.0
+##
+## **A tenth of the 18.0 it shipped at, from play.** At the old rate a shift's ordinary
+## contact -- clipped kerbs at junctions, the odd shunt in traffic -- outran what a shift
+## paid, and the repair sink read as a fine for driving rather than a cost for crashing.
+## The scale on everything money-damage moved together (this, the frame cap, the fire's
+## scorch, the cylinder's blast) so a hard knock still costs ten times a scrape.
+@export var damage_rate := 1.8
 ## The most a single frame's contact can cost. A deep overlap can report an enormous
 ## closing speed for one frame; a cap keeps one physics artefact from emptying the purse.
-@export var damage_cap := 400
+@export var damage_cap := 40
 
 
 ## Charges the bill for anything this frame's slide ran into.
@@ -1870,7 +1965,7 @@ func _take_damage(before: Vector3) -> void:
 	var cost := 0
 	# **A kerb mounted on purpose is not a collision.** On the last few metres of a trip
 	# the player ordered off the road, the thing in front of the car is the thing it was
-	# told to drive over -- and at 9 m/s the kerb face bills £38, because it is vertical
+	# told to drive over -- and at 9 m/s the kerb face bills (at the old rate, £38), because it is vertical
 	# and so passes the floor test below. Charging for obeying an order is a bill the
 	# player cannot avoid except by not using the verb. Other *vehicles* still count:
 	# nothing here licenses driving through a car to reach a verge.
@@ -2073,7 +2168,15 @@ func _plan_turn_leg(heading_error: float) -> bool:
 	forward = Vector3(forward.x, 0.0, forward.z).normalized()
 	var aim_side := signf(heading_error) if not is_zero_approx(heading_error) else 1.0
 	var need := clampf(absf(heading_error), 0.0, PI)
-	var edge := CityGrid.MAP_HALF - 1.0
+	# **Five metres in from the boundary, because a turning body sweeps its half-diagonal.**
+	# The walls stand at exactly MAP_HALF, and the engine -- 8.82m long -- reaches
+	# sqrt(4.41^2 + 1.56^2) = 4.7m from its centre mid-rotation. At one metre of margin a
+	# leg's samples passed while the rotating hull clipped the wall the samples cannot see:
+	# reported from play with an F3 -- the engine wedged on the east perimeter road,
+	# turning, reversing at zero speed -- and replayed exactly at 25.9s and seven escapes
+	# for an 11.9m hop. Legs simply do not plan this close to the rim; ordinary driving
+	# pulls the car inward first, and the turn picks it up where its whole swing fits.
+	var edge := CityGrid.MAP_HALF - 5.0
 
 	_turn_dir = -_turn_dir
 	for attempt in 2:
