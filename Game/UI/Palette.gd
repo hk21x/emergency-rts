@@ -33,23 +33,61 @@ class_name Palette
 ## them headlessly would leave the palette and the baked image disagreeing.
 
 # --- Chrome ------------------------------------------------------------------
+#
+# **These are the UI kit's tokens, to the byte** (`ui-kit/tokens/tokens.json`). The
+# scheme was already in this family -- it was set from the same reference in August
+# 2026, and `TEXT_DIM` was within one unit of the kit's `text.secondary` before anyone
+# compared them -- so adopting the kit moved the chrome by a few points rather than
+# repainting it. What it buys is that the drawn panels (minimap, tiles, avatars) and
+# the *art* panels (every frame under `Game/UI/Kit/`) are now provably the same
+# colours, instead of two sets that merely looked alike.
+#
+# The split to keep in mind: **chrome is the kit's, signals are the game's.** Below
+# this section the service and marker colours stay as they were, deliberately. They
+# are read over a lit 3D city, which is a different job from sitting on a dark panel,
+# and the kit has no opinion about it.
 
-## The docked bar. Opaque: it is the edge of the screen, not an overlay.
-const BAR := Color(0.055, 0.078, 0.110)
-## Cards, in the bar and floating over the world alike.
-const CARD := Color(0.129, 0.180, 0.231)
+## The docked bar. Opaque: it is the edge of the screen, not an overlay. `surface.bg`.
+const BAR := Color(0.031, 0.051, 0.078)
+## A section of chrome one step up from the bar. `surface.section`.
+const SECTION := Color(0.051, 0.075, 0.106)
+## Cards, in the bar and floating over the world alike. `surface.card`.
+const CARD := Color(0.082, 0.118, 0.165)
 ## Recessed fill inside a card: an unarmed command tile, a progress track.
-const WELL := Color(0.043, 0.067, 0.094)
-const EDGE := Color(0.173, 0.227, 0.290)
-const HOVER := Color(0.220, 0.286, 0.361)
-const PRESSED := Color(0.278, 0.353, 0.435)
+## `surface.inset-top`.
+const WELL := Color(0.047, 0.071, 0.106)
+## `stroke.default` -- the line around a raised surface, and the thing that actually
+## separates a card from the bar in this scheme. The fills are only 1.16:1 apart; the
+## edge is what the eye lands on. See the surface check in the suite.
+const EDGE := Color(0.129, 0.176, 0.235)
+## `stroke.soft` -- the line around a *recessed* surface, where the fill is already
+## darker than its surroundings and the stroke is a hairline highlight rather than a
+## border.
+const EDGE_SOFT := Color(0.094, 0.133, 0.180)
+## `stroke.bright` -- the lit edge of something under the pointer.
+const HOVER := Color(0.180, 0.239, 0.310)
+const PRESSED := Color(0.071, 0.314, 0.561)
+
+# --- Primary ------------------------------------------------------------------
+#
+# The interface's own blue, for chrome that is *offering* something: a primary button,
+# a selected row, the line under a live tab. Distinct from POLICE below, which is a
+# service identity and belongs to units.
+
+## `primary.base`.
+const PRIMARY := Color(0.086, 0.408, 0.784)
+## `primary.top` -- the lighter end of a primary button's gradient, and the fill of
+## anything small enough that a gradient would be lost on it.
+const PRIMARY_LIGHT := Color(0.165, 0.498, 0.878)
+## `primary.line` -- a hairline of it, for underscores and focus edges.
+const PRIMARY_LINE := Color(0.290, 0.612, 0.941)
 
 # --- Text --------------------------------------------------------------------
 
-const TEXT := Color(0.902, 0.929, 0.953)
+const TEXT := Color(0.875, 0.906, 0.941)
 ## Labels, units, and anything the eye should skip on the way to the value.
-const TEXT_DIM := Color(0.561, 0.631, 0.698)
-const TEXT_DISABLED := Color(0.337, 0.388, 0.455)
+const TEXT_DIM := Color(0.561, 0.627, 0.698)
+const TEXT_DISABLED := Color(0.333, 0.388, 0.435)
 ## Cards carry their own contrast, so outlines are only for text with nothing behind it.
 const OUTLINE := Color(0.02, 0.03, 0.05, 0.85)
 

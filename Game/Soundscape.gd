@@ -14,6 +14,9 @@ class_name Soundscape
 
 const CITY_STREAM := "res://Game/Audio/city.wav"
 const RADIO_STREAM := "res://Game/Audio/radio.wav"
+## "Calm Ambient 3 (Lifewave 2k)" by The Cynic Project, CC0. See
+## `Game/Audio/CREDITS.txt` -- attribution is not required but is asked for.
+const MUSIC_STREAM := "res://Game/Audio/Music/lifewave2k.wav"
 
 ## Quiet enough to sit under a conversation. The city is a bed, not a feature.
 @export var ambience_db := -26.0
@@ -21,13 +24,31 @@ const RADIO_STREAM := "res://Game/Audio/radio.wav"
 
 var _ambience: AudioStreamPlayer
 var _radio: AudioStreamPlayer
+var _music: AudioStreamPlayer
 
 
 func _ready() -> void:
+	AudioBuses.ensure()
 	_ambience = _player(CITY_STREAM, ambience_db, true)
 	if _ambience:
 		_ambience.play()
 	_radio = _player(RADIO_STREAM, radio_db, false)
+
+	# **The music is the district's, not the title screen's.** This node lives in
+	# `HUD.tscn`, which the main menu deliberately does not use -- so "plays in the game
+	# and not over the menu" needs no condition anywhere. The menu has the backdrop's own
+	# city for atmosphere.
+	_music = _player(MUSIC_STREAM, 0.0, true)
+	if _music:
+		# Level lives on the bus, not the player, so the settings slider has one thing to
+		# move and the balance survives this node being rebuilt on a scene change.
+		_music.bus = AudioBuses.MUSIC
+		_music.play()
+
+
+## True while the bed is actually playing, for anything that wants to know.
+func music_playing() -> bool:
+	return _music != null and _music.playing
 
 
 ## Hooked to whatever exists. Both are optional: a scene without a board still runs,

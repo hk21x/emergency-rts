@@ -241,6 +241,10 @@ func _draw_one_in() -> void:
 		var civilian := node as Civilian
 		if civilian == null:
 			continue
+		# A disturbance does not recruit the missing child -- partly tone, mostly that
+		# converting them frees the body their report is scanning for.
+		if civilian is ChildWanderer:
+			continue
 		var offset := civilian.global_position - global_position
 		offset.y = 0.0
 		if offset.length() < best:

@@ -10,8 +10,9 @@ the traps).
 
 All 15 planned phases are done, and so are 16 (the world reacts), 17 (audio), 18
 (game framing) and 19 (the fire service, on a real appliance since August 2026 --
-the crew is still a repainted police model). Phase 20 is half
-done: the career economy shipped, campaign scenarios have not. Everything else left
+the crew is still a repainted police model). **Phase 20 is done** -- the career
+economy and, since August 2026, the campaign scenarios: three designed shifts picked
+from the title card, each a timeline of calls against a par time. Everything else left
 is in NEXT.md.
 
 ## Commands
@@ -22,17 +23,23 @@ is in NEXT.md.
 | Parse-check one script | `godot --headless --path . --check-only --script res://Game/<file>.gd` |
 | Boot gate (scene loads, scripts compile) | `godot --headless --fixed-fps 60 --path . --quit-after 2` |
 | Refresh import/class cache | `godot --headless --path . --import` |
+| Rebuild the tutorial scene (nav bake; works headless) | `godot --headless --path . --script res://Game/build_tutorial.gd` |
 | Play the game (opens a window) | `godot --path .` |
 
 **`--fixed-fps 60` matters.** Without it the headless loop paces to real time and
-the suite takes ~9 minutes; with it, ~20 seconds, same fixed-step physics, every
+the suite takes ~9 minutes; with it, **~60 seconds**, same fixed-step physics, every
 check identical. Use it for every headless run except the generators below.
+
+That figure said "~20 seconds" until August 2026 and had been wrong for a long time --
+measured at 59s with no new checks in, on a suite that has roughly doubled in size since
+the number was written. Most of the wall clock is a handful of end-to-end *drives*: the
+simulated seconds are real seconds when the scene is the 6,700-node tutorial town.
 
 ## Verification rules
 
-- **The suite is the arbiter.** 846 checks, exits non-zero on failure. A change to
+- **The suite is the arbiter.** 1006 checks, exits non-zero on failure. A change to
   `Game/` is not done until it is green. It **reports its own total** —
-  `all checks passed (846)` — so take the count from a run rather than from here or
+  `all checks passed (1006)` — so take the count from a run rather than from here or
   from memory; that number is why these documents have carried a stale figure twice.
 - **Do not run the suite inline — delegate it.** Ask the `godot-test-runner` agent
   and get one line back. A full run is ~550 lines of output, and output in the main
@@ -75,6 +82,14 @@ check identical. Use it for every headless run except the generators below.
   did not exist. Run it synchronously, one at a time, and let it finish.
 - **Measure a fault before fixing it** — reproduce headlessly and quantify. Twice
   the first diagnosis was wrong; once a fix was doing nothing.
+- **A throwaway probe MUST repoint every `user://` path it writes.** `Station` saves the
+  career on every purchase, so a probe that buys units overwrites the real
+  `user://career.cfg` — the player's fleet and purse, gone, with no warning. Set
+  `station.career_path = "user://probe-<name>-career.cfg"` **before** the first purchase
+  and delete the file afterwards; the `probe-*-career.cfg` files already in the userdata
+  folder are the convention. This was learned the expensive way in August 2026, on a
+  probe written to measure HUD panel sizes, which had no business touching the books at
+  all.
 
 ## The .tscn boundary
 
@@ -115,10 +130,17 @@ and civilians by their own `build_*.gd`. The rule for changes:
   same shape.
 - Adding a verb = a new `Ability` (+`Order`); it gets its command tile, hotkey and
   right-click meaning from the scoring ladder with no UI changes. Hotkeys `Z X C V
-  B N M G H J K L T` are the command keys; `W A S D Q E P F R F1 F2 F3 F4 F5 Esc Enter
-  Space 1-9` are taken. `F3` files a black-box record, `F4` toggles the navigation
-  overlay, and `F5` opens the call spawner -- pick any call kind instead of waiting
-  for the director's weighted roll.
+  B N M G H J K L T` are the command keys; `W A S D Q E F R F1 F2 F3 F4 F5 Esc Enter
+  Space 1-9` are taken. **`P` is free** as of August 2026 -- pause moved to `Esc`.
+  `F3` files a black-box record, `F4` toggles the navigation overlay, and `F5` opens
+  the call spawner -- pick any call kind instead of waiting for the director's
+  weighted roll.
+- **`Esc` has three claimants and they are ordered deliberately**: disarm an armed
+  ability, else close the shop, else open the pause menu. `GameMenu._input` runs
+  *before* both of the others, so it asks `_escape_is_spoken_for()` first rather than
+  leaving the outcome to tree order. Anything new that wants `Esc` joins that guard.
+  Sabotaging it reddens ~150 checks, because a district that pauses when the player
+  meant "cancel" stays paused for every check after it.
 - Seeded randomness only: `RandomNumberGenerator` instances, never
   `Array.shuffle()` / global `randi()` in anything that must reproduce (the map
   build and the tests rely on it).

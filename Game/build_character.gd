@@ -18,7 +18,10 @@ extends SceneTree
 
 const UAL := "res://Assets/animations/UAL1_Standard.glb"
 const OUT_DIR := "res://Game/Characters/"
-const LIBRARY_PATH := "res://Game/Rigs/ual_standard.tres"
+## Binary, and deliberately so. The library is 43 clips of keyframed float tracks;
+## written as text it is 3.0MB that takes 313ms to parse, and written as a binary
+## `.res` it is 1.2MB that loads in 7ms. Measured, both.
+const LIBRARY_PATH := "res://Game/Rigs/ual_standard.res"
 const MAT_01 := "res://Assets/Synty/PolygonStarter/Materials/PolygonStarter_Mat_01_mat.tres"
 
 ## Each source carries several bodies on one shared skeleton; `keep` picks the one
@@ -145,6 +148,15 @@ func _extract_library() -> AnimationLibrary:
 	if err != OK:
 		push_error("could not save %s: %d" % [LIBRARY_PATH, err])
 		return null
+
+	# The line the sharing actually hangs on. `ResourceSaver.save` writes the file but
+	# leaves the in-memory resource pathless, and a pathless resource is one `pack()`
+	# has nowhere to point at -- so it inlines a copy instead. That is exactly what
+	# happened here for months: the library sat on disk, correctly saved, referenced
+	# by nothing, while all eleven character scenes embedded their own 3MB copy of it
+	# and cost 315ms each to parse. Claiming the path makes them external references,
+	# and ten of the eleven loads become cache hits.
+	library.take_over_path(LIBRARY_PATH)
 	print("saved %d clips -> %s" % [library.get_animation_list().size(), LIBRARY_PATH])
 	return library
 

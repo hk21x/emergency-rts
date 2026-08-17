@@ -70,10 +70,12 @@ func _slot_point(unit: Unit, target: Target) -> Vector3:
 	var offset := Vector3(sin(angle), 0.0, cos(angle)) * spacing * float(ring)
 	var candidate := target.position + offset
 	# Cheap test first: "could anyone stand here at all". `standable` rather than
-	# `walkable`, which says yes to a building footprint.
-	var tile := CityGrid.tile_at(candidate)
-	if not CityGrid.standable(tile.x, tile.y):
-		return target.position
+	# `walkable`, which says yes to a building footprint. Skipped off-lattice --
+	# the honest navigation test below is the whole gate there.
+	if CityGrid.lattice_fits:
+		var tile := CityGrid.tile_at(candidate)
+		if not CityGrid.standable(tile.x, tile.y):
+			return target.position
 	# Then the honest one, on this unit's own navigation layer.
 	if not Unit.can_reach(unit, candidate):
 		return target.position

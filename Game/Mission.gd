@@ -45,6 +45,9 @@ const HAZARD_POINTS := 60
 ## Per shed load cleared off the carriageway. The cylinder's number and the cylinder's
 ## reasoning: an obstruction removed is a disaster prevented, not a job finished.
 const DEBRIS_POINTS := 60
+## Per missing child found. Between an arrest and a delivered casualty: a person
+## recovered, without the ambulance run that makes a delivery the dearer job.
+const MISSING_POINTS := 90
 ## What a lost casualty costs. More than a delivery earns, so a shift that loses one
 ## for every save is running at a loss.
 const LOST_PENALTY := 150
@@ -62,6 +65,7 @@ var casualties_lost := 0
 var arrests := 0
 var hazards_made_safe := 0
 var lanes_cleared := 0
+var children_found := 0
 var elapsed := 0.0
 
 ## Freeplay. While true the incident-based win/lose rules are off: nothing is won by
@@ -80,6 +84,11 @@ var crew_recovered := 0
 ## ON_SCENE since the response bonus was written, and that bonus is already paid off
 ## exactly this number. It was simply being used and thrown away.
 var response_total := 0.0
+## The response bonus those cleared calls were worth, summed. Freeplay pays it into
+## [member score] as each call closes; a scripted shout has no purse and no records,
+## but it still wants to say that turning out fast was worth something -- so the same
+## number is banked here for [method shout_score] and simply ignored by the shift.
+var response_earned := 0
 ## Money banked this shift. Every positive scoring event pays the same number in
 ## pounds into the station's purse -- one table, two readouts. Losses cost score
 ## only: fining a struggling career into bankruptcy would spiral, and having
@@ -95,6 +104,18 @@ var is_new_best := false
 
 ## Guards against declaring victory on an empty map before anything has spawned.
 var _seen_incident := false
+
+## Set by a scripted shout that opens in stages: the map goes clear between them,
+## and the scripted win rule reads a clear map as a job done. Without this the
+## tutorial congratulated the player halfway through the lesson. Freeplay never
+## touches it -- there the Director owns the shift and `scoring` short-circuits the
+## whole rule.
+var more_to_come := false
+
+## The time a designed scenario is meant to be beaten in, in seconds. Zero for
+## everything else, and the debrief simply leaves the row out -- freeplay is judged on
+## a clock it already shows, and the tutorial is not a race.
+var par_seconds := 0.0
 
 
 func _ready() -> void:
@@ -122,34 +143,57 @@ func casualties_remaining() -> int:
 
 ## "04:31" for the HUD.
 func elapsed_text() -> String:
-	return "%02d:%02d" % [int(elapsed) / 60, int(elapsed) % 60]
+	return _clock_text(elapsed)
+
+
+## Any number of seconds as mm:ss. The debrief's par row says two of them.
+static func _clock_text(seconds: float) -> String:
+	return "%02d:%02d" % [int(seconds) / 60, int(seconds) % 60]
 
 
 # --- Freeplay ----------------------------------------------------------------
 
 ## Starts a scored shift: tallies to zero, the incident win/lose rules off. Called by
 ## the Director when the shift opens.
-func begin_scoring() -> void:
-	scoring = true
+## Everything a fresh start zeroes, without deciding what kind of start it is.
+##
+## Pulled out of [method begin_scoring] so a scripted scenario can open on a clean
+## sheet too: it wants the tallies reset and the scoring left off, which was exactly
+## the half of that function it could not have.
+func reset_tallies() -> void:
 	score = 0
 	calls_cleared = 0
 	calls_failed = 0
 	crew_lost = 0
 	crew_recovered = 0
 	response_total = 0.0
+	response_earned = 0
 	fires_out = 0
 	casualties_saved = 0
 	casualties_lost = 0
 	arrests = 0
 	hazards_made_safe = 0
 	lanes_cleared = 0
+	children_found = 0
 	earned = 0
 	elapsed = 0.0
 	is_new_best = false
-	# The repair tally belongs to the shift, and the station keeps it -- the mission only
-	# reports it. Zeroed here so a debrief never charges the player for a previous shift.
+	# The repair tally belongs to the run, and the station keeps it -- the mission only
+	# reports it. Zeroed here so a debrief never charges for a previous one.
 	if _found_station():
 		_station.repairs_paid = 0
+	# The guard against declaring victory on a map nothing has spawned on yet. It has
+	# to go back with the tallies, or a second scenario opens with the first one's
+	# memory of having seen an incident and can be won by an empty district.
+	_seen_incident = false
+
+
+func begin_scoring() -> void:
+	scoring = true
+	reset_tallies()
+	# A shift is not run against a designed par, and one left over from a scenario the
+	# player tried earlier would put a row on the debrief that means nothing.
+	par_seconds = 0.0
 	# Also clears the banner from a finished scripted shout, via the state change.
 	_set_state(State.RUNNING)
 	progress_changed.emit()
@@ -189,6 +233,9 @@ func summary() -> String:
 	if lanes_cleared > 0:
 		parts.append("%d shed load%s cleared"
 			% [lanes_cleared, "" if lanes_cleared == 1 else "s"])
+	if children_found > 0:
+		parts.append("%d child%s found"
+			% [children_found, "" if children_found == 1 else "ren"])
 	return "   ·   ".join(parts)
 
 
@@ -215,6 +262,73 @@ func _found_station() -> bool:
 	if _station == null or not is_instance_valid(_station):
 		_station = get_tree().get_first_node_in_group(Station.GROUP) as Station
 	return _station != null
+
+
+## What a scripted shout came to, in freeplay's own currency.
+##
+## A shout runs with `scoring` off -- no purse, no records, no shift clock -- so
+## [member score] stays at zero throughout and would be a lie on a card. This adds the
+## same table up from the tallies instead, response bonus included, so the number a
+## player is shown for clearing a job means the same thing whichever mode they were in.
+## Nothing is paid and no record is set: it is a mark, not a wage.
+func shout_score() -> int:
+	var total := fires_out * FIRE_POINTS \
+		+ casualties_saved * CASUALTY_POINTS \
+		+ arrests * ARREST_POINTS \
+		+ hazards_made_safe * HAZARD_POINTS \
+		+ lanes_cleared * DEBRIS_POINTS \
+		+ children_found * MISSING_POINTS \
+		+ response_earned \
+		- casualties_lost * LOST_PENALTY
+	# A shout that went badly enough to owe points owes nothing: the lesson is the
+	# casualty they lost, and it is named on its own row directly underneath.
+	return maxi(total, 0)
+
+
+## The end of a scripted shout, as rows for the card.
+##
+## Deliberately shorter than [method debrief_rows]. A shift is a career event and reads
+## its money, its record and its repairs; a shout is one job, and the only questions it
+## answers are what it was worth, how long it took, and what was actually done. Rows for
+## work nobody did are left out rather than shown as zero -- the tutorial's two-stage
+## shout would otherwise be four fifths a list of things that never happened.
+func shout_rows() -> Array[Dictionary]:
+	var rows: Array[Dictionary] = []
+	rows.append({"label": "Score", "value": str(shout_score())})
+	rows.append({"label": "Time", "value": elapsed_text()})
+	# Only a designed scenario carries a par, and only then is the row worth a line.
+	# Said as a margin rather than as the target: "1:12 under" is the thing the player
+	# wants to know, and "beat par 4:00" makes them do the subtraction.
+	if par_seconds > 0.0:
+		var margin := par_seconds - elapsed
+		rows.append({"label": "Par %s" % _clock_text(par_seconds),
+			"value": "%s %s" % [_clock_text(absf(margin)),
+				"under" if margin >= 0.0 else "over"],
+			"muted": margin < 0.0})
+	var mean := average_response()
+	rows.append({"label": "Average response",
+		"value": "—" if mean < 0.0 else "%.0fs" % mean})
+	if casualties_saved > 0 or casualties_lost > 0:
+		rows.append({"label": "Casualties delivered", "value": str(casualties_saved),
+			"note": "" if casualties_lost == 0 else "%d lost" % casualties_lost,
+			"muted": casualties_lost == 0})
+	if fires_out > 0:
+		rows.append({"label": "Fires out", "value": str(fires_out)})
+	if arrests > 0:
+		rows.append({"label": "Arrests", "value": str(arrests)})
+	if hazards_made_safe > 0:
+		rows.append({"label": "Cylinders cooled", "value": str(hazards_made_safe)})
+	if lanes_cleared > 0:
+		rows.append({"label": "Shed loads cleared", "value": str(lanes_cleared)})
+	if children_found > 0:
+		rows.append({"label": "Children found", "value": str(children_found)})
+	# The same argument the shift card makes: crew hurt is a cost that would otherwise
+	# only show up as a short roster later.
+	if crew_lost > 0 or crew_recovered > 0:
+		rows.append({"label": "Crew down", "value": str(crew_lost + crew_recovered),
+			"note": "" if crew_lost == 0 else "%d lost" % crew_lost,
+			"muted": crew_lost == 0})
+	return rows
 
 
 func debrief_rows() -> Array[Dictionary]:
@@ -253,6 +367,8 @@ func debrief_rows() -> Array[Dictionary]:
 		rows.append({"label": "Cylinders cooled", "value": str(hazards_made_safe)})
 	if lanes_cleared > 0:
 		rows.append({"label": "Shed loads cleared", "value": str(lanes_cleared)})
+	if children_found > 0:
+		rows.append({"label": "Children found", "value": str(children_found)})
 	return rows
 
 
@@ -270,17 +386,24 @@ func _save_records() -> void:
 	records.save(records_path)
 
 
+## Counted whether or not the shift is scored, and paid only when it is.
+##
+## The tallies used to sit behind the `scoring` gate with the money, which left a
+## scripted shout unable to say how long anyone waited for it -- the figures existed
+## and were thrown away. They are facts about the mission rather than facts about the
+## shift, and [method begin_scoring] zeroes every one of them, so freeplay still opens
+## on a clean sheet.
 func _on_call_closed(call: Call, success: bool) -> void:
-	if not scoring:
-		return
 	if success:
 		calls_cleared += 1
 		response_total += call.response_age if call.response_age >= 0.0 else call.age
+		response_earned += _response_bonus(call)
+	else:
+		calls_failed += 1
+	if scoring and success:
 		var bonus := _response_bonus(call)
 		score += bonus
 		_pay(bonus)
-	else:
-		calls_failed += 1
 	progress_changed.emit()
 
 
@@ -371,6 +494,15 @@ func _on_resolved(incident: Incident, success: bool) -> void:
 			if scoring:
 				score += DEBRIS_POINTS
 				_pay(DEBRIS_POINTS)
+	elif incident is MissingChild:
+		# The suspect's shape: no failure arm, because in this game a missing child is
+		# never *lost* -- only still missing when the clock runs out, which the failed
+		# call already counts.
+		if success:
+			children_found += 1
+			if scoring:
+				score += MISSING_POINTS
+				_pay(MISSING_POINTS)
 
 	progress_changed.emit()
 	_evaluate()
@@ -388,7 +520,7 @@ func _evaluate() -> void:
 		return
 	# Incident._finish() clears `active` before it emits, so the one that just
 	# resolved is already excluded from this count.
-	if _seen_incident and _count_active(Incident.GROUP) == 0:
+	if _seen_incident and not more_to_come and _count_active(Incident.GROUP) == 0:
 		_set_state(State.WON)
 
 

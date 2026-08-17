@@ -13,6 +13,13 @@ class_name CityGrid
 ## Everything here is static. There is one district and it is a rectilinear grid, so a
 ## table of nodes would be strictly more to keep in sync than these tables.
 
+## Whether the loaded map actually IS the district these tables describe. True for
+## the generated Playground; the hand-authored tutorial town sets it false on entry
+## (and restores it on exit) via its TutorialSetup node. Every consumer whose answer
+## would be a confident lie on a foreign map guards on this -- the tables themselves
+## never change, so the suite's ~200 pins on them are untouched.
+static var lattice_fits := true
+
 const TILE := 5.0
 ## Tiles per side. 52 x 5m = a 260m square.
 const GRID := 52

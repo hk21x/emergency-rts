@@ -79,7 +79,9 @@ func start(unit: Unit) -> void:
 	# sweep off a 10m street** where driving straight at it managed 2.6m. So a
 	# destination behind the car is driven at, and the car turns round the way a car
 	# does.
-	if unit is Vehicle and not _turning_round(unit):
+	# And only on the map the lattice actually describes: on the hand-authored
+	# tutorial town its waypoints are coordinates in a city that is not there.
+	if unit is Vehicle and CityGrid.lattice_fits and not _turning_round(unit):
 		_route = CityGrid.lane_route(unit.global_position, point)
 	_aim(unit)
 
@@ -181,6 +183,10 @@ func _give_up_on_this_street(unit: Unit, aim: Vector3) -> bool:
 	if not (unit as Vehicle).road_is_blocked(aim):
 		return false
 	if _shut.size() >= MAX_GIVE_UPS:
+		return false
+	# No lattice, no streets to name or replan around: recovery falls to the
+	# vehicle's own escapes and the bounded turn, which are map-agnostic.
+	if not CityGrid.lattice_fits:
 		return false
 	var here := CityGrid.junction_at(unit.global_position)
 	var ahead := CityGrid.junction_at(aim)

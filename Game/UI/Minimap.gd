@@ -47,6 +47,9 @@ var _camera: RTSCamera
 var controller: RTSController
 ## The overhead render, or null -- in which case the street plan below is drawn instead.
 var _base: Texture2D
+## Where the framed world is centred. The district sits on the origin; a guest map
+## (the tutorial town, centred near (15, -20)) says where its middle actually is.
+var world_centre := Vector3.ZERO
 ## The street plan in world XZ, collected once. Roads do not move.
 var _streets: Array[Rect2] = []
 
@@ -67,6 +70,37 @@ func _ready() -> void:
 		_base = load(BASE_IMAGE) as Texture2D
 	else:
 		_collect_streets()
+
+
+## Drops the baked photograph and draws the schematic street plan instead, framed to
+## [param extent] either side of [param centre]. For maps that are not the district
+## the photograph shows -- the tutorial town calls this on entry, because a confident
+## render of the wrong city is worse than a plain plan of the right one.
+##
+## **Must be called deferred if called from another node's _ready**: this node's own
+## _ready loads the photograph, and readiness order put a first-frame call *before*
+## it -- the plan was collected and then silently replaced by the district's photo a
+## moment later. Measured, by a player looking at the wrong town.
+func use_streets(extent: float, centre := Vector3.ZERO) -> void:
+	_base = null
+	world_extent = extent
+	world_centre = centre
+	_streets.clear()
+	_collect_streets()
+
+
+## A guest map's own photograph, framed like [method use_streets] -- the tutorial
+## bakes one with build_tutorial_minimap.gd. Falls back to the street plan when the
+## photograph has not been baked yet, which is plain but never wrong. The same
+## deferral rule as use_streets applies, and for the same measured reason.
+func use_photo(path: String, extent: float, centre := Vector3.ZERO) -> void:
+	if not ResourceLoader.exists(path):
+		use_streets(extent, centre)
+		return
+	_base = load(path) as Texture2D
+	world_extent = extent
+	world_centre = centre
+	_streets.clear()
 
 
 ## Reads the footprint of every road slab in the map. Doing it from the collision
@@ -122,6 +156,11 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 
 
+## How far the render is taken down. Enough that the chrome wins and the markers still
+## read; a wash this side of half hides the street plan the map exists to show.
+const WASH := Color(0.031, 0.051, 0.078, 0.42)
+
+
 func _draw() -> void:
 	if _base:
 		# Stretched to the panel. The render covers exactly world_extent either side of
@@ -134,6 +173,14 @@ func _draw() -> void:
 			var corner := _to_map(Vector3(road.position.x, 0.0, road.position.y))
 			var far := _to_map(Vector3(road.end.x, 0.0, road.end.y))
 			draw_rect(Rect2(corner, far - corner), street, true)
+
+	# **A wash over the render, under everything the map is for.** The baked photograph
+	# is a daylit city and reads far brighter than the chrome around it -- bright enough
+	# that the card pulls the eye away from the street it is meant to support. Drawn
+	# here rather than as a `modulate` on the node, because modulate would take the
+	# units and the call markers down with it, and those have to stay legible: the wash
+	# is the *ground* going quiet, not the map going dim.
+	draw_rect(Rect2(Vector2.ZERO, size), WASH, true)
 
 	# Units first, incidents over them: a casualty lying under an ambulance is the one
 	# thing on this map you must not lose sight of.
@@ -212,8 +259,8 @@ func view_footprint() -> Array[Vector3]:
 ## World XZ to minimap pixels. +Z maps downward, so -Z (Godot's forward) is up.
 func _to_map(world: Vector3) -> Vector2:
 	return Vector2(
-		(world.x + world_extent) / (world_extent * 2.0) * size.x,
-		(world.z + world_extent) / (world_extent * 2.0) * size.y)
+		(world.x - world_centre.x + world_extent) / (world_extent * 2.0) * size.x,
+		(world.z - world_centre.z + world_extent) / (world_extent * 2.0) * size.y)
 
 
 ## The world point a place on the card stands for.
@@ -233,6 +280,8 @@ func _to_world(point: Vector2) -> Vector3:
 	# corners stand for ground a unit cannot be sent to.
 	var edge := CityGrid.MAP_HALF
 	return Vector3(
-		clampf(inside.x / size.x * world_extent * 2.0 - world_extent, -edge, edge),
+		clampf(inside.x / size.x * world_extent * 2.0 - world_extent
+			+ world_centre.x, -edge, edge),
 		0.0,
-		clampf(inside.y / size.y * world_extent * 2.0 - world_extent, -edge, edge))
+		clampf(inside.y / size.y * world_extent * 2.0 - world_extent
+			+ world_centre.z, -edge, edge))

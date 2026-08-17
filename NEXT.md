@@ -3,15 +3,15 @@
 Follow-up work, in the order it is worth doing. `PROGRESS.md` is where things *are*;
 this is where they are going.
 
-**Everything on the August 2026 roadmap has shipped except one half of one tier.**
-Phases 16 (the world reacts), 17 (audio), 18 (game framing) and 19 (the fire
-service) are done, as is the career economy — which was phase 20's economy half,
-pulled forward. What remains of the roadmap is **20's other half: campaign
-scenarios.** Everything else below is a gap rather than a plan: things that are
-missing and would each stand alone.
+**The August 2026 roadmap has shipped in full.** Phases 16 (the world reacts), 17
+(audio), 18 (game framing) and 19 (the fire service) are done, and so is phase 20 —
+the career economy first, then the campaign scenarios that were its other half. The
+interface has since been rebuilt on the user's UI kit and floated off its docked bar.
 
-Two of them are worth reading before picking anything: the crowd never repopulates,
-and the economy only ever goes up.
+So there is no roadmap left, and everything below is a **gap rather than a plan**:
+things that are missing and would each stand alone. The two that were flagged here as
+worth reading first have both since been closed — the crowd refills now, and the
+economy has a sink — so pick by what you want the game to be, not by urgency.
 
 ---
 
@@ -82,15 +82,26 @@ fire/smoke FX were taken from them (see PROGRESS.md). What remains, and why it w
   `Assets/padding/.gdignore`. Do not ignore `Models/`, `Materials/` or `Textures/`: the
   appliance's material chain runs through all three.
 
-### Campaign scenarios — the last of the roadmap
+### Campaign scenarios — shipped August 2026
 
-The freeplay director produces *rolled* shifts. What the game has never had is a
-**designed** one: a scripted scenario with its own spawn list, objectives and par
-time, picked from the title screen. The phase-5 `Mission` machinery already does
-win/lose on a single shout, and the director's placement helpers are reusable for a
-scripted timeline, so this is largely authoring rather than building — 3 to 5
-scenarios as data. It is also where the fire service earns its keep: a warehouse
-alight with people inside is a scene worth designing rather than rolling.
+Three designed shifts on a SCENARIOS card off the title: SATURDAY NIGHT, RING ROAD
+PILE-UP, WAREHOUSE ALIGHT, each a timeline of calls against a par time. See the
+campaign section in `Game/README.md` for the architecture; the short version is that
+it was mostly authoring, exactly as this entry predicted — `Director.open_kind()`
+places all sixteen call kinds already, `Mission` already scored a scripted shout, and
+the debrief modal already existed to say what it came to.
+
+What a second pass could add, in rough order of value:
+
+- **More of them.** The cost of a fourth is one dictionary in `Scenarios.ALL`.
+- **A best time per scenario**, banked the way `Mission.best_score` is banked for
+  freeplay — the par row invites it, and the ConfigFile is already there.
+- **Objectives beyond "clear it"** — save all six, keep the fire from spreading past
+  a building, no casualties lost. `Mission` has the tallies; what is missing is a
+  place to say the target and a line to show it mid-shift.
+- **A campaign order** — scenarios unlocking in sequence rather than all three at
+  once, which is the point at which this stops being a list and starts being a
+  campaign.
 
 ### The crowd: refilled, but still orderly
 
@@ -706,6 +717,47 @@ has read anywhere between 8% and 25% on identical code within a single session. 
 suite's own bounded check is the only trustworthy reading, and anything else needs
 repeated runs.
 
+### Opening the tutorial still costs ~819ms, and the fix that claimed to remove it did not work
+
+The five-second delay was the character scenes, and that is genuinely fixed (see the
+shared animation library in `Game/README.md`). The ~819ms that remains is the vendor
+town: 2.4MB of **text** `.tscn`, parsed on the click.
+
+A threaded pre-warm was added and reported as taking it to 0ms. It did not.
+`ResourceLoader.load_threaded_request` on that file comes back a **parse error every
+time** -- at boot, delayed a second and a half, with the type named, from either scene
+-- while the same path loads perfectly synchronously. The 0ms figure was a
+resource-cache hit in a probe. Both the pre-warm and its check are gone; see the
+working note below.
+
+Two things that would actually work, neither started:
+
+- **Re-save the town binary.** 3.0MB of text parses in 313ms where 1.2MB of binary
+  loads in 7ms -- measured on the animation library, same mechanism. The trade: the
+  shell *instances* the vendor scene, so the town could no longer be edited and played
+  without re-running the processor.
+- **Split the load across frames** rather than across threads, if Godot 4.7's text
+  loader is the problem: instance the town once at boot into a hidden node and keep it.
+  Costs memory instead of time.
+
+### The interface: what the kit has not reached yet
+
+The August 2026 restructure took the panels onto the user's UI kit and floated them into
+the corners. Two items from that plan were scoped out at the time and are still open;
+both are cosmetic, and neither blocks anything.
+
+- **In-world markers are still drawn by hand.** Selection rings, the move marker and the
+  incident markers out in the district are `_draw`/mesh code from phase 1, so the world
+  layer and the panel layer no longer look like the same game. The kit ships a reticle
+  and a selection bracket. Worth doing as one pass rather than piecemeal — the whole
+  point is that they agree with each other.
+- **The glyph swap is half done.** `Glyph.gd` still carries drawn fallbacks for symbols
+  the kit now supplies as vectors (44 of them). The fallbacks are not dead code — they
+  are what renders when a pack icon is missing — so this is a swap of the *preferred*
+  source, icon by icon, not a deletion. Cheap, tedious, and easy to do wrong quietly:
+  the tell is a tile whose meaning changed because the nearest-named kit icon was not
+  the one the drawn version meant.
+
 ### Props that block
 
 Street furniture is drawn into `MultiMeshInstance3D` batches with no collision, so units
@@ -789,7 +841,86 @@ would make the drive out part of the decision. It would need
 
 ---
 
+**Tutorial follow-ups** (August 2026, from the town migration): the teaching overlay
+— step-by-step prompts gated on player actions — is the named extension point on
+`TutorialDirector`; the tutorial's lawns are deliberately unwalkable (grass under
+every pavement rasterised the person mesh into degenerate edges — see the README's
+tutorial section) so any future content must stand on pavements, paths or roads; and
+the F2 hint and mid-screen dispatch hints are simply absent in the tutorial (HUD has
+no director), which the teaching overlay should replace properly.
+
 ## Working notes
+
+**An eighth way: the check still runs, but the world moved and it is now testing
+something else** (August 2026, the title card's click check). `_test_the_game_opens_on
+_the_title` clicks a car and asserts the click is swallowed by the title card. Adding a
+SCENARIOS button made the card one row taller, the click coordinate — derived from a
+unit's world position, dead centre of the screen — landed on **PLAY**, and the menu
+duly played the game. The check reddened, which was lucky; what it reddened on was four
+cascading failures in two other tests, none of them near the cause. The fixture now
+picks its target against the card's *actual* rect and pans the camera until a unit
+stands clear, so the next button added cannot repeat it. The general shape: a check
+whose target is computed from a layout will silently start aiming somewhere else when
+the layout changes, and the failure surfaces wherever the consequences land.
+
+**And the specific way a `const` truncates a check**: writing to a nested dictionary of
+a GDScript `const` throws "Invalid assignment on read-only value" at runtime, which
+abandons the rest of that check silently — six checks in the scenario test stopped
+running and only the count showed it. `Dictionary.duplicate(true)` first. This is the
+documented "a runtime error skips the rest of the check" trap with a new cause; it cost
+one confused suite run to find, and `grep 'SCRIPT ERROR'` found it in one.
+
+**A tenth: the check counts the things, not what the things are doing** (August 2026,
+the menu backdrop's crew). Seven characters were placed, on the ground, in the right
+spots -- and every one stood in the rig's rest pose, because `_idle` asked for
+`Idle_Loop` and the retarget renames it to `Idle`, so `has_animation` said no and the
+function returned quietly. The check counted bodies and passed. Kin to the ninth below:
+placing a person and animating one are different claims, and only the cheap one was
+tested. The check now reads `current_animation` on each of them.
+
+**A ninth way: the check asserts that work was *requested*, not that it succeeded**
+(August 2026, the tutorial pre-warm). `_check(_menu._prewarming, "and asks for the
+tutorial's town while it is up")` was true, sabotage-proven, and green on every run --
+of a feature that failed on every boot. Asking for a background load and *getting* one
+are different claims, and only the first was tested. The tell was on stderr the whole
+time and nothing reads stderr on a normal run; it surfaced only when a new boot scene
+put the errors at the top of an otherwise clean console. Two lessons: an assertion about
+an asynchronous operation should read its **result** (`load_threaded_get_status`), and a
+performance claim measured in a probe wants re-measuring in the real path -- the probe
+that "proved" this one was reading its own cache.
+
+**A seventh way for a check to be worthless: it never visits the fault** (August 2026,
+the tutorial's stranded ambulance). The drive-home check is a real drive — buys an
+ambulance, orders it to the station from the shout, samples 963 frames — and it stayed
+**green** through the entire two-sheet navmesh fault, including the sabotage run that
+reproduced it. Nothing was wrong with the assertion: the car it drives starts on the
+carriageway, and the strand only happens to a car that has parked beside a kerbside
+casualty and snapped onto the pavement sheet. A journey check proves the journey it
+takes, and says nothing whatever about the journeys it does not. What caught it was a
+*sweep* — every drivable point on the mesh, does it reach the station — which is the
+shape to reach for when the fault is "somewhere in this space", not "on this route".
+
+**A fault with no symptom the game can show you** (August 2026, the duplicated
+animation library). Every check was green, every character animated correctly, and
+eleven scenes were each carrying a private 3 MB copy of the same 43 clips — five
+seconds to open the tutorial, two thirds of a second per mission spawn. Nothing in the
+suite could have caught it, because nothing was *wrong*: the game was slow, and slow is
+not a state an assertion about behaviour ever asks about. It surfaced only when the
+delay was treated as a fault and put under a stopwatch — load, instantiate, add, first
+frame, each timed separately, then the same run with the resource cache pre-warmed to
+attribute what was left. That second run is what made it certain rather than plausible:
+5,770 ms → 27 ms with nothing changed but the cache. Performance regressions want the
+same discipline as behaviour ones, and the check that now guards it asserts a
+*structural* fact (one library instance, and it has a path) rather than a duration —
+timings are too machine-dependent to assert on, structure is not.
+
+**Two checks off one measurement pass are not two witnesses.** The sabotage run for the
+above reddened both new checks, but they read the same two dictionaries built in a
+single loop, so a fault in that loop takes both down together. They do measure distinct
+properties — instance identity and resource path — and the sabotage put a real fault in
+the assets rather than in the fixture, so both are honest. Worth remembering when a
+sabotage report says "2 of 2 red": count the independent *paths to the evidence*, not
+the checks.
 
 **A freed object compares equal to null — a check failed on the exact behaviour it
 existed to confirm** (August 2026, from the bus-collision wreck check). The assertion
@@ -800,6 +931,46 @@ of the feature passed before the assertion was suspected — the feature was nev
 The pattern that survives: latch a `had_wreck := wreck != null` **before** the free, and
 never read `x != null` on a reference that may have been freed since it was taken —
 `is_instance_valid` is the only honest question there.
+
+**A fourth way for a check to be worthless: an under-provoked scenario** (August 2026,
+from the missing-child recruiter exclusion). The assertion was fine, nothing else
+supplied the result, and the quantity was not capped — the *mechanism under test simply
+never ran in the check's window*. The staged suspect's recruit clock latches to a full
+9 s in `_ready` and the check waited 4 s, so the exclusion being tested was never
+reached, and deleting it changed nothing. Kin to the saturated scenario but earlier in
+the chain: saturation stops the *measurement* moving, under-provocation stops the
+*mechanism* running. The fix is the disorder test's own trick — lower the interval
+(`recruit_interval = 0.5`; the code deliberately honours a post-spawn lowering) so the
+window actually contains the behaviour. The same incident hid a second fault: a
+sabotage cycle that edited the file twice restored from a backup taken *after* its
+first deletion, so the exclusion vanished from the tree behind a verified md5 match and
+a green suite — green precisely because the check was under-provoked. The agent
+brief now requires backups strictly before the first edit of a cycle and diff-verifies
+restores against the pre-cycle copy.
+
+**A sixth way: the check draws its subjects from the constant it tests** (August
+2026, from the tutorial's flat-furniture check). It enumerated manholes by walking
+`TutorialMap.FLAT_FURNITURE`, the same array the rule is written in — so a sabotage
+that emptied that array emptied the check's own subject list, and the red came from
+its `flat > 0` guard rather than from fourteen solid manholes. A red for the wrong
+reason is worse than a green, because it looks like proof. Name the subjects
+literally, independent of the thing under test. The tell was the numbers: `0 solid
+of 0` where the fault should have read `14 of 14` — which is why a sabotage report
+must quote its measurements, not just its verdicts.
+
+**A fifth way for a check to be worthless: the probe point is blocked for a
+different reason** (August 2026, from the tutorial's "not through the living rooms"
+check). The assertion was fine, the scenario was provoked, the mechanism ran — but
+the coordinate chosen to test "grass under a house is not a floor" sat over a
+*driveway*, which is excluded ground under a separate rule. So it read as blocked
+whatever the burial rule did, and a sabotage that skipped burial entirely left it
+green. Kin to the redundant payer: two independent mechanisms produce the same
+reading, and the check cannot tell which one it is watching. The fix is a
+coordinate the *other* rule does not touch — found by sweeping for samples with a
+building collider and a grass tile overhead and nothing else, then picking one that
+measurably moves (5.25m short healthy, 0.00m sabotaged). The same cycle found a
+`> 100` polygon bound sleeping through a mesh halved to 198 from 386; bounds set
+"comfortably above zero" are bounds set nowhere.
 
 **A `>= floor` score assertion can be satisfied by a different payer** (August 2026,
 from the shed-load scoring check). `score delta >= 60` stayed green with the whole
@@ -938,6 +1109,13 @@ stretcher run, and a fall from height (casualty plus `trapped`). Three from the 
 tier shipped in August 2026 — the bus-scale RTC (`bus_rtc`), the shed load (`shed_load`,
 first obstruction call, new two-service `Clear` verb) and the drunk collapse (`drunk`,
 first call dispatched on hidden information) — see PROGRESS.md and the README sections.
+Two more followed the same month: **weather shifts** (FOG/SNOW states, the SHIFT'S OWN
+roll, wet collision weights) and the **missing child** (`missing_child`, the first call
+the player searches — unmarked wandering child, marker on the last-seen report). A
+future polish candidate recorded from that build: the child wears an adult outfit at 0.7
+scale because no child mesh exists; the Town pack's SchoolBoy/SchoolGirl *outfits* could
+be retargeted onto the humanoid rig via `Rigs/synty_bone_map.tres` (the Starter
+treatment in `setup_retarget.gd`) if the silhouette ever matters more.
 
 **An unexercised path, recorded rather than removed.** `Unit.can_reach()` is the
 layer-aware half of the group-move slot validation, and in every scenario staged so far
@@ -1014,6 +1192,125 @@ Anything picked up from here should follow what the rest of the project does:
     leave a fire burning beside the cylinder, so heat can only fall if water is landing
     on it. Prefer that to a tolerance whenever the scenario allows it — a bound has to be
     re-tuned every time a rate moves, a staging does not.
+- **A third way to fail to fail: an assertion that is true when the feature is absent.**
+  August 2026, from the HUD restructure. `_test_the_score_strip_reads_and_pauses` ended
+  `_check(not paused, "and resuming thaws it again")` — and `not paused` is trivially
+  true when the button under test never paused anything. The sabotage that gutted
+  `ScoreStrip._open()` reddened the pause assertion above it and left this one **green**,
+  identically to the healthy run. It now carries the pause result in
+  (`_check(froze and not paused, ...)`), so it asserts the *transition* rather than a
+  reading taken afterwards.
+
+  Worth separating from the two entries above because the tell is different: this check
+  had a scenario that provoked the fault and an assertion that could see it, and it still
+  could not fail — because the *post-condition it measured was the default state*. The
+  general rule: when a check reads a state after an action, ask what that read returns if
+  the action did nothing. If the answer is "the same thing", the check is inert. Pairing
+  it with the precondition is usually the whole fix.
+
+  Also from that pass, a note about sabotages rather than checks: two of the three faults
+  specified for the panel-overlap invariant **missed their assertion geometrically** —
+  widening a bottom-docked panel can never intrude on a central rect, however wide it
+  gets, so it went red on three *other* assertions while the target stayed green. A red
+  on the wrong signal proves nothing. Read the assertion's actual subject before choosing
+  where to break the tree.
+- **A fourth way, and the nastiest: green *by contamination*.** August 2026, found by
+  the sabotage agent while proving the Escape rebind. `_test_escape_closes_the_shop_before_it_pauses`
+  asserts "and left the pause menu alone" — and under the sabotage that broke the guard
+  it stayed **green**, while the assertion beside it went red.
+
+  It was not vacuous, and that is what makes it worth recording. A probe in a clean tree
+  showed the fault *does* reach it (`screen=PAUSE paused=true`). Inside the suite it
+  could not, because the same fault had already left the tree paused several checks
+  earlier — so this check's Escape press *resumed* instead of pausing, and
+  `not paused and screen != PAUSE` read true. The check was measuring a district the
+  fault had already broken, and the wreckage happened to look like health.
+
+  Distinguishing this from a genuinely inert check needs a probe, not a re-read — the
+  three earlier specimens above are all visible by inspection, and this one is not. The
+  fix is the same shape as the third: **carry the entry state into the verdict**
+  (`_check(was_clear and not paused and ...)`), so a contaminated tree reports an honest
+  red instead of a false green.
+
+  The general lesson: **a check that runs late in a long suite is only as trustworthy as
+  the checks before it.** When a sabotage produces a big cascade, treat every green
+  downstream of the first red as unverified rather than as evidence.
+- **A new asset needs `--import` before the game can see it, and the failure is silent.**
+  August 2026: a cart icon was drawn for the buy button, the SVG sat correctly on disk,
+  and the button showed nothing. Icons are loaded behind `ResourceLoader.exists(path)` so
+  that a missing glyph costs the *picture* and not the control — which is the right
+  behaviour and completely invisible, because the button still worked. The tell is no
+  `.import` file beside the asset and nothing in `.godot/imported/`.
+
+  Same family as the `class_name` rule already in CLAUDE.md, but the symptom is the
+  opposite: a missing class is a wall of parse errors, a missing texture is *nothing at
+  all*. Anything that guards an asset load with `exists()` should have a check asserting
+  the asset actually arrived, or the guard hides the bug it was written to survive.
+- **Do not assert on a value the player is allowed to change.** August 2026, caught by
+  the check itself on its first run. The music bed was reported as too loud, the default
+  was lowered, and a check went in asserting the music bus sits well under master — read
+  straight off `AudioServer`. It failed at 16.5 dB, because the *settings file* still held
+  the previous default and a saved setting rightly overrides a shipped one.
+
+  The check was wrong, not the game. A live bus level is a fact about somebody's save, and
+  a player who turns the music up has not broken anything. The fix is to assert the
+  **shipped default** by applying it and reading the result back — which happens to be
+  the stronger test anyway: sabotaging `set_music_volume()` to do nothing collapses the
+  measured gap to 0.0 dB, so the check cannot be satisfied by echoing the constant it
+  reads.
+
+  Generalises to every setting: volume, shift length, call pace, time of day, weather.
+  Assert the default and the apply path, never the current value.
+- **Beware a saved setting shadowing a changed default.** Same incident, the user-facing
+  half: lowering `MUSIC_DEFAULT_DB` changed nothing audible, because `settings.cfg`
+  already had a `music` key from a previous run. A default only applies to somebody who
+  has never had the setting written. Anything shipping a changed default has to decide
+  what happens to existing saves and say so, rather than assuming the new number takes.
+
+  Related: `HSlider.step = 0.05` **rounds a default up**. -18 dB is 0.126 linear, which
+  the slider stored as 0.15 — so the bed played ~1.5 dB louder than the constant claimed,
+  and the constant was not lying, the control was.
+- **A sabotage can break a helper the check itself calls.** August 2026, spotted by the
+  sabotage agent. Stubbing `ShopPanel.card_button()` to return null reddened
+  "it lights the two cards the prompt named ([])" — but the check *builds its expected
+  list* by calling `card_button()` too, so the empty result is equally consistent with
+  "the spotlight lost its targets" and "the check's own lookup returned null".
+
+  A cousin of the shared-constant trap already recorded above, but it does not announce
+  itself as a mismatched number: `[]` is what you would see either way. The tell is
+  structural — the check's probe and the code under test share a symbol. The diagnosis is
+  the same as for the constant case: redden the behaviour by a different route and see
+  whether the check still notices. Here another cycle had already done so, pointing the
+  spotlight at the wrong controls with `card_button()` fully intact, which is what
+  actually earns that assertion its meaning.
+- **An ideal fixture is not a test of a real path.** August 2026, the sharpest example
+  this project has produced. `an ambulance drives home from the shout without jamming`
+  teleported the car onto the drivable point nearest the shout, zeroed its velocity and
+  faced it down +Z before ordering it home — and passed green for months while the black
+  box filed eight records about that exact drive. Started at the positions the records
+  actually contained, 3 of 12 attempts never arrived.
+
+  The tell is that the fixture *constructs* a state the game cannot reach on its own. Where
+  a check has to place something, ask where the game would have put it — and if there is a
+  log of where it really ends up, use those coordinates rather than a clean one.
+- **A "measured, made no difference" comment is scoped to what it was measured on.** The
+  kerb-climb gate carried a comment saying a no-progress route through it had been built
+  and measured byte-for-byte identical. True — for cars queued behind other vehicles, which
+  is what that investigation had. It read as a closed question and was not: for a car
+  wedged on a kerb with nothing in front, the same change was the fix. Record what the
+  measurement covered, not just what it concluded.
+- **Run the suite before handing a new check to the sabotage agent.** August 2026: a
+  winding check went from parse-check straight to `godot-check-sabotage`, and it was
+  *already red* on the healthy tree. The agent worked it out — the sabotage appeared to
+  *fix* a check — but it burned a full cycle and the report has no vocabulary for
+  "already red on arrival". A parse check says the file loads; only a run says the check
+  is right. The gate is cheap next to four suite runs.
+- **A check on geometry has to read the geometry.** Class, AABB, position and material all
+  survive a mesh being wound backwards, and a backwards-wound flat marker is *invisible*
+  in play. Godot's front face is clockwise seen from the front, so a triangle facing +Y
+  gives a **negative** y from `(v1-v0).cross(v2-v0)` — the opposite of the obvious guess,
+  and worth verifying against `SurfaceTool.generate_normals()` or a front-face raycast
+  before trusting either polarity.
 - **One unexplained red, August 2026 — keep full suite logs.** A run printed
   `1 check(s) failed of 639` and then went green 18 consecutive times, twice under a
   restored tree in the sabotage agent's own runs. The FAIL line was lost to a `tail`,

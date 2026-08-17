@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="350" height="98" viewBox="0 0 350 98" fill="none" role="img" aria-label="Bars — labelled stack">
+  <defs>
+    <linearGradient id="bx_t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#080D14"/><stop offset="1" stop-color="#060B11"/></linearGradient>
+    <linearGradient id="bx_h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4CAF50"/><stop offset="1" stop-color="#2F7A3D"/></linearGradient>
+    <linearGradient id="bx_f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D8AA33"/><stop offset="1" stop-color="#A57C18"/></linearGradient>
+    <linearGradient id="bx_p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A7FE0"/><stop offset="1" stop-color="#125AAF"/></linearGradient>
+
+  </defs>
+  <text x="0" y="19" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#8FA0B2" text-anchor="start" letter-spacing="1.2" opacity="1">HEALTH BAR</text>
+  <rect x="110.5" y="8.5" width="219" height="13" rx="2" fill="url(#bx_t)" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <rect x="111" y="9" width="163.5" height="12" rx="2" fill="url(#bx_h)" fill-opacity="1"/>
+  <text x="348" y="19" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#8FA0B2" text-anchor="end" letter-spacing="0.4" opacity="1">75%</text>
+  <text x="0" y="49" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#8FA0B2" text-anchor="start" letter-spacing="1.2" opacity="1">FUEL BAR</text>
+  <rect x="110.5" y="38.5" width="219" height="13" rx="2" fill="url(#bx_t)" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <rect x="111" y="39" width="130.79999999999998" height="12" rx="2" fill="url(#bx_f)" fill-opacity="1"/>
+  <text x="348" y="49" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#8FA0B2" text-anchor="end" letter-spacing="0.4" opacity="1">60%</text>
+  <text x="0" y="79" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#8FA0B2" text-anchor="start" letter-spacing="1.2" opacity="1">PROGRESS BAR</text>
+  <rect x="110.5" y="68.5" width="219" height="13" rx="2" fill="url(#bx_t)" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <rect x="111" y="69" width="98.10000000000001" height="12" rx="2" fill="url(#bx_p)" fill-opacity="1"/>
+  <text x="348" y="79" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#8FA0B2" text-anchor="end" letter-spacing="0.4" opacity="1">45%</text>
+
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="34" viewBox="0 0 360 34" fill="none" role="img" aria-label="Notification — warning">
+  <defs>
+    <linearGradient id="ntwa_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#221B0C"/><stop offset="1" stop-color="#0A1017"/></linearGradient>
+    <linearGradient id="ntwa_a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C79A2A"/><stop offset="1" stop-color="#C79A2A"/></linearGradient>
+    <clipPath id="ntwa_c"><rect x="42" y="0" width="276" height="34"/></clipPath>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="359" height="33" rx="3" fill="url(#ntwa_g)" fill-opacity="1" stroke="#54401A" stroke-width="1" stroke-opacity="1"/>
+  <rect x="1" y="1" width="32" height="32" rx="2" fill="#C79A2A" fill-opacity="1"/>
+  <g transform="translate(6 5) scale(0.91667)" color="#FFFFFF" opacity="1"><path d="M13.05 3.35a1.2 1.2 0 0 0-2.1 0L2.3 19.0a1.2 1.2 0 0 0 1.05 1.8h17.3a1.2 1.2 0 0 0 1.05-1.8Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.9 8.6h2.2v6.0h-2.2Z" fill="currentColor" fill-rule="nonzero"/><path d="M12 15.9a1.35 1.35 0 1 1 0 2.7 1.35 1.35 0 0 1 0-2.7Z" fill="currentColor" fill-rule="nonzero"/></g>
+  <g clip-path="url(#ntwa_c)">  <text x="44" y="22" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="12.5" font-weight="500" fill="#DFE7F0" text-anchor="start" letter-spacing="0.4" opacity="1">Unit under attack!</text>
+</g>
+  <g transform="translate(334 7) scale(0.79167)" color="#8FA0B2" opacity="1"><path d="M6.0 6.0 18.0 18.0M18.0 6.0 6.0 18.0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+
+</svg>

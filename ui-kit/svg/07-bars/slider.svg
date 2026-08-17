@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="22" viewBox="0 0 220 22" fill="none" role="img" aria-label="Slider">
+  <defs>
+    <linearGradient id="sl_f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A7FE0"/><stop offset="1" stop-color="#125AAF"/></linearGradient>
+
+  </defs>
+  <rect x="0" y="8" width="220" height="5" rx="2.5" fill="#080D14" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <rect x="0.5" y="8.5" width="109" height="4" rx="2" fill="url(#sl_f)" fill-opacity="1"/>
+  <circle cx="110" cy="10.5" r="8" fill="#FFFFFF" stroke="#1668C8" stroke-width="1.6"/>
+
+</svg>

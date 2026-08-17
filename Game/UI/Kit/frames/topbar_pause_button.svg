@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" role="img" aria-label="Pause button">
+  <defs>
+    <linearGradient id="tbp_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="47" height="47" rx="4" fill="url(#tbp_g)" fill-opacity="1" stroke="#2E3D4F" stroke-width="1" stroke-opacity="1"/>
+
+</svg>

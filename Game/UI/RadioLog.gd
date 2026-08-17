@@ -42,7 +42,7 @@ var _announced := {}
 
 
 func _ready() -> void:
-	add_theme_constant_override("separation", 2)
+	add_theme_constant_override("separation", 4)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	get_tree().node_added.connect(_on_node_added)
 	for node in get_tree().get_nodes_in_group(Incident.GROUP):
@@ -51,12 +51,21 @@ func _ready() -> void:
 
 ## Puts one line on the log. Public, so anything worth announcing can say so without
 ## this node having to know about it first.
-func say(text: String) -> void:
-	var line := Label.new()
-	line.text = text
-	line.theme_type_variation = &"RadioLabel"
+func say(text: String, tone := &"NotifyInfo") -> void:
+	# **A framed row now, not bare text over the city.** The log used to rely on an
+	# outline to stay legible against a lit street; the kit's notification frame does
+	# that job properly and colours its left tab by what the line is about.
+	var line := PanelContainer.new()
+	line.theme_type_variation = tone
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	line.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	add_child(line)
+
+	var words := Label.new()
+	words.text = text
+	words.theme_type_variation = &"PillLabel"
+	words.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	line.add_child(words)
 
 	while get_child_count() > MAX_LINES:
 		var oldest := get_child(0)
@@ -98,15 +107,15 @@ func _set_station(value: Station) -> void:
 
 
 func _on_shift_started() -> void:
-	say("CONTROL — shift begins")
+	say("CONTROL — shift begins", &"NotifyInfo")
 
 
 func _on_shift_ended() -> void:
-	say("CONTROL — all units stand down")
+	say("CONTROL — all units stand down", &"NotifyInfo")
 
 
 func _on_call_opened(call: Call) -> void:
-	say("CONTROL — %s, %s" % [call.title(), call.place])
+	say("CONTROL — %s, %s" % [call.title(), call.place], &"NotifyWarning")
 
 
 ## The one line that is about a *crew* rather than a job, and the reason the log exists
@@ -118,11 +127,11 @@ func _on_call_changed(call: Call) -> void:
 	if _announced.has(id):
 		return
 	_announced[id] = true
-	say("ON SCENE — %s" % call.place)
+	say("ON SCENE — %s" % call.place, &"NotifyInfo")
 
 
 func _on_booked_in(_vehicle: Vehicle, count: int) -> void:
-	say("STATION — %d booked in" % count)
+	say("STATION — %d booked in" % count, &"NotifySuccess")
 
 
 func _on_node_added(node: Node) -> void:
@@ -143,14 +152,16 @@ func _on_incident_resolved(incident: Incident, success: bool) -> void:
 	_announced.erase(incident.get_instance_id())
 	if incident is Fire:
 		if success:
-			say("FIRE — knocked down")
+			say("FIRE — knocked down", &"NotifySuccess")
 	elif incident is Casualty:
-		say("MEDICAL — casualty delivered" if success else "MEDICAL — casualty lost")
+		say("MEDICAL — casualty delivered" if success else "MEDICAL — casualty lost",
+			&"NotifySuccess" if success else &"NotifyDanger")
 	elif incident is Suspect and success:
-		say("POLICE — suspect in custody")
+		say("POLICE — suspect in custody", &"NotifySuccess")
 	elif incident is Hazard:
 		# The failure is worth saying out loud, unlike a fire's. A cylinder going off is
 		# the one outcome here that happens *to* the player rather than being something
 		# they failed to finish, and it is going to be followed by fires and casualties
 		# they did not ask for.
-		say("FIRE — cylinder made safe" if success else "FIRE — CYLINDER EXPLODED")
+		say("FIRE — cylinder made safe" if success else "FIRE — CYLINDER EXPLODED",
+			&"NotifySuccess" if success else &"NotifyDanger")

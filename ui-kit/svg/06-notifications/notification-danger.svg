@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="34" viewBox="0 0 360 34" fill="none" role="img" aria-label="Notification — danger">
+  <defs>
+    <linearGradient id="ntda_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241110"/><stop offset="1" stop-color="#0A1017"/></linearGradient>
+    <linearGradient id="ntda_a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B2382A"/><stop offset="1" stop-color="#B2382A"/></linearGradient>
+    <clipPath id="ntda_c"><rect x="42" y="0" width="276" height="34"/></clipPath>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="359" height="33" rx="3" fill="url(#ntda_g)" fill-opacity="1" stroke="#5A241C" stroke-width="1" stroke-opacity="1"/>
+  <rect x="1" y="1" width="32" height="32" rx="2" fill="#B2382A" fill-opacity="1"/>
+  <g transform="translate(6 5) scale(0.91667)" color="#FFFFFF" opacity="1"><path d="M13.4 1.8c.6 3.2-.9 4.9-2.4 6.4-1.6 1.6-3.3 3.3-3.3 6.3a6.3 6.3 0 0 0 12.6 0c0-4.6-3.3-6.9-6.9-12.7Z" fill="currentColor" fill-rule="nonzero"/></g>
+  <g clip-path="url(#ntda_c)">  <text x="44" y="22" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="12.5" font-weight="500" fill="#DFE7F0" text-anchor="start" letter-spacing="0.4" opacity="1">Building fire detected</text>
+</g>
+  <g transform="translate(334 7) scale(0.79167)" color="#8FA0B2" opacity="1"><path d="M6.0 6.0 18.0 18.0M18.0 6.0 6.0 18.0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="120" viewBox="0 0 220 120" fill="none" role="img" aria-label="Dropdown — open list">
+  <defs>
+    <linearGradient id="do_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0C121B"/><stop offset="1" stop-color="#080D14"/></linearGradient>
+    <linearGradient id="do_s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A7FE0"/><stop offset="1" stop-color="#125AAF"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="219" height="119" rx="3" fill="url(#do_g)" fill-opacity="1" stroke="#2E3D4F" stroke-width="1" stroke-opacity="1"/>
+  <rect x="3" y="4" width="214" height="26" rx="2" fill="url(#do_s)" fill-opacity="1"/>
+  <text x="14" y="22" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="12" font-weight="500" fill="#FFFFFF" text-anchor="start" letter-spacing="0.4" opacity="1">Option 1</text>
+  <text x="14" y="50" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="12" font-weight="500" fill="#DFE7F0" text-anchor="start" letter-spacing="0.4" opacity="1">Option 2</text>
+  <text x="14" y="78" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="12" font-weight="500" fill="#DFE7F0" text-anchor="start" letter-spacing="0.4" opacity="1">Option 3</text>
+  <text x="14" y="106" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="12" font-weight="500" fill="#DFE7F0" text-anchor="start" letter-spacing="0.4" opacity="1">Option 4</text>
+
+</svg>

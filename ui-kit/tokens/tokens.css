@@ -1,0 +1,32 @@
+:root {
+  --ops-surface-bg: #080D14;
+  --ops-surface-section: #0D131B;
+  --ops-surface-panel-top: #18222F;
+  --ops-surface-panel-bottom: #0E1620;
+  --ops-surface-card: #151E2A;
+  --ops-surface-inset-top: #0C121B;
+  --ops-surface-inset-bottom: #080D14;
+  --ops-stroke-default: #212D3C;
+  --ops-stroke-soft: #18222E;
+  --ops-stroke-bright: #2E3D4F;
+  --ops-primary-base: #1668C8;
+  --ops-primary-top: #2A7FE0;
+  --ops-primary-bottom: #125AAF;
+  --ops-primary-hover-top: #3E93F0;
+  --ops-primary-pressed-top: #12508F;
+  --ops-primary-line: #4A9CF0;
+  --ops-primary-tertiary-line: #2E6FBE;
+  --ops-status-success: #3E9B4F;
+  --ops-status-warning: #C79A2A;
+  --ops-status-danger: #B2382A;
+  --ops-status-info: #2A7FE0;
+  --ops-text-primary: #DFE7F0;
+  --ops-text-secondary: #8FA0B2;
+  --ops-text-disabled: #55636F;
+  --ops-radius-button: 3px;
+  --ops-radius-menu-item: 4px;
+  --ops-radius-panel: 6px;
+  --ops-radius-tile: 6px;
+  --ops-radius-chip: 4px;
+  --ops-radius-control: 3px;
+}

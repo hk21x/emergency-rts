@@ -1,0 +1,1682 @@
+[
+ {
+  "path": "01-menu/menu-item-default.svg",
+  "category": "Main menu",
+  "title": "Menu item \u2014 default",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 200,
+  "h": 42
+ },
+ {
+  "path": "01-menu/menu-item-hover.svg",
+  "category": "Main menu",
+  "title": "Menu item \u2014 hover",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 200,
+  "h": 42
+ },
+ {
+  "path": "01-menu/menu-item-pressed.svg",
+  "category": "Main menu",
+  "title": "Menu item \u2014 pressed",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 200,
+  "h": 42
+ },
+ {
+  "path": "01-menu/menu-item-disabled.svg",
+  "category": "Main menu",
+  "title": "Menu item \u2014 disabled",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 200,
+  "h": 42
+ },
+ {
+  "path": "01-menu/examples/menu-single-player.svg",
+  "category": "Main menu",
+  "title": "Menu \u2014 SINGLE PLAYER",
+  "note": "Reference composition (hover).",
+  "w": 200,
+  "h": 42
+ },
+ {
+  "path": "01-menu/examples/menu-multiplayer.svg",
+  "category": "Main menu",
+  "title": "Menu \u2014 MULTIPLAYER",
+  "note": "Reference composition (default).",
+  "w": 200,
+  "h": 42
+ },
+ {
+  "path": "01-menu/examples/menu-load-game.svg",
+  "category": "Main menu",
+  "title": "Menu \u2014 LOAD GAME",
+  "note": "Reference composition (default).",
+  "w": 200,
+  "h": 42
+ },
+ {
+  "path": "01-menu/examples/menu-options.svg",
+  "category": "Main menu",
+  "title": "Menu \u2014 OPTIONS",
+  "note": "Reference composition (default).",
+  "w": 200,
+  "h": 42
+ },
+ {
+  "path": "01-menu/examples/menu-mods.svg",
+  "category": "Main menu",
+  "title": "Menu \u2014 MODS",
+  "note": "Reference composition (default).",
+  "w": 200,
+  "h": 42
+ },
+ {
+  "path": "01-menu/examples/menu-credits.svg",
+  "category": "Main menu",
+  "title": "Menu \u2014 CREDITS",
+  "note": "Reference composition (default).",
+  "w": 200,
+  "h": 42
+ },
+ {
+  "path": "01-menu/examples/menu-exit.svg",
+  "category": "Main menu",
+  "title": "Menu \u2014 EXIT",
+  "note": "Reference composition (default).",
+  "w": 200,
+  "h": 42
+ },
+ {
+  "path": "01-menu/version-plate.svg",
+  "category": "Main menu",
+  "title": "Version plate",
+  "note": "Blank frame for build number and legal line.",
+  "w": 200,
+  "h": 64
+ },
+ {
+  "path": "01-menu/examples/version-plate-filled.svg",
+  "category": "Main menu",
+  "title": "Version plate \u2014 filled",
+  "note": "Swap in your own studio and build string.",
+  "w": 200,
+  "h": 64
+ },
+ {
+  "path": "01-menu/title-plate.svg",
+  "category": "Main menu",
+  "title": "Title plate",
+  "note": "Empty slot for your own game logo. Sized to the menu column.",
+  "w": 260,
+  "h": 80
+ },
+ {
+  "path": "01-menu/menu-container.svg",
+  "category": "Main menu",
+  "title": "Menu container",
+  "note": "Outer shell for the button column. Margins 12/12/12/12.",
+  "w": 240,
+  "h": 400
+ },
+ {
+  "path": "02-topbar/topbar-frame.svg",
+  "category": "Top bar",
+  "title": "Top bar frame",
+  "note": "Blank shell. Margins 10/10/10/10.",
+  "w": 620,
+  "h": 62
+ },
+ {
+  "path": "02-topbar/menu-button.svg",
+  "category": "Top bar",
+  "title": "Hamburger button",
+  "note": "Primary square button. Pair with icon-menu.",
+  "w": 48,
+  "h": 48
+ },
+ {
+  "path": "02-topbar/examples/menu-button-icon.svg",
+  "category": "Top bar",
+  "title": "Hamburger button \u2014 with icon",
+  "note": "Reference composition.",
+  "w": 48,
+  "h": 48
+ },
+ {
+  "path": "02-topbar/pause-button.svg",
+  "category": "Top bar",
+  "title": "Pause button",
+  "note": "Secondary square button.",
+  "w": 48,
+  "h": 48
+ },
+ {
+  "path": "02-topbar/examples/pause-button-icon.svg",
+  "category": "Top bar",
+  "title": "Pause button \u2014 with icon",
+  "note": "Reference composition.",
+  "w": 48,
+  "h": 48
+ },
+ {
+  "path": "02-topbar/stat-block.svg",
+  "category": "Top bar",
+  "title": "Stat block",
+  "note": "Label-over-value readout. Blank.",
+  "w": 80,
+  "h": 42
+ },
+ {
+  "path": "02-topbar/examples/stat-block-time.svg",
+  "category": "Top bar",
+  "title": "Stat block \u2014 TIME",
+  "note": "Reference composition.",
+  "w": 80,
+  "h": 42
+ },
+ {
+  "path": "02-topbar/examples/topbar-composed.svg",
+  "category": "Top bar",
+  "title": "Top bar \u2014 composed",
+  "note": "Full reference layout.",
+  "w": 620,
+  "h": 62
+ },
+ {
+  "path": "03-panels/panel.svg",
+  "category": "Panels",
+  "title": "Panel",
+  "note": "General container. Margins 10/10/10/10.",
+  "w": 260,
+  "h": 160
+ },
+ {
+  "path": "03-panels/panel-inset.svg",
+  "category": "Panels",
+  "title": "Panel \u2014 inset well",
+  "note": "Recessed surface for lists. Margins 8/8/8/8.",
+  "w": 260,
+  "h": 160
+ },
+ {
+  "path": "03-panels/section-frame.svg",
+  "category": "Panels",
+  "title": "Section frame",
+  "note": "Grouping box with a 40px header rule. Margins 10/48/10/10.",
+  "w": 300,
+  "h": 180
+ },
+ {
+  "path": "03-panels/window.svg",
+  "category": "Panels",
+  "title": "Window",
+  "note": "Titled window, 40px blue title bar. Margins 10/48/10/10.",
+  "w": 260,
+  "h": 200
+ },
+ {
+  "path": "03-panels/examples/window-objectives.svg",
+  "category": "Panels",
+  "title": "Window \u2014 objectives",
+  "note": "Reference composition with checklist and scrollbar.",
+  "w": 260,
+  "h": 200
+ },
+ {
+  "path": "03-panels/dialog.svg",
+  "category": "Panels",
+  "title": "Dialog",
+  "note": "Confirm/alert shell. Margins 16/16/16/16.",
+  "w": 290,
+  "h": 180
+ },
+ {
+  "path": "03-panels/examples/dialog-confirm.svg",
+  "category": "Panels",
+  "title": "Dialog \u2014 confirm quit",
+  "note": "Reference composition.",
+  "w": 290,
+  "h": 180
+ },
+ {
+  "path": "03-panels/scrollbar-track.svg",
+  "category": "Panels",
+  "title": "Scrollbar track",
+  "note": "",
+  "w": 6,
+  "h": 140
+ },
+ {
+  "path": "03-panels/scrollbar-thumb.svg",
+  "category": "Panels",
+  "title": "Scrollbar thumb",
+  "note": "Stretch vertically. Margins 0/3/0/3.",
+  "w": 6,
+  "h": 64
+ },
+ {
+  "path": "03-panels/divider.svg",
+  "category": "Panels",
+  "title": "Divider",
+  "note": "Tile horizontally.",
+  "w": 240,
+  "h": 2
+ },
+ {
+  "path": "04-buttons/large/button-primary-default.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 primary / default",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-primary-default-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 primary / default (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/button-primary-hover.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 primary / hover",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-primary-hover-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 primary / hover (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/button-primary-pressed.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 primary / pressed",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-primary-pressed-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 primary / pressed (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/button-secondary-default.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 secondary / default",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-secondary-default-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 secondary / default (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/button-secondary-hover.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 secondary / hover",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-secondary-hover-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 secondary / hover (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/button-secondary-pressed.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 secondary / pressed",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-secondary-pressed-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 secondary / pressed (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/button-tertiary-default.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 tertiary / default",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-tertiary-default-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 tertiary / default (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/button-tertiary-hover.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 tertiary / hover",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-tertiary-hover-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 tertiary / hover (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/button-tertiary-pressed.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 tertiary / pressed",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-tertiary-pressed-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 tertiary / pressed (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/button-danger-default.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 danger / default",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-danger-default-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 danger / default (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/button-danger-hover.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 danger / hover",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-danger-hover-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 danger / hover (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/button-danger-pressed.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 danger / pressed",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-danger-pressed-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 danger / pressed (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/button-disabled.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 disabled",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/large/examples/button-disabled-label.svg",
+  "category": "Buttons",
+  "title": "Button large \u2014 disabled / default (labelled)",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/small/button-primary-default.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 primary / default",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-primary-default-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 primary / default (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/button-primary-hover.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 primary / hover",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-primary-hover-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 primary / hover (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/button-primary-pressed.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 primary / pressed",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-primary-pressed-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 primary / pressed (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/button-secondary-default.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 secondary / default",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-secondary-default-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 secondary / default (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/button-secondary-hover.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 secondary / hover",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-secondary-hover-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 secondary / hover (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/button-secondary-pressed.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 secondary / pressed",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-secondary-pressed-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 secondary / pressed (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/button-tertiary-default.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 tertiary / default",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-tertiary-default-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 tertiary / default (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/button-tertiary-hover.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 tertiary / hover",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-tertiary-hover-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 tertiary / hover (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/button-tertiary-pressed.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 tertiary / pressed",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-tertiary-pressed-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 tertiary / pressed (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/button-danger-default.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 danger / default",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-danger-default-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 danger / default (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/button-danger-hover.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 danger / hover",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-danger-hover-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 danger / hover (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/button-danger-pressed.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 danger / pressed",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-danger-pressed-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 danger / pressed (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/button-disabled.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 disabled",
+  "note": "Blank nine-slice. Margins 8/8/8/8.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/small/examples/button-disabled-label.svg",
+  "category": "Buttons",
+  "title": "Button small \u2014 disabled / default (labelled)",
+  "note": "Reference composition.",
+  "w": 78,
+  "h": 28
+ },
+ {
+  "path": "04-buttons/icon-tile-default.svg",
+  "category": "Buttons",
+  "title": "Icon tile \u2014 default",
+  "note": "Empty 56px container. Drop a 24px icon at 16,16.",
+  "w": 56,
+  "h": 56
+ },
+ {
+  "path": "04-buttons/icon-tile-hover.svg",
+  "category": "Buttons",
+  "title": "Icon tile \u2014 hover",
+  "note": "Empty 56px container. Drop a 24px icon at 16,16.",
+  "w": 56,
+  "h": 56
+ },
+ {
+  "path": "04-buttons/icon-tile-pressed.svg",
+  "category": "Buttons",
+  "title": "Icon tile \u2014 pressed",
+  "note": "Empty 56px container. Drop a 24px icon at 16,16.",
+  "w": 56,
+  "h": 56
+ },
+ {
+  "path": "04-buttons/command-button-default.svg",
+  "category": "Buttons",
+  "title": "Command button \u2014 default",
+  "note": "38px HUD action slot.",
+  "w": 38,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/command-button-hover.svg",
+  "category": "Buttons",
+  "title": "Command button \u2014 hover",
+  "note": "38px HUD action slot.",
+  "w": 38,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/command-button-pressed.svg",
+  "category": "Buttons",
+  "title": "Command button \u2014 pressed",
+  "note": "38px HUD action slot.",
+  "w": 38,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/command-button-empty.svg",
+  "category": "Buttons",
+  "title": "Command button \u2014 empty",
+  "note": "38px HUD action slot.",
+  "w": 38,
+  "h": 38
+ },
+ {
+  "path": "04-buttons/map-control.svg",
+  "category": "Buttons",
+  "title": "Map control button",
+  "note": "32px minimap control.",
+  "w": 32,
+  "h": 32
+ },
+ {
+  "path": "05-icons/icon-alert.svg",
+  "category": "Icons",
+  "title": "alert",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-camera.svg",
+  "category": "Icons",
+  "title": "camera",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-check.svg",
+  "category": "Icons",
+  "title": "check",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-chevron-down.svg",
+  "category": "Icons",
+  "title": "chevron-down",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-chevron-left.svg",
+  "category": "Icons",
+  "title": "chevron-left",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-chevron-right.svg",
+  "category": "Icons",
+  "title": "chevron-right",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-chevron-up.svg",
+  "category": "Icons",
+  "title": "chevron-up",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-clipboard.svg",
+  "category": "Icons",
+  "title": "clipboard",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-close.svg",
+  "category": "Icons",
+  "title": "close",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-cone.svg",
+  "category": "Icons",
+  "title": "cone",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-download.svg",
+  "category": "Icons",
+  "title": "download",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-exit.svg",
+  "category": "Icons",
+  "title": "exit",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-fast-forward.svg",
+  "category": "Icons",
+  "title": "fast-forward",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-flame.svg",
+  "category": "Icons",
+  "title": "flame",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-folder.svg",
+  "category": "Icons",
+  "title": "folder",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-fuel.svg",
+  "category": "Icons",
+  "title": "fuel",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-gear.svg",
+  "category": "Icons",
+  "title": "gear",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-group.svg",
+  "category": "Icons",
+  "title": "group",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-hand.svg",
+  "category": "Icons",
+  "title": "hand",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-helicopter.svg",
+  "category": "Icons",
+  "title": "helicopter",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-home.svg",
+  "category": "Icons",
+  "title": "home",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-info.svg",
+  "category": "Icons",
+  "title": "info",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-magnifier.svg",
+  "category": "Icons",
+  "title": "magnifier",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-medical.svg",
+  "category": "Icons",
+  "title": "medical",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-menu.svg",
+  "category": "Icons",
+  "title": "menu",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-minus.svg",
+  "category": "Icons",
+  "title": "minus",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-move.svg",
+  "category": "Icons",
+  "title": "move",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-pause.svg",
+  "category": "Icons",
+  "title": "pause",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-person.svg",
+  "category": "Icons",
+  "title": "person",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-play.svg",
+  "category": "Icons",
+  "title": "play",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-plus.svg",
+  "category": "Icons",
+  "title": "plus",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-rewind.svg",
+  "category": "Icons",
+  "title": "rewind",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-shield.svg",
+  "category": "Icons",
+  "title": "shield",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-shield-check.svg",
+  "category": "Icons",
+  "title": "shield-check",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-shield-person.svg",
+  "category": "Icons",
+  "title": "shield-person",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-sliders.svg",
+  "category": "Icons",
+  "title": "sliders",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-star.svg",
+  "category": "Icons",
+  "title": "star",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-stop.svg",
+  "category": "Icons",
+  "title": "stop",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-target.svg",
+  "category": "Icons",
+  "title": "target",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-truck.svg",
+  "category": "Icons",
+  "title": "truck",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-warning.svg",
+  "category": "Icons",
+  "title": "warning",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-water-drop.svg",
+  "category": "Icons",
+  "title": "water-drop",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-water-jet.svg",
+  "category": "Icons",
+  "title": "water-jet",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "05-icons/icon-wrench.svg",
+  "category": "Icons",
+  "title": "wrench",
+  "note": "24x24 grid, fill=currentColor. White copies live in godot-icons/.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "06-notifications/notification-info-blank.svg",
+  "category": "Notifications",
+  "title": "Notification \u2014 info (blank)",
+  "note": "Margins 40/8/40/8.",
+  "w": 360,
+  "h": 34
+ },
+ {
+  "path": "06-notifications/notification-info.svg",
+  "category": "Notifications",
+  "title": "Notification \u2014 info",
+  "note": "Reference composition.",
+  "w": 360,
+  "h": 34
+ },
+ {
+  "path": "06-notifications/notification-success-blank.svg",
+  "category": "Notifications",
+  "title": "Notification \u2014 success (blank)",
+  "note": "Margins 40/8/40/8.",
+  "w": 360,
+  "h": 34
+ },
+ {
+  "path": "06-notifications/notification-success.svg",
+  "category": "Notifications",
+  "title": "Notification \u2014 success",
+  "note": "Reference composition.",
+  "w": 360,
+  "h": 34
+ },
+ {
+  "path": "06-notifications/notification-warning-blank.svg",
+  "category": "Notifications",
+  "title": "Notification \u2014 warning (blank)",
+  "note": "Margins 40/8/40/8.",
+  "w": 360,
+  "h": 34
+ },
+ {
+  "path": "06-notifications/notification-warning.svg",
+  "category": "Notifications",
+  "title": "Notification \u2014 warning",
+  "note": "Reference composition.",
+  "w": 360,
+  "h": 34
+ },
+ {
+  "path": "06-notifications/notification-danger-blank.svg",
+  "category": "Notifications",
+  "title": "Notification \u2014 danger (blank)",
+  "note": "Margins 40/8/40/8.",
+  "w": 360,
+  "h": 34
+ },
+ {
+  "path": "06-notifications/notification-danger.svg",
+  "category": "Notifications",
+  "title": "Notification \u2014 danger",
+  "note": "Reference composition.",
+  "w": 360,
+  "h": 34
+ },
+ {
+  "path": "06-notifications/tooltip.svg",
+  "category": "Notifications",
+  "title": "Tooltip",
+  "note": "Caret-bottom bubble. Margins 12/12/12/22.",
+  "w": 220,
+  "h": 76
+ },
+ {
+  "path": "06-notifications/examples/tooltip-ability.svg",
+  "category": "Notifications",
+  "title": "Tooltip \u2014 ability",
+  "note": "Reference composition.",
+  "w": 220,
+  "h": 76
+ },
+ {
+  "path": "07-bars/bar-track.svg",
+  "category": "Bars",
+  "title": "Bar track",
+  "note": "Empty track. Margins 3/3/3/3.",
+  "w": 220,
+  "h": 14
+ },
+ {
+  "path": "07-bars/bar-fill-health.svg",
+  "category": "Bars",
+  "title": "Bar fill \u2014 health",
+  "note": "Stretch horizontally to the value. Margins 3/3/3/3.",
+  "w": 220,
+  "h": 14
+ },
+ {
+  "path": "07-bars/bar-fill-fuel.svg",
+  "category": "Bars",
+  "title": "Bar fill \u2014 fuel",
+  "note": "Stretch horizontally to the value. Margins 3/3/3/3.",
+  "w": 220,
+  "h": 14
+ },
+ {
+  "path": "07-bars/bar-fill-progress.svg",
+  "category": "Bars",
+  "title": "Bar fill \u2014 progress",
+  "note": "Stretch horizontally to the value. Margins 3/3/3/3.",
+  "w": 220,
+  "h": 14
+ },
+ {
+  "path": "07-bars/bar-fill-danger.svg",
+  "category": "Bars",
+  "title": "Bar fill \u2014 danger",
+  "note": "Stretch horizontally to the value. Margins 3/3/3/3.",
+  "w": 220,
+  "h": 14
+ },
+ {
+  "path": "07-bars/unit-health-track.svg",
+  "category": "Bars",
+  "title": "Unit health \u2014 track",
+  "note": "Small bar under unit portraits.",
+  "w": 56,
+  "h": 6
+ },
+ {
+  "path": "07-bars/unit-health-fill.svg",
+  "category": "Bars",
+  "title": "Unit health \u2014 fill",
+  "note": "",
+  "w": 56,
+  "h": 6
+ },
+ {
+  "path": "07-bars/slider.svg",
+  "category": "Bars",
+  "title": "Slider",
+  "note": "Track, fill and grabber at 50%.",
+  "w": 220,
+  "h": 22
+ },
+ {
+  "path": "07-bars/slider-grabber.svg",
+  "category": "Bars",
+  "title": "Slider grabber",
+  "note": "Standalone handle.",
+  "w": 18,
+  "h": 18
+ },
+ {
+  "path": "07-bars/examples/bar-stack.svg",
+  "category": "Bars",
+  "title": "Bars \u2014 labelled stack",
+  "note": "Reference composition for the options screen.",
+  "w": 350,
+  "h": 98
+ },
+ {
+  "path": "08-controls/checkbox-off.svg",
+  "category": "Controls",
+  "title": "Checkbox \u2014 off",
+  "note": "",
+  "w": 20,
+  "h": 20
+ },
+ {
+  "path": "08-controls/checkbox-on.svg",
+  "category": "Controls",
+  "title": "Checkbox \u2014 on",
+  "note": "",
+  "w": 20,
+  "h": 20
+ },
+ {
+  "path": "08-controls/radio-off.svg",
+  "category": "Controls",
+  "title": "Radio \u2014 off",
+  "note": "",
+  "w": 20,
+  "h": 20
+ },
+ {
+  "path": "08-controls/radio-on.svg",
+  "category": "Controls",
+  "title": "Radio \u2014 on",
+  "note": "",
+  "w": 20,
+  "h": 20
+ },
+ {
+  "path": "08-controls/dropdown-closed.svg",
+  "category": "Controls",
+  "title": "Dropdown \u2014 closed",
+  "note": "Blank select field. Margins 8/8/8/8.",
+  "w": 220,
+  "h": 32
+ },
+ {
+  "path": "08-controls/examples/dropdown-closed-filled.svg",
+  "category": "Controls",
+  "title": "Dropdown \u2014 closed (filled)",
+  "note": "Reference composition.",
+  "w": 220,
+  "h": 32
+ },
+ {
+  "path": "08-controls/dropdown-option-default.svg",
+  "category": "Controls",
+  "title": "Dropdown option \u2014 default",
+  "note": "Row in the open list.",
+  "w": 220,
+  "h": 28
+ },
+ {
+  "path": "08-controls/dropdown-option-hover.svg",
+  "category": "Controls",
+  "title": "Dropdown option \u2014 hover",
+  "note": "Row in the open list.",
+  "w": 220,
+  "h": 28
+ },
+ {
+  "path": "08-controls/dropdown-option-selected.svg",
+  "category": "Controls",
+  "title": "Dropdown option \u2014 selected",
+  "note": "Row in the open list.",
+  "w": 220,
+  "h": 28
+ },
+ {
+  "path": "08-controls/examples/dropdown-open.svg",
+  "category": "Controls",
+  "title": "Dropdown \u2014 open list",
+  "note": "Reference composition with the first option selected.",
+  "w": 220,
+  "h": 120
+ },
+ {
+  "path": "08-controls/tab-active.svg",
+  "category": "Controls",
+  "title": "Tab \u2014 active",
+  "note": "Top-rounded tab. Margins 10/10/10/4.",
+  "w": 64,
+  "h": 32
+ },
+ {
+  "path": "08-controls/tab-inactive.svg",
+  "category": "Controls",
+  "title": "Tab \u2014 inactive",
+  "note": "Top-rounded tab. Margins 10/10/10/4.",
+  "w": 64,
+  "h": 32
+ },
+ {
+  "path": "08-controls/tab-hover.svg",
+  "category": "Controls",
+  "title": "Tab \u2014 hover",
+  "note": "Top-rounded tab. Margins 10/10/10/4.",
+  "w": 64,
+  "h": 32
+ },
+ {
+  "path": "08-controls/tab-panel.svg",
+  "category": "Controls",
+  "title": "Tab content panel",
+  "note": "Sits directly under the tab row.",
+  "w": 260,
+  "h": 120
+ },
+ {
+  "path": "08-controls/list-header.svg",
+  "category": "Controls",
+  "title": "List header",
+  "note": "Column titles row.",
+  "w": 260,
+  "h": 28
+ },
+ {
+  "path": "08-controls/list-row-default.svg",
+  "category": "Controls",
+  "title": "List row \u2014 default",
+  "note": "Tile vertically.",
+  "w": 260,
+  "h": 30
+ },
+ {
+  "path": "08-controls/list-row-alt.svg",
+  "category": "Controls",
+  "title": "List row \u2014 alt",
+  "note": "Tile vertically.",
+  "w": 260,
+  "h": 30
+ },
+ {
+  "path": "08-controls/list-row-hover.svg",
+  "category": "Controls",
+  "title": "List row \u2014 hover",
+  "note": "Tile vertically.",
+  "w": 260,
+  "h": 30
+ },
+ {
+  "path": "08-controls/list-row-selected.svg",
+  "category": "Controls",
+  "title": "List row \u2014 selected",
+  "note": "Tile vertically.",
+  "w": 260,
+  "h": 30
+ },
+ {
+  "path": "08-controls/status-dot-available.svg",
+  "category": "Controls",
+  "title": "Status dot \u2014 available",
+  "note": "",
+  "w": 10,
+  "h": 10
+ },
+ {
+  "path": "08-controls/status-dot-en-route.svg",
+  "category": "Controls",
+  "title": "Status dot \u2014 en-route",
+  "note": "",
+  "w": 10,
+  "h": 10
+ },
+ {
+  "path": "08-controls/status-dot-on-scene.svg",
+  "category": "Controls",
+  "title": "Status dot \u2014 on-scene",
+  "note": "",
+  "w": 10,
+  "h": 10
+ },
+ {
+  "path": "08-controls/status-dot-offline.svg",
+  "category": "Controls",
+  "title": "Status dot \u2014 offline",
+  "note": "",
+  "w": 10,
+  "h": 10
+ },
+ {
+  "path": "08-controls/examples/unit-list.svg",
+  "category": "Controls",
+  "title": "List \u2014 units",
+  "note": "Reference composition.",
+  "w": 260,
+  "h": 150
+ },
+ {
+  "path": "09-hud/minimap-frame.svg",
+  "category": "HUD",
+  "title": "Minimap frame",
+  "note": "Render the map texture inside the inner rect.",
+  "w": 200,
+  "h": 160
+ },
+ {
+  "path": "09-hud/unit-selection-panel.svg",
+  "category": "HUD",
+  "title": "Unit selection panel",
+  "note": "26px header strip. Margins 10/34/10/10.",
+  "w": 240,
+  "h": 140
+ },
+ {
+  "path": "09-hud/unit-portrait.svg",
+  "category": "HUD",
+  "title": "Unit portrait",
+  "note": "Squad slot. Pair with unit-health-fill underneath.",
+  "w": 48,
+  "h": 56
+ },
+ {
+  "path": "09-hud/unit-portrait-selected.svg",
+  "category": "HUD",
+  "title": "Unit portrait \u2014 selected",
+  "note": "Accent border marks the active unit.",
+  "w": 48,
+  "h": 56
+ },
+ {
+  "path": "09-hud/stat-row.svg",
+  "category": "HUD",
+  "title": "Stat row",
+  "note": "Small icon + value readout.",
+  "w": 104,
+  "h": 24
+ },
+ {
+  "path": "09-hud/examples/stat-row-crew.svg",
+  "category": "HUD",
+  "title": "Stat row \u2014 crew",
+  "note": "Reference composition.",
+  "w": 104,
+  "h": 24
+ },
+ {
+  "path": "09-hud/command-grid.svg",
+  "category": "HUD",
+  "title": "Command grid",
+  "note": "Holds a 4x2 grid of 38px command buttons.",
+  "w": 176,
+  "h": 96
+ },
+ {
+  "path": "09-hud/examples/unit-card.svg",
+  "category": "HUD",
+  "title": "Unit card \u2014 composed",
+  "note": "Full reference layout.",
+  "w": 240,
+  "h": 140
+ },
+ {
+  "path": "10-misc/resource-chip.svg",
+  "category": "Misc",
+  "title": "Resource chip",
+  "note": "Counter with a stepper affordance. Margins 8/8/8/8.",
+  "w": 112,
+  "h": 30
+ },
+ {
+  "path": "10-misc/examples/resource-chip-filled.svg",
+  "category": "Misc",
+  "title": "Resource chip \u2014 filled",
+  "note": "Reference composition.",
+  "w": 112,
+  "h": 30
+ },
+ {
+  "path": "10-misc/badge-navy.svg",
+  "category": "Misc",
+  "title": "Badge tile \u2014 navy",
+  "note": "Coloured 40px slot for faction or status glyphs.",
+  "w": 40,
+  "h": 40
+ },
+ {
+  "path": "10-misc/badge-blue.svg",
+  "category": "Misc",
+  "title": "Badge tile \u2014 blue",
+  "note": "Coloured 40px slot for faction or status glyphs.",
+  "w": 40,
+  "h": 40
+ },
+ {
+  "path": "10-misc/badge-red.svg",
+  "category": "Misc",
+  "title": "Badge tile \u2014 red",
+  "note": "Coloured 40px slot for faction or status glyphs.",
+  "w": 40,
+  "h": 40
+ },
+ {
+  "path": "10-misc/badge-green.svg",
+  "category": "Misc",
+  "title": "Badge tile \u2014 green",
+  "note": "Coloured 40px slot for faction or status glyphs.",
+  "w": 40,
+  "h": 40
+ },
+ {
+  "path": "10-misc/badge-amber.svg",
+  "category": "Misc",
+  "title": "Badge tile \u2014 amber",
+  "note": "Coloured 40px slot for faction or status glyphs.",
+  "w": 40,
+  "h": 40
+ },
+ {
+  "path": "10-misc/marker-pin.svg",
+  "category": "Misc",
+  "title": "Map marker \u2014 pin",
+  "note": "Outline marker for the world layer.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "10-misc/marker-pin-solid.svg",
+  "category": "Misc",
+  "title": "Map marker \u2014 pin (solid)",
+  "note": "Filled variant for the minimap.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "10-misc/marker-diamond.svg",
+  "category": "Misc",
+  "title": "Map marker \u2014 diamond",
+  "note": "Outline marker for the world layer.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "10-misc/marker-diamond-solid.svg",
+  "category": "Misc",
+  "title": "Map marker \u2014 diamond (solid)",
+  "note": "Filled variant for the minimap.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "10-misc/marker-triangle.svg",
+  "category": "Misc",
+  "title": "Map marker \u2014 triangle",
+  "note": "Outline marker for the world layer.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "10-misc/marker-triangle-solid.svg",
+  "category": "Misc",
+  "title": "Map marker \u2014 triangle (solid)",
+  "note": "Filled variant for the minimap.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "10-misc/marker-pentagon.svg",
+  "category": "Misc",
+  "title": "Map marker \u2014 pentagon",
+  "note": "Outline marker for the world layer.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "10-misc/marker-pentagon-solid.svg",
+  "category": "Misc",
+  "title": "Map marker \u2014 pentagon (solid)",
+  "note": "Filled variant for the minimap.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "10-misc/marker-chevron-marker.svg",
+  "category": "Misc",
+  "title": "Map marker \u2014 chevron-marker",
+  "note": "Outline marker for the world layer.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "10-misc/marker-chevron-marker-solid.svg",
+  "category": "Misc",
+  "title": "Map marker \u2014 chevron-marker (solid)",
+  "note": "Filled variant for the minimap.",
+  "w": 24,
+  "h": 24
+ },
+ {
+  "path": "10-misc/selection-bracket.svg",
+  "category": "Misc",
+  "title": "Selection bracket",
+  "note": "Corner brackets for the selected unit. Scale to the unit's footprint.",
+  "w": 40,
+  "h": 40
+ },
+ {
+  "path": "10-misc/reticle.svg",
+  "category": "Misc",
+  "title": "Reticle",
+  "note": "Dashed ring for area-of-effect targeting.",
+  "w": 40,
+  "h": 40
+ },
+ {
+  "path": "10-misc/octagon.svg",
+  "category": "Misc",
+  "title": "Octagon",
+  "note": "Hazard/no-go zone outline.",
+  "w": 40,
+  "h": 40
+ },
+ {
+  "path": "10-misc/skeleton-line.svg",
+  "category": "Misc",
+  "title": "Skeleton line",
+  "note": "Loading placeholder. Animate opacity 0.4 -> 1.",
+  "w": 180,
+  "h": 12
+ }
+]

@@ -62,7 +62,7 @@ func _process(_delta: float) -> void:
 
 func _build_row() -> PanelContainer:
 	var pill := PanelContainer.new()
-	pill.theme_type_variation = &"PillPanel"
+	pill.theme_type_variation = &"ListRow"
 	pill.mouse_filter = Control.MOUSE_FILTER_STOP
 	Hover.attach(pill)
 	pill.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
@@ -73,8 +73,15 @@ func _build_row() -> PanelContainer:
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pill.add_child(row)
 
+	# **The kind badge fills the frame's icon tab.** It is first in the row and 32
+	# square because that is the size of the coloured square the art puts at x=1 --
+	# anything else there leaves the tab empty, which is what the row looked like
+	# before. The separate status dot went with this change: the tab's own colour now
+	# says whether a job is waiting, overdue or being worked, and two things saying it
+	# is one thing too many at this size.
 	var mark := CallMark.new()
-	mark.custom_minimum_size = Vector2(22.0, 22.0)
+	mark.flat = true
+	mark.custom_minimum_size = Vector2(32.0, 32.0)
 	mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(mark)
@@ -93,6 +100,24 @@ func _build_row() -> PanelContainer:
 	_row_label(row, &"HeaderLabel", Palette.TEXT_DIM)
 	_row_label(row, &"HeaderLabel", Palette.TEXT_DIM)
 	return pill
+
+
+## The kit's four status dots, mapped onto the board's own statuses. Cached by the
+## resource loader, so this is a dictionary lookup after the first row.
+func _dot_for(call: Call) -> Texture2D:
+	# **Three of the kit's four dots, because the board has three states.** There is no
+	# EN_ROUTE on a call: the board knows waiting, on scene, and closed. The kit's fourth
+	# dot goes unused rather than being wired to something it does not mean.
+	var name := "offline"
+	match call.status:
+		Call.Status.ON_SCENE:
+			name = "on_scene"
+		Call.Status.WAITING:
+			name = "en_route"
+		_:
+			name = "offline"
+	var path := "res://Game/UI/Kit/frames/controls_status_dot_%s.svg" % name
+	return load(path) as Texture2D if ResourceLoader.exists(path) else null
 
 
 func _row_label(parent: Node, variation: StringName, colour: Color) -> void:
@@ -122,7 +147,19 @@ func _fill(row: PanelContainer, call: Call) -> void:
 	clock.text = ("%s attending" % call.age_text()) if attending else call.age_text()
 	clock.add_theme_color_override("font_color",
 		Palette.MEDICAL_DEEP if attending else Palette.CASUALTY_DEEP)
-	row.theme_type_variation = &"PillPanel" if attending else &"AlarmPill"
+	# **Warning, then danger, then calm.** A waiting call was drawn as the kit's
+	# *selected* row -- a dark blue plate that reads as "highlighted" to a designer and
+	# as nothing much to a player glancing at it over a lit street. The notification
+	# frames say the right thing instead: amber the moment a job is on the board, red
+	# once it has been waiting longer than the response grace (the same ten seconds the
+	# score docks you after), and the plain row once somebody is actually working it.
+	# **One style, the kit's danger row.** Amber for a fresh call and red for an overdue
+	# one was a nice idea and read as a mistake: the tab changed colour under a badge
+	# that was drawing its own, so every row looked like two half-finished states. An
+	# open call is a job nobody has done yet -- that is what this list is *for* -- so it
+	# gets the one frame, and the plain row once a crew is actually on scene is the only
+	# distinction the list needs to draw.
+	row.theme_type_variation = &"ListRow" if attending else &"NotifyDanger"
 	row.set_meta(&"call", call)
 
 	if not row.gui_input.is_connected(_on_row_input):

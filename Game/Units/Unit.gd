@@ -84,12 +84,35 @@ func _tint_ring() -> void:
 	var mesh := _ring as MeshInstance3D
 	if mesh == null or mesh.material_override == null:
 		return
+	# **The shape is this file's, not the scene's.** Every unit scene ships a TorusMesh
+	# placeholder -- six of them, across a generator and four hand-authored scenes -- and
+	# they are all swapped for one bracket here. Sized off the unit's own collider so a
+	# patrol car and a paramedic each get a bracket that fits, which the shared torus in
+	# each scene could not do.
+	mesh.mesh = Markers.bracket(_ring_reach())
 	var material: StandardMaterial3D = mesh.material_override.duplicate()
 	if material == null:
 		return
 	var shades := Palette.service(service)
 	material.albedo_color = Color(shades[0].r, shades[0].g, shades[0].b, 0.85)
 	mesh.material_override = material
+
+
+## Half the footprint of whatever this unit actually is, for sizing the bracket.
+##
+## Read off the collision shape rather than the visual mesh: the visual is a Synty prefab
+## whose AABB includes a light bar or a raised arm, and a bracket drawn round *that* sits
+## a metre off the ground plane the unit occupies.
+func _ring_reach() -> float:
+	var shape := get_node_or_null("Collision") as CollisionShape3D
+	if shape and shape.shape:
+		var box := shape.shape as BoxShape3D
+		if box:
+			return maxf(box.size.x, box.size.z) * 0.5 + 0.25
+		var capsule := shape.shape as CapsuleShape3D
+		if capsule:
+			return capsule.radius + 0.35
+	return 1.0
 
 
 ## Re-anchors where respawn returns to. The station calls this after standing a

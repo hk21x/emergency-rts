@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="76" viewBox="0 0 220 76" fill="none" role="img" aria-label="Tooltip">
+  <defs>
+    <linearGradient id="tt_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <path d="M6 0.5 H214 A5.5 5.5 0 0 1 219.5 6 V60 A5.5 5.5 0 0 1 214 65.5 H116 L110 73 L104 65.5 H6 A5.5 5.5 0 0 1 0.5 60 V6 A5.5 5.5 0 0 1 6 0.5 Z" fill="url(#tt_g)" stroke="#2E3D4F" stroke-width="1"/>
+
+</svg>

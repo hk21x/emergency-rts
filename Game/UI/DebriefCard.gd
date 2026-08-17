@@ -45,7 +45,33 @@ func _ready() -> void:
 
 ## Fills the card from a finished shift and shows it.
 func show_shift(mission: Mission) -> void:
-	if mission == null or _body == null:
+	if mission == null:
+		return
+	_fill("SHIFT COMPLETE", mission.debrief_rows(), false)
+
+
+## The end of a scripted shout, as a modal.
+##
+## A shift's card is a readout the player leaves behind by pressing F2; a shout's is
+## the end of the thing they were doing, so it takes the mouse and waits to be
+## dismissed. That difference is the whole reason for the [param modal] flag: a card
+## that swallowed clicks during freeplay would leave the district uncommandable until
+## the next shift opened.
+func show_shout(mission: Mission) -> void:
+	if mission == null:
+		return
+	_fill("SHOUT COMPLETE", mission.shout_rows(), true)
+
+
+func hide_card() -> void:
+	visible = false
+	# Handed straight back. A modal that stayed modal after it was dismissed would take
+	# every click on the district with it, and nothing about the card would look wrong.
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _fill(heading_text: String, rows: Array[Dictionary], modal: bool) -> void:
+	if _body == null:
 		return
 	# Removed as well as freed. queue_free() alone does not take effect until the end of
 	# the frame, so a card shown twice in one frame -- which is exactly what happens when
@@ -56,18 +82,34 @@ func show_shift(mission: Mission) -> void:
 		child.queue_free()
 
 	var heading := Label.new()
-	heading.text = "SHIFT COMPLETE"
+	heading.text = heading_text
 	heading.theme_type_variation = &"BannerLabel"
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_body.add_child(heading)
 
-	for row in mission.debrief_rows():
+	for row in rows:
 		_body.add_child(_row(row))
+
+	if modal:
+		# Its own line, kept clear of the last row so the card does not read as though
+		# the button were another figure in the table.
+		var spacer := Control.new()
+		spacer.custom_minimum_size = Vector2(0.0, 10.0)
+		spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_body.add_child(spacer)
+
+		var dismiss := Button.new()
+		dismiss.name = "Dismiss"
+		dismiss.theme_type_variation = &"PrimaryButton"
+		dismiss.text = "CONTINUE"
+		dismiss.pressed.connect(hide_card)
+		_body.add_child(dismiss)
+
+	# STOP rather than IGNORE: a modal has to eat the click that lands on it, or the
+	# player selects and orders units through the card. Children are hit-tested either
+	# way, so the CONTINUE button still answers.
+	mouse_filter = Control.MOUSE_FILTER_STOP if modal else Control.MOUSE_FILTER_IGNORE
 	visible = true
-
-
-func hide_card() -> void:
-	visible = false
 
 
 ## One label/value line, with the optional note trailing the value.

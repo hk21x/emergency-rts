@@ -40,7 +40,10 @@ var _hospital: Area3D
 var _mission: Mission
 var _camera: RTSCamera
 var _controller: RTSController
-var _bar: PanelContainer
+## The transparent layer the bottom panels live on, and the two panels themselves.
+var _bar: Control
+var _unit_panel: PanelContainer
+var _command_panel: PanelContainer
 var _help: PanelContainer
 var _portrait: Portrait
 var _roster: Roster
@@ -78,6 +81,14 @@ func _run() -> void:
 	# of the way off its target.
 	root.size = Vector2i(1600, 900)
 
+	_test_the_characters_share_one_animation_library()
+	await _test_the_menu_backdrop_is_dressed()
+
+	# The tutorial town, checked FIRST and freed before the district loads: two
+	# Stations, Hospitals or Daylights in one tree would poison every
+	# get_first_node_in_group fixture the rest of the suite stands on.
+	await _test_the_tutorial_town_boots()
+
 	var scene := (load(SCENE) as PackedScene).instantiate()
 	root.add_child(scene)
 	_scene = scene as Node3D
@@ -111,7 +122,16 @@ func _run() -> void:
 	_mission = scene.get_node_or_null("Mission") as Mission
 	_ring = _car.get_node_or_null("SelectionRing") as Node3D if _car else null
 	_marker = scene.get_node_or_null("MoveMarker") as Node3D
-	_bar = scene.get_node_or_null("HUD/Root/Bar") as PanelContainer
+	# **The bottom panels, not a bar.** `Bar` is a transparent full-rect layer since the
+	# HUD was floated into corners -- it has no stylebox and no size of its own, so the
+	# thing worth measuring is the panels inside it. Cast as Control, not
+	# PanelContainer: the old cast quietly returned null and took nineteen checks with
+	# it, which the count caught and the FAIL line did not.
+	_bar = scene.get_node_or_null("HUD/Root/Bar") as Control
+	_unit_panel = scene.get_node_or_null(
+		"HUD/Root/Bar/Row/PortraitBlock") as PanelContainer
+	_command_panel = scene.get_node_or_null(
+		"HUD/Root/Bar/Row/CommandBlock") as PanelContainer
 	_help = scene.get_node_or_null("HUD/Root/World/HelpPanel") as PanelContainer
 	_portrait = scene.get_node_or_null(
 		"HUD/Root/Bar/Row/PortraitBlock/Portrait") as Portrait
@@ -241,6 +261,7 @@ func _run() -> void:
 	await _test_the_station_repairs_what_comes_home()
 	await _test_vehicles_slow_for_corners()
 	await _test_rain_makes_the_road_slippery()
+	await _test_fog_and_snow_are_weather_too()
 	await _test_vehicles_keep_out_of_the_buildings()
 	await _test_vehicles_cannot_drive_through_each_other()
 	await _test_a_vehicle_thrown_off_the_map_comes_back()
@@ -254,11 +275,12 @@ func _run() -> void:
 	await _test_box_select()
 	await _test_shift_click_adds()
 	await _test_control_groups()
-	await _test_bar_is_docked_and_solid()
+	await _test_hud_panels_hold_their_corners()
 	await _test_bar_does_not_swallow_world_clicks()
 	await _test_command_grid_follows_the_selection()
 	await _test_command_hotkeys_run_abilities()
 	await _test_roster_lists_everything_under_command()
+	await _test_the_roster_groups_by_service()
 	await _test_roster_marks_the_selection()
 	await _test_roster_chip_selects_a_unit()
 	await _test_portrait_names_the_lead()
@@ -275,6 +297,9 @@ func _run() -> void:
 	await _test_clicking_a_call_moves_the_camera()
 	await _test_the_radio_reports_what_happens()
 	await _test_the_minimap_commands_camera_and_shift()
+	await _test_the_move_marker_is_a_reticle()
+	_test_the_map_zoom_buttons_work()
+	await _test_the_score_strip_reads_and_pauses()
 	await _test_person_walks()
 	await _test_a_person_gets_round_a_parked_car()
 	await _test_the_crowd_sidesteps_onto_pavement_only()
@@ -363,14 +388,20 @@ func _run() -> void:
 	await _test_building_fires_wait_for_a_fire_service()
 	await _test_the_appliance_runs_on_water()
 	await _test_the_district_makes_a_noise()
+	await _test_the_interface_clicks()
 	await _test_the_call_rate_is_a_setting()
 	await _test_the_hour_is_a_setting()
+	await _test_the_shift_rolls_its_own_weather()
+	await _test_wet_weather_loads_the_table_with_collisions()
 	await _test_vehicles_light_up_after_dark()
 	await _test_a_rescue_needs_every_service()
 	await _test_a_disturbance_lives_before_the_law()
 	await _test_a_disturbance_is_arrested_and_delivered()
 	await _test_a_drunk_call_can_be_just_a_collapse()
 	await _test_a_drunk_call_can_turn_into_an_arrest()
+	await _test_a_missing_child_call_stages_a_search()
+	await _test_a_found_child_closes_the_call()
+	await _test_the_missing_child_stays_out_of_other_calls()
 	await _test_scoring_rewards_a_fast_response()
 	await _test_a_slow_response_scores_at_the_floor()
 	await _test_a_lost_casualty_costs_points_not_the_shift()
@@ -380,10 +411,13 @@ func _run() -> void:
 	await _test_the_debrief_reads_as_a_table()
 	await _test_a_shift_ends_even_with_an_unanswerable_call()
 	await _test_pause_freezes_the_district()
+	await _test_escape_closes_the_shop_before_it_pauses()
+	await _test_the_speed_buttons_run_the_district_faster()
 	await _test_the_menu_restarts_a_shift()
 	await _test_settings_shape_the_shift_and_survive()
 	await _test_quit_to_title_stands_the_shift_down()
 	await _test_a_bad_shift_cannot_be_quit_away()
+	await _test_a_scenario_plays_its_timeline()
 	await _test_camera_pan_and_zoom()
 	await _test_respawn()
 	# Dead last, deliberately: it wipes the fleet the whole suite ran on.
@@ -402,9 +436,63 @@ func _test_the_game_opens_on_the_title() -> void:
 	_check(_menu.visible and _menu.screen == GameMenu.Screen.TITLE,
 		"the session opens on the title card")
 
-	await _click(MOUSE_BUTTON_LEFT, _screen_of(_car.global_position + Vector3.UP * 0.9))
-	_check(not _car.is_selected and _menu.visible,
+	# **A column down the left, not a card in the middle.** The reference the user
+	# supplied puts its menu in a left-hand column with the picture beside it, and here
+	# the picture is the district itself -- so the menu has to leave the district
+	# visible. A centred card would satisfy every other check on this screen while
+	# looking nothing like what was asked for.
+	var column := _menu._menu_column.get_global_rect()
+	var screen_width := float(root.size.x)
+	_check(column.position.x < screen_width * 0.1
+			and column.end.x < screen_width * 0.4,
+		"the main menu is a column down the left (ends %.0f%% across)"
+		% (100.0 * column.end.x / screen_width))
+	# Every row carries a kit icon. Checked because the icons are looked up by name at
+	# build time and a renamed file returns null silently -- the row keeps working and
+	# simply loses its picture, which is exactly the kind of thing nobody notices.
+	var rows := 0
+	var pictured := 0
+	for node in _descendants(_menu._title_card):
+		var row := node as Button
+		if row == null or row.theme_type_variation != &"MenuItem":
+			continue
+		rows += 1
+		if row.icon != null:
+			pictured += 1
+	_check(rows >= 4 and pictured == rows,
+		"and every one of its %d rows carries a kit icon (%d did)" % [rows, pictured])
+
+	# **Aimed at a unit the card is not sitting on.** The title card is centred, and
+	# clicking a unit that happens to be behind it lands on a *button* rather than on
+	# the district -- which swallows the click in the least useful possible way, and
+	# then plays the game. It went unnoticed until the card grew a SCENARIOS row and
+	# the old fixed target moved under PLAY. Picked by rect rather than by nudging the
+	# coordinate, so the next button added to the card cannot repeat it.
+	var picked: Unit = _car
+	# **The column, not the card.** Since the main menu was built to the reference the
+	# title card is a full-rect transparent page with a column down the left, so asking
+	# whether a point is "over the card" is now always true and the pan below would
+	# never find a gap. What occupies space is the column.
+	var card_rect: Rect2 = _menu._menu_column.get_global_rect()
+	var aim := _screen_of(picked.global_position + Vector3.UP * 0.9)
+	# The fleet parks together on the forecourt, so when the card covers one it covers
+	# all seven -- picking a different unit is no escape. Panning is: the camera is not
+	# paused by the title, so the district can be slid out from under the card until a
+	# unit is somewhere clickable, and slid back afterwards.
+	var was_focus: Vector3 = _camera.focus
+	var slid := 0
+	while card_rect.has_point(aim) and slid < 6:
+		_camera.focus += Vector3(14.0, 0.0, 14.0)
+		await _idle(2)
+		aim = _screen_of(picked.global_position + Vector3.UP * 0.9)
+		slid += 1
+	_check(not card_rect.has_point(aim),
+		"a unit stands clear of the title card to click at")
+	await _click(MOUSE_BUTTON_LEFT, aim)
+	_check(not picked.is_selected and _menu.visible,
 		"a click on the district is swallowed by the card")
+	_camera.focus = was_focus
+	await _idle(2)
 	await _press_key(KEY_F2)
 	await _idle(2)
 	_check(not _director.active, "and F2 does not open a shift under it")
@@ -425,7 +513,7 @@ func _test_the_map_opens_quiet() -> void:
 		"the board opens empty (%d)" % _board.open_calls().size())
 	_check(_mission.state == Mission.State.RUNNING and not _mission.scoring,
 		"the mission idles rather than scoring (state %d)" % _mission.state)
-	var hint := _scene.get_node_or_null("HUD/Root/World/Debrief") as Label
+	var hint := _scene.get_node_or_null("HUD/Root/World/ObjectiveBar/Body/Debrief") as Label
 	_check(hint != null and hint.visible and "F2" in hint.text,
 		"and the screen says how to start ('%s')" % (hint.text if hint else "no label"))
 
@@ -2034,6 +2122,34 @@ func _test_the_interface_can_be_read() -> void:
 	# Splitting them was not a way to make a failing row pass: the surface row failed at
 	# 1.2:1 and the palette was changed to fix it. Folding it into the ink table at 3.0
 	# would have meant a tile brighter than the card it sits in.
+	# **The chrome is the UI kit's art, and the theme has to still be made of it.**
+	# `build_theme.gd` used to bake StyleBoxFlat -- a colour and a corner radius -- and
+	# the difference between that and the kit is invisible to every other check here:
+	# the sizes are the same, the text is the same, the suite is headless and never
+	# looks at a pixel. Re-running an older builder, or one edit that drops back to
+	# `_flat()`, would quietly return the game to its old look with everything green.
+	# So: the panel a card is drawn with must be a *texture* box, and that texture must
+	# come from the kit folder.
+	var chrome := _scene.get_node("HUD/Root").theme as Theme
+	var card_box := chrome.get_stylebox("panel", "CardPanel") as StyleBoxTexture
+	var card_art := card_box.texture.resource_path if card_box and card_box.texture else ""
+	_check(card_box != null and card_art.begins_with("res://Game/UI/Kit/"),
+		"a card is drawn from the kit's art ('%s')" % card_art)
+	# And the kit's faces, which is what actually makes it read as the reference rather
+	# than as stock Godot. Checked on the button, because a button label is the one
+	# piece of text that is neither body copy nor a heading.
+	#
+	# **Names the face, not just the folder.** Asking only for something under
+	# `Game/UI/Fonts/` had a second, independent payer: the theme's `default_font` is a
+	# kit face too, so deleting the button's own font left the check green reading
+	# Barlow -- it could not tell "deliberately set in the display face" from "never
+	# styled and fell through to body copy". The kit pairs Rajdhani with buttons for a
+	# reason, and that is the thing worth pinning.
+	var button_font := chrome.get_font("font", "Button")
+	var face := button_font.resource_path if button_font else ""
+	_check(face.begins_with("res://Game/UI/Fonts/Rajdhani"),
+		"and its labels are set in the kit's display face ('%s')" % face)
+
 	var pairs := [
 		["text on a card", Palette.TEXT, Palette.CARD],
 		["dim text on a card", Palette.TEXT_DIM, Palette.CARD],
@@ -2057,21 +2173,48 @@ func _test_the_interface_can_be_read() -> void:
 	_check(worst >= 3.0,
 		"every ink reads on its ground (worst: %s at %.1f:1)" % [worst_pair, worst])
 
+	# **Each pair now names what separates it, because the scheme changed under this
+	# check.** The UI kit adopted in August 2026 separates surfaces with a *stroke* and a
+	# gradient rather than a step in fill: its raised panel is #18222F -> #0E1620 inside
+	# a #212D3C line, and the fills either side of that line are 1.16:1 apart. Held to
+	# the old flat 1.3 this row failed on art that is plainly legible on screen.
+	#
+	# **This is a loosening, and worth saying so.** What stops it being the kind that
+	# gets obeyed-by-lowering: a pair with no stroke is still held to 1.3, and a pair
+	# that claims one must show that stroke stepping clear of the darker fill. The
+	# original failure mode -- a surface the same colour as its ground, with nothing
+	# between them -- fails either arm. What is no longer asserted is that two *fills*
+	# alone carry the separation, which in this scheme is simply not how it is done.
 	var surfaces := [
-		["a recessed tile against its card", Palette.WELL, Palette.CARD],
-		["a hovered tile against its card", Palette.HOVER, Palette.CARD],
-		["a card against the bar", Palette.CARD, Palette.BAR],
+		["a recessed tile against its card", Palette.WELL, Palette.CARD,
+			Palette.EDGE_SOFT],
+		["a hovered tile against its card", Palette.HOVER, Palette.CARD, null],
+		["a card against the bar", Palette.CARD, Palette.BAR, Palette.EDGE],
 	]
 	var flattest := INF
 	var flattest_pair := ""
+	var unlined := ""
 	for pair: Array in surfaces:
 		var ratio: float = Palette.contrast(pair[1] as Color, pair[2] as Color)
-		if ratio < flattest:
-			flattest = ratio
-			flattest_pair = str(pair[0])
-	_check(flattest >= 1.3,
-		"and every surface is told apart from the one behind it (worst: %s at %.2f:1)"
-		% [flattest_pair, flattest])
+		var stroke: Variant = pair[3]
+		if stroke == null:
+			# Nothing between them: the fills have to do all of it, at the old bar.
+			if ratio < flattest:
+				flattest = ratio
+				flattest_pair = str(pair[0])
+			continue
+		# Lined: the fills need only differ, and the line has to clear the darker of
+		# the two it sits between.
+		var darker: Color = (pair[1] as Color) if Palette.contrast(pair[1] as Color,
+			Color.WHITE) > Palette.contrast(pair[2] as Color, Color.WHITE) \
+			else (pair[2] as Color)
+		var edge: float = Palette.contrast(stroke as Color, darker)
+		if ratio < 1.10 or edge < 1.15:
+			unlined = "%s (fills %.2f:1, line %.2f:1)" % [pair[0], ratio, edge]
+	_check(flattest >= 1.3 and unlined == "",
+		"and every surface is told apart from the one behind it (%s)"
+		% [unlined if unlined != "" else "worst unlined: %s at %.2f:1"
+			% [flattest_pair, flattest]])
 
 	# **A slider's track is drawn from its stylebox's vertical content margin**, so a box
 	# built with zero padding -- which is right for a card and meaningless here -- bakes a
@@ -2316,13 +2459,13 @@ func _test_clickable_things_respond_to_the_pointer() -> void:
 	# giving one a panel changes its size -- which in the bar makes the bar taller, which
 	# covers whatever floats above it. Six incidents deep, that is not a trade worth
 	# making for a hover effect, so the hover must not move anything.
-	var bar_before := _bar.get_global_rect().size.y
+	var bar_before := _command_panel.get_global_rect().size.y
 	if chip:
 		chip.mouse_entered.emit()
 	await _idle(3)
-	_check(absf(_bar.get_global_rect().size.y - bar_before) < 0.5,
-		"and none of it moves the bar (%.0f from %.0f)"
-		% [_bar.get_global_rect().size.y, bar_before])
+	_check(absf(_command_panel.get_global_rect().size.y - bar_before) < 0.5,
+		"and none of it moves the panels (%.0f from %.0f)"
+		% [_command_panel.get_global_rect().size.y, bar_before])
 	if chip:
 		chip.mouse_exited.emit()
 	await _idle(2)
@@ -2623,6 +2766,64 @@ func _test_rain_makes_the_road_slippery() -> void:
 		"and the road dries out again (%.2f)" % _car.grip_scale)
 
 
+## Fog and snow, the other two skies. Each is rain's shape -- one grip number and an
+## air treatment composed over the hour -- so this asserts exactly those two halves,
+## plus the visual that separates snow from rain: flakes, not streaks.
+func _test_fog_and_snow_are_weather_too() -> void:
+	var daylight := _scene.get_node_or_null("Daylight") as Daylight
+	var world := _scene.get_node_or_null("WorldEnvironment") as WorldEnvironment
+	if daylight == null or world == null:
+		_check(false, "the district has a sky to weather")
+		return
+	var air := world.environment
+	daylight.set_weather(Daylight.Weather.CLEAR)
+	var clear_fog := air.fog_density
+
+	daylight.set_weather(Daylight.Weather.FOG)
+	# **The switch, not just the number.** The map ships with fog_enabled off in depth
+	# mode, and two earlier cuts of this treatment wrote densities into that disabled
+	# path -- the checks measured the values moving and a player pressing FOG saw
+	# nothing. Weather must turn the fog on, in the mode where density means density.
+	_check(air.fog_enabled and air.fog_mode == Environment.FOG_MODE_EXPONENTIAL,
+		"fog switches the air on, exponentially (enabled %s, mode %d)"
+		% [air.fog_enabled, air.fog_mode])
+	_check(air.fog_density >= 0.019,
+		"and thick enough to read at RTS distance (%.4f from %.4f)"
+		% [air.fog_density, clear_fog])
+	_check(is_equal_approx(_car.grip_scale, 0.88),
+		"and takes a little grip -- caution, not a surface (%.2f)" % _car.grip_scale)
+	_check(not daylight.is_wet(), "but the road under fog is not wet")
+	# What real fog does to a real city: the lights come on at noon. Street lamps and
+	# every vehicle's headlamps, through the same lights_on() the hours use.
+	var street := _scene.get_node_or_null("StreetLights") as Node3D
+	var beams := _car.get_node_or_null("Headlights") as Node3D
+	_check(street != null and street.visible,
+		"fog turns the street lights on at noon")
+	_check(beams != null and beams.visible,
+		"and every vehicle runs its headlamps")
+
+	daylight.set_weather(Daylight.Weather.SNOW)
+	_check(is_equal_approx(_car.grip_scale, 0.62),
+		"snow grips below rain (%.2f)" % _car.grip_scale)
+	_check(daylight.is_wet(), "and counts as water on the road")
+	var flakes := daylight.get_node_or_null("Snow") as GPUParticles3D
+	var streaks := daylight.get_node_or_null("Rain") as GPUParticles3D
+	_check(flakes != null and flakes.visible and flakes.emitting,
+		"snow falls as its own particles")
+	_check(streaks == null or not streaks.visible,
+		"and the rain stays off while it does")
+
+	daylight.set_weather(Daylight.Weather.CLEAR)
+	_check(is_equal_approx(air.fog_density, clear_fog)
+			and not air.fog_enabled
+			and is_equal_approx(_car.grip_scale, 1.0),
+		"and the sky clears back to the hour's own air, switch and all (%.4f)"
+		% air.fog_density)
+	_check(street != null and not street.visible
+			and beams != null and not beams.visible,
+		"with the lights back out -- noon is noon again")
+
+
 ## Drives one fixed route with a junction turn in it, and hands back the speed at the
 ## point the car was turning **hardest**. Shared, so the dry and wet runs are provably
 ## the same drive.
@@ -2847,6 +3048,34 @@ func _test_left_click_selects() -> void:
 	_check(_controller.primary() == _car, "left-clicking the car selects it")
 	_check(_ring != null and _ring.visible, "selection ring is shown")
 
+	# **The bracket, not the torus the scene ships.** The shape is swapped in at load by
+	# `Unit._tint_ring`, so the placeholder in each of the six scenes that carry a ring
+	# never has to be edited again -- and a swap that silently did not happen leaves a
+	# perfectly visible ring of the wrong design, which is the sort of thing only a
+	# screenshot catches. Asserted on the mesh's own geometry: an ArrayMesh of flat
+	# triangles, sized to this unit rather than to whatever the scene author chose.
+	var ring_mesh := _ring as MeshInstance3D
+	_check(ring_mesh != null and ring_mesh.mesh is ArrayMesh,
+		"and it is the bracket built at load, not the scene's torus (%s)"
+		% (ring_mesh.mesh.get_class() if ring_mesh and ring_mesh.mesh else "none"))
+	if ring_mesh and ring_mesh.mesh:
+		var span: Vector3 = ring_mesh.mesh.get_aabb().size
+		# A patrol car is about 4.5m long, so its bracket should be metres across --
+		# not the fixed 1m a shared placeholder would give every unit alike.
+		_check(span.x > 1.5 and span.z > 1.5 and span.y < 0.01,
+			"sized to the car and flat on the ground (%.1f x %.1f x %.2f)"
+			% [span.x, span.z, span.y])
+		# The tint is what tells a police unit from a medical one at a glance, and it is
+		# applied to a *duplicated* material -- shared, it would repaint every officer.
+		var ink := (ring_mesh.material_override as StandardMaterial3D).albedo_color
+		var police := Palette.service(Unit.Service.POLICE)[0]
+		_check(absf(ink.r - police.r) < 0.02 and absf(ink.g - police.g) < 0.02,
+			"and still wearing its service colour")
+		_check(_faces_down(ring_mesh.mesh as ArrayMesh) == 0,
+			"and wound face-up rather than into the ground (%d of %d triangles down)"
+			% [_faces_down(ring_mesh.mesh as ArrayMesh),
+				_triangles(ring_mesh.mesh as ArrayMesh)])
+
 
 func _test_clicking_ground_deselects() -> void:
 	# A point on the deck well clear of the car.
@@ -2980,26 +3209,35 @@ func _test_control_groups() -> void:
 
 # --- Interface ---------------------------------------------------------------
 
-func _test_bar_is_docked_and_solid() -> void:
+## The layout invariant that replaced the six checks describing a docked bar.
+##
+## Each of those six named the neighbours it compared, so a renamed panel made them pass
+## on an empty comparison. This asks the same questions of *every* panel at once, off a
+## table resolved by path -- so a rename fails loudly here instead, which is the honest
+## cost of asserting on a layout at all.
+func _test_hud_panels_hold_their_corners() -> void:
 	if _bar == null or _help == null:
-		_check(false, "the HUD has a command bar")
+		_check(false, "the HUD has its panel layer")
 		return
 	await _idle(3)
-	var rect := _bar.get_global_rect()
 	# The viewport, not the window. The project stretches canvas items, so the
 	# interface is laid out in a 1600x900 space whatever size the window happens to be
-	# -- and measuring the window instead would report the bar as the wrong width on
+	# -- and measuring the window instead would report a panel as the wrong width on
 	# every display but one.
 	var screen := root.get_visible_rect().size
-	_check(is_zero_approx(rect.position.x) and absf(rect.end.x - screen.x) < 1.0,
-		"the bar spans the full width (%.0f to %.0f of %.0f)" % [
-			rect.position.x, rect.end.x, screen.x])
-	_check(absf(rect.end.y - screen.y) < 1.0,
-		"and is docked to the bottom (ends at %.0f of %.0f)" % [rect.end.y, screen.y])
-	# It has to leave most of the screen to the city. A bar that grew to half the
-	# window would pass every other check here and ruin the game.
-	_check(rect.size.y < screen.y * 0.3,
-		"leaving %.0f%% of the screen to the world" % (100.0 * (1.0 - rect.size.y / screen.y)))
+	var panels := _hud_panels()
+	_check(panels.size() >= 6,
+		"the HUD is a set of panels (%d found)" % panels.size())
+	# **Every panel inside the viewport.** Replaces nothing -- this was never checked
+	# for the bar, because a bar pinned to three edges cannot leave the screen. A
+	# floating panel can, and at the wrong anchor it does so silently off the bottom.
+	var outside := PackedStringArray()
+	for name in panels:
+		if not Rect2(Vector2.ZERO, screen).encloses(panels[name] as Rect2):
+			outside.append(str(name))
+	_check(outside.is_empty(),
+		"and every one of them is on screen (%s)"
+		% ("all" if outside.is_empty() else ", ".join(outside)))
 
 	var visible_before := _help.visible
 	await _press_key(KEY_F1)
@@ -3057,34 +3295,64 @@ func _test_bar_is_docked_and_solid() -> void:
 	# the CONTROLS chip twice -- and each time the fix pinned the *one* thing that had
 	# just been eaten. This asserts the whole floor, which is what would have caught all
 	# six rather than the sixth.
-	var bar_top := _bar.get_global_rect().position.y
-	var covered: Array[String] = []
-	var floating := _scene.get_node_or_null("HUD/Root/World") as Control
-	if floating:
-		for child in floating.get_children():
-			var panel := child as Control
-			# Guarded: a freed or non-Control child here would raise, and a runtime error
-			# inside a check abandons the rest of it while the suite still reads green.
-			if panel == null or not is_instance_valid(panel) or not panel.visible:
-				continue
-			if panel.get_global_rect().end.y > bar_top + 0.5:
-				covered.append(panel.name)
-	_check(covered.is_empty(),
-		"and the bar covers nothing floating above it (%s)"
-		% ("clear" if covered.is_empty() else ", ".join(covered)))
+	# **No two panels overlap, and the middle is left to the city.**
+	#
+	# This replaces two checks that each hard-coded the neighbours they cared about --
+	# "the bar covers nothing floating above it" walked the direct children of
+	# `Root/World` against the bar's top edge, and "the top bar shares its band with
+	# nothing" named CallList and MinimapCard as strings. Both were written for a
+	# layout with one docked bar and a couple of floating cards. Neither survives the
+	# panels being floated into corners, and worse, both went *green* if a name
+	# changed: `get_node_or_null` returning null recorded no clash.
+	#
+	# Asked as one question of the whole set, it covers all six of the historical
+	# incidents (the dispatch pills, the CONTROLS chip twice, and the three from this
+	# session) rather than the specific pair each fix pinned.
+	var clashes := PackedStringArray()
+	var names := panels.keys()
+	for i in names.size():
+		for j in range(i + 1, names.size()):
+			var a: Rect2 = panels[names[i]]
+			var b: Rect2 = panels[names[j]]
+			if a.intersects(b):
+				clashes.append("%s/%s" % [names[i], names[j]])
+	_check(clashes.is_empty(),
+		"no two panels overlap (%s)"
+		% ("clear" if clashes.is_empty() else ", ".join(clashes)))
 
-	# The height must not depend on the selection either. `Bar.offset_top` is a *minimum*
-	# and goes inert the moment the tiles wrap, so nothing pinned this: a bar that changed
-	# height between selections would jump the world view and re-open the trap above.
-	var fat_height := _bar.get_global_rect().size.y
+	# The city has to be visible through the middle of them. This is what "leaving N%%
+	# of the screen to the world" was really protecting, asked of the place the player
+	# actually looks rather than of one panel's height.
+	# The central 40%. Half the screen reaches x=400 at 1600x900, which is inside any
+	# sane left-hand column -- a bar that strict would forbid the reference's own
+	# layout rather than protect the view through it.
+	var middle := Rect2(screen * 0.3, screen * 0.4)
+	var intruders := PackedStringArray()
+	for name in panels:
+		if (panels[name] as Rect2).intersects(middle):
+			intruders.append(str(name))
+	_check(intruders.is_empty(),
+		"and the middle of the screen is the city's (%s)"
+		% ("clear" if intruders.is_empty() else ", ".join(intruders)))
+
+	# Nor may the layout depend on the selection. A panel that changed size between
+	# selections would jump the world view and re-open the trap above -- which is why
+	# the blocks carry minimum sizes rather than being left to their contents.
+	var fat := _hud_panels()
 	_controller.select([])
 	await _idle(3)
-	var lean_height := _bar.get_global_rect().size.y
+	var lean := _hud_panels()
 	_controller.select(everyone)
 	await _idle(3)
-	_check(absf(fat_height - lean_height) < 1.0,
-		"and stands the same height however much is selected (%.0f against %.0f)"
-		% [fat_height, lean_height])
+	var moved := PackedStringArray()
+	for name in fat:
+		if lean.has(name) and not (fat[name] as Rect2).is_equal_approx(lean[name]):
+			moved.append(str(name))
+	var fat_height: float = (fat.get("commands", Rect2()) as Rect2).size.y
+	var lean_height: float = (lean.get("commands", Rect2()) as Rect2).size.y
+	_check(moved.is_empty() and absf(fat_height - lean_height) < 1.0,
+		"and no panel moves with the selection (%s, %.0f against %.0f)"
+		% [("none" if moved.is_empty() else ", ".join(moved)), fat_height, lean_height])
 
 	# The visible route in: the card ships closed, the chip above the bar opens it.
 	_check(not _help.visible, "the controls card ships closed")
@@ -3129,7 +3397,7 @@ func _test_bar_does_not_swallow_world_clicks() -> void:
 	await _idle(3)
 	_controller.clear_selection()
 
-	var bar := _bar.get_global_rect()
+	var bar := _command_panel.get_global_rect()
 	var above := _screen_of(_car.global_position + Vector3.UP * 0.9)
 	# Without this the rest is vacuous: if the car happened to be drawn under the bar,
 	# "the click did not select it" would prove nothing.
@@ -3190,6 +3458,10 @@ func _test_command_hotkeys_run_abilities() -> void:
 	await _press_key(KEY_ESCAPE)
 	_check(_controller.armed_ability == null, "Esc disarmed it")
 	_check(_armed_tiles().is_empty(), "and the tile went dark")
+	# Escape became the pause key in August 2026, and this is the line that keeps the
+	# rebind honest at its most annoying failure: cancelling an armed ability must not
+	# also throw up the pause menu.
+	_check(not paused, "and did not pause the game while doing it")
 
 	# Instant: the key fires straight away, with nothing to click.
 	_officer.issue(MoveOrder.new(_officer.global_position + Vector3(0.0, 0.0, -6.0)))
@@ -3229,6 +3501,10 @@ func _test_roster_lists_everything_under_command() -> void:
 
 	var strays := PackedStringArray()
 	for chip in _visible_chips():
+		# A standby chip legitimately has no unit -- it stands for one still in the
+		# station. Only a chip that is neither is a stray.
+		if not chip.standby.is_empty():
+			continue
 		if chip.unit == null or chip.unit.service == Unit.Service.NONE:
 			strays.append(str(chip.unit))
 	_check(strays.is_empty() and _visible_chips().size() == commanded.size(),
@@ -3236,6 +3512,49 @@ func _test_roster_lists_everything_under_command() -> void:
 			"" if strays.is_empty() else " -- listed " + ", ".join(strays)))
 	shopper.queue_free()
 	await _idle(3)
+
+
+## One service per line, and never two on the same line.
+##
+## The roster was a single wrapping flow, so a patrol car and an ambulance shared a row
+## and the next ambulance began a new one -- a shape that changed every time a unit was
+## bought. Asserted by **reading the rows back**, not by trusting the grouping code:
+## every visible chip is asked which row it sits in, and a row that holds two services is
+## the failure. That form survives the rows being rebuilt, reordered or reparented.
+func _test_the_roster_groups_by_service() -> void:
+	var roster := _scene.get_node_or_null(
+		"HUD/Root/Bar/Row/RosterBlock/Body/Roster") as Roster
+	if roster == null:
+		_check(false, "the HUD carries a roster")
+		return
+	await _idle(3)
+
+	# `service -> row`, built from what is actually on screen.
+	var seen := {}
+	var mixed := PackedStringArray()
+	for chip in _visible_chips():
+		var service: int = chip.unit.service if chip.unit \
+			else int(chip.standby.get("service", Unit.Service.NONE))
+		var row := chip.get_parent()
+		if seen.has(service) and seen[service] != row:
+			mixed.append("service %d split across rows" % service)
+		seen[service] = row
+	# The other direction: no row may carry two services.
+	var owners := {}
+	for service in seen:
+		var row: Variant = seen[service]
+		if owners.has(row):
+			mixed.append("services %d and %d share a row" % [owners[row], service])
+		owners[row] = service
+
+	_check(not seen.is_empty(), "the roster has chips to group (%d)" % seen.size())
+	_check(mixed.is_empty(), "each service keeps its own line (%s)" % (
+		"clear" if mixed.is_empty() else ", ".join(mixed)))
+
+	# And the fixture really does have more than one service on the strip, or the two
+	# assertions above are true of any roster at all.
+	_check(seen.size() >= 2,
+		"with at least two services on it to keep apart (%d)" % seen.size())
 
 
 func _test_roster_marks_the_selection() -> void:
@@ -3507,7 +3826,14 @@ func _test_the_board_draws_progress_as_a_bar() -> void:
 	if rows.is_empty():
 		_check(false, "a row on screen to read it off")
 		return
-	var bar := rows[0].get_child(0).get_child(3) as ProgressStrip
+	# **Found, not counted to.** This read `get_child(3)` until the UI kit's status dot
+	# was added at the head of the row and shifted every column by one. A positional
+	# index into a layout is a check that breaks the next time the layout gains a
+	# column -- which is a fact about the *test*, not about the game.
+	var bar: ProgressStrip = null
+	for cell in rows[0].get_child(0).get_children():
+		if cell is ProgressStrip:
+			bar = cell as ProgressStrip
 	if bar == null:
 		_check(false, "the row carries a progress bar")
 		return
@@ -3663,10 +3989,11 @@ func _test_the_radio_reports_what_happens() -> void:
 	await _place_unit(_officer, Vector3(30.0, 0.05, 28.0))
 	await _idle(60)
 	await _idle(120)
+	# Counted off the same reader the other log checks use, rather than reaching for a
+	# Label directly -- a log line is a framed row with the words inside it now.
 	var arrivals := 0
-	for child in radio.get_children():
-		var label := child as Label
-		if label and "ON SCENE" in label.text:
+	for line in _radio_text(radio, true).split(" | "):
+		if "ON SCENE" in line:
 			arrivals += 1
 	_check(arrivals == 1,
 		"a crew standing on scene announces itself once, not once a frame (%d of %d "
@@ -3695,10 +4022,52 @@ func _test_the_radio_reports_what_happens() -> void:
 
 
 ## The newest line on the log, or every line joined when [param all] is set.
+## Every HUD panel that occupies space, as name -> screen rect.
+##
+## **Resolved by path, deliberately.** The checks this feeds used to walk a container's
+## children, which meant anything reparented dropped silently out of coverage and
+## anything renamed made the check pass on an empty set. Naming them means a rename
+## fails loudly here instead, and the list is the one place to edit when a panel is
+## added -- which is the honest cost of asserting on a layout at all.
+##
+## Hidden panels are skipped: the help card, the debrief and the shop are modal things
+## that are *meant* to cover the screen when they are up.
+func _hud_panels() -> Dictionary:
+	var wanted := {
+		"status": "HUD/Root/World/StatusStrip",
+		"score": "HUD/Root/World/ScoreStrip",
+		"objective": "HUD/Root/World/ObjectiveBar",
+		"calls": "HUD/Root/World/CallList",
+		"minimap": "HUD/Root/World/MinimapCard",
+		"mapcontrols": "HUD/Root/World/MapControls",
+		"radio": "HUD/Root/World/RadioLog",
+		"controls": "HUD/Root/World/ControlsToggle",
+		"unit": "HUD/Root/Bar/Row/PortraitBlock",
+		"roster": "HUD/Root/Bar/Row/RosterBlock",
+		"commands": "HUD/Root/Bar/Row/CommandBlock",
+		"dispatch": "HUD/Root/Bar/Row/DispatchBlock",
+		"buy": "HUD/Root/World/BuyButton",
+	}
+	var found := {}
+	for name in wanted:
+		var panel := _scene.get_node_or_null(str(wanted[name])) as Control
+		if panel and panel.visible and panel.size.x > 1.0 and panel.size.y > 1.0:
+			found[name] = panel.get_global_rect()
+	return found
+
+
 func _radio_text(radio: RadioLog, all := false) -> String:
 	var lines := PackedStringArray()
 	for child in radio.get_children():
+		# **Looks inside the row.** Log lines were bare Labels until the UI kit's
+		# notification frames arrived, and are now a Label inside a PanelContainer. A
+		# reader that only understood the old shape returned "" for every line and took
+		# three checks with it -- while the log itself was working perfectly.
 		var label := child as Label
+		if label == null:
+			for inner in child.get_children():
+				if inner is Label:
+					label = inner as Label
 		if label:
 			lines.append(label.text)
 	if lines.is_empty():
@@ -3708,6 +4077,181 @@ func _radio_text(radio: RadioLog, all := false) -> String:
 
 ## The minimap as a control surface: left-click looks, right-click orders, and the
 ## view is drawn as the camera frustum's actual footprint on the ground.
+## The map's own zoom buttons, which do what the wheel does for anyone who has not
+## discovered the wheel.
+##
+## **Asserted on the camera moving, not on the buttons existing.** Twice this session a
+## check passed on a feature that was doing nothing -- a pre-warm that only ever failed,
+## and seven characters placed but never animated -- because the cheap half was the half
+## that got tested.
+## How many of [param mesh]'s triangles face the ground rather than the sky.
+##
+## **The one property of a flat marker that nothing else can witness.** Class, size,
+## position and colour all survive a mesh being wound backwards, and `Markers._mesh`
+## fills the normal array with `Vector3.UP` regardless -- so a bracket built face-down is
+## byte-identical to a correct one in every reading the suite took, and simply invisible
+## in the game. Found by sabotage, which reversed the winding and reddened nothing at all.
+## This reads the vertices back and works the sign out from the winding itself.
+func _faces_down(mesh: ArrayMesh) -> int:
+	if mesh == null or mesh.get_surface_count() == 0:
+		return -1
+	var verts: PackedVector3Array = mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+	var down := 0
+	var i := 0
+	while i + 2 < verts.size():
+		# **Godot's front face is wound clockwise seen from the front**, so a triangle
+		# facing +Y yields a *negative* y from this cross product. Getting that backwards
+		# is how this helper first shipped: it called both correct meshes face-down and
+		# went green on the sabotage that actually inverted them. Checked against
+		# `SurfaceTool.generate_normals()` and a front-face raycast before trusting it.
+		var facing := -(verts[i + 1] - verts[i]).cross(verts[i + 2] - verts[i]).y
+		if facing <= 0.0:
+			down += 1
+		i += 3
+	return down
+
+
+func _triangles(mesh: ArrayMesh) -> int:
+	if mesh == null or mesh.get_surface_count() == 0:
+		return 0
+	var verts: PackedVector3Array = mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+	return verts.size() / 3
+
+
+## The destination reticle: the other half of the in-world pass.
+##
+## Asserted on the mesh the controller swapped in and on the queue still being drawn from
+## it, because the marker is *duplicated* per queued order -- a shape built in the wrong
+## place would give the first order a reticle and every queued one a torus.
+func _test_the_move_marker_is_a_reticle() -> void:
+	var marker := _scene.get_node_or_null("MoveMarker") as MeshInstance3D
+	if marker == null:
+		_check(false, "the map carries a move marker")
+		return
+	_check(marker.mesh is ArrayMesh,
+		"the move marker is the reticle built at load (%s)"
+		% (marker.mesh.get_class() if marker.mesh else "none"))
+	var span: Vector3 = marker.mesh.get_aabb().size if marker.mesh else Vector3.ZERO
+	_check(span.x > 1.0 and span.y < 0.01,
+		"flat on the ground and about a metre across (%.1f x %.2f)" % [span.x, span.y])
+	_check(_faces_down(marker.mesh as ArrayMesh) == 0,
+		"and wound face-up (%d of %d triangles down)"
+		% [_faces_down(marker.mesh as ArrayMesh), _triangles(marker.mesh as ArrayMesh)])
+
+	# Queue two orders and confirm the copies carry the same shape.
+	_controller.select([_car])
+	await _idle(3)
+	# Both destinations measured off where the car actually is. `ROAD` is a fixture
+	# position the car is often already standing on, and an order that is satisfied on
+	# the frame it is issued leaves one marker rather than two -- which is how this check
+	# failed twice before the staging was the problem rather than the code.
+	var from := _car.global_position
+	_car.issue(MoveOrder.new(from + Vector3(0.0, 0.0, -30.0)))
+	# `queue` true, or the second order replaces the first.
+	_car.issue(MoveOrder.new(from + Vector3(0.0, 0.0, -60.0)), true)
+	await _idle(6)
+	_check(_car.orders.size() == 2,
+		"two orders are queued to draw (%d)" % _car.orders.size())
+	var drawn := 0
+	var wrong := 0
+	for node in _controller._markers:
+		if not node.visible:
+			continue
+		drawn += 1
+		if (node as MeshInstance3D).mesh != marker.mesh:
+			wrong += 1
+	_check(drawn >= 2 and wrong == 0,
+		"and a queued order's copy carries it too (%d drawn, %d wrong)" % [drawn, wrong])
+	_car.clear_orders()
+	_controller.clear_selection()
+	await _idle(3)
+
+
+func _test_the_map_zoom_buttons_work() -> void:
+	var controls := _scene.get_node_or_null(
+		"HUD/Root/World/MapControls") as MapControls
+	if controls == null or controls.get_child_count() < 2:
+		_check(false, "the minimap carries its zoom buttons")
+		return
+	_check(controls.camera != null, "the zoom buttons are wired to the camera")
+	if controls.camera == null:
+		return
+	# Away from either stop, or a clamp hides the result.
+	controls.camera._target_distance = (controls.camera.min_distance
+		+ controls.camera.max_distance) * 0.5
+	var start: float = controls.camera._target_distance
+	(controls.get_child(0) as Button).pressed.emit()
+	var pulled_in: float = controls.camera._target_distance
+	(controls.get_child(1) as Button).pressed.emit()
+	(controls.get_child(1) as Button).pressed.emit()
+	var pushed_out: float = controls.camera._target_distance
+	_check(pulled_in < start and pushed_out > pulled_in,
+		"+ pulls the view in and - pushes it out (%.0f -> %.0f -> %.0f)"
+		% [start, pulled_in, pushed_out])
+
+
+## The top-right strip: the fleet count it advertises, and the only on-screen way into
+## the pause card.
+##
+## **The count is asserted on a change, not on a match.** Reading the label once and
+## comparing it to the station's own total passes just as happily when the strip is a
+## dead label that happened to be built with the right number in it -- which is the exact
+## shape of the two features this suite has caught doing nothing. Buying a unit and
+## watching the label follow is the cheapest thing that cannot pass while disconnected.
+##
+## The button is asserted on the *tree freezing*, for the same reason: a button that
+## opens a card but leaves the district running is not a pause button.
+func _test_the_score_strip_reads_and_pauses() -> void:
+	var strip := _scene.get_node_or_null("HUD/Root/World/ScoreStrip") as ScoreStrip
+	if strip == null or _station == null:
+		_check(false, "the HUD carries a score strip")
+		return
+
+	var kept_funds := _station.funds
+	var before := _strip_units(strip)
+	_station.funds = maxi(_station.funds, 10000)
+	var bought := _station.purchase(&"patrol")
+	await _idle(2)
+	var after := _strip_units(strip)
+	_check(bought and after == before + 1,
+		"buying a unit moves the strip's UNITS count (%d -> %d)" % [before, after])
+
+	# Back to the books the rest of the suite was handed: this runs mid-session and
+	# several later checks count the fleet and the purse.
+	_station.owned[&"patrol"] = int(_station.owned.get(&"patrol", 0)) - 1
+	_station.funds = kept_funds
+	_station.roster_changed.emit()
+	await _idle(2)
+
+	var buttons: Array[Button] = []
+	for node in strip.find_children("*", "Button", true, false):
+		buttons.append(node as Button)
+	if buttons.size() < 2:
+		_check(false, "the strip carries its pause and settings buttons")
+		return
+
+	buttons[0].pressed.emit()
+	await _idle(2)
+	var froze: bool = _menu.visible and _menu.screen == GameMenu.Screen.PAUSE and paused
+	_check(froze, "its pause button opens the pause card and freezes the district")
+	_menu.resume()
+	await _idle(2)
+	# **The transition, not the reading.** `not paused` on its own is trivially true when
+	# the button never paused anything -- a sabotage that gutted `_open()` left this line
+	# green while the check above went red. Carrying `froze` in makes it say what it means:
+	# the district was frozen by that button and thawed again.
+	_check(froze and not paused, "and resuming thaws it again")
+
+
+## The number the strip's UNITS block is showing, or -1 if it has no such block.
+func _strip_units(strip: ScoreStrip) -> int:
+	var entry: Dictionary = strip._blocks.get(&"units", {})
+	if entry.is_empty():
+		return -1
+	var label := entry["value"] as Label
+	return int(label.text) if label and label.text.is_valid_int() else 0
+
+
 func _test_the_minimap_commands_camera_and_shift() -> void:
 	var minimap := _scene.get_node_or_null(
 		"HUD/Root/World/MinimapCard/Minimap") as Minimap
@@ -5278,7 +5822,7 @@ func _test_a_career_buys_its_fleet() -> void:
 	# The screen tells a fresh career what to do first.
 	_station.roster_changed.emit()
 	await _idle(3)
-	var hint := _scene.get_node_or_null("HUD/Root/World/Debrief") as Label
+	var hint := _scene.get_node_or_null("HUD/Root/World/ObjectiveBar/Body/Debrief") as Label
 	_check(hint != null and hint.visible and "Buy your first units" in hint.text,
 		"an empty career is told to buy, not to press F2 ('%s')"
 		% (hint.text if hint else "no hint"))
@@ -5351,12 +5895,22 @@ func _test_the_career_survives_reload() -> void:
 
 
 func _test_dispatch_puts_a_unit_on_the_forecourt() -> void:
-	# The purse readout lives where the money is spent.
-	var heading := _scene.get_node_or_null(
-		"HUD/Root/Bar/Row/DispatchBlock/Body/Heading") as Label
-	_check(heading != null and "£" in heading.text,
-		"the dispatch heading carries the purse ('%s')"
-		% (heading.text if heading else "no heading"))
+	# **The purse lives in the top bar** since August 2026, when the dispatch block that
+	# used to carry it was hidden. Asserted on the number *tracking the books* rather than
+	# on the label being non-empty: a readout wired to nothing still reads "£0", which is
+	# a plausible balance and therefore an invisible failure.
+	var strip := _scene.get_node_or_null("HUD/Root/World/ScoreStrip") as ScoreStrip
+	var purse: Label = null
+	if strip:
+		var entry: Dictionary = strip._blocks.get(&"funds", {})
+		purse = entry.get("value") as Label if not entry.is_empty() else null
+	var before_funds := _station.funds
+	_station.funds = before_funds + 4321
+	await _idle(3)
+	_check(purse != null and purse.text.contains(str(before_funds + 4321)),
+		"the top bar's purse follows the books ('%s' for £%d)"
+		% [purse.text if purse else "no purse", before_funds + 4321])
+	_station.funds = before_funds
 
 	# Everything owned is already standing on the map, so buy the two this test
 	# sends out.
@@ -5426,15 +5980,16 @@ func _test_dispatch_puts_a_unit_on_the_forecourt() -> void:
 	var units_node := _scene.get_node("Units")
 	var before_click := units_node.get_child_count()
 	var row := _dispatch_row(&"paramedic")
-	_check(row != null, "the dispatch panel offers a row for a paramedic just bought")
+	_check(row != null, "the roster offers a standby chip for a paramedic just bought")
 	var clicked: Unit = null
 	if row != null:
-		await _click(MOUSE_BUTTON_LEFT,
-			row.get_global_rect().position + Vector2(60.0, row.size.y * 0.5))
+		# The centre of the chip. The old dispatch row was 126px wide and this clicked
+		# 60px in; a chip is 48 wide, so that offset would now land outside it.
+		await _click(MOUSE_BUTTON_LEFT, row.get_global_rect().get_center())
 		await _idle(4)
 		_check(units_node.get_child_count() == before_click + 1
 				and _station.available(&"paramedic") == 0,
-			"clicking the dispatch row sends one out through the real interface")
+			"clicking the standby chip sends one out through the real interface")
 		clicked = units_node.get_child(units_node.get_child_count() - 1) as Unit
 
 	# The spares go, and the books with them, so the fleet stays the canonical seven.
@@ -5946,6 +6501,10 @@ func _test_mission_wins_when_everything_is_clear() -> void:
 	await _wait(10)
 	_check(_mission.fires_out == 1, "counted the fire as out (%d)" % _mission.fires_out)
 	_check(_mission.state == Mission.State.WON, "won once nothing was left burning")
+	# The win puts a modal over the district and it stays there until dismissed, which
+	# is the point of it -- so this test clears up after itself rather than leaving the
+	# rest of the suite clicking through a card it cannot see.
+	_reset_mission()
 
 
 func _test_mission_is_lost_when_a_casualty_dies() -> void:
@@ -6054,7 +6613,7 @@ func _test_the_director_opens_calls_where_they_belong() -> void:
 		if title not in ["Medical emergency", "Fire", "Road traffic collision",
 				"Disturbance", "Vehicle fire", "Electrical fire, water unsuitable",
 				"Bus collision, multiple casualties", "Shed load blocking the road",
-				"Person collapsed, drink suspected"]:
+				"Person collapsed, drink suspected", "Child reported missing"]:
 			known = false
 	_check(known and titles.size() >= 2,
 		"the mix drew %d kinds, all of them answerable by the roster (%s)"
@@ -7027,14 +7586,34 @@ func _test_calls_can_be_spawned_on_demand() -> void:
 			layer = child
 	_check(layer != null and layer.visible, "F5 opens it")
 	# Built from the director's own table, so a call kind added there cannot go missing
-	# from the tool because somebody forgot to list it twice.
+	# from the tool because somebody forgot to list it twice. The +4 is the weather
+	# preview strip, counted separately below.
 	var buttons := 0
+	var weather_row: HBoxContainer = null
 	for node in _descendants(layer):
 		if node is Button:
 			buttons += 1
-	_check(buttons == _director.KINDS.size(),
-		"with a row for every call the director knows (%d of %d)"
+		if node.name == "WeatherRow":
+			weather_row = node
+	_check(buttons == _director.KINDS.size() + 4,
+		"with a row for every call the director knows (%d of %d + 4 weather)"
 		% [buttons, _director.KINDS.size()])
+	_check(weather_row != null and weather_row.get_child_count() == 4,
+		"and a weather preview strip with all four skies")
+
+	# The preview drives the sky directly and leaves the settings card's stored choice
+	# alone -- a dev tool must not rewrite what the player chose.
+	var daylight := _scene.get_node_or_null("Daylight") as Daylight
+	var kept_choice := _menu.wet_weather
+	spawner.preview_weather(Daylight.Weather.FOG)
+	_check(daylight != null and daylight.weather == Daylight.Weather.FOG,
+		"pressing a sky previews it on the district")
+	_check(_menu.wet_weather == kept_choice,
+		"without touching the settings card's own choice")
+	spawner.preview_weather(Daylight.Weather.CLEAR)
+	_check(daylight != null and daylight.weather == Daylight.Weather.CLEAR,
+		"and CLEAR puts the map back as generated")
+
 	await _press_key(KEY_F5)
 	await _idle(2)
 
@@ -7864,6 +8443,97 @@ func _test_the_hour_is_a_setting() -> void:
 	daylight.set_time_of_day(kept)
 
 
+## SHIFT'S OWN: the last weather button is a policy, not a sky. The director draws from
+## its seeded stream when the shift opens, so every shift has its own weather and a
+## reproduced seed is rained on identically. Two properties, each its own witness: a
+## fixed choice never rolls, and the roll both happens and reproduces.
+func _test_the_shift_rolls_its_own_weather() -> void:
+	var daylight := _scene.get_node_or_null("Daylight") as Daylight
+	if daylight == null:
+		_check(false, "the district has a sky to roll")
+		return
+	await _clear_calls()
+	await _park_the_shift()
+
+	# Policy off: a fixed CLEAR choice stays CLEAR through a shift opening.
+	_menu.set_weather(Daylight.Weather.CLEAR)
+	_director.shift_seed = 23
+	_director.begin_shift()
+	await _idle(2)
+	_check(daylight.weather == Daylight.Weather.CLEAR,
+		"a fixed weather choice never rolls (%d)" % daylight.weather)
+	await _end_freeplay()
+
+	# Policy on. **Hunted, not assumed**: half the table is CLEAR, and a broken roll
+	# that never fires also leaves CLEAR -- so the check walks seeds until it sees a
+	# weather actually land, which is what proves the wiring, then re-runs that seed
+	# for the reproduction.
+	_menu.set_weather(GameMenu.SHIFT_WEATHER)
+	var rolled_seed := 0
+	var rolled: int = Daylight.Weather.CLEAR
+	for seed_try in range(1, 21):
+		_director.shift_seed = seed_try
+		_director.begin_shift()
+		await _idle(2)
+		var drawn := daylight.weather
+		await _end_freeplay()
+		if drawn != Daylight.Weather.CLEAR:
+			rolled_seed = seed_try
+			rolled = drawn
+			break
+	_check(rolled_seed != 0,
+		"the shift's own policy actually rolls weather (seed %d drew %d)"
+		% [rolled_seed, rolled])
+	if rolled_seed != 0:
+		daylight.set_weather(Daylight.Weather.CLEAR)
+		_director.shift_seed = rolled_seed
+		_director.begin_shift()
+		await _idle(2)
+		_check(daylight.weather == rolled,
+			"and the same seed draws the same sky (%d)" % daylight.weather)
+		await _end_freeplay()
+
+	_menu.set_weather(Daylight.Weather.CLEAR)
+	_director.shift_seed = 0
+
+
+## Wet weather is a dispatch fact, not a screen effect: the collision kinds carry a
+## wet_weight and the picker consults the sky. Asserted at the weight level (the
+## mechanism) and the distribution level (the outcome), both seeded.
+func _test_wet_weather_loads_the_table_with_collisions() -> void:
+	var daylight := _scene.get_node_or_null("Daylight") as Daylight
+	if daylight == null:
+		_check(false, "the district has a sky to consult")
+		return
+	var rtc_row: Dictionary
+	for kind: Dictionary in Director.KINDS:
+		if kind["id"] == &"rtc":
+			rtc_row = kind
+	_check(not rtc_row.is_empty()
+			and _director._kind_weight(rtc_row, true)
+				== 2 * _director._kind_weight(rtc_row, false),
+		"a wet road doubles the collision weight (%d from %d)"
+		% [_director._kind_weight(rtc_row, true), _director._kind_weight(rtc_row, false)])
+
+	daylight.set_weather(Daylight.Weather.RAIN)
+	_director._rng.seed = 77
+	var wet_hits := 0
+	for i in 400:
+		var kind := _director._pick_kind()
+		if kind == &"rtc" or kind == &"bus_rtc":
+			wet_hits += 1
+	daylight.set_weather(Daylight.Weather.CLEAR)
+	_director._rng.seed = 77
+	var dry_hits := 0
+	for i in 400:
+		var kind := _director._pick_kind()
+		if kind == &"rtc" or kind == &"bus_rtc":
+			dry_hits += 1
+	_check(wet_hits > dry_hits,
+		"and a wet shift draws more collisions (%d wet vs %d dry in 400)"
+		% [wet_hits, dry_hits])
+
+
 ## Headlamps, and the reason [Daylight] is a passive watcher rather than something the
 ## station has to remember to call: a vehicle bought at midnight needs lights, and the
 ## station knows nothing about the hour.
@@ -7916,6 +8586,62 @@ func _test_vehicles_light_up_after_dark() -> void:
 	daylight.set_time_of_day(kept)
 
 
+## The interface's own click, driven through a real press.
+##
+## Asserted on the player **actually running** after a synthesised click on a real
+## control, not on the signal being connected: a connection proves the watcher found the
+## button, and proves nothing about whether a sound comes out of it. The two failure modes
+## that matter here are both silent -- an OGG that did not import, and a click wired to a
+## player whose stream is null -- and neither shows up anywhere but the speakers.
+##
+## The rollover is checked the same way, and separately, because it is the one that gets
+## broken by accident: it is rate-limited, so a bug in the gate silences it while the
+## click keeps working.
+func _test_the_interface_clicks() -> void:
+	var clicks := _scene.get_node_or_null("HUD/ClickSounds") as ClickSounds
+	if clicks == null:
+		_check(false, "the HUD ships a click watcher")
+		return
+	_check(clicks._click != null and clicks._click.stream != null,
+		"the click sound is loaded")
+	_check(clicks._rollover != null and clicks._rollover.stream != null,
+		"and so is the rollover")
+	if clicks._click == null or clicks._rollover == null:
+		return
+	_check(clicks._click.bus == AudioBuses.UI,
+		"on the UI bus (%s)" % clicks._click.bus)
+
+	# A real control, clicked where it is: the corner buy button, which the watcher had
+	# to have found on its own -- nothing in `HUD.gd` tells it that button exists.
+	var buy := _scene.get_node_or_null("HUD/Root/World/BuyButton") as Button
+	var shop := _scene.get_node_or_null("HUD/Root/Shop") as ShopPanel
+	if buy == null:
+		_check(false, "a button to press")
+		return
+	clicks._click.stop()
+	await _idle(2)
+	await _click(MOUSE_BUTTON_LEFT, buy.get_global_rect().get_center())
+	_check(clicks._click.playing, "pressing a button makes a click")
+	if shop:
+		shop.close_shop()
+		await _idle(2)
+
+	# The rollover, off its own gate rather than a click.
+	clicks._rollover.stop()
+	clicks._last_rollover = -999.0
+	await _idle(2)
+	buy.mouse_entered.emit()
+	await _idle(2)
+	_check(clicks._rollover.playing, "and the pointer crossing one makes a tick")
+
+	# The gate: a second crossing inside the window must not stack a second tick.
+	clicks._rollover.stop()
+	await _idle(1)
+	buy.mouse_entered.emit()
+	_check(not clicks._rollover.playing,
+		"a second crossing straight after is swallowed rather than rattling")
+
+
 ## Every sound is wired and loaded. Audio fails *silently* -- a missing file, an
 ## unimported one, a player nobody called play() on all look identical from the
 ## code, and none of them makes a noise. So this asserts the streams exist, are
@@ -7929,6 +8655,40 @@ func _test_the_district_makes_a_noise() -> void:
 		"the city bed is playing under everything")
 	_check(soundscape._radio != null and soundscape._radio.stream != null,
 		"and the dispatch radio is loaded")
+
+	# **The music bed.** Same reasoning as everything else in this check, and then some:
+	# `Soundscape._player` casts what it loads to `AudioStreamWAV`, so a music file in any
+	# other format comes back null and the bed is simply absent -- no error, no warning,
+	# and nothing on screen to notice. It also has to be on its own bus, or the settings
+	# card's music slider moves the sirens with it.
+	_check(soundscape._music != null and soundscape._music.stream != null
+			and soundscape.music_playing(),
+		"the ambient bed is playing")
+	_check(soundscape._music != null and soundscape._music.bus == AudioBuses.MUSIC,
+		"on the music bus, so it can be balanced against the game (%s)"
+		% (soundscape._music.bus if soundscape._music else "no player"))
+	var music_bus := AudioServer.get_bus_index(AudioBuses.MUSIC)
+	_check(music_bus > 0, "and that bus exists (%d)" % music_bus)
+
+	# **The shipped default is a bed, and applying it works.** Reported as too loud on
+	# first listen, and the cause was half arithmetic: the settings slider steps in 0.05,
+	# so a default of -18 dB (0.126 linear) rounded *up* to 0.15 and played louder than
+	# the constant said.
+	#
+	# Asserted by *applying* the default and reading the bus back, rather than by
+	# measuring the bus as it stands. The live bus reflects whatever the player last chose
+	# and a player is entitled to turn the music up -- the first cut of this check read it
+	# directly and failed on a stale 0.15 left in the settings file, which is a fact about
+	# a save rather than about the game. This form tests the plumbing and the default at
+	# once and depends on neither.
+	if music_bus > 0:
+		var kept_db := AudioServer.get_bus_volume_db(music_bus)
+		AudioBuses.set_music_volume(db_to_linear(AudioBuses.MUSIC_DEFAULT_DB))
+		var gap: float = AudioServer.get_bus_volume_db(0) \
+			- AudioServer.get_bus_volume_db(music_bus)
+		_check(gap >= 24.0,
+			"the default level sits %.1fdB under master, so it stays a bed" % gap)
+		AudioServer.set_bus_volume_db(music_bus, kept_db)
 
 	# The radio answers the board rather than being told: opening a call chirps.
 	await _clear_calls()
@@ -8438,6 +9198,283 @@ func _test_a_drunk_call_can_turn_into_an_arrest() -> void:
 	await _clear_calls()
 
 
+## The first call the player searches: a marked report where the child was last seen,
+## and an unmarked child strolling the walk graph a genuine walk away. The marker's
+## honesty is the whole design -- it points at what is known, not at the answer.
+func _test_a_missing_child_call_stages_a_search() -> void:
+	await _clear_calls()
+	await _park_the_shift()
+	_stand_down()
+	_director._rng.seed = 41
+	_director._spawn_missing_child()
+	await _idle(6)
+
+	var reports: Array[Node] = []
+	for node in get_nodes_in_group(Incident.GROUP):
+		if node is MissingChild:
+			reports.append(node)
+	if reports.size() != 1:
+		_check(false, "a missing-child call is one report (%d)" % reports.size())
+		_stand_to()
+		return
+	var report := reports[0] as MissingChild
+	var open := _board.open_calls()
+	_check(not open.is_empty() and open[0].kind == Call.Kind.CRIME,
+		"a missing person is police work on the board")
+	_check(not open.is_empty() and open[0].title() == "Child reported missing",
+		"named for the report ('%s')"
+		% (open[0].title() if not open.is_empty() else "no call"))
+
+	var child := report.child
+	if child == null or not is_instance_valid(child):
+		_check(false, "a child to search for")
+		_stand_to()
+		await _clear_calls()
+		return
+	var gap := _flat_distance(child.global_position, report.global_position)
+	_check(gap >= 40.0, "the child is a genuine journey from the report (%.0fm)" % gap)
+	# The marker's honesty: the call sits on the report, never on the child.
+	_check(not open.is_empty()
+			and _flat_distance(open[0].position, report.global_position) < 5.0,
+		"the call's marker stands at the last-seen point")
+	_check(not child.is_selectable(), "the child cannot be selected")
+	_check(child.collision_layer == 128,
+		"and lives on the crowd layer the picking ray ignores (%d)"
+		% child.collision_layer)
+	_check(not child.is_in_group(Incident.GROUP),
+		"and is not an incident -- nothing on the board points at them")
+	var body := child.get_node_or_null("Character") as Node3D
+	_check(body != null and body.scale.x < 0.8,
+		"a small figure reads as a child (scale %.2f)"
+		% (body.scale.x if body else 0.0))
+
+	# Teardown wiring: the child leaves with the report.
+	await _clear_calls()
+	_check(not is_instance_valid(child), "the child leaves with the report")
+	_stand_to()
+
+
+## The three beats: a person finds the child (vehicles driving past do not), the
+## child walks at heel and climbs into a *police* car (an ambulance is refused), and
+## the call closes only when that car pulls up back at the parent -- with the score
+## landing on the reunion, not the find.
+func _test_a_found_child_closes_the_call() -> void:
+	await _clear_calls()
+	await _park_the_shift()
+	_stand_down()
+	_mission.begin_scoring()
+	_director._rng.seed = 43
+	_director._spawn_missing_child()
+	await _idle(6)
+
+	var reports := get_nodes_in_group(Incident.GROUP).filter(
+		func(node: Node) -> bool: return node is MissingChild)
+	if reports.size() != 1:
+		_check(false, "a missing-child call to work (%d)" % reports.size())
+		await _end_freeplay()
+		_stand_to()
+		return
+	var report := reports[0] as MissingChild
+	var child := report.child
+	# Captured now, because every later dereference of `report` is guarded: a fault
+	# that closes the call early frees it, and an unguarded read converts the red
+	# assertions below into a SCRIPT ERROR that silently skips them -- measured, by
+	# the sabotage run that came back green-looking with eleven checks missing.
+	var home_spot := report.global_position
+
+	# Attend the report first, so the response clock stops at once and the score
+	# below is the deterministic sum -- the tightened-equality lesson from the
+	# shed-load check.
+	await _place_unit(_officer, home_spot + Vector3(2.0, 0.0, 0.0))
+	await _idle(8)
+
+	# A vehicle beside the child is not a find: the scan asks people only. Parked
+	# outside board_reach so this stages only the question it asks.
+	await _place_unit(_car, child.global_position + Vector3(5.5, 0.2, 0.0))
+	await _wait(30)
+	_check(is_instance_valid(report) and report.active and not report.found,
+		"a patrol car driving up does not find a child")
+	await _place_unit(_car, _station.global_position + Vector3(-6.0, 0.2, -2.5))
+
+	# The find is the middle of the job, not the end.
+	await _place_unit(_officer, child.global_position + Vector3(1.5, 0.0, 0.0))
+	var taken := false
+	for i in 120:
+		await physics_frame
+		if not is_instance_valid(report) or not report.active:
+			break
+		if report.found:
+			taken = true
+			break
+	_check(taken and is_instance_valid(child) and child.following == _officer,
+		"an officer reaching the child takes them in hand")
+	_check(is_instance_valid(report) and report.active
+			and not _board.open_calls().is_empty(),
+		"and finding them is not the end of the job -- the call stays open")
+	if not is_instance_valid(report) or not is_instance_valid(child):
+		# The reds above have already said what broke; bailing keeps a freed report
+		# from converting the rest of this check into a silent skip.
+		await _end_freeplay()
+		_stand_to()
+		return
+
+	# A child is driven home in a patrol car, not stretchered home in an ambulance.
+	await _place_unit(_ambulance, child.global_position + Vector3(2.0, 0.2, 0.0))
+	await _wait(45)
+	_check(child.riding == null,
+		"an ambulance alongside them is not their ride")
+	await _place_unit(_ambulance, _station.global_position + Vector3(6.0, 0.2, -2.5))
+
+	await _place_unit(_car, child.global_position + Vector3(2.0, 0.2, 0.0))
+	var aboard := false
+	for i in 120:
+		await physics_frame
+		if child.riding == _car:
+			aboard = true
+			break
+	_check(aboard, "a patrol car alongside them is")
+	_check(not child.visible, "and they are riding, not walking beside it")
+	# The child is 45m+ from home here, so a call that closes now has confused
+	# boarding with arriving -- the reunion is at the parent, not at the kerb where
+	# they were picked up.
+	await _wait(30)
+	_check(is_instance_valid(report) and report.active,
+		"aboard is not home -- the call holds until the car gets there")
+
+	# The drive home. Placed rather than driven -- the route has its own tests. The
+	# destination is the captured spot, not a read of the possibly-freed report.
+	await _place_unit(_car, home_spot + Vector3(4.0, 0.2, 0.0))
+	var home := false
+	for i in 120:
+		await physics_frame
+		if not is_instance_valid(report) or not report.active:
+			home = true
+			break
+	_check(home, "pulling up at the parent ends the job")
+	await _idle(8)
+	_check(_board.open_calls().is_empty(), "the reunion closes the call")
+	_check(_mission.children_found == 1,
+		"the debrief counts it (%d)" % _mission.children_found)
+	_check(_mission.score == Mission.MISSING_POINTS + Mission.RESPONSE_BONUS,
+		"scored like a person recovered plus the response bonus (%d, expected %d)"
+		% [_mission.score, Mission.MISSING_POINTS + Mission.RESPONSE_BONUS])
+	_check(_mission.earned == _mission.score,
+		"a reunion pays what it scores (£%d)" % _mission.earned)
+	await _end_freeplay()
+	_stand_to()
+
+
+## The child is a civilian by construction, and three systems consume civilians: a
+## medical call takes one, a disturbance recruits one, a blast converts one. Each
+## taking the child would free the body its report is scanning for -- and the report
+## then retires silently, closing the call for a job nobody did. All three exclusions
+## in one staging: the child is parked in a quiet corner and each consumer is offered
+## them directly.
+func _test_the_missing_child_stays_out_of_other_calls() -> void:
+	await _clear_calls()
+	await _park_the_shift()
+	_stand_down()
+	_director._rng.seed = 47
+	_director._spawn_missing_child()
+	await _idle(6)
+
+	var reports := get_nodes_in_group(Incident.GROUP).filter(
+		func(node: Node) -> bool: return node is MissingChild)
+	if reports.size() != 1:
+		_check(false, "a missing-child call to stage against (%d)" % reports.size())
+		_stand_to()
+		return
+	var report := reports[0] as MissingChild
+	var child := report.child
+	# Parked well clear of the report's own call, so the director's clearance rules
+	# would offer them to a medical call but for the class exclusion.
+	var corner := report.global_position
+	for point in CityGrid.pavement_points():
+		if _flat_distance(point, report.global_position) > 60.0:
+			corner = point
+			break
+	child.global_position = corner
+	child.wander_centre = corner
+	await _idle(4)
+
+	# **One civilian parked somewhere provably eligible, first.**
+	#
+	# The second half of this check reads the *pool*, and the pool is every civilian
+	# standing clear of every open call. By this point in the suite the board is busy
+	# and the crowd has wandered, so on some runs the pool is empty and the check fails
+	# on a picker that is working perfectly -- it went red in a Stop gate having passed
+	# on the re-run before it, which is the worst way for a suite to behave.
+	#
+	# Staging a stand-in makes the assertion about the thing it is named for: the child
+	# is excluded *and* somebody else is not. The point is chosen the same way the
+	# child's corner was, and asked of the director's own clearance rule rather than a
+	# distance guessed here.
+	var stand_in: Civilian = null
+	# The suite *is* the SceneTree, so groups are read off it directly.
+	for node in get_nodes_in_group(Unit.GROUP):
+		var civilian := node as Civilian
+		if civilian and not (civilian is ChildWanderer):
+			stand_in = civilian
+			break
+	if stand_in:
+		for point in CityGrid.pavement_points():
+			if _flat_distance(point, corner) > 40.0 and _director._clear(point):
+				# Position only: `wander_centre` belongs to the child's wanderer, not to
+				# an ordinary civilian, and assigning it here threw -- which abandoned
+				# the rest of this check and cost four more without a FAIL line.
+				stand_in.global_position = point
+				stand_in.is_fleeing = false
+				break
+		await _idle(4)
+	_check(stand_in != null and _director._clear(stand_in.global_position),
+		"a civilian stood somewhere a medical call could take them")
+
+	# The medical call's picker. Two hundred seeded draws: none may be the child, and
+	# at least one must be somebody -- a picker that returns nothing proves nothing.
+	_director._rng.seed = 3
+	var drew_child := false
+	var drew_anyone := false
+	for i in 200:
+		var pick := _director._pick_civilian()
+		if pick is ChildWanderer:
+			drew_child = true
+		elif pick != null:
+			drew_anyone = true
+	_check(not drew_child and drew_anyone,
+		"a medical call never takes the child (200 draws, someone else %s)"
+		% drew_anyone)
+
+	# The disturbance's recruiter, offered the child at point-blank range. The clock
+	# is lowered the way the disorder test lowers it -- the recruit interval latches
+	# at a full 9s in _ready, and a 4s window against that never reaches the
+	# exclusion at all. Measured: the first cut of this line stayed green with the
+	# exclusion deleted, because _draw_one_in had never once run.
+	var suspect := _spawn_suspect(corner + Vector3(2.0, 0.0, 0.0))
+	suspect.recruits = true
+	suspect.max_group = 8
+	suspect.recruit_interval = 0.5
+	await _wait(240)
+	_check(is_instance_valid(child) and child is ChildWanderer,
+		"a disturbance never recruits the child")
+
+	# The blast, applied to the child's own doorstep.
+	var hazard := (load("res://Game/Incidents/Hazard.tscn") as PackedScene) \
+		.instantiate() as Hazard
+	if hazard:
+		_incidents.add_child(hazard)
+		hazard.global_position = corner + Vector3(3.0, 0.0, 0.0)
+		await _idle(4)
+		hazard._hurt_people(child.global_position)
+		await _idle(4)
+	_check(is_instance_valid(child) and child is ChildWanderer,
+		"a blast never converts the child")
+	_check(is_instance_valid(report) and report.active,
+		"and through all three the search stays open")
+
+	await _clear_calls()
+	_stand_to()
+
+
 func _test_scoring_rewards_a_fast_response() -> void:
 	await _clear_calls()
 	await _park_the_shift()
@@ -8565,7 +9602,7 @@ func _test_the_shift_ends_with_a_summary() -> void:
 	# the same thing at length. Both used to be the debrief; this asserts they are not
 	# still showing under it.
 	var banner := _scene.get_node_or_null("HUD/Root/World/Banner") as Label
-	var debrief := _scene.get_node_or_null("HUD/Root/World/Debrief") as Label
+	var debrief := _scene.get_node_or_null("HUD/Root/World/ObjectiveBar/Body/Debrief") as Label
 	var card := _scene.get_node_or_null("HUD/Root/World/DebriefCard") as DebriefCard
 	_check(card != null and card.visible, "the debrief card is what announces the end")
 	_check(banner != null and not banner.visible
@@ -8786,9 +9823,13 @@ func _test_a_shift_ends_even_with_an_unanswerable_call() -> void:
 	await _clear_calls()
 
 
-## P freezes the district: one flag, and everything PAUSABLE -- vehicles, fires,
-## clocks, call ages -- stops together. The menu runs ALWAYS, which is what lets P
+## Escape freezes the district: one flag, and everything PAUSABLE -- vehicles, fires,
+## clocks, call ages -- stops together. The menu runs ALWAYS, which is what lets Escape
 ## also thaw it.
+##
+## Was `P` until August 2026. The key moved because Escape is where every other game puts
+## it; what the move cost is that Escape already meant "cancel" twice over, which
+## `_test_escape_cancels_before_it_pauses` is the check for.
 func _test_pause_freezes_the_district() -> void:
 	await _place(ROAD)
 	_car.navigate_to(ROAD + Vector3(0.0, 0.0, -60.0))
@@ -8796,21 +9837,206 @@ func _test_pause_freezes_the_district() -> void:
 	_check(absf(_car.forward_speed) > 1.0,
 		"a car is on the move (%.1f m/s)" % _car.forward_speed)
 
-	await _press_key(KEY_P)
+	await _press_key(KEY_ESCAPE)
 	_check(_menu.visible and _menu.screen == GameMenu.Screen.PAUSE
 			and paused,
-		"P pauses the game and shows the menu")
+		"Escape pauses the game and shows the menu")
 	var held := _car.global_position
 	await _wait(60)
 	_check(_car.global_position.distance_to(held) < 0.05,
 		"the district is frozen (%.2fm drift over a second)"
 		% _car.global_position.distance_to(held))
 
-	await _press_key(KEY_P)
-	_check(not _menu.visible and not paused, "P again resumes")
+	await _press_key(KEY_ESCAPE)
+	_check(not _menu.visible and not paused, "Escape again resumes")
 	await _wait(30)
 	_check(_car.global_position.distance_to(held) > 1.0, "and the car drives on")
 	_car.stop_navigating()
+
+
+## Escape unwinds the innermost thing first: the shop closes, and the pause menu stays
+## shut.
+##
+## The armed-ability half of this rule is checked where the ability is armed, in
+## `_test_command_hotkeys_run_abilities`. This is the other claimant, and it is the one
+## the tree order would get wrong on its own -- `GameMenu._input` runs *before*
+## `ShopPanel._input`, so without the guard the pause card would open over an open shop.
+func _test_escape_closes_the_shop_before_it_pauses() -> void:
+	var shop := _scene.get_node_or_null("HUD/Root/Shop") as ShopPanel
+	if shop == null or _menu == null:
+		_check(false, "a shop and a menu to arbitrate between")
+		return
+	# **The entry state, carried into the verdict below.** Found by sabotage: when the
+	# guard is broken, the checks *before* this one leave the tree paused and the menu
+	# already in PAUSE -- so this check's Escape *resumes* instead of pausing, and
+	# "the pause menu was left alone" reads true on the very fault it exists to catch.
+	# A probe in a clean tree confirmed the fault does reach it; the suite was simply
+	# too contaminated by then for the reading to mean anything. Requiring a fit tree
+	# turns that false green into an honest red.
+	var was_clear: bool = _menu.screen == GameMenu.Screen.HIDDEN and not paused
+	_check(was_clear, "the menu is down before the shop opens")
+
+	shop.open_shop()
+	await _idle(3)
+	_check(shop.visible, "the shop is open")
+
+	await _press_key(KEY_ESCAPE)
+	_check(not shop.visible, "Escape closed the shop")
+	_check(was_clear and not paused and _menu.screen != GameMenu.Screen.PAUSE,
+		"and left the pause menu alone")
+
+	# And with nothing to cancel, the same key does pause -- otherwise the guard above
+	# could be an Escape handler that never fires at all.
+	await _press_key(KEY_ESCAPE)
+	_check(paused and _menu.screen == GameMenu.Screen.PAUSE,
+		"with nothing open, Escape pauses")
+	await _press_key(KEY_ESCAPE)
+	await _idle(2)
+
+
+## The speed buttons: the district genuinely runs faster, and normal puts it back.
+##
+## **Asserted on the shift clock, not on `Engine.time_scale`.** Reading back the property
+## the button just set proves the button is wired to that property and nothing else --
+## `Mission.elapsed` accumulates `delta`, so it can only double if the frames the rest of
+## the game sees doubled too. The clock is also the flattest thing here to measure: a car
+## would carry acceleration and steering into the number.
+func _test_the_speed_buttons_run_the_district_faster() -> void:
+	var strip := _scene.get_node_or_null("HUD/Root/World/ScoreStrip") as ScoreStrip
+	if strip == null or _mission == null or _menu == null:
+		_check(false, "a strip, a mission and a menu")
+		return
+	var speeds: Array[Button] = []
+	for node in strip.find_children("*", "Button", true, false):
+		var button := node as Button
+		if button and button.toggle_mode:
+			speeds.append(button)
+	_check(speeds.size() == GameMenu.SPEEDS.size(),
+		"the strip offers %d speeds (%d)" % [GameMenu.SPEEDS.size(), speeds.size()])
+	if speeds.size() < GameMenu.SPEEDS.size():
+		return
+
+	var kept_state := _mission.state
+	_mission.state = Mission.State.RUNNING
+
+	speeds[0].pressed.emit()
+	await _idle(2)
+	var mark := _mission.elapsed
+	await _idle(30)
+	var normal: float = _mission.elapsed - mark
+
+	speeds[2].pressed.emit()
+	await _idle(2)
+	mark = _mission.elapsed
+	await _idle(30)
+	var doubled: float = _mission.elapsed - mark
+
+	_check(normal > 0.0 and doubled > normal * 1.7 and doubled < normal * 2.3,
+		"2x runs the shift clock about twice as fast (%.2fs against %.2fs, 30 frames)"
+		% [doubled, normal])
+
+	# **Put the engine back, and check that putting it back works.** `Engine.time_scale`
+	# is global and outlives a scene, so a suite that left here at 2x would hand every
+	# later check a district running at double speed -- and the failures would land
+	# anywhere but here.
+	_menu.reset_speed()
+	await _idle(2)
+	_check(is_equal_approx(Engine.time_scale, 1.0),
+		"and normal speed puts the engine back (%.2f)" % Engine.time_scale)
+	_mission.state = kept_state
+
+
+## A designed shift, end to end: the picker offers it, the timeline opens its waves in
+## order, the win is held back until the last one, and the debrief says what it came to
+## against par.
+##
+## Driven through the menu rather than by making a ScenarioDirector by hand, because
+## the wiring *is* the feature -- the node is created at runtime precisely so the
+## generated district needs no new node in it, and a check that built one itself would
+## never notice that path breaking.
+func _test_a_scenario_plays_its_timeline() -> void:
+	await _clear_incidents()
+	_reset_mission()
+	_director.abandon_shift()
+	await _idle(2)
+
+	# A scenario the suite's fleet can actually field. The police one: the suite buys
+	# patrols and officers, and asserting on a scenario whose units nobody owns would
+	# be asserting on the picker's refusal instead.
+	var index := -1
+	for i in Scenarios.ALL.size():
+		if Scenarios.ALL[i]["id"] == &"night_shift":
+			index = i
+	_check(index >= 0, "the night shift is on the card")
+	if index < 0:
+		return
+	var scenario: Dictionary = Scenarios.by_index(index)
+	_check(Scenarios.missing_for(scenario, _station).is_empty(),
+		"and this career can field it (%s)"
+		% ", ".join(PackedStringArray(Scenarios.missing_for(scenario, _station))))
+
+	_menu.open_scenarios()
+	await _idle(2)
+	_check(_menu.screen == GameMenu.Screen.SCENARIOS,
+		"the picker opens (screen %d)" % _menu.screen)
+
+	_menu.start_scenario(index)
+	await _idle(2)
+	var runner := _scene.get_node_or_null("ScenarioDirector") as ScenarioDirector
+	_check(runner != null, "picking one puts a runner in the district")
+	if runner == null:
+		return
+	_check(not _menu.visible and _mission.par_seconds == scenario["par"],
+		"the card lifts and the mission takes its par (%.0fs)" % _mission.par_seconds)
+	# The freeplay director must stay stood down: a scenario is a shout, not a shift,
+	# and a scoring mission would switch the scripted win rule off entirely.
+	_check(not _director.active and not _mission.scoring,
+		"with freeplay left alone (active %s, scoring %s)"
+		% [_director.active, _mission.scoring])
+
+	# Hurried along rather than waited out: the real timeline is 55 seconds and this
+	# is checking the order, not the arithmetic of a clock.
+	#
+	# On the runner's own **copy**. `Scenarios.ALL` is a const, and a const's nested
+	# dictionaries are read-only at runtime -- writing to one throws, and a throw
+	# inside a check silently abandons the rest of it. That is exactly what happened
+	# here: six checks stopped running and the suite still called itself green apart
+	# from the count. See the working notes in NEXT.md.
+	var hurried := scenario.duplicate(true)
+	for wave: Dictionary in hurried["waves"]:
+		wave["at"] = 0.0
+	runner.scenario = hurried
+	await _idle(30)
+	var opened := get_nodes_in_group(Incident.GROUP).size()
+	_check(opened > 0, "the timeline opens its calls (%d on the map)" % opened)
+	_check(not _mission.more_to_come,
+		"and lets go of the win once the last wave is out")
+
+	# Clearing everything wins it, and the modal says so with a score of its own --
+	# `scoring` is off, so Mission.score is zero throughout and shout_score is what
+	# the card has to be reading.
+	for node in get_nodes_in_group(Incident.GROUP):
+		(node as Incident)._finish(true)
+	await _idle(8)
+	_check(_mission.state == Mission.State.WON,
+		"clearing the last of it wins the scenario (%d)" % _mission.state)
+	var card := _scene.get_node_or_null("HUD/Root/World/DebriefCard") as DebriefCard
+	var shown := PackedStringArray()
+	if card and card.visible:
+		for line in card.get_child(0).get_child(0).get_child(0).get_children():
+			for cell in line.get_children():
+				var text := cell as Label
+				if text:
+					shown.append(text.text)
+	var joined := " ".join(shown)
+	_check(card != null and card.visible and "Par" in joined,
+		"and the debrief reports it against par ('%s')" % joined)
+
+	runner.queue_free()
+	await _clear_incidents()
+	_reset_mission()
+	_mission.par_seconds = 0.0
+	await _idle(2)
 
 
 func _test_the_menu_restarts_a_shift() -> void:
@@ -8879,13 +10105,23 @@ func _test_quit_to_title_stands_the_shift_down() -> void:
 	_check(_director.active, "a shift is running to walk out on")
 	_menu.open_pause()
 	await _idle(2)
-	_menu.quit_to_title()
+	# **`stand_down()`, not `quit_to_title()`.** Since the title became its own scene
+	# the full call ends in `change_scene_to_file`, which would tear this district out
+	# from under every check that follows -- it did, once, and took three unrelated
+	# checks and a script error with it. This is the half that belongs to the district;
+	# the half that leaves is a one-line scene change to a constant.
+	_menu.stand_down()
+	# The suite *is* the SceneTree, so this is its own property rather than a call.
+	paused = false
 	await _idle(6)
-	_check(_menu.visible and _menu.screen == GameMenu.Screen.TITLE,
-		"quit-to-title brings the card back")
-	_check(not paused, "over a district that idles on, unpaused")
+	_check(not paused, "quit-to-title leaves a district that idles on, unpaused")
 	_check(not _director.active and not _mission.scoring,
 		"with the shift stood down")
+	_check(GameMenu.MENU_SCENE == "res://Game/MainMenu.tscn"
+			and ResourceLoader.exists(GameMenu.MENU_SCENE),
+		"and a main menu on disk to go back to (%s)" % GameMenu.MENU_SCENE)
+	_menu.show_title()
+	await _idle(2)
 	await _press_key(KEY_ENTER)
 	_check(not _menu.visible, "and ENTER goes again")
 	_reset_mission()
@@ -8985,10 +10221,23 @@ func _test_the_shop_previews_and_sells() -> void:
 	var kept_owned := _station.owned.duplicate()
 	_check(not shop.visible, "the shop ships closed")
 
-	var heading := _scene.get_node(
-		"HUD/Root/Bar/Row/DispatchBlock/Body/Heading") as Label
-	await _click(MOUSE_BUTTON_LEFT, heading.get_global_rect().get_center())
-	_check(shop.visible, "clicking the DISPATCH heading opens it")
+	# **The corner buy button is the front door** since August 2026, when the dispatch
+	# block gave up the corner and kept only its rows. Clicked through the real interface
+	# rather than by calling `open_shop()`, because a button wired to nothing looks
+	# identical to a button wired correctly from everywhere except a click.
+	var corner_buy := _scene.get_node_or_null("HUD/Root/World/BuyButton") as Button
+	if corner_buy == null:
+		_check(false, "the corner carries a buy button")
+		return
+	await _click(MOUSE_BUTTON_LEFT, corner_buy.get_global_rect().get_center())
+	_check(shop.visible, "clicking the corner buy button opens the shop")
+	# **And it has a picture on it.** The icon is loaded behind an
+	# `ResourceLoader.exists()` guard, so a glyph that never imported costs the picture
+	# and not the button -- which is the right behaviour and completely invisible. It
+	# happened the day the cart was drawn: the SVG was on disk, Godot had not imported it,
+	# and the button worked perfectly while showing nothing at all.
+	_check(corner_buy.icon != null, "and carries its cart icon")
+
 
 	# Every card carries the unit's rendered portrait -- the preview is the point.
 	var missing := 0
@@ -9102,20 +10351,23 @@ func _wrecks() -> Array[Node3D]:
 ## null every time it was ever called, and the one caller then threw on
 ## `get_global_rect()` -- which silently abandoned the rest of that check, so the click
 ## path it was written to cover had never actually been exercised.
-func _dispatch_row(id: StringName) -> HBoxContainer:
-	var panel := _scene.get_node(
-		"HUD/Root/Bar/Row/DispatchBlock/Body/Dispatch") as DispatchPanel
-	return _find_dispatch_row(panel, id)
-
-
-func _find_dispatch_row(node: Node, id: StringName) -> HBoxContainer:
-	for child in node.get_children():
-		var row := child as HBoxContainer
-		if row and row.get_meta(&"id", &"") == id:
-			return row
-		var deeper := _find_dispatch_row(child, id)
-		if deeper != null:
-			return deeper
+## The roster chip standing for a unit of [param id] sitting in the station.
+##
+## Was a row in the DISPATCH block until August 2026, when that block was hidden and
+## sending a unit out moved onto the roster's dimmed standby chips. Same helper name and
+## same job -- find the control that dispatches this type -- so the checks that use it
+## did not have to change.
+func _dispatch_row(id: StringName) -> UnitChip:
+	var roster := _scene.get_node_or_null(
+		"HUD/Root/Bar/Row/RosterBlock/Body/Roster") as Roster
+	if roster == null:
+		return null
+	# The pool, not the children: chips live inside per-service rows since the roster was
+	# grouped, so a walk of the roster's own children now finds three containers.
+	for chip in roster._chips:
+		if chip.visible and not chip.standby.is_empty() \
+				and chip.standby.get("id", &"") == id:
+			return chip
 	return null
 
 
@@ -9134,6 +10386,638 @@ func _dispatch_to(id: StringName, spot: Vector3) -> Unit:
 
 ## Buys [param count] of a type, topping the purse up first: tests that use this are
 ## about dispatch and driving, not affordability, which has its own checks.
+## The main menu's picture is dressed at run time, and has to actually be dressed.
+##
+## `MenuBackdrop` turns a parked tableau into an incident: lightbars and headlights on
+## the two emergency vehicles, a line of cones across the police car's nose, a crew out
+## and a few onlookers. All of it is placed in code against a scene the user keeps
+## editing, so every part of it can silently stop happening -- a renamed vehicle node
+## and the lights go, a moved prefab and the cones go. None of that would show on a
+## boot, which is clean either way.
+##
+## Asserted on the **result** rather than on the attempt, which is the lesson of the
+## tutorial pre-warm: that one checked a request had been made, was green for weeks,
+## and the work behind it failed every time.
+func _test_the_menu_backdrop_is_dressed() -> void:
+	var menu := (load("res://Game/MainMenu.tscn") as PackedScene).instantiate()
+	root.add_child(menu)
+	# Deferred dressing, so it lands a frame after the scene is up.
+	for i in 12:
+		await physics_frame
+
+	var backdrop := menu.get_node_or_null("Backdrop")
+	var lit := 0
+	for name in ["SM_Veh_Car_Police_01", "SM_Veh_Firetruck_01"]:
+		var vehicle := backdrop.get_node_or_null(name) as Node3D if backdrop else null
+		if vehicle == null:
+			continue
+		var beams := vehicle.get_node_or_null("Headlights")
+		var bar := vehicle.get_node_or_null("Lightbar")
+		# Exactly two each: a surviving run-time builder would double them.
+		if beams and beams.get_child_count() == 2 and bar and bar.get_child_count() == 2:
+			lit += 1
+	_check(lit == 2,
+		"both emergency vehicles have headlights and a lightbar (%d of 2)" % lit)
+
+	# **Authored into the scene, so the editor shows them** -- which means this counts
+	# lamps hung on the poles themselves rather than on a runtime circuit. It also
+	# guards the other half of that move: the run-time builder was deleted when the
+	# lights were authored, and had it been left in there would now be two of
+	# everything, which renders as a slightly brighter scene and nothing else.
+	var poles := backdrop.find_children("SM_Prop_LightPole*", "", true, false) \
+		if backdrop else []
+	var lamps := 0
+	for pole in poles:
+		for child in pole.get_children():
+			if child is OmniLight3D:
+				lamps += 1
+	_check(poles.size() > 0 and lamps == poles.size(),
+		"every light pole carries exactly one lamp (%d lamps, %d poles)"
+		% [lamps, poles.size()])
+
+	var dressing := menu.get_node_or_null("Dressing")
+	var cones := 0
+	var people := 0
+	var animated := 0
+	var floating := 0
+	for child in dressing.get_children() if dressing else []:
+		var here: Vector3 = (child as Node3D).global_position
+		# Everything is placed on the ground plane; a cone at head height is a
+		# placement bug that only a screenshot would otherwise catch.
+		if absf(here.y) > 1.0:
+			floating += 1
+		# Told apart by what they are, not by what they are called: only the first
+		# instance of a scene keeps its name and the rest come back as
+		# `@MeshInstance3D@82`, which a name test reads as one cone and eleven people.
+		var player := child.get_node_or_null("AnimationPlayer") as AnimationPlayer
+		if player == null:
+			cones += 1
+			continue
+		people += 1
+		# **Animating, not merely present.** The first cut asked for `Idle_Loop`, which
+		# the retarget renames to `Idle`, so `has_animation` said no and `_idle`
+		# returned quietly -- seven people placed perfectly and every one of them stood
+		# in the rig's rest pose. Counting bodies would still have passed.
+		if player.current_animation != "":
+			animated += 1
+	# Five: two officers, two firefighters, and the member of the public one of them is
+	# talking to. It was seven until three scattered bystanders were cut for reading as
+	# people who had wandered into shot.
+	_check(cones >= 5 and people >= 5 and floating == 0,
+		"the scene is dressed: %d cones, %d people, %d off the ground"
+		% [cones, people, floating])
+	_check(people > 0 and animated == people,
+		"and every one of them is animating rather than stood in rest pose (%d of %d)"
+		% [animated, people])
+	menu.free()
+
+
+## Every character wears the same 43 clips, and must do it by reference.
+##
+## This is a performance fact with a correctness-shaped guard. `build_character`
+## saves the animation library to disk and hands the same in-memory object to all
+## eleven scenes -- but `ResourceSaver.save` leaves that object pathless, and
+## `PackedScene.pack()` inlines any resource it cannot point at. For months the
+## library sat on disk referenced by nothing while every character embedded its own
+## 3MB copy: 315ms to parse, eleven times over, which is what made the tutorial take
+## five seconds to open and every casualty spawn cost two thirds of a second. The
+## fix is one `take_over_path` call, and nothing about the game looks any different
+## when it is missing -- it just gets slow again, quietly, on the next rebuild.
+## So: the sharing itself is the assertion.
+func _test_the_characters_share_one_animation_library() -> void:
+	var libraries := {}
+	var paths := {}
+	var counted := 0
+	var directory := DirAccess.open("res://Game/Characters")
+	for file in directory.get_files() if directory else PackedStringArray():
+		var name := str(file).trim_suffix(".remap")
+		if not name.ends_with(".tscn"):
+			continue
+		var character := (load("res://Game/Characters/" + name)
+			as PackedScene).instantiate()
+		var player := character.get_node_or_null("AnimationPlayer") as AnimationPlayer
+		if player:
+			var library := player.get_animation_library("")
+			libraries[library.get_instance_id()] = true
+			paths[library.resource_path] = true
+			counted += 1
+		character.free()
+
+	_check(counted >= 11 and libraries.size() == 1,
+		"all %d character scenes share one animation library instance (%d distinct)"
+		% [counted, libraries.size()])
+	# An embedded copy has no path of its own, so this catches the same regression
+	# from the other side -- and pins the binary file, which loads in 7ms where the
+	# text one took 313ms.
+	_check(paths.has("res://Game/Rigs/ual_standard.res"),
+		"and it is the one on disk (%s)" % ", ".join(PackedStringArray(paths.keys())))
+
+
+## The tutorial town, structurally. Runs before the district loads (see _run) and
+## frees everything it touched. Headless cannot judge how the town looks -- that is
+## the windowed pass -- but it can pin every wiring fact the migration relies on.
+func _test_the_tutorial_town_boots() -> void:
+	var town := (load("res://Game/Tutorial.tscn") as PackedScene).instantiate()
+	root.add_child(town)
+	# The navigation map ingests its regions asynchronously -- measured at ~30
+	# frames; queries against a half-synced map answer confidently and wrongly.
+	for i in 45:
+		await physics_frame
+
+	_check(CityGrid.lattice_fits == false,
+		"the town switches the lattice machinery off while it is loaded")
+
+	var station := town.get_node_or_null("Station") as Station
+	var spawn := Vector3(-47.5, 0.45, 10.0)
+	_check(station != null and station.global_position.is_equal_approx(spawn),
+		"the station stands on the parking quarter")
+	var faced := Basis(Vector3.UP, deg_to_rad(0.0)).z
+	_check(station != null and station.global_basis.z.dot(faced) > 0.99,
+		"facing out of the quarter toward the street")
+	_check(station != null and station.slot_count == 1,
+		"with a single dispatch slot on the spot")
+	_check(station != null and station.career_path == "user://tutorial-career.cfg",
+		"and its own career book -- practice never touches the district's")
+
+	var hospital := town.get_node_or_null("Hospital") as Area3D
+	_check(hospital != null and hospital.global_position.is_equal_approx(spawn),
+		"the drop-off shares the spawn point, as designed")
+	var pad := town.get_node_or_null("Hospital/Pad") as Node3D
+	_check(pad != null and not pad.visible,
+		"and wears no red pad -- the overlap needs no advertisement")
+
+	for absent in ["Traffic", "Director", "CallSpawner"]:
+		_check(town.get_node_or_null(absent) == null,
+			"the town ships no %s -- lattice natives stay in the district" % absent)
+
+	# The crowd is not shipped in the scene either -- it is put down at load from
+	# the person mesh's own vertices, so nobody ever stands somewhere this town
+	# cannot be stood on.
+	var crowd := town.get_node_or_null("Crowd")
+	var walkers := crowd.get_child_count() if crowd else 0
+	_check(walkers >= TutorialMap.CROWD_SIZE,
+		"the streets are populated (%d walking)" % walkers)
+	var on_mesh := 0
+	var off_forecourt := 0
+	if crowd:
+		for node in crowd.get_children():
+			var walker := node as Civilian
+			if walker == null:
+				continue
+			if Unit.can_reach(walker, walker.global_position, 1.5):
+				on_mesh += 1
+			if _flat_distance(walker.global_position, spawn) \
+					>= TutorialMap.CROWD_CLEAR_OF_STATION - 1.0:
+				off_forecourt += 1
+	_check(walkers > 0 and on_mesh == walkers,
+		"every one of them stands where the mesh allows (%d of %d)"
+		% [on_mesh, walkers])
+	_check(walkers > 0 and off_forecourt == walkers,
+		"and clear of the forecourt the vehicles land on (%d of %d)"
+		% [off_forecourt, walkers])
+
+	var roads := town.get_node_or_null("VehicleNavigation") as NavigationRegion3D
+	var paths := town.get_node_or_null("PersonNavigation") as NavigationRegion3D
+	# Bounded on BOTH sides, and the upper bound is the one with a story. The kerbs
+	# carving this mesh is half the driving fix, and with that pass off the bake still
+	# produced 452 polygons -- a wrong mesh merged over the pavements, not a small one,
+	# which a bare `> 100` slept through. But the carve alone then bakes the lifted
+	# pavement tops as a second sheet, and *that* read as 695: a bigger number for a
+	# worse mesh. The carriageway alone is 117. A count that can only grow is not a
+	# measure of a road network.
+	var road_polygons := roads.navigation_mesh.get_polygon_count() if roads else 0
+	_check(roads != null and road_polygons > 80 and road_polygons < 200,
+		"the carriageway mesh is the streets, not the pavements too (%d polygons)"
+		% road_polygons)
+	# **The property the polygon count cannot see.** Six black-box records of an
+	# ambulance shuffling away from a shout were one fault: the lifted pavements baked
+	# as their own sheet, a car beside a kerbside casualty snapped onto it, and its way
+	# home was on the other one -- `reachable: false`, on a road collider, with nothing
+	# in its way. Measured then: four components, two map-spanning and interleaved.
+	# So this asks the question the fault asked. Every point a car can actually stand
+	# on has to be able to reach the station, or the mesh has somewhere to strand.
+	var station_spot := Vector3(-47.5, 0.45, 10.0)
+	var road_map := roads.get_navigation_map() if roads else RID()
+	var standing := 0
+	var stranded := 0
+	for x in range(-60, 60, 4):
+		for z in range(-60, 40, 4):
+			var here := Vector3(float(x), 0.45, float(z))
+			var route := NavigationServer3D.map_get_path(road_map, here, station_spot,
+				true, 1)
+			if route.size() <= 1:
+				continue
+			# Points out in the gardens snap to the nearest road and would otherwise
+			# flatter the count; only samples that really sit on the mesh are asked.
+			if Vector2(route[0].x - here.x, route[0].z - here.z).length() > 2.0:
+				continue
+			standing += 1
+			var arrival := route[route.size() - 1]
+			if Vector2(arrival.x - station_spot.x,
+					arrival.z - station_spot.z).length() > 2.0:
+				stranded += 1
+	_check(standing > 100 and stranded == 0,
+		"and every drivable point on it can reach the station (%d of %d stranded)"
+		% [stranded, standing])
+	# Flat road furniture must not be solid: a manhole's mesh collider sat exactly
+	# where the tutorial's casualty lay and an ambulance ground against it for the
+	# whole forty seconds a probe would give it.
+	# **Subjects named literally, not read from the constant under test.** Drawing
+	# them from TutorialMap.FLAT_FURNITURE made the check self-referential: empty
+	# that array and the check reddens on an empty subject list rather than on
+	# solid manholes -- a red for the wrong reason, which is worse than a green.
+	var flat := 0
+	var solid_flat := 0
+	for node in _descendants(town.get_node("Map")):
+		var furniture := node as StaticBody3D
+		if furniture == null:
+			continue
+		if not str(furniture.get_parent().name).begins_with("SM_Prop_Manhole"):
+			continue
+		flat += 1
+		if furniture.collision_layer != 0:
+			solid_flat += 1
+	_check(flat > 0 and solid_flat == 0,
+		"and the manholes are flat, not walls (%d solid of %d)" % [solid_flat, flat])
+	# Tight, not merely non-zero: the walkable ground is pavements *and* gardens
+	# and measures 386 polygons. A loose `> 100` bound slept through a rebuild that
+	# halved it to 198 by dropping every buried-lawn rule -- measured, in sabotage.
+	_check(paths != null and paths.navigation_mesh.get_polygon_count() > 300,
+		"and the pavement mesh baked (%d polygons)"
+		% (paths.navigation_mesh.get_polygon_count() if paths else 0))
+	_check(get_nodes_in_group("road_surface").size() > 200,
+		"the runtime stamper marked the road slabs (%d)"
+		% get_nodes_in_group("road_surface").size())
+
+	# The proving shout's geography: drivable to within a kerb's width, walkable to
+	# the centimetre. This is the check that catches a re-authored town whose roads
+	# no longer reach the shout -- and the driveway-islet trap, where the network
+	# looked baked but the station's clamp sat on a two-polygon stub of drive.
+	var tutor := town.get_node_or_null("TutorialDirector") as TutorialDirector
+	_check(tutor != null, "the town carries its scripted director")
+	if tutor and station:
+		var map: RID = station.get_world_3d().navigation_map
+		for spot: Vector3 in [tutor.casualty_spot, tutor.fire_spot]:
+			var drive := NavigationServer3D.map_get_path(
+				map, station.global_position, spot, true, 1)
+			var drive_end := drive[drive.size() - 1] if not drive.is_empty() \
+				else Vector3.INF
+			_check(not drive.is_empty() and Vector2(drive_end.x - spot.x,
+					drive_end.z - spot.z).length() < 8.0,
+				"the road network reaches the shout at %s" % spot)
+			var walk := NavigationServer3D.map_get_path(
+				map, station.global_position, spot, true, 2)
+			var walk_end := walk[walk.size() - 1] if not walk.is_empty() \
+				else Vector3.INF
+			_check(not walk.is_empty() and Vector2(walk_end.x - spot.x,
+					walk_end.z - spot.z).length() < 0.5,
+				"and the pavements deliver a walker onto it")
+
+	# **The gardens walk.** The town lays grass under everything, so the first two
+	# cuts of this mesh either stacked two walkable surfaces (and the navigation map
+	# answered nothing at all) or dropped the lawns outright and left a walker
+	# confined to the pavements. Measured across a 5m sweep of the whole town: a
+	# walker should reach the great majority of it, including the gaps between
+	# houses -- and still not the inside of a house.
+	if station:
+		var map: RID = station.get_world_3d().navigation_map
+		var here := station.global_position
+		var open := 0
+		var sampled := 0
+		for x in range(-60, 91, 10):
+			for z in range(-95, 56, 10):
+				var spot := Vector3(x, 0.45, z)
+				sampled += 1
+				var walk := NavigationServer3D.map_get_path(map, here, spot, true, 2)
+				if walk.is_empty():
+					continue
+				var end := walk[walk.size() - 1]
+				if Vector2(end.x - spot.x, end.z - spot.z).length() < 0.6:
+					open += 1
+		_check(sampled > 0 and float(open) / float(sampled) > 0.8,
+			"a walker reaches the gardens and the gaps between houses (%d of %d)"
+			% [open, sampled])
+		# The other half of the same rule: grass under a house is not a floor.
+		# **The point matters.** The first one chosen sat over a driveway, which is
+		# excluded ground for its own reasons -- so it read as blocked whatever the
+		# burial rule did, and a sabotage that skipped burial entirely left it
+		# green. This one has a house collider and a grass tile overhead and
+		# nothing else: measured 5.25m short healthy, 0.00m with burial skipped.
+		var indoors := Vector3(-35.0, 0.45, -45.0)
+		var into := NavigationServer3D.map_get_path(map, here, indoors, true, 2)
+		var stopped := INF
+		if not into.is_empty():
+			var end := into[into.size() - 1]
+			stopped = Vector2(end.x - indoors.x, end.z - indoors.z).length()
+		_check(stopped > 2.0,
+			"but not through the living rooms (stopped %.1fm short)" % stopped)
+
+	var menu := town.get_node_or_null("HUD/Root/Menu") as GameMenu
+	_check(menu != null and menu.in_tutorial,
+		"the menu knows it is the tutorial's")
+
+	# The shout comes a job at a time, and the mission is told so -- the scripted
+	# win rule reads a clear map as a job done, and a staged shout is clear between
+	# its stages.
+	var tutor_stage := town.get_node_or_null("TutorialDirector") as TutorialDirector
+	var mission := town.get_node_or_null("Mission") as Mission
+	_check(tutor_stage != null and tutor_stage._stages().size() == 2,
+		"the tutorial opens in two stages")
+	_check(mission != null and not mission.more_to_come,
+		"and holds nothing back before the player has started")
+	if tutor_stage and mission:
+		# Shortened before the first stage opens: the breather is set when a stage
+		# opens, so lowering it afterwards leaves the old one already counting.
+		tutor_stage.between_calls = 0.2
+		tutor_stage._open_stage(0)
+		await _idle(4)
+		var first := get_nodes_in_group(Incident.GROUP).size()
+		_check(first == 1, "the first stage opens one job, not two (%d)" % first)
+		_check(mission.more_to_come,
+			"with the mission told there is more coming")
+		# Clear it, and the win must NOT be declared -- this is the trap the flag
+		# exists for. The next stage arrives on its own after the breather.
+		for node in get_nodes_in_group(Incident.GROUP):
+			(node as Incident)._finish(true)
+		await _idle(6)
+		_check(mission.state == Mission.State.RUNNING,
+			"clearing it does not end the tutorial (%d)" % mission.state)
+		var second := 0
+		for i in 120:
+			await physics_frame
+			second = get_nodes_in_group(Incident.GROUP).size()
+			if second > 0:
+				break
+		_check(second == 1, "the second stage follows on its own (%d)" % second)
+		_check(not mission.more_to_come,
+			"and the mission is told it is the last")
+		for node in get_nodes_in_group(Incident.GROUP):
+			(node as Incident)._finish(true)
+		await _idle(6)
+		_check(mission.state == Mission.State.WON,
+			"clearing the last one wins the shout (%d)" % mission.state)
+
+		# What the player is left looking at. A banner could only say the job was
+		# done; the card says what it came to, and takes the mouse until it is
+		# dismissed so the district underneath cannot be ordered around behind it.
+		var banner := town.get_node_or_null("HUD/Root/World/Banner") as Label
+		var card := town.get_node_or_null("HUD/Root/World/DebriefCard") as DebriefCard
+		_check(card != null and card.visible and banner != null and not banner.visible,
+			"and the modal is what says so, not the banner")
+		_check(card != null and card.mouse_filter == Control.MOUSE_FILTER_STOP,
+			"it holds the mouse while it is up (filter %d)"
+			% (card.mouse_filter if card else -1))
+		# The figures reached it -- and are the shout's own, which is the part that
+		# `scoring` being off would otherwise have made zero.
+		#
+		# Redrawn first, deliberately. The automatic card is a snapshot taken the
+		# instant the shout was won, and a call's response bonus lands a beat later
+		# when the board closes it -- so the number on screen is a moment older than
+		# the mission's own. That is right for the player and useless to compare
+		# against, and it failed here as 250 against 350 before this line existed.
+		# The redraw runs the same show_shout -> shout_rows -> shout_score path.
+		card.show_shout(mission)
+		var shown := PackedStringArray()
+		if card:
+			for line in card.get_child(0).get_child(0).get_child(0).get_children():
+				for cell in line.get_children():
+					var text := cell as Label
+					if text:
+						shown.append(text.text)
+		var joined := " ".join(shown)
+		_check("Score" in joined and str(mission.shout_score()) in joined
+				and mission.shout_score() > 0,
+			"carrying a score the shout actually earned (%d in '%s')"
+			% [mission.shout_score(), joined])
+		# Dismissing it gives the district back. Pressed rather than hidden directly:
+		# the button is the only way a player has, so it is the thing worth testing.
+		var dismiss: Button = null
+		if card:
+			for node in card.get_child(0).get_child(0).get_child(0).get_children():
+				if node is Button:
+					dismiss = node as Button
+		_check(dismiss != null, "the modal offers a way out of itself")
+		if dismiss:
+			dismiss.pressed.emit()
+		await _idle(2)
+		_check(card != null and not card.visible
+				and card.mouse_filter == Control.MOUSE_FILTER_IGNORE,
+			"and CONTINUE puts it away and hands the mouse back")
+
+	# **The drive the black box caught**, run for real. Coming home from the shout,
+	# an ambulance used to jam against a sidewalk corner whose kerb face stood
+	# inside the drivable mesh: full throttle, zero speed, fifteen metres short,
+	# escaping and re-approaching for ever. Measured before the fix: never arrived,
+	# twelve escapes, 27% of frames going nowhere. After: 12s, no escapes.
+	#
+	# Driven rather than inspected because the fix is a *bake*, and the geometry
+	# checks above cannot tell a right mesh from a wrong one of similar size --
+	# proven, by a sabotage that broke the bake and reddened nothing.
+	if station:
+		var kept_fleet: Dictionary = station.owned.duplicate()
+		station.funds = 99999
+		station.purchase(&"ambulance")
+		var runner := station.dispatch(&"ambulance") as Vehicle
+		if runner == null:
+			_check(false, "an ambulance to drive home")
+		else:
+			# Started where an ambulance actually parks: the drivable point nearest
+			# the shout, asked of the mesh rather than guessed. Started *on* the
+			# pavement instead, the agent reports its path finished before a wheel
+			# turns -- the trap written up in Vehicle._drive -- and the order
+			# completes on the spot, which reads as a 50m failure that is really a
+			# broken fixture.
+			var to_shout := NavigationServer3D.map_get_path(
+				station.get_world_3d().navigation_map, station.global_position,
+				tutor_stage.casualty_spot if tutor_stage else spawn, true, 1)
+			var kerb := to_shout[to_shout.size() - 1] if not to_shout.is_empty() \
+				else spawn
+			runner.global_position = Vector3(kerb.x, 0.45, kerb.z)
+			runner.velocity = Vector3.ZERO
+			runner.look_at(runner.global_position + Vector3(0.0, 0.0, 1.0), Vector3.UP)
+			await _idle(8)
+			runner.issue(MoveOrder.new(station.global_position))
+			# **Pre-roll before watching.** A freshly dispatched agent has no path
+			# on its first frame and reports itself finished, which Vehicle reads as
+			# an arrival -- so a watch that starts immediately sees the order end on
+			# the spot, 54m from home, and calls the game broken. Measured, from the
+			# diagnostic that caught it.
+			await _wait(25)
+			var short := INF
+			for i in 1500:
+				await physics_frame
+				short = _flat_distance(runner.global_position,
+					station.global_position)
+				if short < 4.0:
+					break
+				if not runner.is_navigating() and i > 60:
+					break
+			_check(short < 4.0,
+				"an ambulance drives home from the shout without jamming (%.1fm)"
+				% short)
+			runner.free()
+
+		# **And from where the player actually leaves it**, which is a different
+		# question and the one that was failing. The check above teleports the
+		# ambulance onto the drivable point nearest the shout, zeroes its velocity and
+		# faces it down +Z -- an ideal start that passed throughout the months the black
+		# box was filing records about this drive. Started at a position taken from those
+		# records, it drove to within 15m of the station and then oscillated: forward to
+		# the same sidewalk corner, dead stop, reverse 7.5m, forward again, for as long
+		# as anyone watched. Nothing in front of it and the mesh saying the ground was
+		# fine; `climb_escapes` was simply unreachable, because an escape moves the car
+		# and movement used to forgive the escape tally.
+		station.purchase(&"ambulance")
+		var wedged := station.dispatch(&"ambulance") as Vehicle
+		if wedged == null:
+			_check(false, "a second ambulance for the awkward start")
+		else:
+			wedged.global_position = Vector3(-21.0, 0.6, -33.0)
+			wedged.velocity = Vector3.ZERO
+			wedged.rotation = Vector3.ZERO
+			await _idle(30)
+			wedged.issue(MoveOrder.new(station.global_position))
+			await _wait(25)
+			var awkward := INF
+			for i in 2400:
+				await physics_frame
+				awkward = _flat_distance(wedged.global_position,
+					station.global_position)
+				if awkward < 5.0:
+					break
+			_check(awkward < 5.0,
+				"and from the awkward parking the black box recorded (%.1fm)"
+				% awkward)
+			wedged.free()
+		station.owned = kept_fleet
+		await _idle(2)
+
+	# The teaching line: a reading of the world, not a script of it. Each prompt is
+	# asserted from the state that should produce it, in the order the job happens.
+	if tutor_stage and mission and station:
+		mission.state = Mission.State.RUNNING
+		for node in get_nodes_in_group(Incident.GROUP):
+			node.free()
+		tutor_stage._opened = false
+		await _idle(2)
+		_check(tutor_stage._lesson() == "",
+			"the tutorial says nothing before the player has started")
+
+		tutor_stage._opened = true
+		var lesson := (load("res://Game/Incidents/Casualty.tscn") as PackedScene) \
+			.instantiate() as Casualty
+		town.get_node("Incidents").add_child(lesson)
+		lesson.global_position = tutor_stage.casualty_spot
+		var kept_owned: Dictionary = station.owned.duplicate()
+		station.owned = {}
+		await _idle(4)
+		_check(tutor_stage._lesson().contains("CART"),
+			"an empty roster is sent to the shop ('%s')" % tutor_stage._lesson())
+
+		# **The words and the glow are one reading.** A prompt naming a unit is thin help
+		# when the storefront holds eight cards, so the tutorial also points at the control
+		# it is talking about -- and the failure worth catching is not "nothing glows" but
+		# "the wrong thing glows", which is why this asserts *which* control it is.
+		var spotlight := town.get_node_or_null("HUD/Spotlight") as Spotlight
+		var cart := town.get_node_or_null("HUD/Root/World/BuyButton") as Control
+		# **Long enough for a teaching tick.** The prompt -- and with it the spotlight --
+		# is re-read four times a second, so the four frames that suffice for a direct
+		# `_lesson()` call are a sixteenth of what the glow needs.
+		await _idle(20)
+		_check(spotlight != null and spotlight._targets.size() == 1
+				and spotlight._targets[0] == cart,
+			"and the cart button is the thing lit up (%d lit)"
+			% (spotlight._targets.size() if spotlight else -1))
+
+		# Open the storefront and the target moves from the door to the two cards named.
+		var tutor_shop := town.get_node_or_null("HUD/Root/Shop") as ShopPanel
+		if tutor_shop:
+			tutor_shop.open_shop()
+			await _idle(20)
+			var lit: Array[StringName] = []
+			for id: StringName in [&"ambulance", &"paramedic", &"engine",
+					&"firefighter", &"patrol", &"officer"]:
+				if spotlight and spotlight._targets.has(tutor_shop.card_button(id)):
+					lit.append(id)
+			_check(lit.size() == 2 and lit.has(&"ambulance") and lit.has(&"paramedic"),
+				"with the shop open it lights the two cards the prompt named (%s)"
+				% str(lit))
+			tutor_shop.close_shop()
+			await _idle(3)
+
+		station.funds = 99999
+		station.purchase(&"ambulance")
+		station.purchase(&"paramedic")
+		_check(tutor_stage._lesson().contains("Send them out"),
+			"units on the books but not on the map are sent out ('%s')"
+			% tutor_stage._lesson())
+
+		# Bought but parked: the glow follows the words onto the roster chips.
+		await _idle(20)
+		var tutor_roster := town.get_node_or_null(
+			"HUD/Root/Bar/Row/RosterBlock/Body/Roster") as Roster
+		var chip := tutor_roster.standby_chip(&"ambulance") if tutor_roster else null
+		_check(chip != null and spotlight != null and spotlight._targets.has(chip),
+			"and once bought, the standby chip is what is lit")
+
+		var bus := station.dispatch(&"ambulance") as Vehicle
+		var medic := station.dispatch(&"paramedic") as Person
+		await _idle(4)
+		_check(tutor_stage._lesson().contains("treat"),
+			"a crew on the map is told to treat ('%s')" % tutor_stage._lesson())
+
+		lesson.treat(1.0)
+		_check(tutor_stage._lesson().contains("carry"),
+			"a stable casualty is told to be carried ('%s')" % tutor_stage._lesson())
+		lesson.take_by_stretcher()
+		_check(tutor_stage._lesson().contains("Wheel"),
+			"and one on the stretcher, wheeled ('%s')" % tutor_stage._lesson())
+		if bus:
+			lesson.load_into(bus)
+			_check(tutor_stage._lesson().contains("station"),
+				"aboard, the lesson is the drive home ('%s')" % tutor_stage._lesson())
+
+		# The fire half, from the same reading.
+		lesson.free()
+		var blaze := (load("res://Game/Incidents/Fire.tscn") as PackedScene) \
+			.instantiate() as Fire
+		town.get_node("Incidents").add_child(blaze)
+		blaze.global_position = tutor_stage.fire_spot
+		await _idle(4)
+		_check(tutor_stage._lesson().contains("Fire Engine"),
+			"a fire with no engine on the books is sent to the shop ('%s')"
+			% tutor_stage._lesson())
+
+		mission.state = Mission.State.WON
+		_check(tutor_stage._lesson() == "",
+			"and it falls silent once the shout is complete")
+		station.owned = kept_owned
+		if bus:
+			bus.free()
+		if medic:
+			medic.free()
+	# The card must survive the minimap's own _ready, which loads the DISTRICT's
+	# photograph: a first-frame call was silently overwritten by it, and the player
+	# navigated the tutorial by a picture of the wrong town. Now the town has its
+	# own baked photograph, the assertion is that THAT one is up, framed on the
+	# town's centre rather than the district's origin.
+	var minimap := town.get_node_or_null("HUD/Root/World/MinimapCard/Minimap")
+	var shown := ""
+	if minimap and minimap._base != null:
+		shown = str(minimap._base.resource_path)
+	_check(shown.ends_with("TutorialMinimapBase.png")
+			and minimap.world_centre.is_equal_approx(TutorialMap.MINIMAP_CENTRE)
+			and is_equal_approx(minimap.world_extent, TutorialMap.MINIMAP_EXTENT),
+		"the minimap shows this town's own photograph, framed on it ('%s')" % shown)
+
+	town.free()
+	await process_frame
+	_check(CityGrid.lattice_fits == true,
+		"and leaving the town hands the district its lattice back")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(
+		"user://tutorial-career.cfg"))
+
+
 func _buy(id: StringName, count: int) -> void:
 	_station.funds += _station.price(id) * count
 	for i in count:
@@ -9376,7 +11260,12 @@ func _clear_incidents() -> void:
 
 
 func _reset_mission() -> void:
-	_mission.state = Mission.State.RUNNING
+	# Through `_set_state` rather than by assignment, because a scripted win now raises
+	# a **modal** card that holds the mouse until it is dismissed -- and a bare
+	# assignment moves the state without telling the HUD, leaving that card standing
+	# over the district. It cost seven click checks their targets the first time, none
+	# of them anywhere near the mission tests that caused it.
+	_mission._set_state(Mission.State.RUNNING)
 	_mission.fires_out = 0
 	_mission.casualties_saved = 0
 	_mission.casualties_lost = 0
@@ -9429,7 +11318,24 @@ func _press_key(keycode: Key, ctrl := false) -> void:
 		await _idle(2)
 
 
+## Clears a debrief modal out of the way before a synthesised click, the way a player
+## would with the CONTINUE button.
+##
+## Winning a scripted shout now raises a card that **holds the mouse** until it is
+## dismissed, and `_evaluate` declares that win whenever the last incident resolves
+## outside a scored shift -- which is most of this suite. So a fire doused in a radio
+## test left a modal standing over the district, and the next four click checks missed
+## targets they were nowhere near responsible for. Dismissed here rather than in each
+## test: no click check is about the modal, and the modal's own behaviour is asserted
+## where it belongs, on the tutorial's finished shout.
+func _dismiss_any_modal() -> void:
+	var card := _scene.get_node_or_null("HUD/Root/World/DebriefCard") as DebriefCard
+	if card and card.visible:
+		card.hide_card()
+
+
 func _click(button: int, screen_position: Vector2, shift := false) -> void:
+	_dismiss_any_modal()
 	for pressed in [true, false]:
 		var event := InputEventMouseButton.new()
 		event.button_index = button
@@ -9443,6 +11349,7 @@ func _click(button: int, screen_position: Vector2, shift := false) -> void:
 
 ## Press, move, release: a left-drag, which the controller reads as a box select.
 func _drag(from: Vector2, to: Vector2) -> void:
+	_dismiss_any_modal()
 	var press := InputEventMouseButton.new()
 	press.button_index = MOUSE_BUTTON_LEFT
 	press.pressed = true

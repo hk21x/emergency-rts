@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="140" viewBox="0 0 240 140" fill="none" role="img" aria-label="Unit card — composed">
+  <defs>
+    <linearGradient id="uc_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+    <linearGradient id="uc_i" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0C121B"/><stop offset="1" stop-color="#080D14"/></linearGradient>
+    <linearGradient id="uc_h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4CAF50"/><stop offset="1" stop-color="#2F7A3D"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="239" height="139" rx="4" fill="url(#uc_g)" fill-opacity="1" stroke="#212D3C" stroke-width="1" stroke-opacity="1"/>
+  <path d="M0 26 L240 26" stroke="#212D3C" stroke-width="1" stroke-opacity="1"/>
+  <text x="10" y="18" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="10.5" font-weight="700" fill="#8FA0B2" text-anchor="start" letter-spacing="1.6" opacity="1">UNIT SELECTION</text>
+  <rect x="10" y="36" width="68" height="44" rx="3" fill="url(#uc_i)" fill-opacity="1" stroke="#2E3D4F" stroke-width="1" stroke-opacity="1"/>
+  <g transform="translate(30 48) scale(1.16667)" color="#E8735C" opacity="1"><path d="M2.2 8.2h11.6v7.4H2.2Z" fill="currentColor" fill-rule="nonzero"/><path d="M14.2 10.4h4.0l3.2 3.2v2.0h-7.2Z" fill="currentColor" fill-rule="nonzero"/><circle cx="6.6" cy="17.2" r="2.3" fill="currentColor"/><circle cx="17.4" cy="17.2" r="2.3" fill="currentColor"/></g>
+  <text x="88" y="50" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="13" font-weight="700" fill="#DFE7F0" text-anchor="start" letter-spacing="0.8" opacity="1">FIRE ENGINE</text>
+  <rect x="88" y="58" width="140" height="8" rx="2" fill="#080D14" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <rect x="89" y="59" width="138" height="6" rx="1.5" fill="url(#uc_h)" fill-opacity="1"/>
+  <text x="228" y="52" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="10.5" font-weight="600" fill="#8FA0B2" text-anchor="end" letter-spacing="0.4" opacity="1">100%</text>
+  <rect x="10" y="92" width="70" height="24" rx="3" fill="url(#uc_i)" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <g transform="translate(15 96) scale(0.66667)" color="#8FA0B2" opacity="1"><path d="M12 4.6a3.3 3.3 0 1 1 0 6.6 3.3 3.3 0 0 1 0-6.6Z" fill="currentColor" fill-rule="nonzero"/><path d="M12 12.4c3.4 0 5.8 2 5.8 4.9v2.3H6.2v-2.3c0-2.9 2.4-4.9 5.8-4.9Z" fill="currentColor" fill-rule="nonzero"/><path d="M4.6 7.4a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z" fill="currentColor" fill-rule="nonzero"/><path d="M4.5 13.4c.8 0 1.6.13 2.2.4-1.4 1.2-2.2 2.9-2.2 4.6v1.2H0.7v-2.1c0-2.5 1.6-4.1 3.8-4.1Z" fill="currentColor" fill-rule="nonzero"/><path d="M19.4 7.4a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z" fill="currentColor" fill-rule="nonzero"/><path d="M19.5 13.4c2.2 0 3.8 1.6 3.8 4.1v2.1h-3.8v-1.2c0-1.7-.8-3.4-2.2-4.6.6-.27 1.4-.4 2.2-.4Z" fill="currentColor" fill-rule="nonzero"/></g>
+  <text x="36" y="108" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#DFE7F0" text-anchor="start" letter-spacing="0.4" opacity="1">4 / 4</text>
+  <rect x="86" y="92" width="70" height="24" rx="3" fill="url(#uc_i)" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <g transform="translate(91 96) scale(0.66667)" color="#8FA0B2" opacity="1"><path d="M12 2.2c3.6 4.4 6.4 7.4 6.4 11a6.4 6.4 0 0 1-12.8 0c0-3.6 2.8-6.6 6.4-11Z" fill="currentColor" fill-rule="nonzero"/></g>
+  <text x="112" y="108" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#DFE7F0" text-anchor="start" letter-spacing="0.4" opacity="1">250 L</text>
+  <rect x="162" y="92" width="70" height="24" rx="3" fill="url(#uc_i)" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <g transform="translate(167 96) scale(0.66667)" color="#8FA0B2" opacity="1"><path d="M12 1.9 20.3 5.3v6.4c0 5.3-3.5 9.6-8.3 11.1-4.8-1.5-8.3-5.8-8.3-11.1V5.3Z" fill="currentColor" fill-rule="nonzero"/></g>
+  <text x="188" y="108" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#DFE7F0" text-anchor="start" letter-spacing="0.4" opacity="1">100%</text>
+
+</svg>

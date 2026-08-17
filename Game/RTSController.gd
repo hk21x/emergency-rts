@@ -79,6 +79,13 @@ var _control_groups := {}
 
 func _ready() -> void:
 	_marker = get_node_or_null(move_marker_path) as Node3D
+	# Same swap the selection bracket gets in `Unit`: the scene ships a torus and the
+	# shape is decided here, so the two generators that build a MoveMarker stay
+	# placeholders and never need regenerating to change how an order looks. Duplicates
+	# made for queued orders share this mesh, which is what keeps them consistent.
+	var marker_mesh := _marker as MeshInstance3D
+	if marker_mesh:
+		marker_mesh.mesh = Markers.reticle(0.85)
 	_box = get_node_or_null(selection_box_path) as Control
 	_camera = get_node_or_null(camera_path) as RTSCamera
 	if _marker:

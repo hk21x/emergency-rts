@@ -222,6 +222,10 @@ const ENGINE_STREAMS := ["res://Game/Audio/engine.wav"]
 ## knocked-over cone, or shunted off the path by a collision.
 @export var stuck_timeout := 0.8
 @export var escape_duration := 1.0
+## How far from where it jammed the car must get before its escape tally is forgiven.
+## Wider than the ~7.5m swing a wedged car oscillates through, so a genuine limit cycle
+## accumulates while an ordinary slow corner does not.
+@export var escape_progress := 12.0
 
 @export_group("World")
 @export var gravity := 32.0
@@ -524,6 +528,9 @@ var _escape_time := 0.0
 ## far it has got through its own options, which is what [method _climb_kerb] needs and
 ## a timer cannot say.
 var _failed_escapes := 0
+## Where the car was when its most recent escape fired, so the tally above can be
+## cleared on *progress* rather than on mere motion. See [method _update_escape].
+var _escape_origin := Vector3.ZERO
 var _steer_angle := 0.0
 var _wheel_spin := 0.0
 var _lean_roll := 0.0
@@ -1422,6 +1429,10 @@ func _passing_line(forward: Vector3, blocker: Vehicle) -> Vector3:
 ## giving 97 frames of mounting at a mean 4.38 m/s with not one step within reach of the
 ## nose. The car was driving happily to somewhere it could already drive.
 func _mount_line(forward: Vector3) -> Vector3:
+	# No lattice, no mount: `standable` is the licence's whole idea of where a
+	# pavement is, and on a foreign map its answer is a lie in both directions.
+	if not CityGrid.lattice_fits:
+		return Vector3.INF
 	var right := forward.cross(Vector3.UP)
 	for side: float in [-1.0, 1.0]:
 		var aim := global_position + forward * mount_reach + right * side * mount_shift
@@ -1699,12 +1710,31 @@ func _update_escape(delta: float) -> void:
 			_escape_time = escape_duration
 			_stuck_time = 0.0
 			_failed_escapes += 1
+			_escape_origin = global_position
 	else:
 		_stuck_time = 0.0
-		# Moving again, so whatever was tried worked and the tally starts over. This is
-		# the branch that keeps a corner from ever accumulating: a car through a bend is
-		# under 0.3 m/s for a moment and back over it long before a second escape.
-		_failed_escapes = 0
+		# **Cleared by progress, not by motion.** Moving used to be enough, and the
+		# consequence was that `_failed_escapes` could never reach two: the escape itself
+		# reverses the car, reversing is motion, and the tally reset on the way back --
+		# so `climb_escapes` was unreachable and a car wedged on a kerb retried the
+		# identical approach for ever. Measured in the tutorial in August 2026 as a clean
+		# limit cycle: forward to the same corner, dead stop, reverse 7.5m, forward again,
+		# thirty seconds of it, nothing in front and the mesh saying the ground was fine.
+		#
+		# The distance is what keeps the original intent: a car easing through a bend is
+		# under 0.3 m/s for a moment and then genuinely gone, so it clears this at once
+		# and never accumulates. A car swinging back and forth across the same seven
+		# metres never does, which is exactly when the kerb climb should be allowed to
+		# have a go.
+		if _failed_escapes > 0 \
+				and _flat_gap(global_position, _escape_origin) > escape_progress:
+			_failed_escapes = 0
+
+
+## Ground-plane distance. Height is noise here: a car bouncing on its suspension has not
+## made progress, and a car dropping off a kerb has.
+func _flat_gap(a: Vector3, b: Vector3) -> float:
+	return Vector2(a.x - b.x, a.z - b.z).length()
 
 
 ## Puts the car back on the road when the physics engine has thrown it off the world.
@@ -1804,15 +1834,23 @@ func _climb_kerb() -> void:
 	# corners honest.
 	# **And the third way is being on a shout with the street shut** -- [member _mounting],
 	# set by the autopilot when it aims this car at a pavement spot to get round an
-	# obstruction. `climb_escapes` is unreachable in practice: an escape moves the car and
-	# movement zeroes `_failed_escapes`, so a shuffling appliance never accumulates two --
-	# measured at 1 on every junction leg, with ten escapes fired and no climb. A no-progress
-	# route through that gate was built and measured **byte-for-byte identical**, because the
-	# cars were not against kerbs at all. They were held behind other vehicles for 64-72% of
-	# their stuck frames, and where something *was* in front it was two metres tall, so
-	# lifting 0.22m still found it -- the third test below, doing its job. Nothing about the
-	# *stuck* gate could have fixed it; the car had to be pointed somewhere else first, and
-	# then the step in its way is an ordinary kerb.
+	# obstruction.
+	#
+	# **`climb_escapes` was unreachable until August 2026**, and the history is worth
+	# keeping because it says what this gate is and is not for. An escape moves the car,
+	# movement used to zero `_failed_escapes`, and so a shuffling appliance never
+	# accumulated two -- measured at 1 on every junction leg, with ten escapes fired and no
+	# climb. A no-progress route through the gate was built then and measured
+	# **byte-for-byte identical**, because in that investigation the cars were not against
+	# kerbs at all: they were held behind other vehicles for 64-72% of their stuck frames,
+	# and where something *was* in front it was two metres tall, so lifting 0.22m still
+	# found it. Nothing about the stuck gate could have fixed *that*.
+	#
+	# The tutorial then produced the case that investigation lacked -- a car wedged on a
+	# sidewalk corner with nothing in front of it, oscillating through the same 7.5m for
+	# thirty seconds. `_update_escape` now forgives the tally on *progress* rather than on
+	# motion, which makes this gate reachable for exactly that car and still not for a
+	# queue. Three of twelve recorded starts went from never getting home to getting home.
 	if not (_navigating and (_off_road_target or _mounting)):
 		if _stuck_time < climb_after or _failed_escapes < climb_escapes:
 			return
@@ -1846,9 +1884,12 @@ func _climb_kerb() -> void:
 	# is that the destination is off the mesh -- but "off the mesh" covers a pavement, a
 	# verge and a park lawn, and it also covers the inside of a building. `standable` is
 	# the distinction, and it is the same test that stopped fires spreading into houses.
-	var footing := CityGrid.tile_at(global_position + along)
-	if not CityGrid.standable(footing.x, footing.y):
-		return
+	# Skipped off-lattice: `standable` answers from a map that is not here. The
+	# navigation test below stays the honest gate.
+	if CityGrid.lattice_fits:
+		var footing := CityGrid.tile_at(global_position + along)
+		if not CityGrid.standable(footing.x, footing.y):
+			return
 	# A car mounting the kerb to pass a shut street is waived the same way an ordered one is,
 	# and for the same reason: the pavement is off the vehicle mesh by construction, so a
 	# landing test against that mesh refuses every mount there could ever be. What keeps it
@@ -2195,7 +2236,10 @@ func _plan_turn_leg(heading_error: float) -> bool:
 			# Heading rotation after this much arc, signed the way the wheels turn it.
 			var swung := direction * steer * arc / radius
 			var sample := centre + spoke.rotated(Vector3.UP, swung)
-			if not CityGrid.is_road(sample) \
+			# Off-lattice the road test is a lie in both directions -- with it left in,
+			# no leg ever plans on the tutorial's streets and the car cannot turn round
+			# at all. Bounds and physics remain the validators there.
+			if (CityGrid.lattice_fits and not CityGrid.is_road(sample)) \
 					or absf(sample.x) > edge or absf(sample.z) > edge:
 				break
 			best = sample

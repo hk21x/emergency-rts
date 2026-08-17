@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Polygon_Starter"
-run/main_scene="res://Game/Playground.tscn"
+run/main_scene="res://Game/MainMenu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/image="uid://ciww16q4wj1cx"

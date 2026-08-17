@@ -136,6 +136,7 @@ func describe() -> String:
 	var rowdy := 0
 	var cylinders := 0
 	var blocked := 0
+	var searching := 0
 	for incident in incidents:
 		if not is_instance_valid(incident) or not incident.active:
 			continue
@@ -150,6 +151,8 @@ func describe() -> String:
 			rowdy += 1
 		elif incident is Debris:
 			blocked += 1
+		elif incident is MissingChild:
+			searching += 1
 
 	if live.size() == 1:
 		return live[0].describe_state()
@@ -164,6 +167,8 @@ func describe() -> String:
 		parts.append("%d cylinder%s" % [cylinders, "" if cylinders == 1 else "s"])
 	if blocked > 0:
 		parts.append("%d blocked lane%s" % [blocked, "" if blocked == 1 else "s"])
+	if searching > 0:
+		parts.append("%d missing" % searching)
 	return ", ".join(parts)
 
 
@@ -275,9 +280,16 @@ func _recentre() -> void:
 			hurt = true
 		elif incident is Suspect:
 			rowdy = true
+		elif incident is MissingChild:
+			# A missing person is police work from the first minute, so the report
+			# wears crime's blue. Without this arm it fell through to MEDICAL and
+			# wore a cross -- the Debris lesson, verbatim.
+			rowdy = true
 	if counted > 0:
 		position = centre / counted
-		place = CityGrid.place_name(position)
+		# Off-lattice the address generator names streets that are not there --
+		# confidently. A generic label is honest; a wrong one reads as a bug.
+		place = CityGrid.place_name(position) if CityGrid.lattice_fits else "TOWN"
 
 	# A disturbance only names the job while it is the whole job: anything burning or
 	# bleeding at the same scene outranks it, the way triage would rank them.

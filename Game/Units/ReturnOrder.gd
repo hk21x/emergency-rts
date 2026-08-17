@@ -114,7 +114,9 @@ func _flat(offset: Vector3) -> float:
 ## forecourt is the last waypoint, since it is not on a street.
 func _build_route(unit: Unit) -> Array[Vector3]:
 	var points: Array[Vector3] = []
-	if not (unit is Vehicle):
+	if not (unit is Vehicle) or not CityGrid.lattice_fits:
+		# On foot -- or on a map the lattice does not describe -- the mesh's own
+		# straight line is the honest route home.
 		points.append(station.global_position)
 		return points
 	points = CityGrid.lane_route(unit.global_position, station.global_position)

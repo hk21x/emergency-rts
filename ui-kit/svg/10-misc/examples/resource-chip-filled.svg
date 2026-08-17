@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="30" viewBox="0 0 112 30" fill="none" role="img" aria-label="Resource chip — filled">
+  <defs>
+    <linearGradient id="rc2_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="111" height="29" rx="4" fill="url(#rc2_g)" fill-opacity="1" stroke="#2E3D4F" stroke-width="1" stroke-opacity="1"/>
+  <circle cx="17" cy="15" r="9" fill="#3E9B4F"/>
+  <g transform="translate(11 9) scale(0.50000)" color="#FFFFFF" opacity="1"><path d="M12 4.8v14.4M4.8 12h14.4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <text x="32" y="20" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="12.5" font-weight="600" fill="#DFE7F0" text-anchor="start" letter-spacing="0.4" opacity="1">12,450</text>
+  <g transform="translate(90 7) scale(0.66667)" color="#8FA0B2" opacity="1"><path d="M5.2 9.4 12 16.2l6.8-6.8" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></g>
+
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="6" viewBox="0 0 56 6" fill="none" role="img" aria-label="Unit health — fill">
+  <defs>
+    <linearGradient id="uh_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4CAF50"/><stop offset="1" stop-color="#2F7A3D"/></linearGradient>
+
+  </defs>
+  <rect x="0" y="0" width="56" height="6" rx="2" fill="url(#uh_g)" fill-opacity="1"/>
+
+</svg>

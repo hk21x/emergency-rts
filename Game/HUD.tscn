@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://Game/HUD.gd" id="1_hud"]
 [ext_resource type="Script" path="res://Game/UI/GameMenu.gd" id="12_menu"]
@@ -16,6 +16,11 @@
 [ext_resource type="Script" path="res://Game/UI/ControlsPanel.gd" id="11_controls"]
 [ext_resource type="Script" path="res://Game/UI/RadioLog.gd" id="13_radio"]
 [ext_resource type="Script" path="res://Game/UI/DebriefCard.gd" id="14_debrief"]
+[ext_resource type="Script" path="res://Game/UI/MapControls.gd" id="15_mapctl"]
+[ext_resource type="Script" path="res://Game/UI/ObjectiveBar.gd" id="16_objective"]
+[ext_resource type="Script" path="res://Game/UI/ScoreStrip.gd" id="17_score"]
+[ext_resource type="Script" path="res://Game/UI/ClickSounds.gd" id="18_clicks"]
+[ext_resource type="Script" path="res://Game/UI/Spotlight.gd" id="19_spot"]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
@@ -27,6 +32,18 @@ script = ExtResource("1_hud")
 ; references to the board and the director.
 [node name="Soundscape" type="Node" parent="."]
 script = ExtResource("14_sound")
+
+; The interface's click and rollover. A sibling of the Soundscape rather than a helper
+; called from nine places: it finds every button and every clickable control by watching
+; `SceneTree.node_added`, which is the shape CLAUDE.md asks new systems to keep, and it
+; covers the controls built at runtime that a call-site rule would have missed.
+[node name="ClickSounds" type="Node" parent="."]
+script = ExtResource("18_clicks")
+
+; The tutorial's "press this next" glow. Idle in the district -- only the tutorial ever
+; hands it a target -- so it costs a null check a frame everywhere else.
+[node name="Spotlight" type="Node" parent="."]
+script = ExtResource("19_spot")
 
 [node name="Root" type="Control" parent="."]
 anchor_right = 1.0
@@ -56,39 +73,84 @@ mouse_filter = 2
 
 ; The shift clock and what is outstanding, centred at the top -- where the eye returns
 ; to between orders.
-[node name="StatusStrip" type="HBoxContainer" parent="Root/World"]
+; A PanelContainer since the UI kit's top bar arrived -- the strip is a *frame* now,
+; and it builds its own row inside itself. Wider than the old pill cluster because it
+; carries a headline as well as the readings, and pinned to both edges rather than
+; centred on a fixed width, which is what the reference does.
+; **Centred and sized to its own content**, not pinned to both edges. Full-width was
+; the first cut and it was wrong twice over: it took most of the room above the city
+; for four short numbers, and it ran straight through the call list and under the
+; minimap. Both anchors at the middle with BOTH grow directions is what makes a
+; PanelContainer shrink to fit.
+[node name="StatusStrip" type="PanelContainer" parent="Root/World"]
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -300.0
 offset_top = 16.0
-offset_right = 300.0
-offset_bottom = 54.0
 grow_horizontal = 2
 mouse_filter = 2
-alignment = 1
 script = ExtResource("8_status")
 
+; **The top-right corner**: the score, the fleet count, and the buttons that open the
+; pause card and settings. Content-sized and grown leftward from the right margin, the
+; same way the top strip is grown from its centre, so a long number pushes the cluster
+; left instead of off the screen. Until this panel arrived the menu was reachable only
+; by pressing P.
+[node name="ScoreStrip" type="PanelContainer" parent="Root/World"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_top = 16.0
+offset_right = -22.0
+grow_horizontal = 0
+mouse_filter = 2
+script = ExtResource("17_score")
+
+; **The right-hand edge**, under the score. It sat top-left for most of its life, but
+; when the dispatch rows moved into the left column there was no longer room for both --
+; and hiding the radio log had just emptied this side of the screen. So the board took
+; the space the log gave up. Narrower than it was (398 against 448) to keep clear of the
+; central 40%, which belongs to the city and which the suite measures.
 [node name="CallList" type="VBoxContainer" parent="Root/World"]
-offset_left = 22.0
-offset_top = 20.0
-offset_right = 430.0
-offset_bottom = 300.0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -420.0
+offset_top = 92.0
+offset_right = -22.0
+offset_bottom = 262.0
+grow_horizontal = 0
 mouse_filter = 2
 script = ExtResource("9_calls")
 
+; The minimap is sunk into the chrome rather than raised out of it -- the UI kit
+; draws a recess with a soft stroke, which is what a map window is.
 [node name="MinimapCard" type="PanelContainer" parent="Root/World"]
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -232.0
-offset_top = 20.0
-offset_right = -22.0
-offset_bottom = 230.0
-grow_horizontal = 0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = -232.0
+offset_right = 232.0
+offset_bottom = -22.0
+grow_vertical = 0
 mouse_filter = 2
-theme_type_variation = &"CardPanel"
+theme_type_variation = &"MinimapPanel"
 
 [node name="Minimap" type="Control" parent="Root/World/MinimapCard"]
 script = ExtResource("3_minimap")
+
+; The zoom buttons, in a column **beside** the map rather than over it. They started
+; inside the card, which is where the reference draws them, and on screen they simply
+; read as two tiles sitting on the district. Out here they are a control surface next
+; to the thing they control -- and, not incidentally, they cannot eat a click meant for
+; the map.
+[node name="MapControls" type="VBoxContainer" parent="Root/World"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 240.0
+offset_top = -232.0
+offset_right = 288.0
+offset_bottom = -150.0
+grow_vertical = 0
+script = ExtResource("15_mapctl")
 
 ; The controls card, closed by default and opened from the chip below it (or F1).
 ; Sits just above the docked bar, in the corner the bar does not reach. The card
@@ -110,17 +172,44 @@ mouse_filter = 2
 script = ExtResource("11_controls")
 
 ; The visible way into the card -- F1 is a shortcut, not a secret.
+; The reference's notification stack: down the right-hand edge, under the score, and
+; growing downward from the top rather than upward from the bar that no longer exists.
+; **Hidden at the user's request** (August 2026) -- the lines read as out of place over
+; the city. Hidden rather than deleted, the same way PortraitBlock was: `HUD.gd` reaches
+; it with `$`, the suite holds it as a fixture, and the log keeps composing its lines out
+; of sight, so unhiding it is one word. Everything it announces is also visible on the
+; call board, which is why it can go without losing information.
 [node name="RadioLog" type="VBoxContainer" parent="Root/World"]
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 22.0
-offset_top = -294.0
-offset_right = 460.0
-offset_bottom = -196.0
-grow_vertical = 0
+visible = false
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -400.0
+offset_top = 92.0
+offset_right = -22.0
+offset_bottom = 340.0
+grow_horizontal = 0
 mouse_filter = 2
-alignment = 2
+alignment = 0
 script = ExtResource("13_radio")
+
+; **The buy button**, alone in the bottom-right corner. Dispatch used to own this corner
+; as a 300px card whose heading read "DISPATCH · £1,250 · BUY"; the rows moved into the
+; left-hand column under the roster, and what is left here is the one thing that was
+; genuinely a *door* rather than a readout. An icon, because a corner button that opens a
+; storefront does not need a sentence.
+[node name="BuyButton" type="Button" parent="Root/World"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -70.0
+offset_top = -70.0
+offset_right = -22.0
+offset_bottom = -22.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_type_variation = &"TransportButton"
 
 [node name="DebriefCard" type="Control" parent="Root/World"]
 visible = false
@@ -129,7 +218,7 @@ anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("14_debrief")
 
-; Sits above the bar's fixed two-row height (176), not above its old one-row height.
+; Sits above the bar's fixed two-row height (180), not above its old one-row height.
 ; Both numbers have to move together: they did not in August 2026, a mixed box-select
 ; wrapped the tiles to a second row, and the chip went under the bar and stopped being
 ; clickable. The suite now measures the overlap against the fattest selection.
@@ -137,9 +226,9 @@ script = ExtResource("14_debrief")
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 22.0
-offset_top = -214.0
+offset_top = -282.0
 offset_right = 136.0
-offset_bottom = -188.0
+offset_bottom = -253.0
 grow_vertical = 0
 mouse_filter = 0
 theme_type_variation = &"PillPanel"
@@ -167,57 +256,89 @@ mouse_filter = 2
 horizontal_alignment = 1
 theme_type_variation = &"BannerLabel"
 
-; The line under the banner at the end of a freeplay shift: score and tallies.
-[node name="Debrief" type="Label" parent="Root/World"]
+; **The objective bar**, top-left. This label used to float in the middle of the city at
+; 20pt with an outline, carrying both the district's standing hint and the tutorial's
+; teaching line. It is the reference's mission-objective slot, and it is the corner the
+; eye starts from rather than the middle of what the player is looking at.
+[node name="ObjectiveBar" type="PanelContainer" parent="Root/World"]
+offset_left = 22.0
+offset_top = 16.0
+offset_right = 452.0
+offset_bottom = 78.0
+mouse_filter = 2
+script = ExtResource("16_objective")
+
+[node name="Body" type="VBoxContainer" parent="Root/World/ObjectiveBar"]
+mouse_filter = 2
+
+[node name="Caption" type="Label" parent="Root/World/ObjectiveBar/Body"]
+mouse_filter = 2
+theme_type_variation = &"HeaderLabel"
+text = "OBJECTIVE"
+
+[node name="Debrief" type="Label" parent="Root/World/ObjectiveBar/Body"]
 visible = false
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -340.0
-offset_top = -18.0
-offset_right = 340.0
-offset_bottom = 12.0
+mouse_filter = 2
+autowrap_mode = 3
+
+; **Not a bar any more.** It was one opaque strip across the bottom holding four
+; blocks in a row; the UI kit's reference floats them in the corners with the city
+; visible between. This node stayed -- renaming it would move fourteen `$` paths in
+; HUD.gd and thirty more in the suite -- but it is now a transparent full-rect layer
+; that the bottom panels anchor themselves inside. No stylebox, no size of its own,
+; and it stops the mouse nowhere.
+[node name="Bar" type="Control" parent="Root"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 20
 
-; The docked command bar. Opaque and mouse-stopping: it is the edge of the screen, and
-; a click that lands on it is a click on the interface, not an order in the world.
-; **Two rows of command tiles, always.** 176 rather than the old 148, because
-; `RTSController.available_abilities()` returns the *union* across the selection, so a
-; mixed box-select offers every verb any of them has -- 14 tiles today, which is more
-; than one row of nine can hold at any width the row can spare.
-;
-; Be clear what this number does and does not do. It is a *minimum*: `Bar` is a
-; PanelContainer, so once the tiles wrap, the content's own height sets the top and this
-; offset is inert. Sabotaging it back to 148 changes nothing, which is how we know. What
-; it buys is that the bar is 176 tall for a one-row selection too, so it does not jump
-; height as the selection changes -- and the CONTROLS chip above keeps a constant gap
-; instead of drifting. The thing that actually stops the chip being covered is the
-; chip's own offsets below. At 560 wide the grid holds nine a row, so two rows seat 18.
-[node name="Bar" type="PanelContainer" parent="Root"]
-anchor_top = 1.0
+; Likewise: the row that laid four blocks out left-to-right is now a plain layer, and
+; each block anchors itself into a corner.
+[node name="Row" type="Control" parent="Root/Bar"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -176.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+; The kit's unit-selection panel: a frame with its own 34px header bar built into the
+; art, which is where the reference puts the unit's name.
+; **Hidden at the user's request.** The readout said the unit's name, speed and what it
+; was doing; the commands panel beside it already says which unit is selected by what it
+; offers. Hidden rather than deleted because `HUD.gd:35` reaches it with `$` and the
+; suite holds it as a fixture -- deleting the node crashes both, and the Portrait keeps
+; updating happily out of sight.
+[node name="PortraitBlock" type="PanelContainer" parent="Root/Bar/Row"]
+visible = false
+custom_minimum_size = Vector2(250, 0)
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -380.0
+offset_top = -178.0
+offset_right = -130.0
+offset_bottom = -22.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_type_variation = &"BarPanel"
-
-[node name="Row" type="HBoxContainer" parent="Root/Bar"]
-
-[node name="PortraitBlock" type="PanelContainer" parent="Root/Bar/Row"]
-custom_minimum_size = Vector2(250, 0)
-theme_type_variation = &"CardPanel"
+theme_type_variation = &"UnitPanel"
 
 [node name="Portrait" type="VBoxContainer" parent="Root/Bar/Row/PortraitBlock"]
 script = ExtResource("5_portrait")
 
+; **The upper half of the left column**, which is where the reference puts its units.
+; The roster inside is an HFlowContainer, so it wraps to whatever the width allows -- 180
+; takes three chips a row, and 308px of height holds the seven-unit fixture with a little
+; to spare. Its height is content-driven, so a much larger fleet grows it downward into
+; the dispatch block below; the overlap invariant is what would report that.
 [node name="RosterBlock" type="PanelContainer" parent="Root/Bar/Row"]
-size_flags_horizontal = 3
+custom_minimum_size = Vector2(300, 0)
+offset_left = 22.0
+offset_top = 92.0
+offset_right = 322.0
+offset_bottom = 470.0
 theme_type_variation = &"CardPanel"
 
 [node name="Body" type="VBoxContainer" parent="Root/Bar/Row/RosterBlock"]
@@ -226,23 +347,36 @@ theme_type_variation = &"CardPanel"
 theme_type_variation = &"HeaderLabel"
 text = "UNITS UNDER COMMAND"
 
-[node name="Roster" type="HFlowContainer" parent="Root/Bar/Row/RosterBlock/Body"]
+[node name="Roster" type="VBoxContainer" parent="Root/Bar/Row/RosterBlock/Body"]
 size_flags_vertical = 3
 script = ExtResource("6_roster")
 
-; Wide enough for the fattest selection in ONE row of tiles. Let them wrap and the
-; PanelContainer grows, the bar grows with it, and whatever sits just above the bar is
-; silently covered -- the same trap the dispatch pills fell into, and it once ate the
-; CONTROLS chip.
+; Commands, bottom-centre. **Slimmer since August 2026, at the user's ask**: the tile came
+; down 54 -> 48 and the block 560 -> 500 wide.
 ;
-; Widened from 460 to 560 in August 2026, for a ninth tile rather than a second row.
-; The width came out of RosterBlock, which is the only expanding block here and was
-; measured holding 546px for a roster that needs far less; the bar itself did not move,
-; so nothing above it could be covered. A tile is 54 wide with 6 between and 10 of card
-; margin each side, so N tiles want 60N + 14: seven fitted 460, nine fit 560.
+; The height is the part that has to be got right, and it is pinned to the *fattest*
+; selection rather than to the common one. 500px takes nine 48px tiles a row, the fattest
+; selection offers fourteen, so the grid wraps to two rows and the panel wants 141px. Pin
+; it shorter than that and the block resizes as the selection changes -- which moves the
+; view under the player and is exactly what "no panel moves with the selection" catches.
+;
+; **The offsets are bottom-anchored, so the height is the difference between them**, not
+; the top one. -145..-22 reads like 145 and is 123, which is how this was first shipped
+; wrong: the content minimum quietly won and the panel breathed with every selection.
+; -172..-22 is 150, against a measured 141.
 [node name="CommandBlock" type="PanelContainer" parent="Root/Bar/Row"]
-custom_minimum_size = Vector2(560, 0)
-theme_type_variation = &"CardPanel"
+custom_minimum_size = Vector2(500, 0)
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -240.0
+offset_top = -172.0
+offset_right = 260.0
+offset_bottom = -22.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_type_variation = &"CommandGridPanel"
 
 [node name="Body" type="VBoxContainer" parent="Root/Bar/Row/CommandBlock"]
 
@@ -254,11 +388,22 @@ text = "COMMANDS"
 size_flags_vertical = 3
 script = ExtResource("7_commands")
 
-; Wide enough for the roster laid out in two columns -- six types stacked in one
-; made the bar 185px tall and swallowed the CONTROLS chip. The purse readout lives
-; in the Heading below, updated by the Dispatch panel.
+; **Hidden at the user's request** (August 2026): the Patrol / Ambulance / ... row list is
+; gone. What it did lives on in two places -- the purse moved up to the top bar, and
+; sending a unit out moved into the roster above, where a unit still in the station shows
+; as a dimmed chip you can click. `Station.dispatch()` had no other caller in the whole
+; interface, so that move was not optional.
+;
+; Hidden rather than deleted, like PortraitBlock and RadioLog: `HUD.gd` reaches the panel
+; inside with `$`, the suite holds the path, and the rows cost nothing to keep building
+; out of sight. The offsets are the ones it last occupied.
 [node name="DispatchBlock" type="PanelContainer" parent="Root/Bar/Row"]
-custom_minimum_size = Vector2(300, 0)
+visible = false
+custom_minimum_size = Vector2(180, 0)
+offset_left = 22.0
+offset_top = 408.0
+offset_right = 202.0
+offset_bottom = 610.0
 theme_type_variation = &"CardPanel"
 
 [node name="Body" type="VBoxContainer" parent="Root/Bar/Row/DispatchBlock"]

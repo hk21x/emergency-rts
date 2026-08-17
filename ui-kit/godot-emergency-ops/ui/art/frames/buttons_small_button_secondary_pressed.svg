@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="78" height="28" viewBox="0 0 78 28" fill="none" role="img" aria-label="Button small — secondary / pressed">
+  <defs>
+    <linearGradient id="bssecpre_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0E141D"/><stop offset="1" stop-color="#0A1017"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="77" height="27" rx="3" fill="url(#bssecpre_g)" fill-opacity="1" stroke="#212D3C" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H72" stroke="#FFFFFF" stroke-opacity="0.02" stroke-width="1" stroke-linecap="round"/>
+
+</svg>

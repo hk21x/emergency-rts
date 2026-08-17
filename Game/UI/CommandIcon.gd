@@ -23,7 +23,11 @@ const CORNER := 8.0
 ## to already know what a droplet means. The reference the restyle follows labels every
 ## tile -- MOVE, STOP, SPRAY -- and naming the verb is the cheapest teaching this
 ## interface has, since the alternative is hovering each one for a tooltip.
-const LABEL_SIZE := 9
+##
+## Dropped 9 → 8 when the tile came down to 48px. The longest verb, EXTINGUISH, is the
+## one that sets this: at 9pt it measures wider than a 48px tile and spilled into its
+## neighbours, and the label is centred, so it spilled both ways.
+const LABEL_SIZE := 8
 
 var ability: Ability
 ## Filled while this ability is waiting for a target click.
@@ -37,7 +41,10 @@ var _hovered := false
 
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(54.0, 54.0)
+	# 48, down from 54 (August 2026, at the user's ask for a slimmer command block). The
+	# art is 38px nine-sliced at 8, so it carries any size above 16 without the corners
+	# going oval; what actually bounds this from below is the verb label, not the plate.
+	custom_minimum_size = Vector2(48.0, 48.0)
 	mouse_entered.connect(_on_hover.bind(true))
 	mouse_exited.connect(_on_hover.bind(false))
 
@@ -77,6 +84,16 @@ func _on_hover(inside: bool) -> void:
 	queue_redraw()
 
 
+## The kit plate for this tile's state, or null if the theme has none.
+func _plate() -> StyleBox:
+	var variation := &"CommandPlateDefault"
+	if armed or active:
+		variation = &"CommandPlatePressed"
+	elif _hovered:
+		variation = &"CommandPlateHover"
+	return get_theme_stylebox(&"panel", variation)
+
+
 func _draw() -> void:
 	if ability == null:
 		return
@@ -88,7 +105,24 @@ func _draw() -> void:
 		fill = Palette.POLICE
 	elif _hovered:
 		fill = Palette.HOVER
-	_rounded(fill)
+
+	# **The kit's plate, drawn as a stylebox.** `draw_style_box` is the one drawing call
+	# that understands nine-slicing, which is what lets 38px art carry a 54px tile
+	# without the corners going oval -- `draw_texture_rect` would stretch the lot.
+	# Falls back to the hand-rolled rounded rect if the variation is missing, the same
+	# rule the glyph pack follows: a missing asset costs the look, not the tile.
+	var plate := _plate()
+	if plate:
+		draw_style_box(plate, Rect2(Vector2.ZERO, size))
+		# The state colour goes on *over* the plate, washed rather than solid. The kit
+		# has three states; this game has four meanings (rest, hovered, armed, running)
+		# and the two extra are colour-coded -- medical green for an armed verb, police
+		# blue for a toggle that is on. Losing that to match the art would be trading a
+		# fact the player needs for a texture.
+		if armed or active:
+			_rounded(Color(fill, 0.72))
+	else:
+		_rounded(fill)
 
 	# Ink that reads on whichever fill won. On the recessed tile that is the ordinary
 	# text colour; on a filled one it is the card colour, which since the restyle is the

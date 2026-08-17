@@ -1,0 +1,47 @@
+Audio in this folder, and where it came from.
+
+--------------------------------------------------------------------------
+Game/Audio/*.wav  (city, radio, engine, crackle)
+--------------------------------------------------------------------------
+Generated, not recorded. `Game/build_audio.gd` synthesises them; re-run it
+to change them. No licence applies -- they are this project's own output.
+
+--------------------------------------------------------------------------
+Game/Audio/siren.mp3, siren.wav
+--------------------------------------------------------------------------
+The one real recording that predates this file. Provenance not captured at
+the time; replace it if the project is ever distributed.
+
+--------------------------------------------------------------------------
+Game/Audio/UI/  -- click1.ogg, rollover2.ogg, switch2.ogg
+--------------------------------------------------------------------------
+From "UI Audio" (also published as "UI SFX Set") by Kenney Vleugels,
+https://kenney.nl/assets/ui-audio -- 50 sounds, of which these three are
+used. Curated rather than copied wholesale, the same way Game/UI/Icons/
+takes a handful of the icon pack.
+
+Licence: Creative Commons Zero (CC0 1.0 Universal).
+  http://creativecommons.org/publicdomain/zero/1.0/
+Kenney's own wording: "You may use these assets in personal and commercial
+projects. Credit (Kenney or www.kenney.nl) would be nice but is not
+mandatory."
+
+Original filenames kept, so a sound can always be traced back to the pack.
+
+--------------------------------------------------------------------------
+Game/Audio/Music/lifewave2k.wav
+--------------------------------------------------------------------------
+"Calm Ambient 3 (Lifewave 2k)" by The Cynic Project (cynicmusic),
+https://opengameart.org/content/calm-ambient-3-lifewave-2k
+
+Licence: Creative Commons Zero (CC0 1.0 Universal). Attribution is NOT
+required, but the author asks for it, and it costs nothing:
+  "The Cynic Project / cynicmusic.com / pixelsphere.org"
+
+Converted from the published 320kbps stereo MP3 (7.5 MB) to 16-bit mono
+WAV at 22050 Hz (8.3 MB). Mono and half-rate because the alternative was a
+16 MB file; WAV rather than OGG because no vorbis encoder was available on
+the build machine, and because AudioStreamWAV is the only format the loop
+code in Soundscape.gd handles sample-exactly -- an MP3 loop carries the
+encoder's padding as an audible gap, which on a 3-minute bed you would hear
+every time round.

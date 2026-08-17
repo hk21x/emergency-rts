@@ -1,0 +1,44 @@
+; The last-seen anchor of a missing-child call: a parent standing where the child was
+; last seen. Same pickable arrangement as Suspect -- layer 8, solid to nothing, box
+; raised to a standing figure -- and the same police-blue ring, because a missing
+; person is police work from the first minute. The child itself is a separate,
+; markerless ChildWanderer; this node is the only thing the board ever points at.
+
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Game/Incidents/MissingChild.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://Game/Characters/Character.tscn" id="2_character"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pick"]
+size = Vector3(1.4, 1.9, 1.4)
+
+[sub_resource type="TorusMesh" id="TorusMesh_marker"]
+inner_radius = 1.1
+outer_radius = 1.28
+rings = 32
+ring_segments = 6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_marker"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.35, 0.55, 1, 0.8)
+
+[node name="MissingChild" type="StaticBody3D"]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_script")
+display_name = "Missing child"
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+shape = SubResource("BoxShape3D_pick")
+
+[node name="Marker" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+material_override = SubResource("StandardMaterial3D_marker")
+cast_shadow = 0
+mesh = SubResource("TorusMesh_marker")
+
+; The usual 180-degree yaw -- Synty faces +Z, Godot forward is -Z.
+[node name="Character" parent="." instance=ExtResource("2_character")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)

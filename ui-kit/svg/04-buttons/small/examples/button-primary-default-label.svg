@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="78" height="28" viewBox="0 0 78 28" fill="none" role="img" aria-label="Button small — primary / default (labelled)">
+  <defs>
+    <linearGradient id="bspridef_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A7FE0"/><stop offset="1" stop-color="#125AAF"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="77" height="27" rx="3" fill="url(#bspridef_g)" fill-opacity="1" stroke="#4A9CF0" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H72" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="1" stroke-linecap="round"/>
+  <text x="39.0" y="17.78" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="10.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.5" opacity="1">BUTTON</text>
+
+</svg>

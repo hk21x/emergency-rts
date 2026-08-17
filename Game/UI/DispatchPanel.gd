@@ -19,10 +19,15 @@ var controller: RTSController
 ## The storefront this panel opens. Wired by the HUD.
 var shop: ShopPanel
 
-## Two columns, because six types stacked in one made the bar 185px tall and ate the
-## CONTROLS chip -- the fourth time this block has sprung that trap. Height is what
-## the bar cannot spare; width it has.
-const COLUMNS := 2
+## One column, since August 2026, when this block moved out of the bottom bar and into
+## the left-hand strip under the roster.
+##
+## It was two for years, and the reason is worth keeping because it **inverted**: in a
+## docked bar, height was the scarce thing (six types stacked in one column made the bar
+## 185px tall and ate the CONTROLS chip -- four separate times) and width was free. In a
+## 180px column it is exactly the other way round. Two columns of 126px rows simply do
+## not fit, and there is room to spare below.
+const COLUMNS := 1
 
 var _rows: Array[HBoxContainer] = []
 var _heading: Label
@@ -103,8 +108,13 @@ func _refresh() -> void:
 		# things is poorer than the funds line says, and finding that out at the debrief
 		# is finding out too late to do anything about it.
 		var owed := station.outstanding_repairs()
-		_heading.text = "DISPATCH   ·   £%d   ·   BUY" % station.funds if owed <= 0 \
-			else "DISPATCH   ·   £%d   ·   £%d damage   ·   BUY" % [station.funds, owed]
+		# **The purse, and no longer the word BUY.** Buying moved to its own icon button
+		# in the bottom-right corner; this label went back to being what it always
+		# mostly was, a readout of what is in the till. It still opens the shop when
+		# clicked -- money is a sensible thing to click when you want to spend it -- but
+		# it no longer advertises itself as the only door.
+		_heading.text = "£%d" % station.funds if owed <= 0 \
+			else "£%d   ·   £%d damage" % [station.funds, owed]
 	for row in _rows:
 		var id: StringName = row.get_meta(&"id")
 		var in_house := station.available(id)

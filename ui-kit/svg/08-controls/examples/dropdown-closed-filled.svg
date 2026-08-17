@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="32" viewBox="0 0 220 32" fill="none" role="img" aria-label="Dropdown — closed (filled)">
+  <defs>
+    <linearGradient id="dd_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="219" height="31" rx="3" fill="url(#dd_g)" fill-opacity="1" stroke="#2E3D4F" stroke-width="1" stroke-opacity="1"/>
+  <text x="12" y="21" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="12" font-weight="500" fill="#8FA0B2" text-anchor="start" letter-spacing="0.4" opacity="1">Select an option</text>
+  <g transform="translate(194 6) scale(0.83333)" color="#8FA0B2" opacity="1"><path d="M5.2 9.4 12 16.2l6.8-6.8" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></g>
+
+</svg>

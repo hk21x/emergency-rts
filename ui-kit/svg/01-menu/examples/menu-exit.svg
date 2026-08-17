@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="42" viewBox="0 0 200 42" fill="none" role="img" aria-label="Menu — EXIT">
+  <defs>
+    <linearGradient id="mxexi_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="199" height="41" rx="4" fill="url(#mxexi_g)" fill-opacity="1" stroke="#212D3C" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H194" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1" stroke-linecap="round"/>
+  <g transform="translate(14 11) scale(0.83333)" color="#DFE7F0" opacity="1"><path d="M14.4 3.6H5.6a2 2 0 0 0-2 2v12.8a2 2 0 0 0 2 2h8.8" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.4 12h10.0M16.8 8.4 20.4 12l-3.6 3.6" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <text x="46" y="26" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="13" font-weight="700" fill="#DFE7F0" text-anchor="start" letter-spacing="1.1" opacity="1">EXIT</text>
+
+</svg>

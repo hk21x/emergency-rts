@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="290" height="180" viewBox="0 0 290 180" fill="none" role="img" aria-label="Dialog — confirm quit">
+  <defs>
+    <linearGradient id="dg2_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+    <linearGradient id="dg2_y" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A7FE0"/><stop offset="1" stop-color="#125AAF"/></linearGradient>
+    <linearGradient id="dg2_n" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <rect x="1" y="1" width="288" height="178" rx="6" fill="url(#dg2_g)" fill-opacity="1" stroke="#2E3D4F" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H284" stroke="#FFFFFF" stroke-opacity="0.07" stroke-width="1" stroke-linecap="round"/>
+  <g transform="translate(262 10) scale(0.83333)" color="#8FA0B2" opacity="1"><path d="M6.0 6.0 18.0 18.0M18.0 6.0 6.0 18.0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <g transform="translate(127 26) scale(1.50000)" color="#F0C860" opacity="1"><path d="M13.05 3.35a1.2 1.2 0 0 0-2.1 0L2.3 19.0a1.2 1.2 0 0 0 1.05 1.8h17.3a1.2 1.2 0 0 0 1.05-1.8Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.9 8.6h2.2v6.0h-2.2Z" fill="currentColor" fill-rule="nonzero"/><path d="M12 15.9a1.35 1.35 0 1 1 0 2.7 1.35 1.35 0 0 1 0-2.7Z" fill="currentColor" fill-rule="nonzero"/></g>
+  <text x="145" y="84" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="12.5" font-weight="500" fill="#DFE7F0" text-anchor="middle" letter-spacing="0.4" opacity="1">Are you sure you want to</text>
+  <text x="145" y="102" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="12.5" font-weight="500" fill="#DFE7F0" text-anchor="middle" letter-spacing="0.4" opacity="1">quit the mission?</text>
+  <rect x="30" y="124" width="106" height="32" rx="3" fill="url(#dg2_y)" fill-opacity="1" stroke="#4A9CF0" stroke-width="1" stroke-opacity="1"/>
+  <text x="83" y="145" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.6" opacity="1">YES</text>
+  <rect x="154" y="124" width="106" height="32" rx="3" fill="url(#dg2_n)" fill-opacity="1" stroke="#2E3D4F" stroke-width="1" stroke-opacity="1"/>
+  <text x="207" y="145" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="12" font-weight="700" fill="#DFE7F0" text-anchor="middle" letter-spacing="1.6" opacity="1">NO</text>
+
+</svg>

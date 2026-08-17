@@ -47,7 +47,7 @@ const SECTIONS := [
 	]},
 	{"title": "SHIFT", "rows": [
 		[{"c": "F2"}, {"t": "start a freeplay shift"}, {"s": true},
-			{"k": "P"}, {"t": "pause"}, {"s": true},
+			{"c": "ESC"}, {"t": "pause"}, {"s": true},
 			{"k": "R"}, {"t": "respawn"}],
 		[{"c": "F3"}, {"t": "report a unit that is stuck"}, {"s": true},
 			{"c": "F4"}, {"t": "show what a unit is steering at"}],

@@ -10,8 +10,8 @@ unmodified, though the POLYGON City pack was relocated on import — see `PROGRE
 ## Where this is up to
 
 **All 15 planned phases are done, plus 16 (the world reacts), 17 (audio), 18 (game
-framing), 19 (the fire service) and the career economy — half of phase 20.** 846
-automated checks, all passing.
+framing), 19 (the fire service) and all of phase 20 — the career economy and the
+campaign scenarios.** 1006 automated checks, all passing.
 
 A 260m city district — twenty-five blocks of varied size, with parks, parking lots and
 four tower families — with 60 pedestrians and 22 civilian cars going about their business.
@@ -20,7 +20,8 @@ its fleet from the DISPATCH block, and keeps it between sessions. `F2` opens a
 **freeplay shift**: five, ten or fifteen minutes of calls the district produces — busier
 towards the end — scored per call cleared and weighted by response time, with every
 task paying its points in pounds. A debrief closes it: score, best, and what was
-earned. You command what you have bought from a docked command bar and work each
+earned. You command what you have bought from panels floated into the screen's
+corners — roster left, commands and dispatch along the bottom, map bottom-left — and work each
 shout end to end: treat the casualty, wheel them to the ambulance, put the fire out
 before it spreads, take the troublemaker in.
 
@@ -90,7 +91,7 @@ Any Godot 4.6+ binary works (originally built on 4.6.3, verified on 4.7):
 | `F2` | start a freeplay shift (scored; see "Freeplay") |
 | `F5` | open the call spawner — pick any call kind instead of waiting for the roll |
 | `ENTER` / `SPACE` (title) | play — the session opens on the title card |
-| `P` | pause menu: resume, restart shift, settings (volume, shift length, call rate, time of day), quit to title |
+| `ESC` | cancel, then pause. It unwinds the innermost thing first: it disarms an armed ability, else closes the shop, else opens the pause menu (resume, restart shift, settings — volume, shift length, call rate, time of day, weather including SHIFT'S OWN — quit to title). Was `P` until August 2026 |
 
 Keys are bound to **physical** keycodes, so the layout holds on AZERTY and QWERTZ.
 
@@ -131,19 +132,25 @@ Keys are bound to **physical** keycodes, so the layout holds on AZERTY and QWERT
 | `Units/LoadSuspectAbility.gd` + order | Sending the patrol car for a detained suspect |
 | `Mission.gd` | Objectives, win and lose — and the freeplay score |
 | `Director.gd` | Freeplay: opens calls on a timer, ends the shift. Inert until F2 |
+| `AudioBuses.gd` | The Music and UI buses, created in code rather than a bus layout |
+| `UI/Markers.gd` | The selection bracket and destination reticle, built at load |
+| `UI/ClickSounds.gd` | The interface's click and rollover; finds its own controls |
 | `UI/Palette.gd` | Every colour the interface uses, in one table |
 | `UI/build_theme.gd` | Bakes `UI/Theme.tres` from that table |
 | `UI/Glyph.gd` | Every symbol: pack icons with drawn fallbacks, shared by tiles, avatars and pills |
 | `UI/ControlsPanel.gd` | The controls card: keycap icons, sectioned by function |
-| `UI/GameMenu.gd` | The framing: title card, pause menu (`P`), settings |
+| `UI/GameMenu.gd` | The framing: title card, pause menu (`ESC`), settings, game speed |
 | `UI/ShopPanel.gd` | The unit shop: portraits, prices, blurbs, BUY |
 | `UI/Icons/`, `UI/Keys/` | Curated icons and keycaps from the pack under `Assets/padding` |
 | `UI/Portrait.gd` | Who is selected and what they are doing |
 | `UI/Roster.gd`, `UnitChip.gd` | Every unit under command, as clickable avatars |
 | `UI/CommandGrid.gd`, `CommandIcon.gd` | Command tiles, drawn from ability metadata |
 | `UI/UnitBadge.gd` | A unit as a circular avatar, used at three sizes |
-| `UI/StatusStrip.gd` | Shift clock and what is outstanding |
+| `UI/StatusStrip.gd` | Shift clock and what is outstanding, top-centre |
+| `UI/ScoreStrip.gd` | Score, fleet count, and the buttons for pause and settings, top-right |
+| `UI/ObjectiveBar.gd` | What to do next, top-left; follows its own label rather than being switched |
 | `UI/Minimap.gd` | Overhead map, click to jump the camera |
+| `UI/MapControls.gd` | The map's zoom buttons, beside the card rather than on it |
 | `build_portraits.gd` | Renders the unit avatars. **Needs a window** |
 | `build_minimap.gd` | Renders the minimap's base image. **Needs a window** |
 | `Units/Target.gd` | What was clicked: point, collider, unit |
@@ -155,7 +162,7 @@ Keys are bound to **physical** keycodes, so the layout holds on AZERTY and QWERT
 | `Car.tscn` | The original Starter car. Unused, kept as a reference |
 | `Person.tscn`, `Paramedic.tscn` | The two crews on foot. Service decides their verbs |
 | `Characters/PoliceOfficer.tscn`, `Paramedic.tscn` | **Generated** from the City police characters |
-| `HUD.tscn`, `HUD.gd` | The docked command bar and the world overlays |
+| `HUD.tscn`, `HUD.gd` | The floating command panels and the world overlays |
 | `Playground.tscn` | The city district — **generated**, see below |
 | `build_map.gd` | Generates `Playground.tscn`, including both navigation bakes |
 | `setup_project.gd` | Registers input actions, sets the main scene |
@@ -1305,6 +1312,42 @@ list empties and the call closes RESOLVED for a job nobody did. It is the first 
 dispatched on genuinely incomplete information — sending a paramedic *and* an officer
 is insurance, and the assessment is what the paramedic's first seconds buy.
 
+### The missing child — a marker that admits what it does not know
+
+`missing_child` is the first call the player *searches*. The board's marker stands on
+a `MissingChild` anchor — a parent at the place the child was last seen, police-blue
+ring, flavour "Child reported missing" — and never moves. The child themselves is a
+`ChildWanderer`, spawned by the director 45–90m away and strolling the pedestrian
+graph tethered to a 32m roam radius, wearing **no marker of any kind**: being a
+`Civilian` subclass makes them unselectable, invisible to the picking ray and absent
+from every board and minimap by construction. The find is physical — the anchor scans
+four times a second for any *person* with a service within 6m of the child (vehicles
+deliberately do not count; driving past is not finding anyone).
+
+**Found is the middle of the job.** The child cannot be clicked, so the escort is not
+an order: they attach to whoever found them and walk at heel (`follow()`, re-aimed a
+few times a second). Brought within 4.5m of a **police** vehicle — the reach bridges
+kerb-to-lane like the suspect escort's — they climb in (`ride()`: hidden, inert,
+cosmetic seat, no cell bookkeeping because a child is not a prisoner; an ambulance is
+refused). The call closes only when that car pulls up within 10m of the parent:
+search, walk them to the car, drive them home — three beats on the call row's bar
+(0.4 found, 0.7 aboard), and only the reunion pays `MISSING_POINTS` (90).
+
+Two structural decisions carry the design. The child is **not an Incident** — if they
+were, `Call._recentre()` would average them into the call's position and the marker
+would chase the answer it is supposed to not know. And the child is excluded by class
+from all three systems that consume civilians (`Director._pick_civilian`,
+`Suspect._draw_one_in`, `Hazard._hurt_people`): any of them taking the child frees the
+body the report is scanning for, upon which the report retires silently — the
+drunk-call rule, so a vanished child closes the call without banking a find nobody
+made. There is no failure arm in the scoring: in this game a missing child is never
+*lost*, only still missing when the clock runs out, which the failed call already
+counts.
+
+No child-sized mesh exists in any pack — Synty's "SchoolBoy" is a school uniform on
+the standard 1.84m adult rig — so Child.tscn scales an ordinary outfit to 0.7. At RTS
+distance, small is young.
+
 ### Spawning a call on demand — F5
 
 The director rolls from a weighted table, so seeing a particular call means opening a
@@ -1330,14 +1373,179 @@ things about it are deliberate:
   spawner to build its panel in `_ready` put the panel on screen from frame one, where it
   swallowed clicks and made the map-click checks miss by 84.9m.
 
+The panel also carries a **PREVIEW WEATHER strip** — CLEAR / RAIN / FOG / SNOW — on the
+same argument as the calls: a rolled SHIFT'S OWN sky is one draw in four-ish, and snow
+at dusk can only be judged by looking. It drives `Daylight.set_weather()` directly and
+deliberately does **not** touch the settings card's stored choice: it is a preview, not
+a setting, and a dev tool that silently rewrote what the player chose would be worse
+than no tool. The strip's buttons reflect whatever the sky is actually doing.
+
 Third of the same shape as `F3` (force a black-box record) and `F4` (navigation overlay).
+
+## The tutorial town
+
+A second playable scene, reached from a **TUTORIAL** button on the title card: the
+user's hand-authored Synty town (`Assets/PolygonTown/Scenes/Tutorial.tscn`, treated
+as **read-only input** — the vendor-dir rule) wrapped by a processor-emitted shell at
+`Game/Tutorial.tscn`. Rebuild with `godot --headless --path . --script
+res://Game/build_tutorial.gd` whenever the town's **roads or pavements** change (the
+navmeshes are baked at build time); prop and building edits need no re-run, because
+the shell *instances* the vendor scene rather than copying it.
+
+**The click costs about 819ms, and a pre-warm that claimed to remove it did not
+work.** Almost all of that is parsing the vendor town's 2.4MB of text `.tscn`. A
+`ResourceLoader.load_threaded_request` was added to do it on a worker while the title
+was up; threaded, that file comes back a **parse error every time** — at boot, delayed,
+with the type named, in either scene — while the same path loads perfectly
+synchronously. The 819ms → 0ms measurement that seemed to prove it was a resource-cache
+hit in a probe, and the check guarding it asserted only that a request had been *made*.
+Both are gone. It hid because nothing reads stderr on a normal run; making the menu its
+own boot scene put the errors at the top of a clean console.
+
+The town could instead be re-saved binary and read twenty times quicker, and
+deliberately is not: the shell *instances* the vendor scene, which is exactly what lets
+the town be edited and played with no processor re-run.
+
+The architecture is three pieces:
+
+- **`build_tutorial.gd`** stamps road/pavement collision layers by prefab family
+  (`TutorialMap`'s classifier), bakes the two navmeshes with the district's own
+  parameters, and assembles the system nodes around the instanced town — Station on
+  the user's spawn point (10, 0.45, −3) at 270°, single dispatch slot, its **own
+  career file** (`user://tutorial-career.cfg`, reset on every entry — practice never
+  touches the district's books); the Hospital pad co-located with the spawn by
+  design; no Traffic, Crowd, Director or CallSpawner (all lattice-native).
+- **`TutorialMap.gd`** ("TutorialSetup", deliberately the scene's first child) flips
+  `CityGrid.lattice_fits` off in `_enter_tree` and back on in `_exit_tree` — the
+  tables describe the generated district, and on this map every answer would be a
+  confident lie, so eight guard sites (lane routing, street write-offs, the
+  turn-planner's road test, kerb mounts, slot validation, addresses) fall back to
+  the navmesh and physics while it is false. Deleting the restore reddens fourteen
+  district checks at once — measured; that is how load-bearing the one line is. It
+  also re-stamps the collision layers `pack()` deliberately dropped, and swaps the
+  minimap to its schematic street plan (the baked photograph is the district).
+- **`TutorialDirector.gd`** is the whole script, and it opens **a job at a time**:
+  on the first PLAY a collapsed person, and only once that is dealt with does the
+  bin fire come in. Both at once was the first cut and taught nothing — a player
+  still learning to select a unit had two markers, two services, and a fire growing
+  while they read the first row. Staging needs one thing from elsewhere:
+  `Mission.more_to_come`, because the scripted win rule declares victory on a clear
+  map and a staged shout is briefly clear between its stages. Clearing the last one
+  drives the same path to the SHOUT COMPLETE card; `begin_shift` is never called.
+
+  The two spots are 74m apart in different parts of town — they were 60m apart on one
+  street until August 2026, which read as the same incident twice. Both came from a
+  reachability sweep of the baked meshes, and the sweep has a trap in it: **both
+  navmeshes share the world's default navigation map**, told apart by
+  `navigation_layers` rather than by map, so `map_get_closest_point` answers off the
+  *union* of the two and every pavement point reports as being on the road as well.
+  `region_get_closest_point` is the call that can tell a kerb from a carriageway.
+
+### The tutorial points at what it is talking about
+
+Naming a unit in a prompt is thin help when the storefront holds eight cards. A
+`Spotlight` node pulses whichever control the current prompt means: the cart button
+while anything is unbought, the two named cards once the shop is open, the roster's
+standby chips once they are bought and still parked. Nothing glows during the parts of
+the lesson that are about the world — a glowing panel would be pointing the wrong way at
+"right-click the casualty".
+
+**The words and the glow are one reading.** `TutorialDirector._lesson()` works out what
+is missing once and records it in `_to_buy` / `_to_send`; the prompt and the spotlight
+are two renderings of that single answer. Working it out twice is how a tutorial ends up
+saying "buy an ambulance" while pointing at the fire engine — and the checks are written
+to catch precisely that: swapping the spotlight's two branches leaves both prompt-text
+checks green and reddens only the three that assert *which* control is lit.
+
+`Spotlight` writes `modulate` every frame, which is the same property `Hover` uses, so a
+spotlit control outranks a hovered one while the glow is on it. Releasing restores 1.0
+rather than whatever Hover last set; if the pointer is resting on the control as the step
+completes, Hover puts its own lift back on the next `mouse_entered`.
+
+**The gardens walk, and the town is inhabited.** The person mesh covers pavements
+*and* open ground, so a walker crosses lawns and slips through the gaps between
+houses — but not through the living rooms. That rule is one geometric test in
+`TutorialMap.stamp`: a lawn tile with a pavement, a road or a building on top of it
+is scenery rather than ground. It exists because this town tiles grass **under
+everything**, and the two naive readings both failed measurably — parse the grass
+as-is and two walkable surfaces stack in every cell until the navigation *map*
+reports more than two edges per rasterisation cell and answers every query with
+nothing; drop the grass outright and a walker is confined to the pavements. Sinking
+the lawns 20cm was tried too and does not help: the map's height cells are 25cm and
+both surfaces still land in one. Note also that Recast has no notion of an
+*obstacle* — feeding it the houses so they would carve the mesh simply baked their
+roofs as walkable, 34,236 polygons of them. Where a walker may not go is decided by
+what ground is baked, exactly as in the district.
+
+**The kerbs carve the drivable mesh, and that is the driving fix.** The town's
+pavement slabs are 16.5cm kerbs that overlap the road tiles at every corner, so a
+vehicle mesh baked from roads alone claimed ground a kerb face was standing in. Play
+caught it before any check did: four black-box records in one session, an ambulance
+at full throttle and zero speed jammed against a sidewalk corner, fifteen metres
+short of the forecourt, escaping and re-approaching for ever. The vehicle bake now
+parses the pavements with the kerbs **lifted half a metre** — 8.5cm of real
+proudness is invisible under a 25cm rasterisation cell, so the real kerb alone does
+not carve anything — and the person bake runs immediately after with them back down,
+because a walker steps over a kerb rather than driving into it. Measured on the
+route that failed: never arrived, twelve escapes, 27% of frames going nowhere →
+**12s, no escapes, 1%**. Flat road furniture (manholes, drains, speed bumps) is made
+non-solid by the same stamp, after one sat exactly where the tutorial's casualty lay
+and an ambulance ground against a drain cover for forty seconds.
+
+**…and then the lifted pavements are thrown away, which is the other half.** The
+carve leaves the raised tops in the mesh, and they were written off as "islands no
+car on the road can reach — the same harmless shape as a roof". They are not. A
+kerbside shout parks the ambulance beside one; it snaps onto it; and its route home
+is on the other sheet. That is six black-box records of a car shuffling as it *left*
+a shout — the last of them saying `reachable: false` while sat on a road collider
+with nothing within 14m. Measured afterwards: **four components, two of them
+map-spanning and interleaved**, 457 of 685 sampled drivable points unable to reach
+the station. `build_tutorial._drop_lifted()` now discards every polygon whose mean
+height sits above the carriageway datum plus half the lift, taking the mesh from 695
+polygons to **117 in one component**. The datum is read off the baked mesh rather
+than assumed — this town's ground is at y≈0.45, not 0, and a hardcoded floor threw
+the entire carriageway away on the first attempt.
+
+Two checks guard the pair, and they are not the same check twice: a **two-sided**
+polygon bound (80..200 — the old `> 600` was pinning the broken mesh, and a bound
+that can only grow is not a measure of a road network), and a sweep asserting every
+drivable point can reach the station. Cutting the two polygons that bridge the
+station to the town reddens the second alone while the first stays green at 115.
+Worth knowing what did *not* catch it: the tutorial's real drive-home check stayed
+green through the whole fault, because a forty-second drive does not happen to start
+where the strand is.
+
+**The teaching line reads the world rather than scripting it.** `TutorialDirector`
+borrows the HUD's own mid-screen line — free here, since the district's hint needs a
+Director this town does not have — and every prompt is a *state* the player is in,
+not a step they have been counted through: buy the units, send them out, treat,
+carry, wheel, drive home, then the fire half. A player who buys the engine early or
+treats before the ambulance has parked is never told to undo it, and one who
+restarts mid-lesson picks up where the town actually is. It says nothing before the
+shift starts (the title card is talking) and nothing once the shout is complete (the
+banner is).
+
+Two dozen civilians are put down at load from the **person mesh's own vertices** —
+the one description of this town that cannot drift from it — and they stroll by
+mesh as well: `Civilian` gains off-lattice branches for strolling, fleeing and
+gawping that use `map_get_path` where the district's crowd uses `walk_moves`.
+
+Three traps the build measured, kept here because each looked like something else:
+the navigation map ingests regions **asynchronously (~30 frames)** and answers
+half-synced queries confidently; the town's **5m-wide streets** need a 1.0 vehicle
+agent radius where the district's 10m streets take 1.5; and **driveways and lawns
+must not be road/pavement** — driveways bake as marooned two-polygon islands severed
+by the sidewalk they cross, and the town's blanket of grass under every pavement
+gave the person mesh degenerate coplanar edges the server refused to answer queries
+on. Lawns are unwalkable in the tutorial; nothing in its content stands on one.
 
 ## Sound
 
-Every sound in the game is **synthesised**, not recorded — `build_audio.gd` writes
-16-bit mono WAVs sample by sample, because the project owns no sound library and
+The four **world** sounds are **synthesised**, not recorded — `build_audio.gd` writes
+16-bit mono WAVs sample by sample, because the project owned no sound library and
 buying one was not the point. They are placeholders a real recording can replace
-file-for-file.
+file-for-file. The interface sounds and the music bed are not synthesised; they are
+CC0 assets, and `Game/Audio/CREDITS.txt` says which and from where.
 
 | Sound | Where it lives | Driven by |
 | --- | --- | --- |
@@ -1346,6 +1554,46 @@ file-for-file.
 | Crackle | `AudioStreamPlayer3D` on the fire | its intensity |
 | Radio chirp | `Soundscape` (non-positional) | `CallBoard.call_opened` |
 | City bed | `Soundscape` (non-positional) | nothing; it just plays |
+| Ambient bed | `Soundscape`, on the Music bus | nothing; it just plays, in the game only |
+| Click / rollover | `ClickSounds`, on the UI bus | any button pressed, any control crossed |
+
+### Three buses, made in code
+
+`AudioBuses.ensure()` adds **Music** and **UI** beside Master, both routed through it,
+so the settings card's master slider still means "the whole game" and the new music
+slider is *balance* rather than level. They are created in code rather than shipped as
+a `default_bus_layout.tres` for the same reason everything else here is generated: a
+`.tres` is a resource nobody can diff, and `ensure()` is idempotent so any scene can
+call it without owning it.
+
+### The interface finds its own controls
+
+`ClickSounds` is a passive watcher on `SceneTree.node_added`, not a `Click.attach()`
+helper. Interactive controls are built in nine files and several are built at runtime —
+roster chips, command tiles, call rows, shop cards — so a call-site rule would have been
+missed at the tenth site, and silently. What counts as interactive is narrow on purpose:
+a `Button`, or a `Control` that stops the mouse **and** has something connected to
+`gui_input`. That second clause is what keeps the click off panels that stop the mouse
+only so a click cannot fall through to the world.
+
+The rollover is rate-limited to one per 60ms, which is less about taste than about the
+roster: it rebuilds whenever the fleet changes, and a chip re-entering under a
+stationary pointer would otherwise tick every time.
+
+### The music is the district's, not the title's
+
+`Soundscape` lives in `HUD.tscn`, and the main menu deliberately has no HUD — so "plays
+in the game and not over the menu" needed no condition anywhere. The menu has the
+backdrop's own city for atmosphere.
+
+**Why the bed is a mono WAV and not an OGG.** `Soundscape._player()` casts what it loads
+to `AudioStreamWAV` — which is also why an OGG dropped into that folder produces silence
+rather than an error — and `AudioStreamWAV` is the only format whose loop points this
+code sets sample-exactly. An MP3 carries the encoder's padding as an audible gap at the
+loop, which on a three-minute bed you would hear every time round. The published track is
+a 320kbps stereo MP3; it is converted to 16-bit mono at 22050 Hz, because stereo at that
+length was a 16 MB file. `ClickSounds` has its own loader that does *not* cast, so the
+UI sounds stay as the OGG they shipped as.
 
 Positional audio lives on the thing making it; the last two have nowhere to be — the
 ambience is everywhere and a radio call is in the player's ear, not at the address it
@@ -1633,9 +1881,80 @@ worth more than the fire it puts out, which is the game telling you what it is a
 
 The shift is `shift_length` (300s) of new calls, ending when the board is clear: time
 running out with a job open means finishing the job. The status strip shows the score
-and time remaining; the debrief under the banner shows the score, calls cleared and
-failed, delivered and lost — and arrests, when there were any. `F2` after a debrief
-starts the next shift.
+and time remaining; the debrief card shows the score, calls cleared and failed,
+delivered and lost — and arrests, when there were any. `F2` after a debrief starts the
+next shift.
+
+## Campaign scenarios
+
+The freeplay director produces *rolled* shifts. A scenario is the other thing — a
+shift somebody wrote down. Three of them, on a **SCENARIOS** card off the title:
+SATURDAY NIGHT (police, par 3:00), RING ROAD PILE-UP (medical, 4:00) and WAREHOUSE
+ALIGHT (both services, 5:00).
+
+They are deliberately thin, because everything underneath already existed:
+
+- **`Scenarios.gd`** is data — `{id, name, brief, par, requires, waves}`, each wave a
+  time and a list of call kinds. Adding one is adding a dictionary.
+- **`Director.open_kind()`** already knows how to place all sixteen call kinds
+  sensibly on the district, so no scenario has to know where a junction is.
+- **`ScenarioDirector.gd`** is the order and the clock: it opens each wave when the
+  timeline reaches it and holds `Mission.more_to_come` until the last one is out —
+  the same flag the tutorial's staged shout needed, because the scripted win rule
+  reads a clear map as a job done and a staged shift is clear between its waves.
+- **`Mission.shout_score()`** and the modal debrief already say what a shout came to.
+  Scenarios add one row: par, said as a margin ("02:59 under") rather than a target,
+  so the player is not left doing the subtraction.
+
+**The runner is created at runtime, and that is what makes it cheap.**
+`Playground.tscn` is generated by `build_map.gd`, so shipping a node in it means
+editing the generator and regenerating *with a window*. A node the menu builds and
+adds to the running scene needs neither, and a scenario nobody picks costs nothing.
+It finds the Mission and Director among its own siblings **by type** — neither is in
+a group, the HUD reaches them by exported path, and a runtime node has no way to be
+handed one.
+
+**The freeplay director stays stood down.** `begin_shift()` is never called, so
+`Mission.scoring` stays false and the scripted win path is live — which is also why
+the score has to come from `shout_score()`: `Mission.score` is zero throughout.
+
+**A scenario the career cannot field is not offered.** Each declares what it
+`requires`, the picker reads the roster, and a row whose units are missing is
+disabled with the reason under it — the same argument the freeplay director's
+`needs_fire_service` gating makes, made once at the door instead of on every roll.
+The card is rebuilt every time it opens, because the roster is what decides that and
+the player buys units between visits.
+
+### Two cards, and only one of them is modal
+
+`UI/DebriefCard.gd` draws both endings, from `Mission` rows, built in code because
+their number varies with what actually happened:
+
+- **`show_shift()`** — the end of a freeplay shift. `debrief_rows()`: score, best,
+  money, calls, average response, repairs, crew. It never takes the mouse; the player
+  leaves it behind by pressing `F2`.
+- **`show_shout()`** — the end of a scripted shout, the tutorial's included. It
+  *replaced the `SHOUT COMPLETE` banner*, which could say the job was done and nothing
+  else. `shout_rows()` is deliberately shorter: what it was worth, how long it took,
+  how fast the turnout was, and only the tallies that are not zero. It is **modal** —
+  `MOUSE_FILTER_STOP` while up, with a `CONTINUE` button — because it is the end of the
+  thing the player was doing, not a readout beside it.
+
+**A shout scores in freeplay's currency, without being paid for it.** `scoring` is off
+during a scripted shout, so `Mission.score` stays zero throughout and would be a lie on
+a card. `shout_score()` adds the same table up from the tallies instead — the same
+point constants, plus the response bonus — and pays nothing and banks no record. A
+mark, not a wage. To make the response half of it available at all, `_on_call_closed`
+now tallies `calls_cleared`, `response_total` and `response_earned` **whether or not
+the shift is scored**: they are facts about the mission, not about the shift, and
+`begin_scoring()` zeroes every one of them so freeplay still opens on a clean sheet.
+
+The modality has a reach worth knowing about: `_evaluate` declares a scripted win
+whenever the last incident resolves outside a scored shift, which in the suite is most
+of it. A fire doused in a radio-log test left a modal standing over the district and
+cost four later click checks their targets — so `_click`/`_drag` dismiss any open card
+first, the way a player would, and the modal's own behaviour is asserted where it
+belongs: on the tutorial's finished shout.
 
 **The best shift is banked.** `Mission` keeps `best_score` in `user://records.cfg` —
 one section, one key — written on `end_shift()` when beaten and read back at
@@ -1700,21 +2019,45 @@ a shared constant, so the van-bodied appliance gets them at its width.
 
 ### Weather is a property of the road
 
-CLEAR / RAIN, on the same node and the same settings card. The visual half is a 40m rain
-box following the camera's ground focus, plus a fog and exposure bump applied *after* the
-hour's preset so the two compose — every hour has a wet version without another table.
+CLEAR / RAIN / FOG / SNOW, on the same node and the same settings card — plus a fifth
+button, **SHIFT'S OWN**, which is a policy rather than a sky: the director draws the
+weather from its seeded stream when a shift opens (`Director.WEATHER_ROLL`, clear-heavy
+on purpose), so every shift has its own weather and a reproduced `shift_seed` is rained
+on identically. The visual half is a 40m precipitation box following the camera's
+ground focus — thin fast streaks for rain, slow drifting flakes for snow, one
+parameterised builder — plus a per-weather fog/exposure treatment applied *after* the
+hour's preset so hour and weather compose without a row per pair. The fog treatment
+**switches the fog on**: the map ships with `fog_enabled` off and its fog in depth
+mode (where density is an opacity cap), so every density write in the project's
+history was going into a disabled renderer path. Two sabotage passes measured the
+numbers moving and never the look; a player pressing FOG and seeing nothing was the
+measurement that counted. Weather flips to enabled exponential fog at an absolute
+density and the baseline restore flips it back, so CLEAR remains the map exactly as
+shipped. Fog also **lights the city at noon** — street lamps and every vehicle's
+headlamps, through `Daylight.lights_on()`, which is what the lighting consumers now
+ask instead of `is_dark()`: dark is a fact about the hour, lit is a decision about
+the conditions, and real fog lights real cities.
 
-The mechanical half is one number. `Vehicle.grip_scale` multiplies both grip terms, and
-the autopilot already derives corner entry from `sqrt(max_lateral_accel * grip_scale *
-radius)` and caps yaw by the same term — so `WET_GRIP` (0.72) lengthens braking distances
-and lowers apex speeds for the player's units **and** the ambient fleet without a single
-branch asking whether it is raining. Measured on one junction: **8.9 m/s dry, 7.2 wet.**
+The mechanical half is one number per state. `Vehicle.grip_scale` multiplies both grip
+terms, and the autopilot already derives corner entry from `sqrt(max_lateral_accel *
+grip_scale * radius)` and caps yaw by the same term — so `Daylight.GRIP` (rain 0.72,
+fog 0.88, snow 0.62) lengthens braking distances and lowers apex speeds for the
+player's units **and** the ambient fleet without a single branch asking whether it is
+raining. Measured on one junction: **8.9 m/s dry, 7.2 wet.** Fog's 0.88 is caution
+rather than a surface — what fog takes is sight, and `is_wet()` deliberately answers
+false for it.
 
-0.5 was tried and rejected: junctions are 10m across and the planner already sits near
-the limit of what a car can hold, so ordinary turns began missing their apex and getting
-re-routed, which reads as a broken car rather than as weather. Note the grip figure has
-**two** consumers — the corner planner and the yaw cap — so a sabotage aimed at only one
-leaves the other still slowing the car.
+Rain's 0.5 was tried and rejected: junctions are 10m across and the planner already
+sits near the limit of what a car can hold, so ordinary turns began missing their apex
+and getting re-routed, which reads as a broken car rather than as weather. Snow's 0.62
+sits between that rejected floor and rain. Note the grip figure has **two** consumers —
+the corner planner and the yaw cap — so a sabotage aimed at only one leaves the other
+still slowing the car.
+
+Wet weather is also a **dispatch fact**: the rtc and bus_rtc rows of `Director.KINDS`
+carry a `wet_weight` (double their dry weight) that `_pick_kind` swaps in whenever
+`Daylight.is_wet()` — more collisions when the road does not grip, with the weather
+node as the single source of truth.
 
 Three fixed hours rather than a rolling clock, because three states can be tested and a
 shift that drifted through them would mean every lighting check had to say *when* it
@@ -1973,15 +2316,68 @@ Freeplay is where calls become what the game is judged on — see "Freeplay".
 
 ## The interface
 
-An Emergency 4–style **docked bar** owns the bottom 176px: portrait, roster, command
-tiles, dispatch. It is opaque and it stops the mouse, so a click that lands on it is a
-click on the interface and never also an order out in the world. Everything else —
-status strip, incident pills, minimap, controls, banner — floats over the 3D view and
-ignores the mouse, except the minimap and the incident rows, which opt back in.
+**Floating panels in the corners**, with the city visible between them. It was a docked
+bar owning the bottom 176px until August 2026 — portrait, roster, command tiles and
+dispatch laid out in one opaque strip — and the restructure onto the user's reference
+layout unpicked it. As it now stands: the roster down the left, commands along the
+bottom, minimap bottom-left, a cart button alone in the bottom-right corner, objective
+top-left, clock top-centre, purse and score and speed top-right, call board down the
+right. The
+radio log is hidden (August 2026) — it kept composing its lines out of sight, and the
+board it duplicated took over the edge it left empty.
 
-The camera still renders full-screen behind the bar rather than into a letterboxed
-`SubViewport`. For a solid bar the result is identical, and it leaves camera picking
-untouched.
+Each panel stops the mouse over itself, so a click that lands on one is a click on the
+interface and never also an order out in the world; the layers *between* them ignore it,
+so the gaps are still city.
+
+**The move was an anchors job, not a rewrite, and deliberately so.** `HUD.gd` resolves
+fourteen nodes with `$`, the suite resolves about thirty `HUD/Root/...` path strings, and
+two baked scenes carry `../HUD/Root/SelectionBox` — so every node kept its name and its
+place in the tree, and only anchors, offsets and container types changed. `Root/Bar` and
+`Root/Bar/Row` are the visible scar: a `PanelContainer` and an `HBoxContainer` that are
+now transparent full-rect `Control`s with no stylebox and no size of their own, kept
+under those names because renaming them would have cost forty path edits to no end.
+
+The camera still renders full-screen behind the panels rather than into a letterboxed
+`SubViewport` — which is now the only sensible arrangement, since there is no longer a
+solid edge to letterbox against.
+
+### What replaced the bar's six checks
+
+The docked bar had six geometry checks, and every one of them named the neighbours it
+compared — so a renamed panel made them pass *vacuously*. They are gone, replaced by one
+invariant over `_hud_panels()`, a name→rect table resolved by path so a rename fails
+loudly instead: no two panels overlap, all are on screen, the middle 40% belongs to the
+city, and no panel rect moves when the selection changes. All four have been seen to
+fail — the overlap one names the offending pair, which is worth more than a bare red.
+
+The last of them is the one that earns its keep: `CommandBlock` is pinned in **both**
+axes because an unpinned grid wraps to an 873px column for a full-roster selection. That
+is the exact fault that once put the CONTROLS chip under the bar and stopped it being
+clickable.
+
+### Size panels from a probe, not from arithmetic
+
+Every number in `HUD.tscn` that pins a panel came off a throwaway script that instantiates
+the district, buys the suite's seven-unit fixture, selects everything, and prints each
+panel's rect **and its `get_combined_minimum_size()`**. Laying the August 2026 slim-down
+out by hand instead put the dispatch block through three neighbours at once, and the
+second attempt still had the command block resizing with the selection.
+
+Two things the probe tells you that arithmetic does not:
+
+- **A `PanelContainer`'s content minimum beats its offsets.** Pin it smaller than its
+  contents and it silently grows, so the offsets you wrote are a lower bound and not a
+  size. The failure looks like a panel that moves on its own.
+- **Bottom-anchored offsets give the height as their difference.** `offset_top = -145`
+  with `offset_bottom = -22` is a 123px panel, not a 145px one. Both numbers are negative
+  and it reads like the first one is the height.
+
+Current minimums, for reference: roster 300×238 with eleven units across three services,
+commands 500×141 for the fattest (14-ability) selection. Re-measure rather than
+extrapolate — the roster's is a function of fleet size *and* column width, so a bigger
+career grows it downward into the dispatch block, and the overlap invariant is what
+reports that.
 
 ### It is laid out for 1600x900 and scaled from there
 
@@ -1999,14 +2395,120 @@ one — but **anything measuring the interface must ask the viewport, not the wi
 and `smoke_test.gd` sets `root.size` to the stretch base so its synthesised clicks land
 where it thinks they do. At any other size they came out about a third off.
 
-The scheme is **light**: pale chrome, white cards, dark ink, rounded corners, pills.
-It reads better over a bright Synty city than the dark scheme it replaced — a white
-card with a saturated service colour on it stays legible against a lit shopfront in a
-way a dark translucent panel does not.
+The scheme is **dark**, and since August 2026 it is a **UI kit the user supplied**
+(`ui-kit/` at the project root: 210 vectors, design tokens, nine-slice margins, and a
+reference Godot theme). It went light → dark → kit; each move is recorded in
+`Palette.gd`, because the reasons are not obvious afterwards.
 
 `Palette.gd` holds every colour, `build_theme.gd` bakes `Theme.tres` from it, and the
 drawing code reads the same constants. Without one table the theme and the `_draw`
 calls drift, and a unit ends up one blue in the roster and a different blue on the map.
+
+### What the kit changed, and the one guard it broke
+
+The chrome is now **art**, not styleboxes: `Game/UI/Kit/frames/` holds 114 vectors and
+`build_theme.gd` bakes them into `StyleBoxTexture`s. Nine-slice margins come from
+`ui-kit/NINE-SLICE.md` and are not free parameters — too small and a 6px corner
+stretches into an ellipse, too large and the middle stops repeating. Circular pieces
+(slider grabbers, status dots) are never nine-sliced; the kit says so and an oval
+grabber is the proof. Type is the kit's pairing: **Rajdhani** for display, headings and
+button labels, **Barlow** for body copy, which is most of why it reads as the reference
+rather than as stock Godot.
+
+`Palette`'s chrome constants are the kit's tokens **to the byte**, so the drawn parts
+(minimap, command tiles, avatars) match the frames around them. The split worth knowing:
+**chrome is the kit's, signals are the game's.** Service and marker colours stay as they
+were, because they are read over a lit 3D city rather than on a dark panel, and the kit
+has no opinion about that.
+
+**One guard had to be re-pointed, which is worth being plain about.** The suite asserted
+that adjacent surfaces differ by ≥1.3:1 in fill. The kit separates surfaces with a
+*stroke* and a gradient instead — its raised panel is `#18222F → #0E1620` inside a
+`#212D3C` line, and the fills either side are 1.16:1 apart — so that row failed on art
+that is plainly legible. The check now makes each pair **name its separator**: a pair
+with no stroke is still held to 1.3, and a pair that claims one must show that stroke
+stepping clear of the darker fill. It is a loosening; what stops it being the kind that
+gets obeyed-by-lowering is that the original failure mode — a surface the same colour as
+its ground with nothing between them — still fails either arm.
+
+**What wears the kit now**, beyond the theme itself: the top bar (a framed strip of
+stat blocks, rebuilt from a centred pill cluster — the node stayed a `StatusStrip` at
+the same path and changed what it *is*, which is what made the adoption cheap), the call
+list (kit list rows with the kit's status dots, mapped onto the board's three real
+statuses — the fourth dot goes unused rather than being wired to something it does not
+mean), the radio log (notification frames toned by outcome: a new job amber, a delivery
+green, a lost casualty red), the minimap (the kit's map frame), the unit readout (the
+kit's unit-selection panel, header bar and all), the command tiles (the kit's grid
+plate) and the shop cards (the recessed panel, replacing a hand-rolled well).
+
+Three suite fixtures had to learn the new shapes, all the same class of thing: a
+positional `get_child(3)` into a call row that gained a status-dot column, and two
+readers that expected a log line to *be* a Label when it became a Label inside a frame.
+Each now finds what it wants by type rather than by counting to it.
+
+Two checks pin the kit itself, because nothing else here can see it: the suite is
+headless and never looks at a pixel, so a builder edit that dropped back to flat
+styleboxes would restore the old look with everything green. They assert a card is drawn
+from a texture under `Game/UI/Kit/` and that button labels are set in a face under
+`Game/UI/Fonts/`.
+
+### The main menu
+
+Built to the reference the user supplied: a title plate, a column of icon rows, a
+version plate at the foot. `Game/MainMenu.tscn` is the project's `main_scene` — the
+game opens on it.
+
+**The scene is authored at its hour** — night, since August 2026 — so what the editor
+shows is what ships. It was not
+at first: `Daylight` rewrote the lights and the environment on load, and the saved scene
+described a bright midday forecourt that nothing ever rendered — which makes placing a
+light in the editor guesswork. `Game/author_menu_hour.gd` writes the preset for
+`MenuBackdrop.HOUR` into the scene's two suns and gave it its own environment copy (`Game/UI/MenuEnvironment.tres` —
+the vendor `.tres` it referenced is shared with the district, and editing that in place
+would have dimmed the whole game). The values were **read out of `Daylight.PRESETS`**
+rather than retyped, and every one of them is an absolute assignment, so the runtime
+grade running over an already-dusk scene is a no-op rather than a second darkening. The hour stays a
+one-line change **with a second half**: `MenuBackdrop.HOUR` is what the game applies,
+and `author_menu_hour.gd` — which reads that same constant — is what teaches the saved
+scene about it. Change the one without re-running the other and the game is right while
+the editor lies.
+
+**The lighting is authored too.** Street lamps on every pole, headlights and a lightbar
+on each emergency vehicle — 18 nodes written in by `Game/author_menu_lights.gd`, so the
+editor viewport shows what ships and each light can be dragged, recoloured and re-aimed
+by hand. What run time still owns is the *flashing*, because a saved scene cannot blink:
+`MenuBackdrop` finds the beads and runs `Vehicle`'s double-blink over them. The cost,
+worth stating: the lamps used to hang off the shell's `StreetLights` node, whose
+visibility `Daylight` switches with the hour; authored, they are simply on. That is the
+right trade only because this scene is a *set* — it is always dusk here and the hour is
+a constant. It would be the wrong trade in the district, where the hour is a setting.
+
+**The picture is a scene, not a still.** The user authored
+`Assets/PolygonTown/Scenes/MainMenu.tscn` in the editor — a petrol station well alight,
+a police cordon, an appliance pulled up — and it is treated as read-only input exactly
+like the tutorial town: `MenuBackdrop` instances it and dresses it at run time, so cars
+can be moved about in the editor and the menu simply shows the new arrangement. Dusk
+and rain come from [Daylight], the district's own weather node pointed at the vendor
+scene's two suns, rather than anything painted in. The environment resource is
+**duplicated before it is touched**, because Daylight writes fog and ambient into
+whatever it is given and that `.tres` is shared — dimming the district's sky as a side
+effect of opening the menu is the bug that would otherwise be waiting.
+
+**No HUD, because there is no HUD in the scene.** The bar, minimap and call list cannot
+leak onto the title screen when they are not there to leak; that is the thing a
+separate menu scene buys over an overlay. The cost is that PLAY, TUTORIAL and SCENARIOS
+are now scene changes, and two of them carry state across the gap: `GameMenu.skip_title`
+so the district does not open a second title card on arrival, and
+`GameMenu.pending_scenario` so a scenario picked from the menu starts once there is a
+district to run it in. Statics rather than signals because the two menus never exist at
+the same time — one scene is torn down before the other is built.
+
+Two checks pin the layout, because both failure modes are silent. A centred card would
+satisfy every other check on this screen while looking nothing like the reference, so
+one asserts the column starts in the left tenth and ends before 40% across. And the row
+icons are looked up by name at build time -- `_icon()` returns null for a missing file
+and a Button treats that as "no icon" -- so a renamed asset would cost the menu its
+pictures without costing it a row. The other counts them.
 
 ### Unit avatars are real renders
 
@@ -2636,6 +3138,41 @@ invisible at this camera distance.
 `Armature/GeneralSkeleton:BoneName`, so the skeleton must sit at exactly that path
 under the `AnimationPlayer`'s root or nothing binds.
 
+### One library, referenced — and the line that decides it
+
+All eleven character scenes share `Rigs/ual_standard.res`, and the sharing rests on a
+single call in `build_character._extract_library()`:
+
+    library.take_over_path(LIBRARY_PATH)
+
+`ResourceSaver.save()` writes the file but leaves the in-memory resource **pathless**,
+and `PackedScene.pack()` inlines any resource it cannot point at. Without that line
+the library is saved correctly, referenced by nothing, and copied whole into every
+character scene — which is exactly how it stood until August 2026: eleven 3.02 MB
+scenes carrying byte-identical keyframes (16 differing lines in 18,167, all node ids
+and mesh refs), **315 ms each to parse**.
+
+Nothing looked wrong. It was measured only when the tutorial's opening delay was
+chased with a stopwatch:
+
+| | before | after |
+|---|---|---|
+| the eleven characters, cold | 3,461 ms | **66 ms** |
+| tutorial's first frame | 5,770 ms | **28 ms** |
+| a casualty or missing-child spawn | ~630 ms | **~1 ms** |
+| the scenes on disk | 3.02 MB each | 29 KB each |
+
+The library is deliberately **binary** (`.res`, not `.tres`): the same 43 clips are
+3.0 MB of text that parses in 313 ms, and 1.2 MB of binary that loads in 7 ms. Text
+parsing of keyframed float tracks was the whole cost, and every character-bearing
+scene paid it — a casualty spawned two, its own and the outfit `_wear_outfit()` puts
+on it, which is why missions hitched as they opened.
+
+Two checks guard it, because a regression here is invisible: the game looks and plays
+exactly the same, it just quietly gets slow again on the next rebuild. They assert
+that all eleven scenes hand back **one** library instance, and that its path is the
+file on disk (an embedded copy has none of its own).
+
 One trap worth knowing: an `autoplay` set on an **instanced** scene's child is not
 preserved by `PackedScene.pack()`. A first attempt at a check scene did that and
 rendered six identical T-poses that looked exactly like a failed retarget.
@@ -2652,7 +3189,7 @@ directly with `godot --path . res://Game/AnimationViewer.tscn`.
 `--fixed-fps 60` decouples the headless loop from the wall clock: same fixed-step
 physics, same checks, ~20 seconds instead of ~9 minutes.
 
-846 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
+1006 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
 shift through the station (the map ships empty), and every bought unit is clickable
 from the opening view; the crowd strolls, runs from a fire and cannot be selected or
 picked through; traffic drives the roads and yields; units start parked, drive to a
@@ -2660,8 +3197,10 @@ target, stop on arrival, turn around for a target behind them, cross the distric
 corner to corner, route around the centre block, and — ordered into the middle of a
 block — come to rest out on the street instead; synthesised input for select /
 deselect / box-select / shift-add / control groups / order / queued order / Stop /
-marker / respawn; camera pan, clamping and zoom; the interface — the bar stays docked
-and leaves the world clickable, the command grid tracks the selection in keyboard
+marker / respawn; camera pan, clamping and zoom; the interface — the panels stay in
+their corners without overlapping and leave the world clickable, the map's zoom buttons
+move the camera, the score strip counts the fleet and pauses the district from its own
+button, the command grid tracks the selection in keyboard
 order, hotkeys arm and fire, the roster lists the shift and refuses civilians, a chip
 selects its unit, every unit has a rendered portrait; calls — an incident opens one,
 a spreading fire stays one, a casualty upgrades it, a unit arriving marks it attended,
@@ -2702,12 +3241,12 @@ Three things the harness has to do, all learned the hard way:
   and watching the test still pass is the only way to catch this.
 
 - **Set `root.size` explicitly.** `--headless` gives a **64x64** viewport, which makes
-  `unproject_position` meaningless and leaves the docked command bar spanning the
-  entire screen, where it eats every click as GUI input before `_unhandled_input` sees
-  it. Symptom: right-clicks silently do nothing, but only after a *clicked* selection
+  `unproject_position` meaningless and leaves the command panels spanning the entire
+  screen, where they eat every click as GUI input before `_unhandled_input` sees it.
+  Symptom: right-clicks silently do nothing, but only after a *clicked* selection
   — a code-driven selection still works, which makes it look like an input bug rather
-  than a layout one. `_test_bar_is_docked_and_solid` now asserts the bar leaves at
-  least 70% of the window to the world, which catches this directly.
+  than a layout one. The panel invariant catches it directly: "the middle of the screen
+  is the city's" cannot hold on a 64x64 viewport, whatever the panels do.
 - **Push events with `Viewport.push_input`,** not `Input.parse_input_event`, which
   only queues; nothing reliably pumps that queue without a display server.
 

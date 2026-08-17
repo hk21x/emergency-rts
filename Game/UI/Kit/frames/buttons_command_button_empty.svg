@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38" fill="none" role="img" aria-label="Command button — empty">
+  <defs>
+    <linearGradient id="cmemp_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0C121B"/><stop offset="1" stop-color="#080D14"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="37" height="37" rx="4" fill="url(#cmemp_g)" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+
+</svg>

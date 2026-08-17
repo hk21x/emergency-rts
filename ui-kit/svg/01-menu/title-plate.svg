@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="80" viewBox="0 0 260 80" fill="none" role="img" aria-label="Title plate">
+  <defs>
+    <linearGradient id="tp_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <rect x="1" y="1" width="258" height="78" rx="6" fill="url(#tp_g)" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="0.6"/>
+  <rect x="9" y="9" width="242" height="62" rx="4" fill="none" fill-opacity="1" stroke="#212D3C" stroke-width="1" stroke-opacity="0.5"/>
+  <text x="130" y="45" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="13" font-weight="700" fill="#55636F" text-anchor="middle" letter-spacing="3.2" opacity="1">TITLE LOCKUP</text>
+
+</svg>

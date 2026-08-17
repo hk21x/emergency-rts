@@ -172,12 +172,11 @@ func _input(event: InputEvent) -> void:
 
 ## One type's card: portrait, name, price, what it does, how many are owned, BUY.
 func _build_card(config: Dictionary) -> Control:
+	# The kit's recessed panel rather than a hand-rolled well: a shop card is a thing
+	# sunk into the storefront, and drawing that by hand was one more place for the
+	# scheme's surface colours to be restated and then drift.
 	var card := PanelContainer.new()
-	var well := StyleBoxFlat.new()
-	well.bg_color = Palette.WELL
-	well.set_corner_radius_all(6)
-	well.set_content_margin_all(float(Palette.STEP))
-	card.add_theme_stylebox_override("panel", well)
+	card.theme_type_variation = &"InsetPanel"
 	card.custom_minimum_size = Vector2(190.0, 0.0)
 
 	var box := VBoxContainer.new()
@@ -239,8 +238,24 @@ func _build_card(config: Dictionary) -> Control:
 	buy.pressed.connect(_on_buy.bind(config["id"]))
 	box.add_child(buy)
 
+	# The card says all of this on its face already; the tooltip is for the moment the
+	# pointer is over the BUY and the eye is not.
+	var told := "%s   £%d\n%s" % [str(config["label"]).to_upper(),
+		int(config["price"]), "\n".join(PackedStringArray(config["blurb"]))]
+	card.tooltip_text = told
+	buy.tooltip_text = told
+
 	_cards[config["id"]] = {"buy": buy, "owned": owned}
 	return card
+
+
+## The BUY button for [param id], or null if the shop has no such card.
+##
+## Public for the tutorial's spotlight: naming a unit in a prompt is not much help when
+## the storefront holds eight of them, so the one being named glows.
+func card_button(id: StringName) -> Button:
+	var pieces: Dictionary = _cards.get(id, {})
+	return pieces.get("buy") as Button if not pieces.is_empty() else null
 
 
 func _refresh() -> void:

@@ -17,6 +17,11 @@ class_name Civilian
 @export var pause_min := 1.5
 @export var pause_max := 6.0
 
+## How far a stroll carries on a map with no pedestrian lattice -- roughly the
+## tile-to-tile hop the graph gives, so the two look the same from the camera.
+const OFF_LATTICE_STEP_MIN := 5.0
+const OFF_LATTICE_STEP_MAX := 14.0
+
 @export_group("Fleeing")
 ## A fire closer than this sends them the other way.
 @export var flee_radius := 14.0
@@ -168,6 +173,16 @@ func _nearest_gathering() -> Incident:
 ## helps, never lands on the scene itself, and never crosses an officer's cordon;
 ## a graph with no closer tile leaves them watching from where the pavement runs out.
 func _approach(point: Vector3) -> void:
+	if not CityGrid.lattice_fits:
+		# Off the lattice the mesh is the only map there is: walk straight at the
+		# scene and stop the respectful distance short, which is what the graph
+		# hops were arranging the long way round.
+		var towards := global_position - point
+		towards.y = 0.0
+		if towards.length() < 0.5:
+			return
+		_walk_to(point + towards.normalized() * watch_near)
+		return
 	var moves := _moves_here()
 	if moves.is_empty():
 		return
@@ -211,6 +226,15 @@ func _nearest_fire() -> Fire:
 ## panicking shopper who sprints into the road has swapped one incident for another.
 ## The scan loop re-aims on each arrival, which is what chains the hops.
 func _flee_from(point: Vector3) -> void:
+	if not CityGrid.lattice_fits:
+		# Straight away from the trouble, as far as the mesh will take them.
+		var away := global_position - point
+		away.y = 0.0
+		if away.length() < 0.5:
+			away = Vector3(_rng.randf_range(-1.0, 1.0), 0.0,
+				_rng.randf_range(-1.0, 1.0))
+		_walk_to(global_position + away.normalized() * OFF_LATTICE_STEP_MAX)
+		return
 	var moves := _moves_here()
 	if moves.is_empty():
 		return
@@ -230,6 +254,9 @@ func _flee_from(point: Vector3) -> void:
 ## from a kerb tile facing a zebra -- straight over the crossing.
 func _stroll() -> void:
 	_pause_left = _rng.randf_range(pause_min, pause_max)
+	if not CityGrid.lattice_fits:
+		_stroll_off_lattice()
+		return
 	var moves := _moves_here()
 	if moves.is_empty():
 		return
@@ -248,8 +275,44 @@ func _stroll() -> void:
 ## in the middle of the carriageway, which is the one thing the district's pedestrians
 ## are never allowed to do.
 func _may_step_to(point: Vector3) -> bool:
+	# Off the lattice there is no table saying where a pavement is; the person mesh
+	# already refuses to path anywhere a pedestrian may not stand.
+	if not CityGrid.lattice_fits:
+		return true
 	var tile := CityGrid.tile_at(point)
 	return CityGrid.walkable(tile.x, tile.y)
+
+
+## Walks at [param point] on the navigation mesh, settling for wherever the mesh
+## actually reaches. The lattice-free counterpart of [method _step_to]: on a map
+## [CityGrid] does not describe, the person mesh is the only honest statement of
+## where a pedestrian may stand -- and it is a better one, because it was baked
+## from that map's own ground.
+func _walk_to(point: Vector3) -> void:
+	var agent := get_node_or_null("NavigationAgent") as NavigationAgent3D
+	if agent == null:
+		return
+	var path := NavigationServer3D.map_get_path(get_world_3d().navigation_map,
+		global_position, point, true, agent.navigation_layers)
+	if path.is_empty():
+		return
+	navigate_to(path[path.size() - 1])
+
+
+## A stroll with no lattice to stroll along: somewhere nearby the mesh can reach.
+## Tries a handful of directions rather than one, so a civilian in a corner is not
+## stuck waiting for the dice.
+func _stroll_off_lattice() -> void:
+	for attempt in 6:
+		var angle := _rng.randf() * TAU
+		var reach := _rng.randf_range(OFF_LATTICE_STEP_MIN, OFF_LATTICE_STEP_MAX)
+		var candidate := global_position \
+			+ Vector3(sin(angle), 0.0, cos(angle)) * reach
+		if _cordon_at(candidate):
+			continue
+		if Unit.can_reach(self, candidate, 1.5):
+			_walk_to(candidate)
+			return
 
 
 func _step_to(tile: Vector2i) -> void:

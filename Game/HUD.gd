@@ -22,12 +22,13 @@ extends CanvasLayer
 @export var daylight_path: NodePath
 
 @onready var _banner: Label = $Root/World/Banner
-@onready var _debrief: Label = $Root/World/Debrief
+@onready var _debrief: Label = $Root/World/ObjectiveBar/Body/Debrief
 @onready var _menu: GameMenu = $Root/Menu
 @onready var _shop: ShopPanel = $Root/Shop
 @onready var _help: PanelContainer = $Root/World/HelpPanel
 @onready var _controls_toggle: PanelContainer = $Root/World/ControlsToggle
 @onready var _status: StatusStrip = $Root/World/StatusStrip
+@onready var _score: ScoreStrip = $Root/World/ScoreStrip
 @onready var _calls: CallList = $Root/World/CallList
 @onready var _radio: RadioLog = $Root/World/RadioLog
 @onready var _debrief_card: DebriefCard = $Root/World/DebriefCard
@@ -50,6 +51,9 @@ func _ready() -> void:
 	if _mission:
 		_mission.state_changed.connect(_show_banner)
 		_status.mission = _mission
+		_score.mission = _mission
+	# The only on-screen route to the pause card and settings; `P` is its shortcut.
+	_score.menu = _menu
 
 	_director = get_node_or_null(director_path) as Director
 	_status.director = _director
@@ -60,6 +64,12 @@ func _ready() -> void:
 	# that was left at night comes back at night.
 	_menu.daylight = get_node_or_null(daylight_path) as Daylight
 	_station = get_node_or_null(station_path) as Station
+	_score.station = _station
+	if _station:
+		# The strip re-reads itself every frame *while a shift runs*, which is when the
+		# score moves. Buying the first unit happens before that, on a quiet district --
+		# so the fleet count needs telling, or it sits on zero until F2.
+		_station.roster_changed.connect(_score.refresh)
 	# The radio takes all three: the board for jobs opening and crews arriving, the
 	# director for the shift's own start and finish, the station for a booking-in.
 	# Everything else it hears by watching incidents resolve.
@@ -96,9 +106,19 @@ func _ready() -> void:
 	# null and leave the bar empty for the whole session.
 	_portrait.controller = controller
 	_roster.controller = controller
+	# The roster is where units are sent out from now, so it needs the books as well as
+	# the selection.
+	_roster.station = _station
+	# Not to build anything with -- the menu needs it to tell "cancel what I am doing"
+	# from "open the menu" now that both are Escape.
+	_menu.controller = controller
 	_commands.controller = controller
 	_calls.controller = controller
 	_dispatch.controller = controller
+	var controls := get_node_or_null(
+		"Root/World/MapControls") as MapControls
+	if controls:
+		controls.camera = get_viewport().get_camera_3d() as RTSCamera
 	var minimap := get_node_or_null("Root/World/MinimapCard/Minimap") as Minimap
 	if minimap:
 		minimap.controller = controller
@@ -106,6 +126,7 @@ func _ready() -> void:
 	# holds the shop so its heading (and any unowned row) can open it.
 	_shop.station = _station
 	_dispatch.shop = _shop
+	_wire_buy_button()
 	# Last: the setter builds the rows and needs the controller already in place, so a
 	# dispatched unit can be handed straight to the selection.
 	_dispatch.station = _station
@@ -123,9 +144,39 @@ func _refresh_hint() -> void:
 	if _station:
 		for config in Station.TYPES:
 			fleet += _station.total(config["id"])
-	_debrief.text = "Buy your first units from  DISPATCH" if _station and fleet == 0 \
+	_debrief.text = "Buy your first units from the  CART  button" if _station and fleet == 0 \
 		else "Press  F2  to start a shift"
 	_debrief.visible = true
+
+
+## The corner buy button: an icon, a tooltip, and the shop behind it.
+##
+## Dressed here rather than in `HUD.tscn` because a `.tscn` cannot say "use this icon if
+## the file exists" -- and the kit's icon set is a vendor folder, so a missing name has to
+## cost the picture and not the button. Same rule the glyph pack and the map controls
+## follow.
+func _wire_buy_button() -> void:
+	var buy := get_node_or_null("Root/World/BuyButton") as Button
+	if buy == null:
+		return
+	# **A cart, drawn for this button.** It was the kit's plus, because none of its 44
+	# icons is a cart -- and a plus reads as "add one more of whatever I am looking at",
+	# which is not what a storefront door means. `Game/UI/Icons/` is the project's own
+	# folder, so a glyph the vendor pack does not carry is authored here rather than
+	# added to `Game/UI/Kit/`, which is a copy of someone else's set.
+	var path := "res://Game/UI/Icons/cart.svg"
+	if ResourceLoader.exists(path):
+		buy.icon = load(path) as Texture2D
+	# **Godot left-aligns a Button's icon**, even when the button has no text for it to
+	# sit beside -- so an icon-only button draws its glyph against the left margin and
+	# looks skewed. Both alignments have to be said; setting the horizontal one alone
+	# leaves it riding high.
+	buy.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	buy.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
+	buy.tooltip_text = "Buy units"
+	Hover.attach(buy)
+	if not buy.pressed.is_connected(_shop.open_shop):
+		buy.pressed.connect(_shop.open_shop)
 
 
 func _on_controls_toggle(event: InputEvent) -> void:
@@ -153,9 +204,12 @@ func _show_banner(state: Mission.State) -> void:
 	_debrief.visible = false
 	match state:
 		Mission.State.WON:
-			_banner.text = "SHOUT COMPLETE"
-			_banner.add_theme_color_override("font_color", Palette.MEDICAL_DEEP)
-			_banner.visible = true
+			# The card carries the heading now, the same trade the end of a shift
+			# makes: a banner can say the job is done and nothing else, and what a
+			# player wants at the end of one is what it came to.
+			_banner.visible = false
+			if _mission:
+				_debrief_card.show_shout(_mission)
 		Mission.State.LOST:
 			_banner.text = "CASUALTY LOST"
 			_banner.add_theme_color_override("font_color", Palette.CASUALTY_DEEP)
@@ -170,3 +224,7 @@ func _show_banner(state: Mission.State) -> void:
 				_debrief_card.show_shift(_mission)
 		_:
 			_banner.visible = false
+			# Back to RUNNING -- a new shift, or a shout re-opened. The card goes with
+			# it, and takes its hold on the mouse with it: a modal left standing over a
+			# live district would swallow every order the player gave.
+			_debrief_card.hide_card()

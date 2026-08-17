@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="78" height="28" viewBox="0 0 78 28" fill="none" role="img" aria-label="Button small — secondary / hover">
+  <defs>
+    <linearGradient id="bssechov_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22303F"/><stop offset="1" stop-color="#16202C"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="77" height="27" rx="3" fill="url(#bssechov_g)" fill-opacity="1" stroke="#3D4F63" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H72" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="1" stroke-linecap="round"/>
+
+</svg>

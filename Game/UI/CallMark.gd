@@ -53,11 +53,30 @@ static func symbol(kind: Call.Kind) -> StringName:
 		_: return &"flame"
 
 
+## Drawn without its disc, for a mark that already has a coloured plate behind it.
+##
+## The call list's rows put this in the notification frame's icon tab, which is a solid
+## square of the tone the row is in -- and a coloured disc drawn on top of a coloured
+## square reads as two badges arguing rather than one icon. Flat, the tab is the colour
+## and this is only the symbol.
+@export var flat := false: set = _set_flat
+
+
+func _set_flat(value: bool) -> void:
+	flat = value
+	queue_redraw()
+
+
 func _draw() -> void:
 	if call == null or not is_instance_valid(call):
 		return
 	var centre := size * 0.5
 	var radius := minf(size.x, size.y) * 0.5
 	var tone := shades(call.kind)
+	if flat:
+		# Light ink, because every tone the tab comes in is dark enough to carry it.
+		Glyph.draw(self, symbol(call.kind), centre, radius * 0.60, Palette.TEXT,
+			Color(0, 0, 0, 0))
+		return
 	draw_circle(centre, radius, tone[0])
 	Glyph.draw(self, symbol(call.kind), centre, radius * 0.56, tone[1], tone[0])

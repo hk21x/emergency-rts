@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="62" viewBox="0 0 620 62" fill="none" role="img" aria-label="Top bar — composed">
+  <defs>
+    <linearGradient id="tc_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+    <linearGradient id="tc_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A7FE0"/><stop offset="1" stop-color="#125AAF"/></linearGradient>
+    <linearGradient id="tc_s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0C121B"/><stop offset="1" stop-color="#080D14"/></linearGradient>
+
+  </defs>
+  <rect x="1" y="1" width="618" height="60" rx="6" fill="url(#tc_g)" fill-opacity="1" stroke="#212D3C" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H614" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1" stroke-linecap="round"/>
+  <rect x="7" y="7" width="48" height="48" rx="4" fill="url(#tc_b)" fill-opacity="1" stroke="#4A9CF0" stroke-width="1" stroke-opacity="1"/>
+  <g transform="translate(19 19) scale(1.00000)" color="#FFFFFF" opacity="1"><path d="M4.0 6.6h16M4.0 12h16M4.0 17.4h16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <text x="68" y="26" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="12" font-weight="700" fill="#DFE7F0" text-anchor="start" letter-spacing="1.2" opacity="1">MISSION OBJECTIVE</text>
+  <text x="68" y="44" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="11" font-weight="500" fill="#8FA0B2" text-anchor="start" letter-spacing="0.4" opacity="1">Extinguish the building fire and rescue civilians.</text>
+  <text x="383" y="26" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="9.5" font-weight="700" fill="#8FA0B2" text-anchor="middle" letter-spacing="1.8" opacity="1">TIME</text>
+  <text x="383" y="44" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="15" font-weight="700" fill="#DFE7F0" text-anchor="middle" letter-spacing="0.6" opacity="1">08:45</text>
+  <text x="457" y="26" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="9.5" font-weight="700" fill="#8FA0B2" text-anchor="middle" letter-spacing="1.8" opacity="1">SCORE</text>
+  <text x="457" y="44" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="15" font-weight="700" fill="#DFE7F0" text-anchor="middle" letter-spacing="0.6" opacity="1">12,450</text>
+  <text x="531" y="26" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="9.5" font-weight="700" fill="#8FA0B2" text-anchor="middle" letter-spacing="1.8" opacity="1">UNITS</text>
+  <text x="531" y="44" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="15" font-weight="700" fill="#DFE7F0" text-anchor="middle" letter-spacing="0.6" opacity="1">12/20</text>
+  <rect x="566" y="7" width="48" height="48" rx="4" fill="#151E2A" fill-opacity="1" stroke="#2E3D4F" stroke-width="1" stroke-opacity="1"/>
+  <g transform="translate(578 20) scale(0.91667)" color="#DFE7F0" opacity="1"><path d="M7.0 4.6h3.6v14.8H7.0ZM13.4 4.6h3.6v14.8h-3.6Z" fill="currentColor" fill-rule="nonzero"/></g>
+
+</svg>

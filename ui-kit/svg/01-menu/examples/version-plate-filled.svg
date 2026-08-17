@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="64" viewBox="0 0 200 64" fill="none" role="img" aria-label="Version plate — filled">
+  <defs>
+    <linearGradient id="vp_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="199" height="63" rx="4" fill="url(#vp_g)" fill-opacity="1" stroke="#212D3C" stroke-width="1" stroke-opacity="1"/>
+  <text x="12" y="22" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="11.5" font-weight="700" fill="#DFE7F0" text-anchor="start" letter-spacing="1.4" opacity="1">VERSION 1.0</text>
+  <text x="12" y="40" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="10.5" font-weight="500" fill="#8FA0B2" text-anchor="start" letter-spacing="0.4" opacity="1">Your studio name</text>
+  <text x="12" y="54" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="10.5" font-weight="500" fill="#8FA0B2" text-anchor="start" letter-spacing="0.4" opacity="1">All rights reserved.</text>
+
+</svg>

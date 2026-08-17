@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none" role="img" aria-label="Badge tile — red">
+  <defs>
+    <linearGradient id="bgred_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E8735C"/><stop offset="1" stop-color="#B2382A"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="39" height="39" rx="5" fill="url(#bgred_g)" fill-opacity="1" stroke="#E8735C" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H34" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linecap="round"/>
+
+</svg>

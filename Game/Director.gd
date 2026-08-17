@@ -92,7 +92,10 @@ const KERB_OFFSET := CityGrid.LANE_OFFSET + 1.5
 const KINDS := [
 	{"id": &"medical", "weight": 35},
 	{"id": &"fire", "weight": 25},
-	{"id": &"rtc", "weight": 15},
+	# `wet_weight` replaces `weight` while the road is wet (rain or snow): collisions
+	# climb when the grip goes, which makes the weather a dispatch fact rather than a
+	# screen effect. See _kind_weight().
+	{"id": &"rtc", "weight": 15, "wet_weight": 30},
 	{"id": &"crime", "weight": 15},
 	{"id": &"vehicle_fire", "weight": 10},
 	{"id": &"building", "weight": 20, "needs_fire_service": true},
@@ -118,7 +121,7 @@ const KINDS := [
 	# **The RTC at the size where dispatch order matters.** One ambulance carries two
 	# stretchers, so three-plus casualties force the triage question the two-body RTC
 	# never asks: who rides first? Sized by the medical roster, gentled per casualty.
-	{"id": &"bus_rtc", "weight": 8},
+	{"id": &"bus_rtc", "weight": 8, "wet_weight": 16},
 	# **The one call whose patient is the road.** Nothing burns and nobody is hurt;
 	# the street itself is shut until a crew clears it, and the district's own traffic
 	# reacts. Ungated: officers and firefighters both carry the verb, and every career
@@ -128,6 +131,10 @@ const KINDS := [
 	# and only a paramedic's assessment tells them apart -- so it is dispatched on the
 	# not-knowing, which no other call asks the player to do.
 	{"id": &"drunk", "weight": 12},
+	# **The call whose marker admits it does not know where the job is.** The marker
+	# stands at the last-seen report; the child strolls the walk graph unmarked, and a
+	# unit finds them by getting close. The first call the player *searches*.
+	{"id": &"missing_child", "weight": 8},
 ]
 
 ## What a vehicle fire leaves at the kerb. Plain mesh prefabs straight from the pack:
@@ -346,6 +353,8 @@ func open_kind(kind: StringName) -> void:
 			_spawn_shed_load()
 		&"drunk":
 			_spawn_drunk()
+		&"missing_child":
+			_spawn_missing_child()
 		_:
 			_spawn_medical()
 	# A tick with nowhere to put a call simply skips it; the timer has already been
@@ -353,6 +362,7 @@ func open_kind(kind: StringName) -> void:
 
 
 func _pick_kind() -> StringName:
+	var wet := _road_is_wet()
 	var offered: Array[Dictionary] = []
 	var total := 0
 	for kind in KINDS:
@@ -361,13 +371,51 @@ func _pick_kind() -> StringName:
 		if kind.get("needs_doctor", false) and not _has_doctor():
 			continue
 		offered.append(kind)
-		total += int(kind["weight"])
+		total += _kind_weight(kind, wet)
 	var roll := _rng.randi_range(1, total)
 	for kind in offered:
-		roll -= int(kind["weight"])
+		roll -= _kind_weight(kind, wet)
 		if roll <= 0:
 			return kind["id"]
 	return &"medical"
+
+
+## A kind's weight in the current conditions: wet weather -- rain or snow, the sky's
+## own [method Daylight.is_wet] -- swaps in the row's `wet_weight` where it carries one.
+func _kind_weight(kind: Dictionary, wet: bool) -> int:
+	if wet and kind.has("wet_weight"):
+		return int(kind["wet_weight"])
+	return int(kind["weight"])
+
+
+func _road_is_wet() -> bool:
+	var daylight := get_tree().get_first_node_in_group(Daylight.GROUP) as Daylight
+	return daylight != null and daylight.is_wet()
+
+
+## What a shift may open under. Clear-heavy on purpose: weather is an event, not the
+## default, and a district that is usually dry is what makes the wet shift read.
+const WEATHER_ROLL := [
+	{"weather": Daylight.Weather.CLEAR, "weight": 50},
+	{"weather": Daylight.Weather.RAIN, "weight": 24},
+	{"weather": Daylight.Weather.FOG, "weight": 14},
+	{"weather": Daylight.Weather.SNOW, "weight": 12},
+]
+
+
+## The shift's weather, drawn from the seeded stream so a reproduced shift is rained on
+## identically. The director owns the dice and nothing else: the menu owns the policy
+## of whether a shift rolls at all, and the sky owns what the answer looks like.
+func roll_weather() -> int:
+	var total := 0
+	for row in WEATHER_ROLL:
+		total += int(row["weight"])
+	var roll := _rng.randi_range(1, total)
+	for row in WEATHER_ROLL:
+		roll -= int(row["weight"])
+		if roll <= 0:
+			return int(row["weather"])
+	return Daylight.Weather.CLEAR
 
 
 ## How big a building fire is, by how many firefighters the career has to send.
@@ -850,6 +898,59 @@ func _spawn_drunk() -> void:
 		prop.position = Vector3(sin(angle), 0.0, cos(angle)) * 0.6
 
 
+## A child reported missing: a parent standing at the last-seen point, and the child
+## themselves strolling the walk graph a genuine walk away. The report carries the
+## call, the marker and the flavour; the child wears nothing, which is the game --
+## the player searches the nearby streets rather than clicking a dot.
+func _spawn_missing_child() -> void:
+	var anchor_spot := _pick_pavement()
+	if anchor_spot == Vector3.INF:
+		return
+	var spot := _child_spot(anchor_spot)
+	if spot == Vector3.INF:
+		return
+	var anchor := _spawn("res://Game/Incidents/MissingChild.tscn") as MissingChild
+	if anchor == null:
+		return
+	anchor.global_position = anchor_spot
+	anchor.flavour = "Child reported missing"
+	var parent := get_node_or_null(incidents_path)
+	if parent == null:
+		return
+	var child := (load("res://Game/Units/Child.tscn") as PackedScene) \
+		.instantiate() as ChildWanderer
+	# Position and tether set before add_child: a Civilian seeds its stroll and finds
+	# its graph tile in _ready, and a child who woke up at the origin would spend its
+	# first stroll walking back from a tile it was never on.
+	child.position = spot
+	child.wander_centre = spot
+	parent.add_child(child)
+	child.global_position = spot
+	anchor.child = child
+	# The child leaves with the report -- found, torn down or abandoned. The shed-load
+	# truck pattern.
+	anchor.tree_exited.connect(func() -> void:
+		if is_instance_valid(child):
+			child.queue_free())
+
+
+## A pavement point a genuine journey from the last-seen spot: far enough that the
+## search wants the district swept rather than the next street glanced at, near enough
+## that the child's roam tether and the call's promise agree. Widened from 25-55 once
+## the find became the middle of the job -- with the drive home carrying the weight,
+## the search in front of it earns real distance.
+func _child_spot(anchor: Vector3) -> Vector3:
+	var candidates: Array[Vector3] = []
+	for point in CityGrid.pavement_points():
+		var offset := point - anchor
+		offset.y = 0.0
+		if offset.length() >= 45.0 and offset.length() <= 90.0:
+			candidates.append(point)
+	if candidates.is_empty():
+		return Vector3.INF
+	return candidates[_rng.randi_range(0, candidates.size() - 1)]
+
+
 func _spawn(scene_path: String, outfit := "") -> Node3D:
 	var parent := get_node_or_null(incidents_path)
 	if parent == null:
@@ -874,6 +975,10 @@ func _pick_civilian() -> Civilian:
 	for node in get_tree().get_nodes_in_group(Unit.GROUP):
 		var civilian := node as Civilian
 		if civilian == null or civilian.is_fleeing:
+			continue
+		# Never the child of a missing-child call: taking them frees a body its report
+		# is scanning for, and the search would close itself as a job done.
+		if civilian is ChildWanderer:
 			continue
 		if _clear(civilian.global_position):
 			candidates.append(civilian)

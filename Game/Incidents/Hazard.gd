@@ -196,6 +196,11 @@ func _hurt_people(here: Vector3) -> void:
 			continue
 		if _falloff(civilian.global_position, here) <= 0.0:
 			continue
+		# The missing child is a civilian by construction but never blast fodder:
+		# converting them to a casualty frees the body their report is scanning for,
+		# and the search call would quietly close as done.
+		if civilian is ChildWanderer:
+			continue
 		var casualty := (load("res://Game/Incidents/Casualty.tscn") as PackedScene) \
 			.instantiate() as Casualty
 		if casualty == null:

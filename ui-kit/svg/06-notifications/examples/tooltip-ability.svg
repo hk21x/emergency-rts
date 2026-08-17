@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="76" viewBox="0 0 220 76" fill="none" role="img" aria-label="Tooltip — ability">
+  <defs>
+    <linearGradient id="tt_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <path d="M6 0.5 H214 A5.5 5.5 0 0 1 219.5 6 V60 A5.5 5.5 0 0 1 214 65.5 H116 L110 73 L104 65.5 H6 A5.5 5.5 0 0 1 0.5 60 V6 A5.5 5.5 0 0 1 6 0.5 Z" fill="url(#tt_g)" stroke="#2E3D4F" stroke-width="1"/>
+  <rect x="10" y="10" width="26" height="26" rx="3" fill="#0C121B" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <g transform="translate(15 15) scale(0.66667)" color="#7FB8F5" opacity="1"><path d="M12 2.2c3.6 4.4 6.4 7.4 6.4 11a6.4 6.4 0 0 1-12.8 0c0-3.6 2.8-6.6 6.4-11Z" fill="currentColor" fill-rule="nonzero"/></g>
+  <text x="44" y="22" font-family="Rajdhani, 'DejaVu Sans Condensed', 'Segoe UI', sans-serif" font-size="12" font-weight="700" fill="#DFE7F0" text-anchor="start" letter-spacing="1.2" opacity="1">WATER CANNON</text>
+  <text x="44" y="40" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="10.5" font-weight="500" fill="#8FA0B2" text-anchor="start" letter-spacing="0.4" opacity="1">Extinguishes fires in an area.</text>
+  <text x="44" y="54" font-family="Barlow, 'DejaVu Sans', 'Segoe UI', sans-serif" font-size="10.5" font-weight="500" fill="#8FA0B2" text-anchor="start" letter-spacing="0.4" opacity="1">Effective against large fires.</text>
+
+</svg>

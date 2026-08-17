@@ -21,32 +21,64 @@ class_name Daylight
 
 signal changed(mode: int)
 
+## Found by group, the way [Station] is: the director asks the sky about the weather
+## when it weighs its call table, and an exported path would mean the generator
+## learning a new wire.
+const GROUP := &"daylight"
+
 ## DAY is the map as it ships. DUSK is the interesting one to play -- long shadows,
 ## lit windows, and you can still read the street.
 enum Mode { DAY, DUSK, NIGHT }
 
-## CLEAR is the map as it ships. RAIN is the only weather with a *mechanical* half, and
-## deliberately so -- see [constant WET_GRIP].
-enum Weather { CLEAR, RAIN }
+## CLEAR is the map as it ships. Every other weather is one number of mechanics --
+## grip, see [constant GRIP] -- plus an air treatment composed over the hour's preset.
+enum Weather { CLEAR, RAIN, FOG, SNOW }
 
 ## Below this the district is dark enough to want its lights on. A single threshold
 ## rather than a flag per system, so nothing can disagree about whether it is night.
 const LIT_BELOW := Mode.DUSK
 
-## What a wet road is worth, as a fraction of dry grip.
+## What each weather's road is worth, as a fraction of dry grip.
 ##
-## This is the whole of the weather's mechanics, and it is one number because the
-## driving model already asks the right question. The autopilot plans corner entry
+## This is the whole of the weather's mechanics, and it is one number per state because
+## the driving model already asks the right question. The autopilot plans corner entry
 ## speeds from `sqrt(max_lateral_accel * grip_scale * radius)` and caps yaw by the same
 ## term, so scaling grip lengthens braking distances and lowers apex speeds for the
 ## player's units *and* the ambient fleet, with no branch anywhere saying "if raining".
-## Rain is a property of the road, not a case in the controller.
+## Weather is a property of the road, not a case in the controller.
 ##
-## 0.72 rather than something dramatic: the district's junctions are 10m across and the
-## corner planner is already close to the limit of what a car can hold: 0.5 made
+## Rain's 0.72 rather than something dramatic: the district's junctions are 10m across
+## and the corner planner is already close to the limit of what a car can hold: 0.5 made
 ## ordinary junction turns miss their apex and re-route, which reads as broken rather
-## than as weather.
-const WET_GRIP := 0.72
+## than as weather. Snow sits at 0.62 -- below rain, above the rejected 0.5 -- and fog's
+## 0.88 is caution rather than a surface: the road under fog is damp at most, and what
+## fog mostly does is sit in the air.
+const GRIP := {
+	Weather.CLEAR: 1.0,
+	Weather.RAIN: 0.72,
+	Weather.FOG: 0.88,
+	Weather.SNOW: 0.62,
+}
+
+## How each weather thickens and cools the air, composed *after* the hour's preset so
+## the two settings multiply out rather than needing a row per pair.
+##
+## `fog` is an **absolute exponential density, and the weather switches the fog on** --
+## both words earned the hard way. The scene ships with `fog_enabled = false` and its
+## fog in depth mode, where density is an opacity *cap*: every fog_density write in
+## the project's history (the presets', rain's, this table's first two cuts) was a
+## number going into a renderer path that was off. Two sabotage passes measured the
+## values moving and never the look; a player pressing FOG and seeing nothing is what
+## finally measured the look. Weather turns fog_enabled on with exponential mode, and
+## the baseline restore turns it back off, so CLEAR is still the map as shipped.
+const AIR := {
+	Weather.RAIN: {"fog": 0.008,
+		"tint": Color(0.44, 0.47, 0.53), "blend": 0.55, "exposure": 0.92},
+	Weather.FOG: {"fog": 0.022,
+		"tint": Color(0.56, 0.58, 0.62), "blend": 0.75, "exposure": 0.90},
+	Weather.SNOW: {"fog": 0.012,
+		"tint": Color(0.60, 0.63, 0.70), "blend": 0.60, "exposure": 0.97},
+}
 
 @export var time_of_day := Mode.DAY: set = set_time_of_day
 @export var weather := Weather.CLEAR: set = set_weather
@@ -122,9 +154,13 @@ var _baseline := {}
 ## Built the first time it rains and kept thereafter, because a GPUParticles3D with a
 ## process material is not free to construct and the weather is a toggle.
 var _rain: GPUParticles3D
+## Same again for snow: its own node rather than re-dressing the rain's, because the
+## two differ in mesh, fall speed and count, and a re-dress mid-shift would stall.
+var _snow: GPUParticles3D
 
 
 func _ready() -> void:
+	add_to_group(GROUP)
 	_key = get_node_or_null(key_light_path) as DirectionalLight3D
 	_fill = get_node_or_null(fill_light_path) as DirectionalLight3D
 	_street = get_node_or_null(street_lights_path) as Node3D
@@ -147,16 +183,27 @@ func is_dark() -> bool:
 	return time_of_day >= LIT_BELOW
 
 
-## True when the road is wet. The counterpart to [method is_dark], and the only
-## question anything else should ask about the weather.
+## True when the district should be running on its own lights: dark enough, **or
+## fogbound**. Fog is the one weather that lights a city at noon -- lamps and
+## headlamps are how a fogbound street stays legible, and it is what real fog does to
+## a real city. The lighting consumers ask this, not [method is_dark]: dark is a fact
+## about the hour, lit is a decision about the conditions.
+func lights_on() -> bool:
+	return is_dark() or weather == Weather.FOG
+
+
+## True when there is water on the road -- rain or snow. The counterpart to
+## [method is_dark], and the only question anything else should ask about the weather.
+## Fog deliberately does not count: what fog takes is sight, not surface, and the
+## callers of this are asking about the surface.
 func is_wet() -> bool:
-	return weather == Weather.RAIN
+	return weather == Weather.RAIN or weather == Weather.SNOW
 
 
 ## Grip every vehicle on the map is running on, dry 1.0. Public so a measurement can
 ## ask the same question the vehicles do rather than restating the constant.
 func road_grip() -> float:
-	return WET_GRIP if is_wet() else 1.0
+	return float(GRIP.get(weather, 1.0))
 
 
 func set_time_of_day(mode: int) -> void:
@@ -170,7 +217,7 @@ func set_time_of_day(mode: int) -> void:
 
 
 func set_weather(next: int) -> void:
-	var wanted: Weather = clampi(next, Weather.CLEAR, Weather.RAIN) as Weather
+	var wanted: Weather = clampi(next, Weather.CLEAR, Weather.SNOW) as Weather
 	if wanted == weather and not _baseline.is_empty():
 		return
 	weather = wanted
@@ -192,6 +239,10 @@ func _capture() -> void:
 		_baseline["ambient_colour"] = _environment.ambient_light_color
 		_baseline["fog_density"] = _environment.fog_density
 		_baseline["fog_colour"] = _environment.fog_light_color
+		# The switch and the mode, because the weather flips both: the map ships with
+		# fog disabled in depth mode, and CLEAR must put both back exactly.
+		_baseline["fog_enabled"] = _environment.fog_enabled
+		_baseline["fog_mode"] = _environment.fog_mode
 		_baseline["exposure"] = _environment.tonemap_exposure
 	if _sky:
 		_baseline["sky_top"] = _sky.sky_top_color
@@ -227,29 +278,39 @@ func _apply() -> void:
 			_sky.ground_horizon_color = preset["ground_horizon"]
 			_sky.ground_bottom_color = preset["ground_bottom"]
 
-	# Rain thickens the air and cools it, on top of whatever the hour just set. Applied
-	# after the preset rather than folded into it, so the two settings compose: every
-	# hour has a wet version without six more rows in the table.
-	if is_wet() and _environment:
-		_environment.fog_density *= 2.4
+	# Weather thickens the air and cools it, on top of whatever the hour just set.
+	# Applied after the preset rather than folded into it, so the two settings compose:
+	# every hour has a wet, foggy and snowy version without more rows in the table.
+	# The switch is reset from the baseline first, unconditionally: a preset path
+	# (dusk, night) never touches fog_enabled, so without this a spell of fog would
+	# leave the air switched on into the next clear hour.
+	if _environment:
+		_environment.fog_enabled = bool(_baseline.get("fog_enabled", false))
+		_environment.fog_mode = int(_baseline.get("fog_mode", Environment.FOG_MODE_DEPTH)) \
+			as Environment.FogMode
+	var air: Dictionary = AIR.get(weather, {})
+	if not air.is_empty() and _environment:
+		_environment.fog_enabled = true
+		_environment.fog_mode = Environment.FOG_MODE_EXPONENTIAL
+		_environment.fog_density = float(air["fog"])
 		_environment.fog_light_color = _environment.fog_light_color.lerp(
-			Color(0.44, 0.47, 0.53), 0.55)
-		_environment.tonemap_exposure *= 0.92
+			air["tint"], float(air["blend"]))
+		_environment.tonemap_exposure *= float(air["exposure"])
 
 	var wet := road_grip()
 	for node in get_tree().get_nodes_in_group(Unit.GROUP):
 		var vehicle := node as Vehicle
 		if vehicle:
 			vehicle.grip_scale = wet
-	_update_rain()
+	_update_precipitation()
 
-	var dark := is_dark()
+	var lit := lights_on()
 	if _street:
-		_street.visible = dark
+		_street.visible = lit
 	for node in get_tree().get_nodes_in_group(Unit.GROUP):
 		var beams := (node as Node).get_node_or_null("Headlights") as Node3D
 		if beams:
-			beams.visible = dark
+			beams.visible = lit
 
 
 func _restore_daylight() -> void:
@@ -285,36 +346,40 @@ func _on_node_added(node: Node) -> void:
 		(node as Vehicle).grip_scale = road_grip()
 
 
-## The rain, built once and then only shown or hidden.
+## The falling weather, built once per form and then only shown or hidden.
 ##
 ## Parented to this node and moved to sit over the camera each frame rather than made a
 ## child of the camera: the camera is the RTS rig, which is rotated and zoomed, and rain
 ## that inherited that would tilt with it. Water falls straight down whatever the player
 ## is looking at.
-func _update_rain() -> void:
-	if not is_wet():
-		if _rain:
-			_rain.emitting = false
-			_rain.visible = false
-		set_process(false)
-		return
-	if _rain == null:
-		_rain = _build_rain()
-	_rain.visible = true
-	_rain.emitting = true
-	set_process(true)
-	_track_camera()
+func _update_precipitation() -> void:
+	var raining := weather == Weather.RAIN
+	var snowing := weather == Weather.SNOW
+	if raining and _rain == null:
+		_rain = _build_precipitation(false)
+	if snowing and _snow == null:
+		_snow = _build_precipitation(true)
+	if _rain:
+		_rain.visible = raining
+		_rain.emitting = raining
+	if _snow:
+		_snow.visible = snowing
+		_snow.emitting = snowing
+	set_process(raining or snowing)
+	if raining or snowing:
+		_track_camera()
 
 
 func _process(_delta: float) -> void:
 	_track_camera()
 
 
-## Keeps the rain box over whatever the camera is looking at. The district is 260m and
-## the box is 60m, so following the view is what stops the player driving out from under
-## the weather.
+## Keeps the falling weather over whatever the camera is looking at. The district is
+## 260m and the box is 40m, so following the view is what stops the player driving out
+## from under the weather.
 func _track_camera() -> void:
-	if _rain == null or not _rain.visible:
+	var active := _rain if _rain and _rain.visible else _snow
+	if active == null or not active.visible:
 		return
 	var camera := get_viewport().get_camera_3d()
 	if camera == null:
@@ -325,15 +390,21 @@ func _track_camera() -> void:
 	var forward := -camera.global_basis.z
 	if absf(forward.y) > 0.05:
 		focus += forward * (camera.global_position.y / -forward.y)
-	_rain.global_position = Vector3(focus.x, RAIN_HEIGHT, focus.z)
+	active.global_position = Vector3(focus.x, RAIN_HEIGHT, focus.z)
 
 
-func _build_rain() -> GPUParticles3D:
+## One builder for both forms of falling weather; [param snow] picks the deltas.
+## Rain is a thin stretched quad falling fast -- a streak; snow is a small square quad
+## falling slowly with a wide spread -- a flake. Same box, same camera-following, and
+## the note from the rain's first build holds for both: these read as *quantity*, not
+## size, and anything big enough to admire is big enough to look like debris.
+func _build_precipitation(snow: bool) -> GPUParticles3D:
 	var drops := GPUParticles3D.new()
-	drops.name = "Rain"
-	drops.amount = RAIN_DROPS
-	drops.lifetime = 1.4
-	drops.preprocess = 1.4
+	drops.name = "Snow" if snow else "Rain"
+	drops.amount = 1100 if snow else RAIN_DROPS
+	# Slow flakes need to live long enough to cross the whole box height.
+	drops.lifetime = 9.0 if snow else 1.4
+	drops.preprocess = drops.lifetime
 	drops.explosiveness = 0.0
 	# The box is wide enough to cover the view and is not culled when its origin
 	# leaves the frustum, which at this size it constantly would be.
@@ -344,31 +415,29 @@ func _build_rain() -> GPUParticles3D:
 	motion.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
 	motion.emission_box_extents = Vector3(RAIN_BOX, 1.0, RAIN_BOX)
 	motion.direction = Vector3(0.05, -1.0, 0.0)
-	motion.spread = 2.0
-	motion.initial_velocity_min = 18.0
-	motion.initial_velocity_max = 24.0
-	motion.gravity = Vector3(0.0, -22.0, 0.0)
+	motion.spread = 14.0 if snow else 2.0
+	motion.initial_velocity_min = 1.8 if snow else 18.0
+	motion.initial_velocity_max = 3.0 if snow else 24.0
+	motion.gravity = Vector3(0.0, -2.6 if snow else -22.0, 0.0)
 	motion.scale_min = 0.7
 	motion.scale_max = 1.3
 	drops.process_material = motion
 
-	# A thin stretched quad reads as a falling streak at RTS distance; a round sprite
-	# reads as snow.
-	var streak := QuadMesh.new()
-	# Small and faint on purpose. Rain reads as *quantity*, not as size: a big bright
-	# streak at RTS distance looks like debris, and any streak that passes close to the
-	# camera is magnified enormously whatever it measures on the ground.
-	streak.size = Vector2(0.02, 0.42)
+	# A thin stretched quad reads as a falling streak at RTS distance; a round-ish
+	# sprite reads as snow -- the observation is old, and now both halves of it are used.
+	var flake := QuadMesh.new()
+	flake.size = Vector2(0.07, 0.07) if snow else Vector2(0.02, 0.42)
 	var wet := StandardMaterial3D.new()
 	wet.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	wet.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	wet.albedo_color = Color(0.80, 0.87, 0.97, 0.22)
+	wet.albedo_color = Color(0.96, 0.97, 1.0, 0.55) if snow \
+		else Color(0.80, 0.87, 0.97, 0.22)
 	# BILLBOARD_PARTICLES, not BILLBOARD_ENABLED: the particle form keeps the quad's
 	# own Y axis upright while turning it to face the view, which is what makes a drop
 	# read as a falling streak instead of a flake turning end-on.
 	wet.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	streak.material = wet
-	drops.draw_pass_1 = streak
+	flake.material = wet
+	drops.draw_pass_1 = flake
 	drops.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(drops)
 	return drops
@@ -392,7 +461,7 @@ func _fit_headlights(node: Node) -> void:
 
 	var beams := Node3D.new()
 	beams.name = "Headlights"
-	beams.visible = is_dark()
+	beams.visible = lights_on()
 	vehicle.add_child(beams)
 	for side in [-1.0, 1.0]:
 		var beam := SpotLight3D.new()

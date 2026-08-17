@@ -155,8 +155,10 @@ var repairs_paid := 0
 var debt := 0
 var owned := {}
 ## A var rather than a const so the test suite can point the career at a disposable
-## file -- the same contract records_path and settings_path honour.
-var career_path := "user://career.cfg"
+## file -- the same contract records_path and settings_path honour. Exported so a
+## scene can carry its own book: the tutorial's station saves to a separate file and
+## the real career is never touched by a practice run.
+@export var career_path := "user://career.cfg"
 
 ## Running count per type, so a second patrol car is Patrol 2 and not Patrol 1 again.
 var _issued := {}

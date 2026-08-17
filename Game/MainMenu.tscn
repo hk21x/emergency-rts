@@ -1,0 +1,57 @@
+[gd_scene load_steps=6 format=3]
+
+; The screen the game opens on: the user's petrol-station fire, at dusk in the rain,
+; with the menu column over it and **nothing else**. No HUD -- no bar, no minimap, no
+; call list -- because none of it exists in this scene. That is the point of the menu
+; being its own scene rather than an overlay: the game's interface cannot leak onto the
+; title screen if it is not there to leak.
+;
+; Hand-authored, like HUD.tscn. There is no generator because there is nothing to
+; generate: it instances one scene and hangs four nodes off it, and the dressing
+; (camera, environment, dusk, rain) is done at run time by MenuBackdrop so the user can
+; keep editing the vendor scene without a rebuild.
+
+[ext_resource type="Script" path="res://Game/MenuBackdrop.gd" id="1_backdrop"]
+[ext_resource type="PackedScene" path="res://Assets/PolygonTown/Scenes/MainMenu.tscn" id="2_scene"]
+[ext_resource type="Script" path="res://Game/Daylight.gd" id="3_daylight"]
+[ext_resource type="Script" path="res://Game/UI/GameMenu.gd" id="4_menu"]
+[ext_resource type="Theme" path="res://Game/UI/Theme.tres" id="5_theme"]
+
+[node name="MainMenu" type="Node3D"]
+script = ExtResource("1_backdrop")
+
+[node name="Backdrop" parent="." instance=ExtResource("2_scene")]
+
+; Empty, but present: Daylight's street-light path points here and this scene has no
+; switched lamp circuit of its own. Same shape as the tutorial's.
+[node name="StreetLights" type="Node3D" parent="."]
+
+; Pointed at the vendor scene's own two suns and its environment. The paths are the one
+; piece of wiring that breaks if those nodes are renamed in the editor -- everything
+; else here finds its subject by type or by being handed it.
+[node name="Daylight" type="Node" parent="."]
+script = ExtResource("3_daylight")
+key_light_path = NodePath("../Backdrop/Directional light")
+fill_light_path = NodePath("../Backdrop/Directional light (2)")
+environment_path = NodePath("../Backdrop/WorldEnvironment")
+street_lights_path = NodePath("../StreetLights")
+
+[node name="Menu" type="CanvasLayer" parent="."]
+
+; A CanvasLayer cannot carry a theme, so the menu hangs off one Control that can --
+; the same arrangement HUD.tscn uses, for the same reason.
+[node name="Root" type="Control" parent="Menu"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("5_theme")
+
+[node name="Menu" type="Control" parent="Menu/Root"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_menu")
+is_main_menu = true

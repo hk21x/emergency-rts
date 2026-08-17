@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" role="img" aria-label="Radio — on">
+  <defs>
+    <linearGradient id="cb_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0C121B"/><stop offset="1" stop-color="#080D14"/></linearGradient>
+
+  </defs>
+  <circle cx="10" cy="10" r="8.4" fill="url(#cb_g)" stroke="#1668C8" stroke-width="1.4"/>
+  <circle cx="10" cy="10" r="4.2" fill="#4A9CF0"/>
+
+</svg>

@@ -27,9 +27,14 @@ class_name CallSpawner
 const PANEL_WIDTH := 260.0
 const MARGIN := 22.0
 
+## The weather preview strip's labels, in [enum Daylight.Weather] order -- the index
+## *is* the state, the settings card's own convention.
+const WEATHER_LABELS := ["CLEAR", "RAIN", "FOG", "SNOW"]
+
 ## Toggled by the key; nothing is built until the first time it is asked for.
 var _layer: CanvasLayer
 var _panel: PanelContainer
+var _weather_row: HBoxContainer
 var _open := false
 
 
@@ -90,6 +95,23 @@ func _build() -> void:
 		button.pressed.connect(spawn_call.bind(kind))
 		body.add_child(button)
 
+	# The weather strip: the same "see it without waiting" argument as the calls above.
+	# A rolled SHIFT'S OWN sky is one draw in four-ish, and snow at dusk or fog at
+	# night can only be judged by looking.
+	var weather_heading := Label.new()
+	weather_heading.text = "PREVIEW WEATHER"
+	body.add_child(weather_heading)
+	_weather_row = HBoxContainer.new()
+	_weather_row.name = "WeatherRow"
+	body.add_child(_weather_row)
+	for i in WEATHER_LABELS.size():
+		var choice := Button.new()
+		choice.text = str(WEATHER_LABELS[i])
+		choice.toggle_mode = true
+		choice.pressed.connect(preview_weather.bind(i))
+		_weather_row.add_child(choice)
+	_mark_weather()
+
 	var note := Label.new()
 	note.text = "Opens through the director's own placement,\nso nothing lands inside a building."
 	note.add_theme_font_size_override("font_size", 11)
@@ -102,6 +124,31 @@ func spawn_call(kind: StringName) -> void:
 	var director := _director()
 	if director:
 		director.open_kind(kind)
+
+
+## Sets the sky directly, and deliberately does NOT touch the settings card's stored
+## choice: this is a preview for looking at weather, not a settings change, and a dev
+## tool that silently rewrote what the player chose would be worse than no tool.
+## Public for the same reason [method spawn_call] is.
+func preview_weather(state: int) -> void:
+	var daylight := get_tree().get_first_node_in_group(Daylight.GROUP) as Daylight
+	if daylight:
+		daylight.set_weather(state)
+	_mark_weather()
+
+
+## Presses the strip's button for whatever the sky is actually doing, so the tool reads
+## as a state, not a row of triggers.
+func _mark_weather() -> void:
+	if _weather_row == null:
+		return
+	var daylight := get_tree().get_first_node_in_group(Daylight.GROUP) as Daylight
+	if daylight == null:
+		return
+	for i in _weather_row.get_child_count():
+		var choice := _weather_row.get_child(i) as Button
+		if choice:
+			choice.set_pressed_no_signal(i == daylight.weather)
 
 
 ## The director, found the way everything else finds it: by name, as a sibling under the
