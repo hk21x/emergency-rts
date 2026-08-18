@@ -1,0 +1,14 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Synty/PolygonHeist/Textures/PolygonHeist_04_A.png" id="1_atlas"]
+[ext_resource type="Texture2D" path="res://Assets/Synty/PolygonHeist/Textures/Emissive_01.png" id="2_emis"]
+
+[resource]
+resource_name = "RescueLivery"
+depth_draw_mode = 1
+albedo_texture = ExtResource("1_atlas")
+roughness = 0.8
+emission = Color(1, 1, 1, 1)
+emission_operator = 1
+emission_texture = ExtResource("2_emis")
+uv1_scale = Vector3(1, 1, 0)

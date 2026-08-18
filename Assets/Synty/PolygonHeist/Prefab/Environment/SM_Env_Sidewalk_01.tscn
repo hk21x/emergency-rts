@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://cn228bu7o1m1x"]
+
+[ext_resource type="ArrayMesh" uid="uid://il6ufjtas8ub" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Env_Sidewalk_01.res" id="1_m6x0q"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_uoncg"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_s161l"]
+size = Vector3(5, 0.059775352, 5)
+
+[node name="SM_Env_Sidewalk_01" type="MeshInstance3D" unique_id=902710531]
+gi_mode = 2
+mesh = ExtResource("1_m6x0q")
+surface_material_override/0 = ExtResource("2_uoncg")
+
+[node name="BoxCollider" type="StaticBody3D" parent="." unique_id=1787893282]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoxCollider" unique_id=513228766]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, -0.029887676, -2.5)
+shape = SubResource("BoxShape3D_s161l")

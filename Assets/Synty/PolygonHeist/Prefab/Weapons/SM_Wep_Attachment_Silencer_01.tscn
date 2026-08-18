@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dnh7fwptgelvx"]
+
+[ext_resource type="ArrayMesh" uid="uid://c3mhbhgaxnk5g" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_Attachment_Silencer_01.res" id="1_txbp3"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_18h5q"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_pm5mi"]
+points = PackedVector3Array(0.028312381, 0.005233135, -0.071782514, 0.024957266, -0.014891976, -0.071782514, 0.02160215, 0.022008713, -0.071782514, 0.018247034, 0.018653598, 0.13623925, 0.02160215, -0.014891976, 0.1328591, -0.005233193, -0.028312437, -0.071782514, 0.004826572, -0.024957322, 0.1328591, 0.004826572, 0.028718945, -0.071782514, -0.005233193, 0.025363829, 0.1328591, -0.018653654, 0.018653598, 0.1328591, -0.025363885, -0.0048266295, 0.1328591, -0.015298539, -0.021602206, 0.1328591, -0.02200877, -0.021602206, -0.071782514, -0.02200877, 0.022008713, -0.071782514, -0.028719, 0.005233135, -0.0650833, -0.028719, -0.0048266295, -0.0650833)
+
+[node name="SM_Wep_Attachment_Silencer_01" type="MeshInstance3D" unique_id=1405933859]
+gi_mode = 2
+mesh = ExtResource("1_txbp3")
+surface_material_override/0 = ExtResource("2_18h5q")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=2091196176]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=974458318]
+shape = SubResource("ConvexPolygonShape3D_pm5mi")

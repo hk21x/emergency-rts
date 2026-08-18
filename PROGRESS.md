@@ -35,11 +35,12 @@ found along the way.
 | 20. Structure | **half** | The career economy shipped; campaign scenarios are still to author |
 | 21. Feel & consequence | **part** | Weather, time of day, radio log, debrief — plus the driving faults found from play and fixed |
 
-The fire service is **half dressed**. The engine is a real appliance since August 2026 —
+The fire service is **fully dressed** as of August 2026. The engine is a real appliance —
 PolygonTown's fire truck, with a working ladder and its own hose nozzle in the crew's
-hands — but the City pack ships no firefighter, so the crew are still police models
-repainted orange. A style-matched pack would replace them without touching a mechanic:
-the crew's `source` in `build_character.gd` and two portrait entries.
+hands — and the crew are a real firefighter and paramedic from the POLYGON City Characters
+pack. The swap cost exactly what this note predicted (the crew's `source` in
+`build_character.gd` and two portrait entries) plus one thing it did not: a third bone map,
+because the pack ships on its own skeleton.
 
 Explicitly parked: **multiplayer co-op**, a **mod editor**, and **save/load**
 (a shift is 5–15 minutes; there is nothing yet worth saving mid-shift).
@@ -786,6 +787,392 @@ ambulance while pointing at the fire engine — and the sabotage pass proved the
 exactly that, since swapping the spotlight's branches left both prompt-text checks green
 and reddened only the three that assert *which* control is lit.
 
+### Three new bodies and a helicopter (August 2026)
+
+The Heist pack landed and brought a SWAT van, a helicopter and a SWAT officer on **the
+same rig the existing characters use** — drop-ins. Built in one windowed generator run,
+`build_vehicles` -> `build_map`, because regenerating one leaves the map loading old values
+silently.
+
+- **Police van** — 2.47 x 2.41 x 6.09, six cells, £800, **zero new code**. `DISORDER_SIZE`
+  runs to eight suspects at one kerb and a patrol car holds two.
+- **Recovery truck** — built, awaiting the `Wreck` incident that gives it a job.
+- **Air support** — 2.53 x 3.82 x 10.90, £1,800, and the first unit that never touches the
+  road network.
+
+**There is no air pathfinding, and that is the finding rather than a shortcut.** A
+navigation mesh exists to route *around* obstacles; at cruise height there are none, so an
+air mesh would be a second navigation system whose every query returned the straight line
+`Aircraft` already flies. The real work in flight turned out to be the **vertical states**
+and **where you may put it down**.
+
+`Aircraft` is a sibling of `Vehicle`, not a subclass: `Unit`'s movement contract is five
+methods and a helicopter satisfies all five without inheriting 2,400 lines of steering,
+kerbs, reversing and lane discipline that mean nothing in the air. The generator already
+took a per-vehicle `script`, so the seam existed; what it needed was a `drives` split, since
+assigning `cells` or `tank_capacity` to a node without them is an error rather than a no-op.
+
+**Landing is `CityGrid.standable()`** — roads, parks and the pavement ring — so a
+helicopter can never be set down on a roof or in a living room, and the rule cannot drift
+from the one the crowd walks on.
+
+**Three checks of mine were wrong before the code was.** Two waits were short enough to fail
+on their own arithmetic (a 24m climb at 7 m/s takes 3.4s before it travels at all). And the
+landing assertion, named "not overhead", tested only the aircraft's *self-reported phase* —
+sabotage showed a helicopter that jumps to GROUNDED without descending passes it while the
+message prints `y 24.45`. The first repair then measured against the datum captured
+*immediately before landing*, which is cruise height, so `y < datum + 1` was still trivially
+true and the broken descent still passed. It measures against the ground it took off from
+now, and reddens at `y 24.45 against ground 0.45`.
+
+That is the same lesson as the tank and the crowd, in a third costume: **an assertion has to
+be evaluated in a state where only the thing it names can satisfy it** — and a datum read at
+the wrong moment is as good as no datum.
+
+### The helicopter landed every time you told it to go somewhere (August 2026)
+
+Shipped, played, and reported by the user in one sentence: *"we want it to hover by default
+once taken off, as opposed to constantly land."*
+
+`LandAbility.score()` returned **12**, and `MoveAbility` scores **0** because Move is the
+ladder's floor. So Land beat Move on every right-click — and since the only ground it will
+land on is `standable()` ground, which is the only ground you would ever send it to, there
+was no click anywhere on the map that made a helicopter fly and hold. Flying somewhere was
+unreachable through the interface while being fully implemented underneath.
+
+The reasoning in the original comment was not silly — *"a right-click on open ground with a
+helicopter selected means put down there, which is the only thing it could sensibly mean"* —
+it was just wrong about what a helicopter is for. A verb whose target is **ground** cannot be
+resolved from a plain right-click without swallowing Move, because ground is what Move
+targets. `SecureAbility` had already met this and answered it: decline every right-click,
+override `can_target`, and let the player arm it deliberately. Land is armed-only now, and
+the hover fell out with no other change.
+
+**The suite had a helicopter landing check and it could not have caught this**, which is the
+part worth keeping. It called `chopper.land_at(ROAD)` directly — the method, not the verb —
+so it proved the descent and the landing rule while never once asking what a right-click
+resolves to. A check that reaches past the interface tests the engine and vouches for the
+game. The new pair goes through `Unit.resolve()`, and is deliberately two-sided: Move is
+chosen **and** `LandAbility.can_target()` still accepts that exact point, so a landing verb
+that had simply broken cannot pass it.
+
+Then sabotage found half the pair was blind anyway. `so it is still in the air after carrying
+that out` waited 120 ticks — 2 seconds — and from 60m out at cruise height the aircraft needs
+~1.8s to cross and 3.4s to descend, so it was airborne at the 2s mark whichever verb it
+chose. It passed with the bug fully present, for arithmetic reasons. **Third time in one
+function.** Waits in this project are not padding; they are part of the assertion, and the
+number has to be derived from the speeds rather than picked.
+
+### It pivoted like a sprite (August 2026)
+
+Reported the same way, one sentence: *"the helicopter needs to gradually rotate in the sky,
+rather than immediately turn to the point it's going."* `face_towards()` wrote the bearing
+straight into `global_rotation.y`, so ordering it somewhere behind it turned the aircraft
+through 180 degrees inside a single frame and then slid it there, already pointed. Turning
+that into a **rate** is most of what makes the thing look airborne.
+
+`face_towards()` itself had to stay instant -- it is [Unit]'s one-argument contract, and
+[WorkOrder] and the stretcher orders call it expecting the unit to be looking the right way
+on the next frame. The easing lives beside it in `_turn_towards()`, which cruise calls and
+nothing else does.
+
+**It still translates straight at the destination, and that is the important design
+decision.** Flying along the heading would look better and would open the door to a circling
+limit cycle any time the turn rate could not keep up with the speed -- a fault this project
+has already paid to learn once, in a wedged car. Instead the heading eases while the
+movement stays a straight line, so arrival is unconditional; the aircraft merely crabs for
+the two seconds the nose takes. A speed floor (`SIDEWAYS_SPEED`, 0.3) stops it flying
+backwards at full tilt during the swing, and sabotage confirmed the floor earns its place:
+with the turn disabled entirely the aircraft still crossed the district and landed, nose
+180 degrees wrong, with every distance figure unchanged.
+
+**The check that guarded it was half a check.** `< 0.2 rad in 2 frames` asserts the nose does
+not come round *too fast* -- and an aircraft that never turns satisfies that for nothing. The
+sabotage agent noticed, and the measurement was already on the page: with `turn_speed` set to
+zero it printed `0.00 rad in 2 frames` and stayed green. It is a band now, `> 0.01 and < 0.2`,
+which is a statement about turning rather than about not snapping. Worth keeping as a shape:
+**a check written against one failure mode tends to come out one-sided**, because the fault
+you are picturing only ever pushes the number one way.
+
+The rotors, by contrast, were only ever cosmetic: `_update_rotors()` spools with
+`is_airborne()` rather than with speed, because a helicopter holding station has its blades
+at full song and one on the pad has them stopped. Their check reads the blades **by node
+path** so that a regeneration renaming the part reddens a check instead of quietly leaving
+the discs still — and proving the parked half needed its own inverted sabotage (`wanted :=
+1.0`), because a rotor that never turns satisfies "still while parked" for free.
+
+### Water from the main (August 2026)
+
+`Game/Hydrant.gd` with `nearest()`, the finite tank, `refill_per_second` and
+`hydrant_reach` all existed — but the hose ran from the appliance, so a hydrant was a
+refuelling stop. `ConnectAbility` (`P`) and `ConnectOrder` make it a supply: connected, the
+tank stops draining and the crew fight off the main.
+
+**What it changes is where you park.** The hose reaches 18m from the appliance and a
+hydrant holds it at 9m, so an engine can be near the fire, near the water, or at a spot
+serving both — and only the third fights a big fire without a pause to refill. Building
+fires are sized to the crew you own, so the pause is the thing that loses them.
+
+The connection **outlives the order**: `ConnectOrder` finishes the moment the line is on,
+leaving state on the appliance, so the crew can be sent elsewhere while the engine stands
+and supplies them. It breaks by driving away, re-derived every frame rather than trusted —
+nothing announces that a vehicle has moved.
+
+Two implementation notes worth keeping. It targets a **point**, not a thing: the hydrant
+the player sees is drawn into the street-furniture MultiMesh and has no collider, so there
+is nothing to click. And `ConnectOrder` is a `WorkOrder` on a *vehicle*, which is safe
+because `_apply_action` guards its animation on `unit as Person` — an appliance just skips
+the clip.
+
+**This is the third vacuous assertion this session, and the worst of them.** "It never runs
+dry, whatever the tank says" was written with a *full* tank — and `has_water()` is
+`water > 0.0 or is_on_main()`, so the first term satisfied it and the branch it was named
+for was never reached. Deleting `or is_on_main()` outright left **the entire suite green**.
+The repair was in the scenario, not the assertion: empty the tank, then assert it still has
+water on the main and none once away from both. With that, the same deletion reddens.
+
+The pattern across all three: **an assertion that names a branch has to be run in the state
+where only that branch can satisfy it.** A full tank, a calm crowd, a single critical
+casualty — each let a check pass on the wrong term.
+
+### Triage: the board says who is dying (August 2026)
+
+`bus_rtc` puts three to five casualties at one junction against an ambulance that carries
+two stretchers. The decision that call is built around is **who rides first** — and for the
+whole life of the call the board said "4 casualties" and nothing else.
+
+`Casualty.severity()` is a derived tier — STABLE, UNKNOWN, SERIOUS, CRITICAL — off state
+that already existed: `health`, `is_stable`, `needs_doctor`, `needs_assessment`, and
+whether they are already carried or aboard. **Never stored**, because a stored copy is a
+second truth to keep in step. The order is a dispatcher's: anyone already on their way is
+off the list whatever their health says; an unassessed casualty is *unknown* rather than
+assumed well, because the drunk call exists to punish assuming; and `needs_doctor` is
+critical however healthy they look, because a paramedic cannot fix them at all — they can
+only hold them, and holding is not treating. The call row now reads
+`3 casualties, 2 critical`.
+
+**The sabotage found the assertion carrying the whole thing on one casualty.** The row
+check was a bare `contains("critical")`. Dropping the `needs_doctor` term took the critical
+count from 2 to 1 — a real under-count, the exact fault the tier exists to prevent — and
+the assertion never moved, because one critical is enough to put the word on the row. It
+asserts `"2 critical"` now. The general shape is one this project keeps re-learning: **a
+check on a rendered string should assert the number, not the noun**, because the noun
+survives almost any error in the count.
+
+### Panic, bounded (August 2026)
+
+The crowd fled fires "orderly to a fault" — along the pedestrian graph, crossing at the
+zebras even at a run, filing away down the single best line like a queue. Panic changes
+that, and the interesting part is the constraint rather than the feature.
+
+**The bound is that panic never leaves the graph.** It changes *how* they move — running
+rather than walking, scattering rather than filing — and never *where* they may go. That
+was not a compromise reached to satisfy a check; `Civilian._flee_from` already carried the
+argument in a comment, and it is right: a shopper who sprints into the carriageway has
+swapped one incident for another, and **traffic cannot see pedestrians**, so a panicking
+civilian in the road is run over by a car that never brakes. Making them scatter into the
+road would need traffic to model pedestrians first, which is a separate feature.
+
+So panic is a widened tie-break, not a different rule. Calm, the walk takes whichever legal
+hop puts most distance between them and the trouble; frightened, the jitter is comparable
+to a tile, so a near-best hop often wins and the crowd comes apart. Both choose *among
+legal moves*. `Person.hurry` forces the run gait, because a graph hop is under
+`run_distance` and a fleeing civilian would otherwise walk away from a fire.
+
+Panic is a **reading of the distance**, not a state with a timer, so it cannot leak — step
+far enough away and it passes.
+
+Also owed and now paid: **the crowd flees a cylinder about to go.** It had fled fires since
+phase 16 and stood placidly beside a hazard at 0.9 heat the whole time — the one place the
+existing behaviour would have done the right thing if simply told.
+
+**The sabotage pass corrected two things I had believed.** First, the offside assertion was
+*inert on its own*: gated on `is_panicking`, it counts zero samples and passes by default
+when nobody panics — the "post-condition is the default state" trap again. It asserts the
+sample count now. Second, and worth recording because it was written in a comment as
+reassurance: **the 7,200-sample legality sweep does not witness panic at all.** It runs with
+nothing burning, so nobody panics and the branch is never entered; under a sabotage that
+sent panicking civilians into the road it did not move, while this check reported 21 frames
+offside and the flee-legality check 165. An unweakened check is not the same as a covering
+one.
+
+### Health on the roster (August 2026)
+
+A thin bar under each roster chip, and two rules that make it worth having rather than
+decorative.
+
+**Only people.** `health` is a [Person] field; a vehicle's damage is a `repair_bill` in
+pounds, settled when it books in. A bar under a patrol car would be a readout with nothing
+behind it, so the vehicle chips never draw one — and the check asserts the vehicle's bar
+stays hidden *while a person's is showing*, which a "does the bar exist" check would sail
+straight past.
+
+**Only while hurt.** A full bar under every chip is a row of green noise that teaches the
+eye to skip the exact place a warning will appear. It hides at full health, the same rule
+the top bar's stat blocks follow.
+
+The honest test of whether it was worth building at all: **before fire harmed units it
+would have been dead UI.** `health` moved only when a gas cylinder went off, so a bar would
+have sat at 100% for entire careers. It became a live quantity the player can act on one
+change ago, which is why it earns its place now and would not have then.
+
+### Fire became dangerous (August 2026)
+
+The most common call in the game could not hurt you. `Hazard._hurt_people()` has always
+carried a complete, tested chain — crew take harm and go down, civilians convert to
+casualties wearing what they were wearing — and it fired only when a gas cylinder went off,
+the rarest kind in the table. `Fire._singe()` is that chain pointed at fire.
+
+**The number that matters is 3.2, and it is chosen against `ExtinguishOrder.REACH` (5.0),
+not picked for feel.** A unit working a fire closes to REACH and stands there, so a
+firefighter on the hose is 1.8m outside the harm radius and never singed; one the player
+walked past the fire, or parked a crew on top of, is inside it. Fire does not punish
+fighting it — it punishes standing in it. That preserves the design decision that predates
+the harm: `ExtinguishOrder` holds a firefighter at work range *precisely* so the fire
+service stays playable, and a radius at or above REACH would make every building fire a war
+of attrition against your own crew.
+
+The check asserts the property rather than the number: it stands one firefighter at exactly
+REACH and one at 1m, and requires the first to be untouched and the second hurt. Sabotage
+widening the radius to 8.0 reddens it at 0.71 health, measured at 5.0m.
+
+Onlookers catch too, but **only above `spread_threshold`** — below it a bin fire is
+something people stand near; above it the fire is out of hand, and the crowd flees fires
+perfectly well, so anyone still inside was caught rather than careless.
+
+Two things the pass taught:
+
+- **The first onlooker check could not fail for the right reason.** It asserted the shopper
+  had vanished and that the incident tally had risen — but a civilian can vanish for
+  reasons unrelated to fire, and the tally counts the fire itself, so a conversion and an
+  unrelated resolution cancel out. It counts *casualties within 4m of the fire* now.
+- **A widened radius surfaced a latent fragility in an unrelated check.** The crowd-flee
+  test guarded its sampling loop with `is_instance_valid` but not the two assertions after
+  it, so a civilian converted mid-check would raise — which does not fail a check, it
+  abandons the rest of it and drops those assertions from the count silently. It cannot
+  happen at the shipped radius; the inconsistency was worth closing regardless.
+
+### A real fire crew, and a third rig (August 2026)
+
+The last asset gap in the game, closed. The firefighter and the paramedic had been
+repainted police for the project's whole life — the City pack ships police and nothing
+else — and both `build_character.gd` and `Game/README.md` carried apologetic notes saying
+so. The POLYGON City Characters pack arrived with `SK_Character_FireFighter` and
+`SK_Character_Paramedic` in their own kit.
+
+**The route was the one the docs predicted** — the crew's `source` in
+`build_character.gd`, two portrait entries, no mechanic touched — **plus one thing they did
+not predict.** The pack sits on a *third* skeleton: mostly Unreal-mannequin naming, but
+with `Pelvis`, `UpperArm_L`, `Hand_L`, `Thigh_L` and `Foot_L` capitalised where the
+mannequin has them lowercase, `head` lowercase where the mannequin has `Head`, Synty's
+merged finger chains rather than the mannequin's five, and **no `Root` at all** — it starts
+at `Pelvis`, and the `_ik_*` bones are IK helpers, not a character root.
+
+Close enough to the existing mannequin map to look reusable, and far enough that it is not:
+bone names are matched exactly and case-sensitively. So `setup_retarget.gd` gained a third
+map, `CITY_CHARACTERS`, renaming the rig onto the same `SkeletonProfileHumanoid` the Starter
+characters and the animation library already share. After that, one shared
+`AnimationLibrary` drives all three rigs — the suite's own check reports **1 distinct
+instance across 11 character scenes**.
+
+Two decisions worth keeping:
+
+- **The import targets are built by scanning the pack directory**, not by listing nineteen
+  paths. The failure mode for a missed character is not an error: it imports under its own
+  bone names and then *stands still*, playing nothing, while every "is it loaded" check
+  passes.
+- **`strings` on an FBX was not good enough to write the map from.** It found `Foot_L` and
+  missed `Pelvis` entirely, which pointed at the wrong conclusion — that the pack was
+  unrelated to anything already mapped. Loading the scene in Godot and printing
+  `Skeleton3D.get_bone_name()` gave the real 55-bone list, and the map fell out of it in one
+  pass.
+
+The paint-warmth check needed no re-pointing: it guards the real turnout kit now instead of
+the repaint trick, and passes at **+0.18** where the repaint managed +0.08. `ALT_FIRE` in
+`build_portraits.gd` is gone — a real fire kit needs no palette fold.
+
+Still asset-blocked after this: K9 (no dog mesh anywhere), water rescue (no hull, no water),
+hazmat (no suits). Ladder rescue is *no longer* asset-blocked — the models and the animated
+ladder both exist — but it is blocked on level design instead: `CityGrid` models buildings
+as footprints whose interiors `standable()` refuses, so there is no upper floor to rescue
+from.
+
+### The settings card became sections (August 2026)
+
+It had grown one row at a time to **~770px against a 900px viewport** — one more setting
+would have reached the edge and two would have run off it. Overflow there is silent and
+total: `_card()` centres the panel with no clipping, so an over-tall card draws off *both*
+edges and the rows past them stop being clickable, exactly as the shop did at 964. And
+nothing measured it. A settings card running off the bottom would have shipped green.
+
+Three sections behind a tab strip — SOUND, DISPLAY, THE SHIFT — so **the card is as tall
+as the tallest section rather than the sum of all of them**: 557 against 900, with room
+for roughly 28 settings. `screen` stays `SETTINGS` throughout, so `_switch`, Escape,
+`_settings_from` and the pause rule were untouched. Tabs are ordinary toggle buttons
+wearing the kit's button art; a `TabContainer` would have been the one unthemed stock
+control in the game, which is the defect the slider work was written to fix.
+
+**RESET CAREER now asks.** It was a `DangerButton` directly above BACK with no
+confirmation — one misclick from dissolving a fleet. It gets the one new screen that earns
+its complexity, because Escape has to mean *no*: CANCEL is primary and first, RESET is
+danger and second, so the affirming press is deliberately not where the finger already is.
+
+The tidy underneath: `_slider()` and `_choice_row()` replaced ~115 lines of copy-paste, so
+each of the pending settings is now a line rather than a block; the card panels are named
+so a check can find them; the pause rule came out of `_switch` into `_should_pause()`.
+
+**What the sabotage pass taught, and it is the interesting part.** Flattening the tabs back
+into one column left the card at **812px — still inside 900**, so the fit checks stayed
+green and only the structural check saw it. That check took two attempts: the first
+compared the card's height against the sections stacked minus the tallest, and *failed on a
+correct card*, because the card's fixed chrome (241px of banner, tabs and buttons) happened
+to equal the two smaller sections combined. Any assertion mixing chrome with content needs
+to know the chrome, and a check cannot. The honest form needs none of it: **a tabbed card's
+height follows the tab shown, and a flattened one's does not** — 302 to 557 healthy, 812 to
+812 flattened.
+
+And one check could not fail at all: "RESET CAREER opens a confirmation" called
+`ask_reset_career()` directly, so pointing the card's button straight at the wipe left it
+green. The whole risk was a mis-wired button and the button was the one thing never
+pressed. It emits on the real button now, and reddens.
+
+### Sound-effects volume, fullscreen, and the game's own icon (August 2026)
+
+**A third audio bus.** Music got its own bus a session earlier and everything else stayed
+on Master, which meant the only way to quieten the sirens was to quieten the music along
+with them -- precisely the balance the music slider had just been added to let you set.
+Sirens, engines, the fire's crackle, the city bed and the dispatch radio are on an `Sfx`
+bus now, with a slider of their own. The check asserts *per player* that nothing was left
+behind, because "most of them" is the failure mode: a siren still on Master is a siren the
+slider cannot reach, and nothing on screen would say so.
+
+**A display setting**, which the game simply did not have -- there was no way to go
+fullscreen from inside it. Guarded on there being a screen at all, since the suite and
+every generator run headless.
+
+That guard produced the more interesting result. The obvious check -- that the headless
+viewport does not resize -- **cannot fail**: Godot's headless display server has no window
+(`get_window_list()` is empty, `screen_get_size()` is zero) and `window_set_mode` is a
+silent no-op there, neither warning nor resizing. Sabotage removed the guard entirely and
+nothing went red. `_apply_fullscreen()` now *returns whether it reached the display
+server*, and the check asserts the guard's decision rather than its invisible
+consequences.
+
+**The launcher icon** was the Synty vendor logo -- wrong identity, and a vendor asset
+pressed into service as the game's own. It is the user's icon now, set through
+`setup_project.gd` like every other project setting.
+
+Running that script turned up a quiet regression it had been carrying for months: its
+`MAIN_SCENE` constant still said `Playground.tscn`, correct when written and stale from
+the moment the menu became its own scene. Re-running it put the game back to booting
+straight into the district. It only surfaced because the script prints the previous value
+before overwriting it -- which is now the reason it prints it. Both the boot scene and the
+icon are pinned by checks.
+
+`config/name` is deliberately still `Polygon_Starter`: it decides the `user://` folder, so
+renaming it orphans the saved career, the records and the settings. That is a migration,
+not a rename.
+
 ### The in-world markers meet the kit (August 2026)
 
 The last thing in the game still drawn the way phase 1 drew it: a `TorusMesh` ring under
@@ -848,6 +1235,315 @@ the check that guarded this drive used a staging no player can produce, and it s
 for months. And **a comment saying "this was measured and made no difference" is scoped to
 the case it was measured on**; this one was right about queues and wrong about kerbs, and
 it read like a closed question.
+
+### The rotors were doing everything in the wrong order (August 2026)
+
+Reported in one sentence, as these keep being: *"it takes off before the propellers spin"*,
+and the same again for landing. Both were true, and both came from the same decision --
+rotor speed was driven off **altitude**, which is a plausible-sounding rule that is wrong at
+each end of a flight. Nothing was turning as the aircraft lifted, so it appeared to be
+raised by something other than its rotors; and the blades wound *down* through the descent,
+so it landed under stopped discs.
+
+The fix is one line -- `wanted = 0.0 if phase == GROUNDED else 1.0` -- because a helicopter
+turns its rotors at full speed whenever it is doing anything at all, and stops them only
+when parked. **Altitude was a proxy for "is it flying", and the proxy disagreed with the
+thing at exactly the two moments anybody watches.**
+
+The take-off delay is a new `Phase.SPOOLING`: told to go, a grounded aircraft sits still for
+four seconds winding up, and enters CLIMBING on the frame the blades reach full speed. It
+lives in the phase machine rather than in a timer inside `take_off()` because **three
+separate call sites** put an aircraft into the air -- the verb, a right-click, and a landing
+order given while grounded -- and a timer in one of them is a rule the other two do not know
+about. They all go through `_leave_ground()` now.
+
+An unplanned gain worth recording: air support acquired a **cost in seconds** that no road
+unit pays. The helicopter was strictly better than driving for any distance; four seconds on
+the pad is a real reason to send a car to something close, which is the kind of balance you
+cannot get from a price alone.
+
+**Two stale comments were the residue.** The check that samples the spool still described an
+altitude ramp and quoted the old 1.4s spool, and it stayed green throughout -- a comment
+cannot fail. It was caught by a sabotage agent *reading* it, which is the only mechanism
+this project has for that class of rot. The check's own message had the same problem and was
+reworded: it said "full song at cruise height" against a reading taken "low down", when the
+two samples now differ because one is mid-spool and not because one is higher.
+
+### The shop became a requisition modal (August 2026)
+
+The storefront was replaced with a supplied UI kit -- a themed modal with category tabs and
+a **cart**: pick several units, then confirm once. The old shop charged per click.
+
+**Matching the old class's four public names is what made it safe.** [RequisitionPanel]
+keeps `station`, `open_shop`, `close_shop` and `card_button`, and its own `visible` still
+means "the shop is open", because three unrelated places reach for those: [HUD] wires the
+buy button, [GameMenu] asks before claiming `Esc`, and [TutorialDirector] pulses a named
+card. The swap touched **one line of `HUD.tscn`** and four type annotations.
+
+The kit's scene is instanced at runtime rather than merged into `HUD.tscn`. It is 400 files
+of theme, fonts and art, and a hand-merged copy would be a second thing to keep in step with
+any future version of it.
+
+**Three faults, each instructive.**
+
+*Dropping `_input` broke the pause chain, and two checks went green over it.* The old panel
+closed itself on `Esc`; the new one left input to the modal. So the shop never closed,
+`_escape_is_spoken_for()` saw it open for the rest of the session, and `Esc` could never
+reach pause again. Three checks reddened -- and `Escape again resumes` and `and the car
+drives on` **passed vacuously**, because "not paused" and "the car moved" are both true when
+`Esc` does nothing and the district was never frozen. The feared 150-check cascade did not
+happen only because the guard broke the *opposite* way: nothing paused, rather than
+everything staying paused.
+
+*Two guards silently skipped nineteen assertions.* The suite still cast the node `as
+ShopPanel`, which now yields null, so both shop checks hit `_check(false, ...)` and
+`return`. The count fell 1087 → 1069 and only **four** FAILs appeared. That is the
+documented silent-truncation mode arriving by a different road: not a runtime error, just an
+early return. The check count was the only witness.
+
+*A check that could only ever have passed by accident.* Told the cards must all fit on
+screen, five of thirteen failed -- correctly, because the catalogue is a `ScrollContainer`
+and the rest is below the fold by design. The assertion had been inherited from a fixed-row
+layout where it meant something. It now asks the question the original bug was actually
+about -- nothing escapes **sideways**, where no scrollbar can rescue it -- plus that the
+scroller reaches the bottom.
+
+*And a check that measured against a ruler made of the thing it was measuring.* The
+overflow assertion compared each card to its own `ScrollContainer` parent -- which has no
+fixed width and stretches to whatever the cards demand. Sabotage forcing every card 900px
+wide blew the catalogue out to 1822px inside a 1600px modal and dragged seven of thirteen
+cards clean off it; the check reported **`0 of 13`**. The fault was total and the number did
+not move at all, because **the reference frame moved with the fault**. That is a distinct
+failure from the ones already in this file: not a second satisfier, not under-provocation,
+and not fixable by provoking harder -- the comparison was self-referential, so no fault could
+ever register. Measured against the panel, which is viewport-sized and fixed, the same
+sabotage now reads `7 of 13` and names them.
+
+Worth generalising: **an assertion needs a ruler that the fault cannot bend.** A parent
+container sized by its children is not a ruler.
+
+**One weakness is left in, and named rather than hidden.** Pushed mouse input reaches the
+tabs and the DEPLOY button but was measured not to reach a card inside the scroller, so the
+cart is driven through `UnitCard`'s own `pressed` signal -- the path a real press takes, and
+everything downstream of the button is genuinely exercised. What is *not* proven is that a
+click lands on a card. The corner button and DEPLOY are still clicked for real. Saying so in
+the check's comment is the alternative to quietly asserting something weaker.
+
+**The cards came out unreadable, and the cause was one unset enum.** Reported from play
+with a screenshot: "POLICE '", "RECOVERY 1", "AMBULA", prices clipped mid-figure. A
+[TextureRect] defaults to `EXPAND_KEEP_SIZE`, so its minimum size is the *texture's* size
+and `custom_minimum_size` is only a floor. The kit was drawn against 24x24 icons; this game
+feeds it **192x192 rendered portraits**, so every 72px portrait panel became 192px inside a
+340px card and left about 48px for the text. `EXPAND_IGNORE_SIZE` restored the whole layout.
+
+Worth keeping as a general point about adopting someone else's UI: **the kit was correct and
+the data was correct, and they were incompatible in a way neither could state.** Nothing was
+misconfigured; a size assumption baked into the art it was designed for simply did not hold
+for ours.
+
+Two smaller things fell out, both of them my fixes rather than the kit's faults. Clipping the
+description label evened up a ragged grid -- two cards were 155-159px against the others'
+138, because a label's minimum width pushes its card out -- but then genuinely cut two
+descriptions off; autowrapping to two lines fixes both, since an autowrapped label's minimum
+width is its longest *word*. And trimming each blurb to its first sentence kept lines short
+until the recovery truck came out reading **"Seats 2."** and nothing else -- its informative
+half is the second sentence. Wrapping removed the need for the rule that had to guess which
+half mattered.
+
+**And then the same enum a third time, in the cart.** Reported with a screenshot: three
+units in the order and the dialog had stretched to the height of the screen. `OrderRow`
+builds its own [TextureRect] for the unit's picture, with the same unset `expand_mode`, so
+each row was about 192px instead of 52 and the modal sizes itself around its contents. The
+order list is wrapped in a [ScrollContainer] at runtime as well, so a long order cannot
+resize the dialog either.
+
+Three instances of one mistake, in three files, none of which could see the others. The
+lesson is not "remember `expand_mode`" -- it is that **an assumption about art dimensions is
+invisible in the code that depends on it**, and adopting a UI built for different assets
+means every place the art is measured is a candidate.
+
+The check that pins it asserts the panel's whole `size`, not its height, and sabotage showed
+why that mattered by accident: with the row fix removed but the scroller still in place, the
+modal grew **sideways** instead -- 1060 to 1221 wide, height unchanged. A height-only
+assertion would have gone green on the very fault it was written for.
+
+The £350 deployment fee the kit ships with is set to **zero**. Switching front ends is no
+reason to start charging the player money; it is one line if the fee is ever wanted as a
+mechanic.
+
+### A cell nobody asked for, found by a new shop UI (August 2026)
+
+A purchase-modal UI kit arrived to replace the storefront. Before wiring it up, the
+catalogue had to be mapped onto its card model -- and the very first dump printed **"1
+cells" beside a tow truck**.
+
+`build_vehicles` read `root.cells = int(config.get("cells", 1))`, so a catalogue row that
+simply did not mention cells got one. The ambulance, the fire engine and the recovery truck
+each carried a phantom cell. And **the scene files looked correct by saying nothing**: a
+`.tscn` stores only properties that differ from the script's default, and `Vehicle.cells`
+defaults to 1, so the absence of a line *was* the bug. Two were inert because
+[LoadSuspectAbility] gates on POLICE service; the recovery truck is police, so a prisoner
+could be loaded into a tow truck.
+
+**It survived because every arrest check uses a patrol car or a van** -- the two units that
+declare their own cell counts and were therefore always right. A default is only exercised
+by the cases that say nothing, and those are exactly the cases nobody writes a check for.
+The new check asserts a table rather than a rule, because both directions matter: a van
+that quietly loses its six cells is as wrong as a truck that gains one.
+
+Worth noting *how* it was found. Nothing in the suite was looking for this, and nothing
+would have. It surfaced because a new consumer had to read numbers the old one never read
+-- which is an argument for building the adapter early when replacing a UI, rather than
+last.
+
+### Backgrounding a sabotage agent raced the Stop gate (August 2026)
+
+The suite came back red mid-turn with `truck has 1, wants 0` -- the phantom-cell fault,
+caught in flight, because a `godot-check-sabotage` cycle was running in the background with
+`cells = 1` deliberately injected. CLAUDE.md already forbade exactly this and every cycle
+that turn had been run synchronously. The rule was broken by **resuming** an agent with
+`SendMessage`, which has no synchronous form and always launches in the background.
+
+The note has been widened: the hazard is any path that *starts* the agent, not the
+`run_in_background` flag. Reading it as being about the flag is what made an explicit,
+already-documented trap invisible.
+
+### Two more units, and a repaint that was accepted and ignored (August 2026)
+
+The **Interceptor** (the Heist pack's second police body, the quickest car on the road) and
+**Air Rescue** (the fire service's first flying unit) went in together, in one windowed
+generator run. Neither needed new machinery. What they needed was a livery, and finding it
+took a correction.
+
+**I said the rescue livery did not exist. It did.** I searched filenames for `rescue`, found
+nothing, eyeballed two of the sixteen Heist atlases, saw they matched, and concluded the
+pack shipped one helicopter skin. The player produced the Synty store shot: four
+helicopters, the fourth red and yellow with RESCUE on the tail. The livery is
+`PolygonHeist_04_A.png`, which carries RESCUE in red on amber exactly where `01_A` carries
+POLICE in white on blue -- the *fourth* colourway of an atlas, not a file with the word in
+its name. **The lesson is about the search, not the pack**: a filename grep and two spot
+checks felt like a survey and covered an eighth of the evidence. What settled it in the end
+was a twenty-line script that diffed every atlas against `01_A` and printed the average
+colour of the label block. Sixteen numbers, and `04_A` at rgb(223,133,21) was the answer at
+a glance.
+
+**Then the repaint did nothing, twice.** `_copy_materials` decided what to repaint by asking
+whether the material path contained `"PolygonCity_01_A"` -- the City pack's body material and
+nothing else -- so a Heist vehicle declaring a `palette` was accepted, ignored, and built
+identical to the unpainted one, with no warning. Fixing that in `build_vehicles.gd` left the
+shop card still showing a police machine beside a label reading Air Rescue, because
+`build_portraits.gd` carries **its own copy of the same guard** and had the same fault. The
+only thing that caught the second one was looking at the rendered PNG.
+
+The fix in both is `path.ends_with("_01_A_mat.tres")` rather than `"_01_A" in path`, because
+Heist ships `PolygonHeist_01_A_Glass_mat` beside the body material and the over-broad version
+paints the cockpit with the bodywork atlas. The check is three-sided for exactly that reason:
+the livery is on the rescue machine, *absent* on the police one, and the glass is untouched.
+
+Two things generalise. **A config value that is read, accepted and silently discarded is the
+worst shape of bug this project keeps producing** -- the missing `siren` key, the un-repointed
+`StuckLog`, and now this, all of which looked correct in the source and wrong only on screen.
+And **a duplicated guard gets fixed once**: the two generators had the same line for the same
+reason and no test tied them together.
+
+Also caught by the suite rather than by eye: the two new portrait PNGs shipped without
+`.import` companions and loaded as null, so the shop showed `2 missing of 13`. That trap is
+documented and still cost a run -- **a new asset needs `--import` before it exists**.
+
+### A unit was built, painted, and unreachable (August 2026)
+
+Asked by the player, in five words: *"How do I get a recovery truck"*. You could not. The
+truck had a generated scene, a portrait, a measured lightbar and a place in
+`build_vehicles.gd` -- and no row in `Station.TYPES`, so nothing in the game could reach any
+of it. It had been built one session earlier and discussed as though it were in the game,
+including by me, twice.
+
+**Every check that touched vehicles walked the catalogue**, so none of them could see a unit
+that was not in the catalogue. That is the whole shape of the fault: the suite was thorough
+in one direction and blind in the other, and thoroughness in one direction reads exactly like
+coverage. `_test_every_emergency_vehicle_is_purchasable` walks scenes → catalogue instead,
+filtering on `service != NONE` so civilian traffic stays correctly unsellable. Deleting the
+truck's row again reproduces the original bug on demand: `stranded: TowTruck.tscn`.
+
+Worth pairing with the lightbar check written the same week, which walks catalogue → scenes.
+Neither direction subsumes the other, and the pair is what makes "the fleet is complete" a
+claim rather than a hope.
+
+### A check that could flap on a busy machine (August 2026)
+
+Found by a sabotage pass as collateral it correctly argued was *not* collateral: a UI audio
+check reddened during a cycle that changed a folder path in a catalogue test, which cannot
+reach it. `rollover2.ogg` runs 0.0573s; the check waited two frames -- 0.0333s of
+*simulated* time -- before reading `playing`. The audio server plays in real time whatever
+`--fixed-fps` says, so a pair of heavy frames finishes the sample and the check reads false
+with nothing wrong.
+
+The fix is not a longer wait but no wait: `emit()` calls the handler synchronously, so
+`playing` is true the instant it returns and the frames bought nothing. **A margin is not a
+fix when the two quantities are measured on different clocks** -- simulated frames against
+real-time audio -- because no margin is safe, only larger. The suite is the arbiter here, and
+an arbiter that flaps is worse than one that is wrong in a fixed direction.
+
+### The black box had been recording the test suite (August 2026)
+
+The count of records in `user://stuck-log.txt` jumped between sessions in a way nobody could
+tie to play -- 144 one session and 0 the next, then 57, then 95, always `Ambulance 2`, always
+the tutorial ambulance driving to the station. It was carried as an open defect for months
+and read as evidence of a second driving fault behind the one that was fixed.
+
+It was the suite. `_run` repoints the district's [StuckLog] before a single check goes off,
+and the comment there is emphatic about why -- *"every suite run had been appending its
+fixtures into `user://stuck-log.txt` ... and one of them was diagnosed as a live bug."* That
+repoint reaches one scene. `_test_the_tutorial_town_boots` instantiates **Tutorial.tscn**,
+a second scene, carrying its own recorder that kept the default path. So the fixture's
+drive was filed into the player's black box under a name indistinguishable from play, and
+the record count tracked how often the suite had been run.
+
+**The same trap, in the same file, caught twice and fixed once.** The tutorial test pins
+`station.career_path == "user://tutorial-career.cfg"` twenty lines below the bug: the career
+trap was remembered for this scene and the black-box one was not. What generalises is not
+"be careful" but the shape -- **anything a fixture writes to `user://` has to be repointed
+per scene, not per suite**, and the only reliable enforcement is a check that asserts it,
+which now sits beside the repoint.
+
+Proven the honest way. Sabotage pointed the fixture back at the real log, and the file grew
+by exactly one record reading `--- Ambulance 2: no progress for 4s ---` -- the historical
+signature, reproduced on demand. A healthy run leaves the file untouched, so the growth is
+attributable to the fault alone. (The player's log was backed up first and restored
+byte-identical; a sabotage that writes to real user data is a backed-up artefact like any
+other, which the procedure now says.)
+
+The August escape fix above stands on its own evidence and is not withdrawn -- it was
+measured by a probe against recorded start positions, 9 of 12 getting home before and 12 of
+12 after. What is withdrawn is the belief that a *second*, unfixed fault was still filing
+records. There was no second fault. There was a test writing in the player's diary.
+
+### Two checks that looked sound and were not (August 2026)
+
+Both came out of one sabotage pass, and neither is a Godot lesson.
+
+**A guard coupled to the fault it guards.** The new lightbar check walks the catalogue,
+sorts vehicles into `lit` and `dark`, and asserts `dark` is empty. Its companion asserted
+`lit.size() >= 5`, to stop an empty catalogue passing vacuously. But `lit` and `dark`
+partition one set, so darkening a single vehicle dropped `lit` to 4 and reddened the guard
+too -- **a guard that cannot survive its partner's fault is not a guard**. Counting
+`lit.size() + dark.size()` decouples them, and sabotage confirmed both halves: darken a
+vehicle and only the partner reddens; make the catalogue unloadable and only the guard does.
+
+**Two satisfiers, one assertion.** `the rotors are still winding up low down` sampled the
+main rotor half a second after take-off and asserted the rate was low, to prove rotor speed
+follows altitude. Delete the altitude ramp entirely and it stayed green. The fault was fully
+present and the number *moved* -- 0.032 rad to 0.206 -- but the bound was 0.3, because at
+0.5s `rotor_spool` (1.4s) still capped the value whatever it was aiming at. **The check was
+named for the ramp and measuring the spool.** Sampling at 1.5s, past spool completion,
+leaves altitude as the only thing that can hold the reading down: 0.284 rad healthy against
+1.467 with the ramp gone.
+
+That last one is worth separating from vacuity, because it looks like it and is not. A
+vacuous check cannot see the fault at all; this one saw it, reported a six-fold change, and
+passed anyway because something else was independently sufficient. **The tell is that the
+number moved and the verdict did not** -- which is only visible if the check prints its
+measurement, and is invisible in a bare boolean.
 
 ### Driving: the tutorial's ambulance was stranded on a sheet of pavement (August 2026)
 
@@ -1205,7 +1901,8 @@ suite, and all now pinned:
   and asks whether red leads; that is the right question for a *repainted* placeholder
   and the wrong one for a purpose-built asset. The appliance's red-and-white livery
   averages +0.03, under the bar, while a yellow taxi reads warmer than either. The check
-  now covers the firefighter alone -- who is still a repaint, and still passes at +0.08
+  now covers the firefighter alone -- a real turnout kit since August 2026, passing at +0.18
+  where the repaint it replaced managed +0.08
   -- and the appliance is pinned by what it *is*: wheelbase, bulk, and a ladder no other
   body in any pack has.
 
@@ -1719,7 +2416,7 @@ proved the driving fix and the manhole rule had **no witness at all** until a
 behavioural drive check and a direct assertion were added, and then caught that the
 new manhole check drew its subjects from the very constant it tested.
 
-**1006 automated checks**, all passing. Run them with any Godot 4.6+ binary
+**1089 automated checks**, all passing. Run them with any Godot 4.6+ binary
 (`--fixed-fps 60` decouples the loop from the wall clock — ~20s instead of ~9min):
 
     godot --headless --fixed-fps 60 --path . --script res://Game/smoke_test.gd

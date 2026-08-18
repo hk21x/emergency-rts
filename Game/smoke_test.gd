@@ -221,6 +221,7 @@ func _run() -> void:
 	await _test_civilians_stroll()
 	await _test_the_crowd_keeps_to_the_pavements()
 	await _test_civilians_flee_a_fire()
+	await _test_panic_stays_on_the_pavement()
 	await _test_civilians_gather_at_a_collapse()
 	await _test_the_crowd_comes_back()
 	await _test_a_medical_call_takes_a_civilian()
@@ -281,6 +282,7 @@ func _run() -> void:
 	await _test_command_hotkeys_run_abilities()
 	await _test_roster_lists_everything_under_command()
 	await _test_the_roster_groups_by_service()
+	await _test_the_roster_shows_a_hurt_crew_member()
 	await _test_roster_marks_the_selection()
 	await _test_roster_chip_selects_a_unit()
 	await _test_portrait_names_the_lead()
@@ -292,6 +294,7 @@ func _run() -> void:
 	await _test_a_call_upgrades_when_the_scene_changes()
 	await _test_the_board_draws_progress_as_a_bar()
 	await _test_a_call_notices_a_unit_arriving()
+	await _test_the_board_triages_casualties()
 	await _test_a_call_closes_when_its_incidents_do()
 	await _test_a_lost_casualty_fails_its_call()
 	await _test_clicking_a_call_moves_the_camera()
@@ -384,11 +387,20 @@ func _run() -> void:
 	await _test_a_car_fire_scorches_what_is_near_it()
 	await _test_a_fire_looks_like_its_intensity()
 	await _test_the_appliance_raises_its_ladder()
+	await _test_a_fire_burns_what_stands_in_it()
+	await _test_a_spreading_fire_catches_an_onlooker()
+	await _test_only_prisoner_carriers_have_cells()
+	await _test_the_rescue_helicopter_wears_the_rescue_livery()
+	await _test_every_emergency_vehicle_is_purchasable()
+	await _test_every_responding_vehicle_has_a_lightbar()
+	await _test_the_helicopter_flies_and_lands_on_open_ground()
+	await _test_an_appliance_can_work_off_a_hydrant()
 	await _test_the_fire_service_fights_fires()
 	await _test_building_fires_wait_for_a_fire_service()
 	await _test_the_appliance_runs_on_water()
 	await _test_the_district_makes_a_noise()
 	await _test_the_interface_clicks()
+	await _test_the_display_setting_is_headless_safe()
 	await _test_the_call_rate_is_a_setting()
 	await _test_the_hour_is_a_setting()
 	await _test_the_shift_rolls_its_own_weather()
@@ -415,6 +427,9 @@ func _run() -> void:
 	await _test_the_speed_buttons_run_the_district_faster()
 	await _test_the_menu_restarts_a_shift()
 	await _test_settings_shape_the_shift_and_survive()
+	await _test_every_menu_card_fits_the_screen()
+	await _test_settings_back_returns_where_it_came_from()
+	await _test_reset_career_asks_first()
 	await _test_quit_to_title_stands_the_shift_down()
 	await _test_a_bad_shift_cannot_be_quit_away()
 	await _test_a_scenario_plays_its_timeline()
@@ -694,13 +709,83 @@ func _test_civilians_flee_a_fire() -> void:
 	_check(offside == 0,
 		"they fled along the pavement, not through the road (%d frames offside)"
 		% offside)
+	# **Guarded, like the loop above already was.** Since fire began converting bystanders
+	# to casualties, a civilian this check is holding can be freed under it -- and reading
+	# a freed object raises, which does not fail the check, it *abandons the rest of it*
+	# and takes the two assertions below out of the count silently. Found by a sabotage
+	# that widened the harm radius; it cannot happen at the shipped radius, and the
+	# inconsistency was worth closing anyway.
+	if not is_instance_valid(civilian):
+		_check(false, "the fleeing civilian survived to be measured")
+		await _clear_incidents()
+		return
 	var now := _flat_distance(civilian.global_position, fire.global_position)
 	_check(now > start + 4.0,
 		"and put %.1fm between them, up from %.1fm" % [now, start])
 
 	await _clear_incidents()
 	await _wait(40)
-	_check(not civilian.is_fleeing, "and settles once the fire is out")
+	_check(is_instance_valid(civilian) and not civilian.is_fleeing,
+		"and settles once the fire is out")
+
+
+## Panic: they run, they scatter — and they never leave the pavement doing it.
+##
+## **The last assertion is the whole design.** The crowd has always fled along the
+## pedestrian graph, crossing at the zebras even at a run, because a shopper who sprints
+## into the carriageway has swapped one incident for another — and traffic cannot see
+## pedestrians, so a panicking civilian in the road would be run over by a car that never
+## braked. Panic changes *how* they move, never *where* they may go.
+##
+## **This check is the only witness for that, and the 7,200-sample sweep is not.** That
+## sweep runs with nothing burning, so nobody panics and the panicking branch is never
+## entered — sabotage confirmed it does not move at all when panic is made to leave the
+## pavement, while this check reports 21 frames offside and the flee-legality check 165.
+## An unweakened sweep is not the same as a covering one.
+##
+## The offside count is also asserted to have been *taken*: gated on `is_panicking`, it
+## counts zero samples and passes by default if nobody panics, which is this project's
+## "the post-condition is the default state" trap exactly.
+func _test_panic_stays_on_the_pavement() -> void:
+	await _clear_incidents()
+	var civilian := _first_civilian()
+	if civilian == null:
+		_check(false, "a civilian to frighten")
+		return
+	var spot := civilian.global_position
+	# Inside `panic_radius` (7.0) but outside the fire's own singe radius (3.2), so this
+	# frightens them rather than converting them to a casualty mid-check.
+	var fire := _spawn_fire(spot + Vector3(4.5, 0.0, 0.0), 0.95)
+	await _wait(20)
+
+	_check(civilian.is_fleeing and civilian.is_panicking,
+		"a fire at arm's length panics them (fleeing %s, panicking %s)"
+		% [civilian.is_fleeing, civilian.is_panicking])
+	_check(civilian.hurry, "and they run rather than walk away from it")
+
+	var offside := 0
+	var sampled := 0
+	for i in 150:
+		await physics_frame
+		if not is_instance_valid(civilian):
+			break
+		if not civilian.is_panicking:
+			continue
+		sampled += 1
+		if not _pedestrian_legal(civilian.global_position):
+			offside += 1
+	_check(sampled > 20,
+		"panic lasted long enough to measure (%d frames sampled)" % sampled)
+	_check(offside == 0,
+		"and panicking never puts them in the road (%d offside of %d)"
+		% [offside, sampled])
+
+	fire.queue_free()
+	await _clear_incidents()
+	await _wait(30)
+	if is_instance_valid(civilian):
+		_check(not civilian.is_panicking and not civilian.hurry,
+			"panic passes on its own once the fire is gone")
 
 
 ## The street dressing draws on the pack rather than on a handful of favourites.
@@ -3557,6 +3642,42 @@ func _test_the_roster_groups_by_service() -> void:
 		"with at least two services on it to keep apart (%d)" % seen.size())
 
 
+## The roster shows a hurt crew member's health, and never invents one for a vehicle.
+##
+## **The second half is the point.** `health` is a [Person] field; a vehicle's damage is a
+## `repair_bill` in pounds, settled when it books in. A bar under a patrol car would be a
+## readout with nothing behind it -- so this asserts the vehicle's bar stays hidden even
+## while a person's is showing, which a "does the bar exist" check would sail past.
+func _test_the_roster_shows_a_hurt_crew_member() -> void:
+	_controller.clear_selection()
+	await _idle(3)
+	var hurt_chip: UnitChip = null
+	var car_chip: UnitChip = null
+	for chip in _visible_chips():
+		if chip.unit == _officer:
+			hurt_chip = chip
+		elif chip.unit == _car:
+			car_chip = chip
+	if hurt_chip == null or car_chip == null:
+		_check(false, "a person and a vehicle on the roster to compare")
+		return
+
+	_check(not hurt_chip._health.visible,
+		"an unhurt crew member shows no health bar")
+	var kept := _officer.health
+	_officer.hurt(0.5)
+	await _idle(4)
+	_check(hurt_chip._health.visible,
+		"and a hurt one does (health %.2f)" % _officer.health)
+	_check(not car_chip._health.visible,
+		"while a vehicle never does -- it has a repair bill, not health")
+
+	# Back to full, and the bar goes away again rather than sitting at 100%.
+	_officer.health = kept
+	await _idle(4)
+	_check(not hurt_chip._health.visible, "and it hides again once they are patched up")
+
+
 func _test_roster_marks_the_selection() -> void:
 	_controller.select([_cars[0], _cars[1]])
 	await _idle(3)
@@ -3882,6 +4003,58 @@ func _test_a_call_notices_a_unit_arriving() -> void:
 	await _idle(4)
 	_check(open[0].status == Call.Status.WAITING,
 		"driving away leaves it unattended again (%d)" % open[0].status)
+
+
+## Triage: the board says who is dying, not just how many are hurt.
+##
+## **Asserted on the tiers moving with the state that decides them**, not on the words. A
+## severity that is merely *present* is worth nothing -- the failure that matters is a
+## casualty who is running out of time reading the same as one who is fine, which is what
+## "4 casualties" said for the whole life of the bus RTC.
+func _test_the_board_triages_casualties() -> void:
+	await _clear_calls()
+	var spot := ROAD + Vector3(0.0, 0.0, 18.0)
+	var fine := _spawn_casualty(spot)
+	var dying := _spawn_casualty(spot + Vector3(2.0, 0.0, 0.0))
+	await _idle(6)
+
+	_check(fine.severity() == Casualty.Severity.SERIOUS,
+		"a fresh casualty is serious (%d)" % fine.severity())
+	dying.health = 0.2
+	_check(dying.severity() == Casualty.Severity.CRITICAL,
+		"and one running out of time is critical (%d)" % dying.severity())
+
+	# The tier a paramedic cannot resolve, whatever the health bar says.
+	var held := _spawn_casualty(spot + Vector3(4.0, 0.0, 0.0))
+	held.needs_doctor = true
+	held.health = 0.9
+	_check(held.severity() == Casualty.Severity.CRITICAL,
+		"one needing a doctor is critical however healthy (%.2f, %d)"
+		% [held.health, held.severity()])
+
+	# Stabilised drops off the list even though the health never moved.
+	fine.treat(1.0)
+	await _idle(3)
+	_check(fine.severity() == Casualty.Severity.STABLE,
+		"and a stabilised one stops being urgent (%d)" % fine.severity())
+
+	await _idle(6)
+	var board_says := ""
+	for call_row in _board.open_calls():
+		if call_row.describe().contains("casualt"):
+			board_says = call_row.describe()
+	# **The number, not the word.** `contains("critical")` was the first cut and sabotage
+	# showed it is carried by a single casualty: dropping the `needs_doctor` term took the
+	# count from 2 to 1 and the assertion never noticed, because one critical is enough to
+	# put the word on the row. A triage line that under-counts by all but one would have
+	# shipped green. Two of the three staged casualties are critical here -- the dying one
+	# and the one waiting on a doctor -- so the row has to say so.
+	_check(board_says.contains("2 critical"),
+		"the call row names how many are critical ('%s')" % board_says)
+
+	for node in get_nodes_in_group(Incident.GROUP):
+		node.free()
+	await _clear_calls()
 
 
 func _test_a_call_closes_when_its_incidents_do() -> void:
@@ -8195,6 +8368,547 @@ func _test_the_appliance_raises_its_ladder() -> void:
 	await _idle(4)
 
 
+## Fire hurts whoever stands in it — and never the crew who are fighting it.
+##
+## **The second assertion is the one that matters.** `ExtinguishOrder` holds a firefighter
+## at `REACH` (5.0) precisely so the fire service stays playable; a harm radius at or above
+## that would make every building fire a war of attrition against your own crew. So this
+## does not merely check that the radius is smaller — it stands a firefighter at working
+## range and watches them not be hurt, which is the property, and would fail if either
+## number moved toward the other.
+func _test_a_fire_burns_what_stands_in_it() -> void:
+	await _clear_calls()
+	var spot := ROAD + Vector3(0.0, 0.0, 26.0)
+	var fire := _spawn_fire(spot, 0.9)
+	await _idle(4)
+
+	# Two firefighters bought for this, and given back at the end: the fleet the rest of
+	# the suite was handed has to survive a check that stands people in a fire.
+	_buy(&"firefighter", 2)
+	# On the hose: at the range the order actually works from.
+	var working := _dispatch_to(&"firefighter",
+		spot + Vector3(ExtinguishOrder.REACH, 0.0, 0.0)) as Person
+	# Standing in it: well inside the singe radius.
+	var inside := _dispatch_to(&"firefighter", spot + Vector3(1.0, 0.0, 0.0)) as Person
+	if working == null or inside == null:
+		_check(false, "two crew to stand near the fire")
+		fire.queue_free()
+		await _clear_calls()
+		return
+	var working_health := working.health
+	var inside_health := inside.health
+	await _wait(90)
+
+	_check(inside.health < inside_health - 0.05,
+		"standing in a fire hurts (%.2f -> %.2f)" % [inside_health, inside.health])
+	_check(is_equal_approx(working.health, working_health),
+		"and a firefighter at working range is never singed (%.2f at %.1fm, radius %.1f)"
+		% [working.health, ExtinguishOrder.REACH, fire.singe_range])
+	_check(fire.singe_range < ExtinguishOrder.REACH,
+		"the singe radius stays inside the work range (%.1f against %.1f)"
+		% [fire.singe_range, ExtinguishOrder.REACH])
+
+	_dissolve(working, &"firefighter")
+	_dissolve(inside, &"firefighter")
+	fire.queue_free()
+	await _clear_calls()
+
+
+## A fire that has got away catches an onlooker, and leaves the child alone.
+func _test_a_spreading_fire_catches_an_onlooker() -> void:
+	await _clear_calls()
+	var spot := ROAD + Vector3(0.0, 0.0, 32.0)
+	var fire := _spawn_fire(spot, 0.95)
+	var shopper := (load(CIVILIAN_SCENE) as PackedScene).instantiate() as Civilian
+	_scene.add_child(shopper)
+	shopper.global_position = spot + Vector3(1.2, 0.0, 0.0)
+	await _idle(4)
+	await _wait(40)
+
+	# **Counted as casualties at the fire, not as incidents anywhere.** The first cut
+	# asserted the shopper had vanished and that the incident tally had risen; the first
+	# half can be true for reasons that have nothing to do with fire (the crowd despawns,
+	# something else frees them) and the second counts the fire itself, so a conversion
+	# and an unrelated resolution cancel out. Neither said what this check is named for.
+	var caught := 0
+	for node in get_nodes_in_group(Incident.GROUP):
+		var casualty := node as Casualty
+		if casualty and _flat_distance(casualty.global_position, spot) < 4.0:
+			caught += 1
+	_check(not is_instance_valid(shopper) or shopper.is_queued_for_deletion(),
+		"a bystander inside a fire that has got away is caught")
+	_check(caught >= 1, "and becomes a casualty at the fire (%d found)" % caught)
+
+	for node in get_nodes_in_group(Incident.GROUP):
+		node.free()
+	await _clear_calls()
+
+
+## Connecting to a hydrant: the tank stops draining, and driving off takes the line with it.
+##
+## **Asserted on the tank, not on the flag.** `is_on_main()` returning true proves the
+## appliance thinks it is connected; only watching `draw_water` fail to bite proves the
+## connection is worth having. The second half matters as much: a line that survived the
+## engine driving away would be an infinite tank with extra steps.
+## The helicopter: it climbs, it flies straight over everything, and it will not be put
+## down on a building.
+##
+## **The landing rule is the assertion that matters.** "Clear land, not properties" is
+## `CityGrid.standable()` — the same line the crowd walks on — so this checks the verb
+## refuses a point inside a block *and* accepts one on the road, because a rule that
+## refuses everything would pass a one-sided check.
+## Only the vehicles meant to carry prisoners have anywhere to put one.
+##
+## **A cell arrived by default and nobody noticed.** `build_vehicles` set
+## `root.cells = int(config.get("cells", 1))`, so a catalogue row that simply did not
+## mention cells got one -- and because a `.tscn` stores only what differs from the
+## script's own default, the resulting scene file *looked* correct by saying nothing. The
+## ambulance, the fire engine and the recovery truck each carried a phantom cell. Two were
+## inert, since [LoadSuspectAbility] gates on POLICE service, but the recovery truck is
+## police: a prisoner could be put in a tow truck.
+##
+## It survived because every arrest check in this suite uses a patrol car or a van, which
+## declare their own cell counts and were therefore always right. **A default is only
+## exercised by the cases that say nothing**, and those are the ones nobody writes a check
+## for. Found by mapping the catalogue onto a new shop UI, which printed "1 cells" beside
+## a tow truck.
+##
+## Asserted as a table rather than a rule, because both directions matter: a van that
+## quietly lost its six cells is as wrong as a truck that gained one.
+func _test_only_prisoner_carriers_have_cells() -> void:
+	const EXPECTED := {
+		&"patrol": 2, &"van": 6, &"interceptor": 2, &"truck": 0,
+		&"ambulance": 0, &"doctor_car": 0, &"engine": 0,
+	}
+	var wrong := PackedStringArray()
+	var seen := 0
+	for config: Dictionary in Station.TYPES:
+		var id: StringName = config["id"]
+		if not EXPECTED.has(id):
+			continue
+		var packed := load(String(config["scene"])) as PackedScene
+		if packed == null:
+			continue
+		var unit := packed.instantiate()
+		var vehicle := unit as Vehicle
+		if vehicle != null:
+			seen += 1
+			if vehicle.cells != int(EXPECTED[id]):
+				wrong.append("%s has %d, wants %d"
+					% [id, vehicle.cells, int(EXPECTED[id])])
+		unit.free()
+	_check(seen == EXPECTED.size(),
+		"all %d of the catalogue's cell-bearing bodies were read (%d)"
+		% [EXPECTED.size(), seen])
+	_check(wrong.is_empty(),
+		"and each has exactly the cells it should (%s)"
+		% ("all correct" if wrong.is_empty() else "; ".join(wrong)))
+
+
+## The air rescue helicopter is actually wearing the rescue livery.
+##
+## **Because a palette that does not apply is silent.** Both generators decided whether to
+## repaint a mesh by asking whether its material path contained `"PolygonCity_01_A"` -- the
+## City pack's body material and nothing else. A Heist-pack vehicle declaring a palette was
+## therefore accepted and ignored: the config read as applied, the build printed no warning,
+## and the scene came out identical to the unpainted one. It happened in `build_vehicles.gd`
+## and then again, separately, in `build_portraits.gd`, where the only thing that caught it
+## was somebody looking at the rendered PNG.
+##
+## Three-sided on purpose. The livery is present on the rescue machine; it is *absent* on
+## the police one, so a repaint that fired on everything would fail; and the glass is
+## untouched, because the obvious over-broad fix (`"_01_A" in path`) also matches
+## `PolygonHeist_01_A_Glass_mat` and gives the aircraft an opaque cockpit.
+func _test_the_rescue_helicopter_wears_the_rescue_livery() -> void:
+	var rescue := _materials_in("res://Game/Vehicles/RescueHelicopter.tscn")
+	var police := _materials_in("res://Game/Vehicles/Helicopter.tscn")
+	_check(rescue.has("res://Game/Materials/RescueLivery.tres"),
+		"the rescue helicopter carries the rescue livery (%s)" % ", ".join(rescue))
+	_check(not police.has("res://Game/Materials/RescueLivery.tres"),
+		"and the police one does not, so the repaint is selective")
+	var glass := "res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_Glass_mat.tres"
+	_check(rescue.has(glass),
+		"and its glass kept the pack's own material rather than the bodywork atlas")
+
+
+## Every material path used by any mesh in a built scene.
+func _materials_in(path: String) -> PackedStringArray:
+	var found := PackedStringArray()
+	var packed := load(path) as PackedScene
+	if packed == null:
+		return found
+	var root := packed.instantiate()
+	var stack: Array[Node] = [root]
+	while not stack.is_empty():
+		var node: Node = stack.pop_back()
+		for child in node.get_children():
+			stack.append(child)
+		var mesh := node as MeshInstance3D
+		if mesh == null or mesh.mesh == null:
+			continue
+		for surface in mesh.mesh.get_surface_count():
+			var material := mesh.get_active_material(surface)
+			if material and material.resource_path != "" \
+					and not found.has(material.resource_path):
+				found.append(material.resource_path)
+	root.free()
+	return found
+
+
+## Every emergency vehicle scene on disk is something the player can actually buy.
+##
+## **Written because one was not.** The recovery truck was generated, given a portrait and
+## a lightbar, and never added to `Station.TYPES` -- so the scene, the portrait and the
+## bodywork all existed and nothing in the game could reach any of it. It was found by a
+## player asking how to get one, which is the worst way to find it: everything about the
+## unit looked finished from the inside, including this suite, because every check that
+## touched vehicles walked the *catalogue* and the truck was not in it.
+##
+## So this walks the other direction -- from the scenes to the catalogue -- which is the
+## only direction that can see a unit nobody sells. Civilian traffic is [Unit.Service.NONE]
+## and is meant to be unbuyable, so service is the filter.
+func _test_every_emergency_vehicle_is_purchasable() -> void:
+	var sold := {}
+	for config: Dictionary in Station.TYPES:
+		sold[String(config["scene"])] = true
+	var unreachable := PackedStringArray()
+	var reachable := PackedStringArray()
+	var dir := DirAccess.open("res://Game/Vehicles")
+	if dir == null:
+		_check(false, "the vehicle folder can be read")
+		return
+	for file in dir.get_files():
+		if not file.ends_with(".tscn"):
+			continue
+		var path := "res://Game/Vehicles/%s" % file
+		var packed := load(path) as PackedScene
+		if packed == null:
+			continue
+		var unit := packed.instantiate()
+		var as_unit := unit as Unit
+		if as_unit != null and as_unit.service != Unit.Service.NONE:
+			if sold.has(path):
+				reachable.append(file)
+			else:
+				unreachable.append(file)
+		unit.free()
+	# Two-sided: a folder that read as empty would give an empty `unreachable` and pass.
+	_check(reachable.size() >= 6,
+		"%d emergency vehicle scenes are on the forecourt (%s)"
+		% [reachable.size(), ", ".join(reachable)])
+	_check(unreachable.is_empty(),
+		"and none is built but unsellable (stranded: %s)"
+		% ("none" if unreachable.is_empty() else ", ".join(unreachable)))
+
+
+## Every vehicle the player can buy and send to a call carries a lightbar.
+##
+## **Written because two of them did not.** The police van shipped without a `siren` key
+## in `build_vehicles.gd`, and the omission leaves no trace: the generator simply builds
+## no lightbar, so the van sat correct on the forecourt and responded to every call dark
+## and silent. The recovery truck had the same gap, found by this check rather than by
+## anyone noticing. One key drives both halves -- [Vehicle] only creates its
+## `AudioStreamPlayer3D` when `siren_path` resolves -- so a missing lightbar is a missing
+## siren too, which is why the mistake is worth a check rather than a memo.
+##
+## Runs over the catalogue rather than a list of scenes, so a unit added later is covered
+## the day it is added. Aircraft are exempt by falling out of the `as Vehicle` cast.
+func _test_every_responding_vehicle_has_a_lightbar() -> void:
+	var dark := PackedStringArray()
+	var lit := PackedStringArray()
+	for config: Dictionary in Station.TYPES:
+		if not bool(config["vehicle"]):
+			continue
+		var packed := load(String(config["scene"])) as PackedScene
+		if packed == null:
+			continue
+		var unit := packed.instantiate()
+		var vehicle := unit as Vehicle
+		if vehicle != null:
+			if vehicle.siren_path.is_empty() \
+					or vehicle.get_node_or_null(vehicle.siren_path) == null:
+				dark.append(String(config["id"]))
+			else:
+				lit.append(String(config["id"]))
+		unit.free()
+	# Both sides: a catalogue that failed to load would give an empty `dark` and pass.
+	#
+	# **Counts the whole catalogue, not the lit half.** Written as `lit.size() >= 5` this
+	# was coupled to the very fault its partner exists to catch -- `lit` and `dark`
+	# partition one set, so darkening a single vehicle dropped the count to 4 and reddened
+	# the guard as well. A guard that cannot survive its partner's fault is not a guard.
+	_check(lit.size() + dark.size() >= 5,
+		"the catalogue offers %d road vehicles to check (%s)"
+		% [lit.size() + dark.size(), ", ".join(lit)])
+	_check(dark.is_empty(),
+		"and every one of them has a lightbar and siren (dark: %s)"
+		% ("none" if dark.is_empty() else ", ".join(dark)))
+
+
+func _test_the_helicopter_flies_and_lands_on_open_ground() -> void:
+	_buy(&"helicopter", 1)
+	var chopper := _station.dispatch(&"helicopter") as Aircraft
+	if chopper == null:
+		_check(false, "a helicopter to fly")
+		return
+	chopper.global_position = Vector3(ROAD.x, 0.45, ROAD.z)
+	await _idle(4)
+	_check(not chopper.is_airborne(), "it starts on the ground")
+	# Read by path rather than through the aircraft, so a regeneration that renames the
+	# part reddens this check instead of silently leaving the blades still.
+	var main_rotor := chopper.get_node_or_null(
+		"%s/%s" % [Aircraft.BLADE_PARENT, Aircraft.MAIN_ROTOR]) as Node3D
+	var tail_rotor := chopper.get_node_or_null(
+		"%s/%s" % [Aircraft.BLADE_PARENT, Aircraft.TAIL_ROTOR]) as Node3D
+	_check(main_rotor != null and tail_rotor != null, "both rotors are on the airframe")
+	var parked_main := main_rotor.rotation.y if main_rotor else 0.0
+	await _wait(20)
+	_check(main_rotor != null and is_equal_approx(main_rotor.rotation.y, parked_main),
+		"and its rotors are still while it is parked")
+
+	# Straight up first, and nowhere until it is up: climbing out from between buildings
+	# while also moving is how an aircraft ends up inside one.
+	chopper.take_off()
+	var ground_y := chopper.global_position.y
+	# **Sampled at 1.5s, which is deliberately mid-spool.** `rotor_spool` is 4.0s, so the
+	# blades are turning and not yet at full speed: 0.213 rad here against 1.47 once it is
+	# flying. The band below excludes a dead rotor at one end and a full-speed one at the
+	# other, which is what makes it a statement about *winding up* rather than about
+	# turning.
+	#
+	# This comment used to describe an altitude ramp and quote a 1.4s spool, and both had
+	# stopped being true -- rotor speed is phase-driven now and the spool is 4.0s. The
+	# check still passed throughout, which is the point: **a stale comment on a green
+	# check is invisible**, and this one was caught by a sabotage agent reading it rather
+	# than by anything the suite could do.
+	#
+	# 2 frames, not more: at full song the main rotor turns 1.47 rad in that time, and a
+	# longer sample passes a whole revolution and aliases back to a meaningless number.
+	await _wait(90)
+	var low_from := main_rotor.rotation.y if main_rotor else 0.0
+	await _wait(2)
+	var low_rate := absf(angle_difference(
+		main_rotor.rotation.y if main_rotor else 0.0, low_from))
+	_check(low_rate > 0.05 and low_rate < 0.6,
+		"the rotors are winding up on the pad (%.3f rad in 2 frames)" % low_rate)
+	# **The order of the two, which is the whole of what was reported.** At a second and a
+	# half the blades are turning and the aircraft has not moved: it used to lift first and
+	# spin up afterwards, so it appeared to be raised by something other than its rotors.
+	# A tolerance of 5cm rather than equality, because this is a float that other systems
+	# are free to nudge.
+	_check(chopper.global_position.y <= ground_y + 0.05,
+		"and it has not left the ground while they do (%.2fm up)"
+		% (chopper.global_position.y - ground_y))
+	_check(not chopper.is_airborne(), "so it does not count as airborne yet")
+	# Past the 4s spool and a good way into the climb. The arithmetic matters and has been
+	# wrong here twice: the spool ends at 4.0s, this line is reached at 1.53s, so 300 more
+	# frames puts it 2.5s into a 7 m/s climb -- about 17m, comfortably past the 6m asserted
+	# and comfortably short of the 24m ceiling.
+	await _wait(300)
+	_check(chopper.global_position.y > ground_y + 6.0,
+		"take off climbs (%.1fm up)" % (chopper.global_position.y - ground_y))
+	_check(chopper.is_airborne(), "and it is airborne")
+
+	# **Flies over a block, not around it.** The straight line between these two points
+	# crosses ground no vehicle could drive, which is the whole of what an aircraft buys.
+	var over := Vector3(ROAD.x, 0.45, ROAD.z) + Vector3(0.0, 0.0, -60.0)
+	chopper.navigate_to(over)
+	# Climb to 24m at 7 m/s is 3.4s before it travels at all, then 60m at 26 m/s. Ten
+	# seconds is comfortably past both.
+	await _wait(600)
+	_check(_flat_distance(chopper.global_position, over) < 6.0,
+		"and flies to a point across the district (%.1fm short)"
+		% _flat_distance(chopper.global_position, over))
+
+	# **Turning, both of them.** The blades are the only moving part on the airframe, and
+	# a helicopter hovering with a frozen disc reads as a bug in the game rather than a
+	# missing flourish. Sampled over 20 frames rather than one, because a single frame of
+	# a fast spin can alias back to where it started.
+	var flying_main := main_rotor.rotation.y if main_rotor else 0.0
+	var flying_tail := tail_rotor.rotation.x if tail_rotor else 0.0
+	await _wait(2)
+	var cruise_rate := absf(angle_difference(
+		main_rotor.rotation.y if main_rotor else 0.0, flying_main))
+	_check(main_rotor != null and not is_equal_approx(main_rotor.rotation.y, flying_main),
+		"the main rotor turns in flight")
+	_check(tail_rotor != null and not is_equal_approx(tail_rotor.rotation.x, flying_tail),
+		"and so does the tail rotor")
+	# The far end of the spool, stated as a relationship rather than a bare magnitude.
+	#
+	# **Reworded once the mechanism changed.** This began life measuring an altitude ramp
+	# and its name said so -- "full song at cruise height", against a reading taken "low
+	# down". Rotor speed is phase-driven now, so the two samples differ because the first
+	# is mid-spool, not because one is higher than the other. The numbers were identical
+	# either way, which is exactly how a check ends up describing a mechanism the game no
+	# longer has.
+	_check(cruise_rate > 1.0 and cruise_rate > low_rate * 4.0,
+		"and they reach full song by the time it is flying (%.2f rad against %.3f mid-spool)"
+		% [cruise_rate, low_rate])
+
+	# **A right-click makes it fly, not land -- and this shipped the wrong way round.**
+	# Land scored 12 against Move's 0, so every right-click on open ground put the
+	# aircraft down. The only ground it will land on is the only ground you would send it
+	# to, which made hovering unreachable: order it anywhere and it landed there.
+	#
+	# Two-sided on purpose. The first half alone would pass if landing had simply been
+	# broken; the second proves the verb still applies to that exact point and it is the
+	# ladder, not the rule, that changed.
+	var open_ground := Target.new()
+	open_ground.position = ROAD
+	var chosen := chopper.resolve(open_ground)
+	_check(chosen is MoveAbility,
+		"a right-click on open ground flies it there (%s)" % chosen)
+	_check(LandAbility.new().can_target(chopper, open_ground),
+		"though landing still accepts that same point once armed")
+	chopper.issue(chosen.make_order(chopper, open_ground))
+	# **It flies round, it does not pivot.** The bearing back to ROAD is behind it -- it
+	# has just flown 60m the other way -- so this is close to the worst case the turn rate
+	# has to serve, and a snap would show up as the full swing inside two frames.
+	var heading := chopper.global_rotation.y
+	var back := ROAD - chopper.global_position
+	var bearing := atan2(-back.x, -back.z)
+	_check(absf(angle_difference(heading, bearing)) > 2.0,
+		"the way home is behind it, so this is a real turn (%.2f rad)"
+		% absf(angle_difference(heading, bearing)))
+	await _wait(2)
+	# **A band, not a ceiling.** Written as `< 0.2` this asserted only that the nose does
+	# not come round *too fast*, which an aircraft that never turns at all satisfies for
+	# free -- sabotage measured exactly that, 0.00 rad, and the check stayed green. The
+	# floor is what makes it a statement about turning rather than about not snapping.
+	# 1.6 rad/s over two frames is 0.053, so the band holds either bound at arm's length.
+	var turned := absf(angle_difference(chopper.global_rotation.y, heading))
+	_check(turned > 0.01 and turned < 0.2,
+		"and the nose comes round at a rate rather than snapping (%.2f rad in 2 frames)"
+		% turned)
+	# **Long enough to have landed, had it decided to.** The first cut waited 120 ticks,
+	# and sabotage showed that half of this pair could not see the bug at all: from 60m
+	# out at cruise height the aircraft needs ~1.8s to cross and 3.4s to come down, so at
+	# 2s it is still airborne whichever verb it chose. A check that the fault cannot
+	# reach is not a check. 400 clears both, and matches the deliberate landing below.
+	await _wait(400)
+	_check(chopper.is_airborne(), "so it is still in the air after carrying that out")
+	# Against the bearing captured at the order, not one recomputed here: it is standing on
+	# ROAD by now, and the bearing to where you already are is meaningless.
+	_check(absf(angle_difference(chopper.global_rotation.y, bearing)) < 0.35,
+		"and by the end it is facing the way it went (%.2f rad off)"
+		% absf(angle_difference(chopper.global_rotation.y, bearing)))
+
+	# The rule: inside a block is a building, and a building is not a landing site.
+	var block_middle := CityGrid.tile_centre(
+		CityGrid.block_base_x(1) + 2, CityGrid.block_base_z(1) + 2)
+	_check(not Aircraft.can_land_at(block_middle),
+		"it refuses to land on a building (%s)" % str(block_middle))
+	_check(Aircraft.can_land_at(ROAD),
+		"and accepts open ground, so the rule is not simply 'no'")
+
+	# Put it down for real, and confirm it reaches the floor rather than reporting done
+	# while still overhead.
+	chopper.land_at(ROAD)
+	# **Still at full song on the way down**, the other half of what was reported. Sampled
+	# a third of the way into the descent: 24m at 7 m/s is 3.4s, so 100 frames is about
+	# 12m up with plenty of descent left to be wrong in.
+	await _wait(100)
+	_check(chopper.phase == Aircraft.Phase.DESCENDING,
+		"it is descending when sampled (phase %d)" % chopper.phase)
+	var descent_from := main_rotor.rotation.y if main_rotor else 0.0
+	await _wait(2)
+	var descent_rate := absf(angle_difference(
+		main_rotor.rotation.y if main_rotor else 0.0, descent_from))
+	_check(descent_rate > 1.0,
+		"and its rotors are still turning at full speed as it comes down (%.2f rad against %.2f at cruise)"
+		% [descent_rate, cruise_rate])
+	await _wait(400)
+	# **Altitude, not just the phase it claims.** The first cut asserted only
+	# `not is_airborne() and not is_navigating()` -- the aircraft's own account of itself --
+	# and sabotage proved a helicopter that jumps to GROUNDED without descending passes it
+	# while the message prints `y 24.45`. A check named "not overhead" has to measure the
+	# height. The datum is where it was flying from, so this holds on any ground level.
+	_check(not chopper.is_airborne() and not chopper.is_navigating(),
+		"landing reports finished (phase %d)" % chopper.phase)
+	# **Measured against the ground it took off from, not against where it is now.** The
+	# first repair captured the datum immediately before landing -- at cruise height -- so
+	# `y < datum + 1` was trivially true and the broken descent still passed. `ground_y`
+	# is from before the take-off, which is the only height that means "down".
+	_check(chopper.global_position.y < ground_y + 1.0,
+		"and it is actually on the ground, not overhead (y %.2f against ground %.2f)"
+		% [chopper.global_position.y, ground_y])
+
+	_dissolve(chopper, &"helicopter")
+	await _idle(2)
+
+
+func _test_an_appliance_can_work_off_a_hydrant() -> void:
+	await _clear_calls()
+	_buy(&"engine", 1)
+	var engine := _dispatch_to(&"engine", ROAD) as Vehicle
+	if engine == null:
+		_check(false, "an appliance to connect")
+		return
+	var hydrant := Hydrant.nearest(_scene, engine.global_position, 400.0)
+	if hydrant == null:
+		_check(false, "a hydrant on the map to connect to")
+		return
+
+	# Parked at the hydrant, by hand: the drive itself is other checks' business.
+	engine.clear_orders()
+	engine.global_position = hydrant.global_position + Vector3(3.0, 0.0, 0.0)
+	engine.velocity = Vector3.ZERO
+	engine.forward_speed = 0.0
+	await _idle(6)
+
+	_check(not engine.is_on_main(), "an appliance beside a hydrant is not yet connected")
+	engine.connect_to_main(hydrant)
+	await _idle(3)
+	_check(engine.is_on_main(), "and connects when told to")
+
+	# **Drawn against the tank's real size, not against the gauge.** `draw_water` takes
+	# litres and divides by `tank_capacity`, which is 20 on the appliance — so the first
+	# cut of this check drew 0.3 and moved the gauge by 0.015, passing on a margin far too
+	# small to mean anything. Half a tank is unmistakable in either direction.
+	var half_tank := engine.tank_capacity * 0.5
+	engine.water = 1.0
+	engine.draw_water(half_tank)
+	_check(is_equal_approx(engine.water, 1.0),
+		"the tank does not drain while it is on the main (%.2f after half a tank drawn)"
+		% engine.water)
+	# **Emptied first, and that is the whole assertion.** Written with a full tank this
+	# line was vacuous: `has_water()` is `water > 0.0 or is_on_main()`, so a full tank
+	# satisfied it and the main-supply branch was never reached. Sabotage proved it --
+	# deleting `or is_on_main()` outright left the *entire suite* green. An empty tank on
+	# the main is the only state that tells the two guards apart.
+	engine.water = 0.0
+	_check(engine.has_water(),
+		"and a dry tank on the main still has water")
+
+	# Drive off: the line comes with it.
+	engine.forward_speed = 3.0
+	await _idle(4)
+	_check(not engine.is_on_main(), "driving away takes it off the main")
+
+	# **Parked well clear of the hydrant for the dry test.** Standing beside one tops the
+	# tank up on its own -- correct behaviour, and it crept to 0.01 and failed this the
+	# first time. The same appliance that had water a moment ago has none once it is both
+	# off the main and away from the supply, which is the other half of the same guard.
+	engine.global_position = hydrant.global_position + Vector3(40.0, 0.0, 0.0)
+	engine.forward_speed = 0.0
+	engine.hydrant = null
+	engine.water = 0.0
+	await _idle(3)
+	_check(not engine.has_water(),
+		"and a dry tank away from one does not (%.2f)" % engine.water)
+	engine.water = 1.0
+	engine.draw_water(half_tank)
+	_check(engine.water < 0.6,
+		"and the tank starts paying again (%.2f after the same draw)" % engine.water)
+
+	engine.forward_speed = 0.0
+	engine.water = 1.0
+	engine.hydrant = null
+	# Back to the fleet the rest of the suite was handed.
+	_dissolve(engine, &"engine")
+	await _clear_calls()
+
+
 func _test_the_fire_service_fights_fires() -> void:
 	await _clear_incidents()
 	_buy(&"engine", 1)
@@ -8586,6 +9300,37 @@ func _test_vehicles_light_up_after_dark() -> void:
 	daylight.set_time_of_day(kept)
 
 
+## The display setting: it stores, it persists, and it does not touch a headless window.
+##
+## The behaviour worth pinning here is the **guard**, not the mode change -- there is no
+## window in a headless run to put into fullscreen, and a call that ignored that would
+## either warn on every suite run or resize the viewport the whole suite measures against.
+## So this asserts the setting round-trips and that `root.size` is exactly where the suite
+## pinned it afterwards.
+func _test_the_display_setting_is_headless_safe() -> void:
+	if _menu == null:
+		_check(false, "a menu to carry the setting")
+		return
+	var kept := _menu.fullscreen
+	var before: Vector2i = root.size
+	_menu.set_fullscreen(true)
+	await _idle(3)
+	_check(_menu.fullscreen, "the display setting stores fullscreen")
+	# **Asserted on the guard's decision, not on the viewport.** The first cut checked
+	# that `root.size` had not moved, and sabotage showed that cannot fail: headless Godot
+	# has no window, so `window_set_mode` neither warns nor resizes and the assertion was
+	# true whether the guard existed or not. `_apply_fullscreen` reports whether it
+	# reached the display server, which is the thing the guard actually decides.
+	_check(not _menu._apply_fullscreen(),
+		"and asks the display server for nothing when there is no screen")
+	_check(root.size == before,
+		"leaving the viewport the suite measures against (%s)" % str(root.size))
+	_menu.set_fullscreen(false)
+	await _idle(2)
+	_check(not _menu.fullscreen, "and windowed puts it back")
+	_menu.set_fullscreen(kept)
+
+
 ## The interface's own click, driven through a real press.
 ##
 ## Asserted on the player **actually running** after a synthesised click on a real
@@ -8614,7 +9359,7 @@ func _test_the_interface_clicks() -> void:
 	# A real control, clicked where it is: the corner buy button, which the watcher had
 	# to have found on its own -- nothing in `HUD.gd` tells it that button exists.
 	var buy := _scene.get_node_or_null("HUD/Root/World/BuyButton") as Button
-	var shop := _scene.get_node_or_null("HUD/Root/Shop") as ShopPanel
+	var shop := _scene.get_node_or_null("HUD/Root/Shop") as RequisitionPanel
 	if buy == null:
 		_check(false, "a button to press")
 		return
@@ -8631,7 +9376,13 @@ func _test_the_interface_clicks() -> void:
 	clicks._last_rollover = -999.0
 	await _idle(2)
 	buy.mouse_entered.emit()
-	await _idle(2)
+	# **Read immediately, with no frames in between, and that is the fix not the shortcut.**
+	# `emit()` calls `_play_rollover` synchronously, so `playing` is true the instant it
+	# returns -- the two frames that used to sit here bought nothing and cost correctness.
+	# `rollover2.ogg` runs 0.0573s and two fixed-step frames are 0.0333s of *simulated*
+	# time, but the audio server plays in real time whatever `--fixed-fps` says, so on a
+	# loaded machine the sample could finish inside the wait and the check would read false
+	# with nothing wrong. A sabotage pass found it flapping; it was never a real red.
 	_check(clicks._rollover.playing, "and the pointer crossing one makes a tick")
 
 	# The gate: a second crossing inside the window must not stack a second tick.
@@ -8640,6 +9391,25 @@ func _test_the_interface_clicks() -> void:
 	buy.mouse_entered.emit()
 	_check(not clicks._rollover.playing,
 		"a second crossing straight after is swallowed rather than rattling")
+
+	# **Pressing a button while the interface is being torn down.** QUIT TO TITLE changes
+	# scene, which frees the HUD and this watcher, and the `pressed` that ordered it can
+	# still arrive afterwards -- Godot answers `play()` on a detached player with an error
+	# in the console. Staged by detaching the player rather than by changing scene, which
+	# in the suite would tear the district out from under every check after this one.
+	#
+	# **Last in this check, deliberately.** It sat before the gate assertion above and
+	# broke it: detaching and reattaching costs four frames, the gate is 60ms -- about
+	# 3.6 frames -- so the window had expired by the time the gate was measured and the
+	# tick it expected to be swallowed played instead.
+	var parent := clicks._click.get_parent()
+	parent.remove_child(clicks._click)
+	clicks._play_click()
+	clicks._play_rollover()
+	_check(not clicks._click.is_inside_tree(),
+		"a click arriving after the HUD is gone is swallowed, not an error")
+	parent.add_child(clicks._click)
+	await _idle(2)
 
 
 ## Every sound is wired and loaded. Audio fails *silently* -- a missing file, an
@@ -8669,6 +9439,40 @@ func _test_the_district_makes_a_noise() -> void:
 		% (soundscape._music.bus if soundscape._music else "no player"))
 	var music_bus := AudioServer.get_bus_index(AudioBuses.MUSIC)
 	_check(music_bus > 0, "and that bus exists (%d)" % music_bus)
+
+	# **Everything the world makes is on the effects bus.** The point of the bus is that
+	# one slider can quieten the district without touching the music, and that only works
+	# if nothing was left behind on Master. Asserted per player, because "most of them"
+	# is the failure mode: a siren still on Master is a siren the slider cannot reach, and
+	# nothing on screen would say so.
+	var strays := PackedStringArray()
+	for entry: Array in [["city bed", soundscape._ambience],
+			["dispatch radio", soundscape._radio]]:
+		var player := entry[1] as AudioStreamPlayer
+		if player and player.bus != AudioBuses.SFX:
+			strays.append("%s on %s" % [entry[0], player.bus])
+	var siren := _car.get_node_or_null("SirenAudio") as AudioStreamPlayer3D
+	var revs := _car.get_node_or_null("EngineAudio") as AudioStreamPlayer3D
+	if siren and siren.bus != AudioBuses.SFX:
+		strays.append("siren on %s" % siren.bus)
+	if revs and revs.bus != AudioBuses.SFX:
+		strays.append("engine on %s" % revs.bus)
+	_check(strays.is_empty(), "every world sound is on the effects bus (%s)"
+		% ("clear" if strays.is_empty() else ", ".join(strays)))
+
+	# And the slider reaches it. Asserted on the bus moving, not on the setting storing:
+	# a value written to a variable that never reaches `AudioServer` is silent in exactly
+	# the way the music default was.
+	var sfx_bus := AudioServer.get_bus_index(AudioBuses.SFX)
+	if sfx_bus > 0 and _menu:
+		var kept_sfx := _menu.sfx_volume
+		_menu.set_sfx_volume(0.25)
+		var quiet := AudioServer.get_bus_volume_db(sfx_bus)
+		_menu.set_sfx_volume(1.0)
+		var loud := AudioServer.get_bus_volume_db(sfx_bus)
+		_check(quiet < loud - 6.0,
+			"and the effects slider moves it (%.1fdB against %.1fdB)" % [quiet, loud])
+		_menu.set_sfx_volume(kept_sfx)
 
 	# **The shipped default is a bed, and applying it works.** Reported as too loud on
 	# first listen, and the cause was half arithmetic: the settings slider steps in 0.05,
@@ -9860,9 +10664,10 @@ func _test_pause_freezes_the_district() -> void:
 ## The armed-ability half of this rule is checked where the ability is armed, in
 ## `_test_command_hotkeys_run_abilities`. This is the other claimant, and it is the one
 ## the tree order would get wrong on its own -- `GameMenu._input` runs *before*
-## `ShopPanel._input`, so without the guard the pause card would open over an open shop.
+## `RequisitionPanel._input`, so without the guard the pause card would open over an
+## open shop.
 func _test_escape_closes_the_shop_before_it_pauses() -> void:
-	var shop := _scene.get_node_or_null("HUD/Root/Shop") as ShopPanel
+	var shop := _scene.get_node_or_null("HUD/Root/Shop") as RequisitionPanel
 	if shop == null or _menu == null:
 		_check(false, "a shop and a menu to arbitrate between")
 		return
@@ -10097,6 +10902,194 @@ func _test_settings_shape_the_shift_and_survive() -> void:
 	_menu.set_volume(1.0)
 
 
+## Every menu card fits the screen, and the settings card is one section tall.
+##
+## **The check that did not exist while the settings card grew to 770 of 900.** Overflow
+## here is silent and total: `_card()` centres the panel with no clipping, so an over-tall
+## card draws off both the top and the bottom and its rows stop being clickable -- the
+## same fault the shop had at 964. Nothing measured any of it.
+##
+## Two traps decided the shape. The `CenterContainer` around each card is full-rect, so
+## its rect is *always* the viewport and a check pointed at it passes for ever; the named
+## `PanelContainer` inside is the node with a height. And a hidden `Control` has a zero
+## rect, so a card must be **open** when it is measured -- which is why this drives the
+## real openers rather than reading the cards off the tree.
+func _test_every_menu_card_fits_the_screen() -> void:
+	if _menu == null:
+		_check(false, "a menu to measure")
+		return
+	var screen := Rect2(Vector2.ZERO, root.get_visible_rect().size)
+	var kept_screen := _menu.screen
+	var too_tall := PackedStringArray()
+	var spilled := PackedStringArray()
+
+	for entry: Array in [["TitleCard", _menu.show_title],
+			["PauseCard", _menu.open_pause], ["SettingsCard", _menu.open_settings],
+			["ScenariosCard", _menu.open_scenarios],
+			["ConfirmCard", _menu.ask_reset_career]]:
+		(entry[1] as Callable).call()
+		await _idle(3)
+		var card := _menu.find_child(str(entry[0]), true, false) as Control
+		# The title card is a full-rect page with a column in it rather than a centred
+		# panel, and it is measured by its own check; skip it if it has no named panel.
+		if card == null:
+			continue
+		var rect := card.get_global_rect()
+		if not screen.encloses(rect):
+			too_tall.append("%s %dx%d" % [entry[0], rect.size.x, rect.size.y])
+		# **Contained is not the same as reachable.** A panel that fits while its contents
+		# hang out of it is exactly the shape of the bug, which is why the shop's own fit
+		# check walks its BUY buttons rather than its frame.
+		for node in _descendants(card):
+			var control := node as Control
+			if control == null or not control.visible:
+				continue
+			if not (control is Button or control is HSlider):
+				continue
+			if not screen.encloses(control.get_global_rect()):
+				spilled.append("%s/%s" % [entry[0], control.name])
+	_check(too_tall.is_empty(), "every menu card fits the %dx%d viewport (%s)"
+		% [screen.size.x, screen.size.y,
+			"clear" if too_tall.is_empty() else ", ".join(too_tall)])
+	_check(spilled.is_empty(), "and every control on them is reachable (%s)"
+		% ("clear" if spilled.is_empty() else ", ".join(spilled)))
+
+	# Each tab in turn, naming the tallest -- the number that decides how much room is
+	# left for the settings still to come.
+	_menu.open_settings()
+	await _idle(3)
+	var card_panel := _menu.find_child("SettingsCard", true, false) as Control
+	var worst := 0.0
+	var worst_tab := ""
+	var slightest := INF
+	for i in _menu._tab_buttons.size():
+		_menu._tab_buttons[i].pressed.emit()
+		await _idle(3)
+		var tall: float = card_panel.get_global_rect().size.y
+		slightest = minf(slightest, tall)
+		if tall > worst:
+			worst = tall
+			worst_tab = str(GameMenu.SETTINGS_SECTIONS[i]["tab"])
+		if not screen.encloses(card_panel.get_global_rect()):
+			too_tall.append(str(GameMenu.SETTINGS_SECTIONS[i]["tab"]))
+	_check(too_tall.is_empty() and worst > 0.0,
+		"the tallest settings tab is %s at %.0f of %.0f" % [worst_tab, worst, screen.size.y])
+
+	# **The structural one, and it took two attempts to find an honest form.** The checks
+	# above describe a symptom and would go green again if somebody shrank a font. The
+	# first attempt compared the card's height against the sections stacked minus the
+	# tallest -- and failed on a correct card, because the card's fixed chrome (banner,
+	# tab strip, two buttons: 241px) happened to equal the two smaller sections combined.
+	# Any assertion mixing chrome with content needs to know the chrome, and this check
+	# cannot.
+	#
+	# What it can see without knowing any of that: **a tabbed card's height follows the
+	# tab shown**, and a flattened one's does not. Every page visible at once, or every
+	# setting collapsed into a single page, gives the same height on every tab.
+	_check(worst > slightest,
+		"and the card's height follows the tab shown, so the sections are not all stacked (%.0f to %.0f)"
+		% [slightest, worst])
+	var empty := 0
+	for page in _menu._settings_pages:
+		if (page as Control).get_combined_minimum_size().y < 1.0:
+			empty += 1
+	_check(empty == 0 and _menu._settings_pages.size() >= 2,
+		"across %d sections, none of them empty (%d empty)"
+		% [_menu._settings_pages.size(), empty])
+
+	# Every setting is on exactly one tab, counted off the table rather than off child
+	# indices -- so "fix the overflow by dropping a setting" fails here.
+	var declared := 0
+	for section: Dictionary in GameMenu.SETTINGS_SECTIONS:
+		declared += int(section["groups"])
+	var built := 0
+	for page in _menu._settings_pages:
+		for node in _descendants(page):
+			var label := node as Label
+			if label and label.theme_type_variation == &"HeaderLabel":
+				built += 1
+	_check(built == declared,
+		"every setting the table declares is on a tab (%d built, %d declared)"
+		% [built, declared])
+
+	_menu.resume()
+	paused = false
+	_menu._switch(kept_screen)
+	await _idle(2)
+
+
+## BACK goes where SETTINGS was opened from, even after switching tabs.
+##
+## The one bug the tab design can produce: a tab button that called `open_settings()`
+## would re-record `_settings_from`, and pause -> settings -> switch tab -> back would
+## land on the title screen with the district still frozen behind it.
+func _test_settings_back_returns_where_it_came_from() -> void:
+	if _menu == null:
+		_check(false, "a menu to navigate")
+		return
+	_menu.open_pause()
+	await _idle(2)
+	_menu.open_settings()
+	await _idle(2)
+	_menu._tab_buttons[_menu._tab_buttons.size() - 1].pressed.emit()
+	await _idle(2)
+	_check(_menu.screen == GameMenu.Screen.SETTINGS,
+		"switching tabs stays on the settings card (screen %d)" % _menu.screen)
+	_menu.close_settings()
+	await _idle(2)
+	_check(_menu.screen == GameMenu.Screen.PAUSE and paused,
+		"and BACK returns to the pause card it was opened from (screen %d, paused %s)"
+		% [_menu.screen, paused])
+	_menu.resume()
+	paused = false
+	await _idle(2)
+
+
+## RESET CAREER asks first, and Escape says no.
+##
+## Deliberately never presses the confirm's own RESET: the real wipe is exercised by
+## `_test_reset_career_starts_over`, which runs dead last for that reason.
+func _test_reset_career_asks_first() -> void:
+	if _menu == null or _station == null:
+		_check(false, "a menu and a station")
+		return
+	var kept_funds := _station.funds
+	var kept_fleet: Dictionary = _station.owned.duplicate()
+	_menu.open_settings()
+	await _idle(2)
+	# **Pressed, not called.** The first cut called `ask_reset_career()` directly, and
+	# sabotage showed that cannot fail: pointing the card's button straight at the wipe
+	# left the check green, because nothing in the suite ever traversed the button's
+	# connection. The whole risk here is a mis-wired button, so the button is what must be
+	# pressed.
+	var reset_button: Button = null
+	var card := _menu.find_child("SettingsCard", true, false)
+	for node in _descendants(card) if card else []:
+		var button := node as Button
+		if button and button.text == "RESET CAREER":
+			reset_button = button
+			break
+	if reset_button == null:
+		_check(false, "the settings card carries a RESET CAREER button")
+		return
+	reset_button.pressed.emit()
+	await _idle(2)
+	_check(_menu.screen == GameMenu.Screen.CONFIRM,
+		"pressing RESET CAREER opens a confirmation (screen %d)" % _menu.screen)
+	_check(_station.funds == kept_funds and _station.owned == kept_fleet,
+		"and takes nothing until it is answered (£%d, %d types)"
+		% [_station.funds, _station.owned.size()])
+	await _press_key(KEY_ESCAPE)
+	_check(_menu.screen == GameMenu.Screen.SETTINGS,
+		"Escape declines it, back to settings (screen %d)" % _menu.screen)
+	_check(_station.funds == kept_funds and _station.owned == kept_fleet,
+		"with the career still intact")
+	_menu.close_settings()
+	_menu.resume()
+	paused = false
+	await _idle(2)
+
+
 func _test_quit_to_title_stands_the_shift_down() -> void:
 	await _clear_calls()
 	_director.shift_length = 9999.0
@@ -10117,6 +11110,20 @@ func _test_quit_to_title_stands_the_shift_down() -> void:
 	_check(not paused, "quit-to-title leaves a district that idles on, unpaused")
 	_check(not _director.active and not _mission.scoring,
 		"with the shift stood down")
+	# **The boot scene is the menu, and the launcher wears the game's own icon.** Both
+	# live in `project.godot`, both are written by `setup_project.gd`, and both have been
+	# silently wrong: the icon was the Synty vendor logo for the whole life of the
+	# project, and re-running that script in August 2026 put the boot scene back to the
+	# district because its constant predated the menu existing.
+	_check(ProjectSettings.get_setting("application/run/main_scene", "")
+			== "res://Game/MainMenu.tscn",
+		"the game boots into the main menu (%s)"
+		% ProjectSettings.get_setting("application/run/main_scene", "none"))
+	var icon: String = ProjectSettings.get_setting("application/config/icon", "")
+	_check(icon.begins_with("res://") and not icon.contains("Synty")
+			and ResourceLoader.exists(icon),
+		"and the launcher icon is the game's own, on disk (%s)" % icon)
+
 	_check(GameMenu.MENU_SCENE == "res://Game/MainMenu.tscn"
 			and ResourceLoader.exists(GameMenu.MENU_SCENE),
 		"and a main menu on disk to go back to (%s)" % GameMenu.MENU_SCENE)
@@ -10213,7 +11220,7 @@ func _test_reset_career_starts_over() -> void:
 ## fingernail chip on the bar. Opened from the DISPATCH heading, sells through its
 ## BUY buttons, and swallows the keyboard while it is up.
 func _test_the_shop_previews_and_sells() -> void:
-	var shop := _scene.get_node_or_null("HUD/Root/Shop") as ShopPanel
+	var shop := _scene.get_node_or_null("HUD/Root/Shop") as RequisitionPanel
 	if shop == null:
 		_check(false, "the HUD ships a shop")
 		return
@@ -10221,100 +11228,182 @@ func _test_the_shop_previews_and_sells() -> void:
 	var kept_owned := _station.owned.duplicate()
 	_check(not shop.visible, "the shop ships closed")
 
-	# **The corner buy button is the front door** since August 2026, when the dispatch
-	# block gave up the corner and kept only its rows. Clicked through the real interface
+	# **The corner buy button is the front door.** Clicked through the real interface
 	# rather than by calling `open_shop()`, because a button wired to nothing looks
 	# identical to a button wired correctly from everywhere except a click.
 	var corner_buy := _scene.get_node_or_null("HUD/Root/World/BuyButton") as Button
 	if corner_buy == null:
 		_check(false, "the corner carries a buy button")
 		return
-	await _click(MOUSE_BUTTON_LEFT, corner_buy.get_global_rect().get_center())
-	_check(shop.visible, "clicking the corner buy button opens the shop")
-	# **And it has a picture on it.** The icon is loaded behind an
-	# `ResourceLoader.exists()` guard, so a glyph that never imported costs the picture
-	# and not the button -- which is the right behaviour and completely invisible. It
-	# happened the day the cart was drawn: the SVG was on disk, Godot had not imported it,
-	# and the button worked perfectly while showing nothing at all.
-	_check(corner_buy.icon != null, "and carries its cart icon")
-
-
-	# Every card carries the unit's rendered portrait -- the preview is the point.
-	var missing := 0
-	for id in shop._cards:
-		var buy := shop._cards[id]["buy"] as Button
-		var portrait := (buy.get_parent() as Node).get_child(0) as TextureRect
-		if portrait == null or portrait.texture == null:
-			missing += 1
-	_check(shop._cards.size() == Station.TYPES.size() and missing == 0,
-		"every card shows the unit's rendered portrait (%d missing of %d)"
-		% [missing, shop._cards.size()])
-
-	# **And every one of them is reachable.** Reported from play once the doctor and the
-	# doctor's car took the catalogue to eight: a single row of cards ran off the side of
-	# the screen, and an overflowing container clips rather than wrapping, so the cards past
-	# the edge could not be clicked at all. The shop is grouped by service now, which fixes
-	# it for eight -- this is what stops the ninth quietly breaking it again.
-	#
-	# Asserted on the **BUY buttons**, not on the storefront's own rect, because a panel
-	# that fits while its contents hang out of it is exactly the shape of the bug. And
-	# against the viewport rather than the window: the project stretches canvas items, so
-	# the interface is laid out in a 1600x900 space whatever size the window happens to be.
-	var screen := Rect2(Vector2.ZERO, root.get_visible_rect().size)
-	var unreachable: Array[String] = []
-	for id in shop._cards:
-		var chip := shop._cards[id]["buy"] as Button
-		if not screen.encloses(chip.get_global_rect()):
-			unreachable.append(String(id))
-	_check(unreachable.is_empty(),
-		"and every BUY is on screen and clickable (%d off it%s)"
-			% [unreachable.size(),
-				"" if unreachable.is_empty() else ": " + ", ".join(unreachable)])
-	# **And the cards are grouped by service, which is the point of the layout.** These say
-	# something the fit assertions above cannot: those two describe a *symptom*, and would go
-	# green again the moment anybody made the cards small enough, grouped or not. Measured
-	# against the ungrouped layout all six fire together -- one row of eight comes out
-	# **1906 wide** in a 1600 viewport with the paramedic's and the doctor's BUY buttons off
-	# the screen entirely, which is precisely the bug reported from play.
-	var grouped := 0
-	for group: Array in ShopPanel.SHELVES:
-		var kind: int = group[0]
-		var wanted := 0
-		for config: Dictionary in Station.TYPES:
-			if int(config.get("service", Unit.Service.NONE)) == kind:
-				wanted += 1
-		var cards := shop.find_child("Shelf" + str(group[1]), true, false)
-		var holder := cards.get_node_or_null("Cards") if cards else null
-		var got: int = holder.get_child_count() if holder else -1
-		_check(got == wanted,
-			"the %s shelf holds its own %d units (got %d)" % [group[1], wanted, got])
-		grouped += maxi(got, 0)
-	_check(grouped == Station.TYPES.size(),
-		"and every unit in the catalogue sits on a shelf (%d of %d)"
-			% [grouped, Station.TYPES.size()])
-
-	var storefront := shop.find_child("Storefront", true, false) as Control
-	_check(storefront != null and screen.encloses(storefront.get_global_rect()),
-		"and the storefront itself fits the viewport (%s in %.0fx%.0f)"
-			% ["none" if storefront == null else str(storefront.get_global_rect().size),
-				screen.size.x, screen.size.y])
-
-	# Buying through the interface moves real money.
 	_station.funds = 10000
 	_station.roster_changed.emit()
+	await _click(MOUSE_BUTTON_LEFT, corner_buy.get_global_rect().get_center())
+	_check(shop.visible, "clicking the corner buy button opens the shop")
+	# The icon is loaded behind a `ResourceLoader.exists()` guard, so a glyph that never
+	# imported costs the picture and not the button -- right behaviour, and completely
+	# invisible. It happened the day the cart was drawn.
+	_check(corner_buy.icon != null, "and carries its cart icon")
+
+	# Every unit in the catalogue has a card, and every card carries its rendered
+	# portrait -- the preview is the point of a shop.
+	var cards := shop.cards()
+	var missing := 0
+	for id: StringName in cards:
+		var card := cards[id] as UnitCard
+		if card == null or card.unit == null or card.unit.icon == null:
+			missing += 1
+	_check(cards.size() == Station.TYPES.size() and missing == 0,
+		"every card shows the unit's rendered portrait (%d missing of %d, catalogue %d)"
+		% [missing, cards.size(), Station.TYPES.size()])
+
+	# **And every one of them is reachable.** Reported from play when the catalogue reached
+	# eight and a single row ran off the side of the screen: an overflowing container clips
+	# rather than wrapping, so the cards past the edge could not be clicked at all.
+	#
+	# **Asked of a scrolling list, which is what the requisition modal uses.** The first cut
+	# of this simply demanded every card sit inside the viewport, and five of thirteen
+	# failed -- correctly, because a scroller shows a window onto its content and the rest
+	# is below the fold *by design*. That assertion could only ever have passed for a
+	# catalogue small enough not to need scrolling, which is the very case it was written
+	# to stop mattering.
+	#
+	# So the surviving question is the one the original bug was actually about: nothing
+	# escapes **sideways**, where there is no scrollbar to rescue it, and the scroller can
+	# actually reach the bottom of the grid.
+	# **Measured against the panel, not against the card's own parent, and the difference
+	# is the whole check.** The first cut compared each card to the `ScrollContainer`
+	# holding it -- and that container has no fixed width, so it stretches to whatever the
+	# cards demand. Sabotage forcing every card 900px wide blew the catalogue out to 1822px
+	# inside a 1600px modal, dragging 7 of 13 cards clean off it, and this still reported
+	# `0 of 13`: **the reference frame moved with the fault**, so nothing could ever escape
+	# it. Vacuous, and not fixable by provoking harder -- the comparison was self-referential.
+	#
+	# The panel is viewport-sized and fixed, which is what the question needs. Horizontal
+	# only, deliberately: below the fold is where a scrolling list is *supposed* to put
+	# things, but there is no scrollbar sideways and a card off that edge is unreachable.
+	var catalogue := cards[&"patrol"].get_parent().get_parent() as ScrollContainer
+	var panel := shop.get_global_rect()
+	var overflowing: Array[String] = []
+	for id: StringName in cards:
+		var card := cards[id] as Control
+		if not card.visible:
+			continue
+		var rect := card.get_global_rect()
+		if rect.position.x < panel.position.x - 1.0 or rect.end.x > panel.end.x + 1.0:
+			overflowing.append(String(id))
+	_check(catalogue != null and overflowing.is_empty(),
+		"no card hangs off the side of the panel (%d of %d%s)"
+			% [overflowing.size(), cards.size(),
+				"" if overflowing.is_empty() else ": " + ", ".join(overflowing)])
+	var grid := cards[&"patrol"].get_parent() as Control
+	_check(catalogue != null and grid != null
+			and catalogue.get_v_scroll_bar().max_value >= grid.size.y - 1.0,
+		"and the list scrolls far enough to reach the last of them (%.0f of %.0fpx)"
+			% [0.0 if catalogue == null else catalogue.get_v_scroll_bar().max_value,
+				0.0 if grid == null else grid.size.y])
+
+	# **Grouping is by tab now, not by shelf.** The old storefront laid the catalogue out in
+	# per-service shelves and this checked each shelf's population; the requisition modal
+	# filters one grid instead. Same property, asked of the new shape: there is a tab for
+	# ALL and one for each service that actually has units, and picking one leaves only that
+	# service's cards on screen.
+	var tabs := shop.tab_buttons()
+	_check(tabs.size() == ShopCatalogue.categories().size() + 1,
+		"the shop offers a tab for ALL and one per service (%d)" % tabs.size())
+	var fire_tab: Button = null
+	for tab in tabs:
+		if tab.get_meta(&"cat", &"") == &"fire":
+			fire_tab = tab as Button
+	if fire_tab != null:
+		await _click(MOUSE_BUTTON_LEFT, fire_tab.get_global_rect().get_center())
+		await _idle(2)
+		var strays: Array[String] = []
+		var shown := 0
+		for id: StringName in cards:
+			var card := cards[id] as UnitCard
+			if not card.visible:
+				continue
+			shown += 1
+			if card.unit.category != &"fire":
+				strays.append(String(id))
+		_check(shown > 0 and strays.is_empty(),
+			"and choosing FIRE shows only fire units (%d shown, strays: %s)"
+			% [shown, "none" if strays.is_empty() else ", ".join(strays)])
+	# Back to ALL so the rest of this check sees the whole catalogue.
+	for tab in tabs:
+		if tab.get_meta(&"cat", &"") == &"all":
+			await _click(MOUSE_BUTTON_LEFT, (tab as Button).get_global_rect().get_center())
 	await _idle(2)
+
+	# **Buying is a cart now**, which is the one behaviour that genuinely changed: the old
+	# storefront charged on the card's BUY, this one collects an order and charges once on
+	# DEPLOY. Both steps are clicked, because a deploy button that never fires looks exactly
+	# like a card that never added.
 	var funds_before := _station.funds
 	var owned_before := _station.total(&"patrol")
-	var buy_button := shop._cards[&"patrol"]["buy"] as Button
-	await _click(MOUSE_BUTTON_LEFT, buy_button.get_global_rect().get_center())
+	# **Driven through the card's own `pressed`, not a synthetic click, and that is a
+	# weakness worth naming.** `UnitCard` does `pressed.connect(func(): add_requested.emit(
+	# unit))`, so this is the path a real press takes and everything downstream of the
+	# button is genuinely exercised. What it does *not* prove is that a mouse click reaches
+	# the card -- pushed input lands on the tabs and the DEPLOY button, both outside the
+	# scroller, and was measured not to land on a card inside it. Rather than assert a
+	# weaker thing quietly, this says so: the click path into the scrolling grid is
+	# unverified, and the corner button and DEPLOY below are still clicked for real.
+	var patrol_card := cards[&"patrol"] as UnitCard
+	patrol_card.pressed.emit()
+	await _idle(2)
+	var deploy := shop.deploy_button()
+	_check(deploy != null and not deploy.disabled,
+		"adding a unit arms the DEPLOY button")
+	await _click(MOUSE_BUTTON_LEFT, deploy.get_global_rect().get_center())
+	await _idle(2)
 	_check(_station.funds == funds_before - _station.price(&"patrol")
 			and _station.total(&"patrol") == owned_before + 1,
-		"BUY buys (£%d -> £%d)" % [funds_before, _station.funds])
+		"and deploying buys exactly what was in the order (£%d -> £%d, %d -> %d patrols)"
+		% [funds_before, _station.funds, owned_before, _station.total(&"patrol")])
+	_check(not shop.visible, "and the shop closes once the order is placed")
 
+	# **The dialog is the same size with a full cart as with an empty one.**
+	#
+	# Reported from play: three units in the order and the modal had stretched to the
+	# height of the screen. Two [TextureRect]s were sizing themselves to a 192x192
+	# portrait -- the same `EXPAND_KEEP_SIZE` default that had already wrecked the cards --
+	# so each cart row was about 192px instead of 52, and the modal sizes itself around
+	# its contents.
+	#
+	# Measured on the panel rather than on a row, because the fault is not "rows are tall",
+	# it is "the window moves when you shop". Six is past the point the reported case broke
+	# at, and the order count is asserted alongside so this cannot pass by adding nothing.
+	shop.open_shop()
+	await _idle(4)
+	var shell := (shop.get_child(0) as Control).find_child("Shell", true, false) as Control
+	var empty_size := shell.size
+	var wanted := 6
+	var loaded := 0
+	for id: StringName in cards:
+		if loaded >= wanted:
+			break
+		(cards[id] as UnitCard).pressed.emit()
+		loaded += 1
+	await _idle(6)
+	_check(loaded == wanted and shop.deploy_button() != null
+			and not shop.deploy_button().disabled,
+		"%d units go into the cart" % loaded)
+	_check(shell.size.is_equal_approx(empty_size),
+		"and the dialog is the same size full as empty (%s against %s)"
+		% [str(shell.size), str(empty_size)])
+	shop.close_shop()
+	await _idle(2)
+
+	# **An order it cannot pay for is refused at the card.** The modal is told the purse
+	# when it opens, so the funds are set first and the shop reopened -- a budget set behind
+	# an open modal is a stale number and would prove nothing.
 	_station.funds = 10
 	_station.roster_changed.emit()
+	shop.open_shop()
 	await _idle(2)
-	_check(buy_button.disabled, "an unaffordable card's BUY is disabled")
+	_check((cards[&"patrol"] as UnitCard).disabled,
+		"an unaffordable unit cannot be added to the order")
 
 	# The keyboard has no business reaching the game underneath.
 	await _press_key(KEY_F2)
@@ -10518,7 +11607,24 @@ func _test_the_characters_share_one_animation_library() -> void:
 ## the windowed pass -- but it can pin every wiring fact the migration relies on.
 func _test_the_tutorial_town_boots() -> void:
 	var town := (load("res://Game/Tutorial.tscn") as PackedScene).instantiate()
+	# **Before `add_child`, because the town starts running the moment it is in the tree.**
+	# The district's recorder is repointed in `_run` before a single check goes off, and
+	# the comment there explains why; this is the *second* scene the suite builds and it
+	# carries its own [StuckLog], which kept the default. So every suite run that got this
+	# far filed the fixture's driving into `user://stuck-log.txt` under the name
+	# "Ambulance 2" -- indistinguishable from play, and duly read back as a live defect in
+	# the tutorial. Twice.
+	#
+	# The line twenty below pins this town's `career_path` for exactly the same reason. The
+	# career trap was remembered here and the black-box one was not, which is the argument
+	# for the check underneath rather than for being more careful.
+	var town_log := town.get_node_or_null("StuckLog") as StuckLog
+	if town_log:
+		town_log.log_path = "user://smoke-tutorial-stuck.txt"
 	root.add_child(town)
+	_check(town_log != null and town_log.log_path != "user://stuck-log.txt",
+		"the tutorial fixture is not writing into the player's own black box (%s)"
+		% ("absent" if town_log == null else town_log.log_path))
 	# The navigation map ingests its regions asynchronously -- measured at ~30
 	# frames; queries against a half-synced map answer confidently and wrongly.
 	for i in 45:
@@ -10930,7 +12036,7 @@ func _test_the_tutorial_town_boots() -> void:
 			% (spotlight._targets.size() if spotlight else -1))
 
 		# Open the storefront and the target moves from the door to the two cards named.
-		var tutor_shop := town.get_node_or_null("HUD/Root/Shop") as ShopPanel
+		var tutor_shop := town.get_node_or_null("HUD/Root/Shop") as RequisitionPanel
 		if tutor_shop:
 			tutor_shop.open_shop()
 			await _idle(20)

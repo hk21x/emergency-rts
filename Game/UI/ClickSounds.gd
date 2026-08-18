@@ -99,13 +99,19 @@ func _on_gui_input(event: InputEvent) -> void:
 		_play_click()
 
 
+## **Guarded on being in the tree**, which is not paranoia: a scene change frees the HUD
+## and this node with it, and a button's `pressed` can still arrive in the same frame from
+## the card that ordered the change -- QUIT TO TITLE being the one that found it. Godot
+## answers a `play()` on a detached player with "Playback can only happen when a node is
+## inside the scene tree", which is an error in the console on an otherwise clean quit.
 func _play_click() -> void:
-	if _click:
+	if _click and _click.is_inside_tree():
 		_click.play()
 
 
 func _play_rollover() -> void:
-	if _rollover == null or _elapsed - _last_rollover < ROLLOVER_GAP:
+	if _rollover == null or not _rollover.is_inside_tree() \
+			or _elapsed - _last_rollover < ROLLOVER_GAP:
 		return
 	_last_rollover = _elapsed
 	_rollover.play()

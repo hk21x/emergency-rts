@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://hnwk6yfrflvf"]
+
+[ext_resource type="ArrayMesh" uid="uid://cg36jlkcrdr8t" path="res://Assets/Synty/PolygonHeist/Model/extracted/SM_Item_Mask_Luchador_01.res" id="1_ri5nc"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_o15ln"]
+
+[node name="SM_Item_Mask_Luchador_01" type="MeshInstance3D" unique_id=1561216390]
+gi_mode = 2
+mesh = ExtResource("1_ri5nc")
+surface_material_override/0 = ExtResource("2_o15ln")

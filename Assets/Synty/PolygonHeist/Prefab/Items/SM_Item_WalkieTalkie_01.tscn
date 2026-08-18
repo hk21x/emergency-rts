@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bofbf3kxlj7fg"]
+
+[ext_resource type="ArrayMesh" uid="uid://bdkeoqisr2525" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_WalkieTalkie_01.res" id="1_nxdle"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_ea8dn"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_32cm7"]
+points = PackedVector3Array(-0.053166933, -0.06973245, 0.028501369, 0.05430442, -0.06815447, 0.028168652, 0.051821716, 0.07733602, 0.02682088, -0.048643373, 0.08172282, 0.026031386, -0.050715797, -0.0632627, -0.029109001, -0.042541828, -0.08163048, -0.02508823, -0.04377266, -0.08598573, 0.023820806, 0.04521522, -0.08497582, 0.02366291, 0.04426843, -0.08163048, -0.02508823, 0.052442394, -0.0632627, -0.029109001, 0.049875535, 0.07714666, -0.027710471, -0.014464203, 0.23128453, -0.011204448, -0.034925416, 0.23642877, 0.009249039, -0.034925416, 0.23128453, -0.011204448, -0.045466363, 0.08112318, -0.026249912, 0.047687396, -0.06774419, -0.029075166)
+
+[node name="SM_Item_WalkieTalkie_01" type="MeshInstance3D" unique_id=1634950886]
+gi_mode = 2
+mesh = ExtResource("1_nxdle")
+surface_material_override/0 = ExtResource("2_ea8dn")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=408546836]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1945062729]
+shape = SubResource("ConvexPolygonShape3D_32cm7")

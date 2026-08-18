@@ -1,0 +1,1290 @@
+[gd_scene format=3 uid="uid://clxnmgelhe7xa"]
+
+[ext_resource type="PackedScene" uid="uid://bjmdf6b0xybst" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Ceiling_Light_03.tscn" id="1_70fle"]
+[ext_resource type="Environment" uid="uid://cp1i4080dpifs" path="res://Assets/Synty/PolygonHeist/Materials/WorldEnvironmentLighting.tres" id="1_kuv5k"]
+[ext_resource type="PackedScene" uid="uid://cn228bu7o1m1x" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Sidewalk_01.tscn" id="2_kuv5k"]
+[ext_resource type="PackedScene" uid="uid://bo35bpxbb6cve" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_Exterior_03.tscn" id="3_kwng8"]
+[ext_resource type="PackedScene" uid="uid://dv2nddq3fw5ji" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Sidewalk_Straight_01.tscn" id="4_egtr2"]
+[ext_resource type="PackedScene" uid="uid://dog5w6og6jo85" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Road_01.tscn" id="5_pg875"]
+[ext_resource type="PackedScene" uid="uid://seb054f8a44s" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Ceiling_05.tscn" id="6_p0fn0"]
+[ext_resource type="PackedScene" uid="uid://c5rdmdhiiffdn" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_Interior_02.tscn" id="7_3rm7u"]
+[ext_resource type="PackedScene" uid="uid://h6enjqyv363v" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Steps_03.tscn" id="8_r1uxp"]
+[ext_resource type="PackedScene" uid="uid://jj5hlkrhtarh" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Floor_01.tscn" id="9_bgxvg"]
+[ext_resource type="PackedScene" uid="uid://ctjrt1sv18yjp" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Door_03.tscn" id="10_gfqam"]
+[ext_resource type="PackedScene" uid="uid://cschf6bql7pv5" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Ceiling_Light_02.tscn" id="11_u5m7f"]
+[ext_resource type="PackedScene" uid="uid://dhkq5ll7k3e0h" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Ceiling_02.tscn" id="12_1dfbi"]
+[ext_resource type="PackedScene" uid="uid://7iau1q74jbrr" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Ceiling_06.tscn" id="13_mmekr"]
+[ext_resource type="PackedScene" uid="uid://blosjbmmar0wc" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Interior_01.tscn" id="14_j8jcu"]
+[ext_resource type="PackedScene" uid="uid://dgw3ckcihnupr" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_Exterior_01.tscn" id="15_lm0bp"]
+[ext_resource type="PackedScene" uid="uid://duvlq55rq5071" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Ceiling_01.tscn" id="16_xet22"]
+[ext_resource type="PackedScene" uid="uid://cgbqnts3tspyq" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_Exterior_04.tscn" id="17_q11nn"]
+[ext_resource type="PackedScene" uid="uid://ca14xlfm7n0oo" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_VaultGate_Frame_01.tscn" id="18_v8v0l"]
+[ext_resource type="PackedScene" uid="uid://8vr0npt88ib8" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Glass_Ground_01.tscn" id="19_deqnf"]
+[ext_resource type="PackedScene" uid="uid://d3viux0okn5wr" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Roof_05.tscn" id="20_ku5ro"]
+[ext_resource type="PackedScene" uid="uid://djstksnqoveku" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Glass_DoorFrame_01.tscn" id="21_osv6m"]
+[ext_resource type="PackedScene" uid="uid://bdafeg13p16bn" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Interior_DoubleDoor_01.tscn" id="22_5mwk6"]
+[ext_resource type="PackedScene" uid="uid://cm54k8mmk7j25" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Interior_Window_02.tscn" id="23_4q4o3"]
+[ext_resource type="PackedScene" uid="uid://ot4uteg071v" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Floor_02.tscn" id="24_n22bw"]
+[ext_resource type="PackedScene" uid="uid://cy2rt52dfbt1v" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Ceiling_04.tscn" id="25_ar88w"]
+[ext_resource type="PackedScene" uid="uid://df4bg6etrdgco" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Window_Panels_01.tscn" id="26_nsmp3"]
+[ext_resource type="PackedScene" uid="uid://dh4eqyno5p06a" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Exterior_Window_Ground_01.tscn" id="27_trlju"]
+[ext_resource type="PackedScene" uid="uid://vla6jgp8wgts" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Stairway_01.tscn" id="28_kq8kr"]
+[ext_resource type="PackedScene" uid="uid://dcmbr0n2lugkr" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Exterior_DoubleDoor_01.tscn" id="29_3ioi1"]
+[ext_resource type="PackedScene" uid="uid://c5jj2ee4s26r1" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Skylight_01.tscn" id="30_r1e3y"]
+[ext_resource type="PackedScene" uid="uid://cr3446koef56k" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_Exterior_Floor_02.tscn" id="31_5t2cp"]
+[ext_resource type="PackedScene" uid="uid://dcbfl0ea0ra1i" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Interior_Ground_01.tscn" id="32_04upk"]
+[ext_resource type="PackedScene" uid="uid://do56wyyoom0gt" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Exterior_Window_01.tscn" id="33_3c8x1"]
+[ext_resource type="PackedScene" uid="uid://byw87ptakqhv7" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Ceiling_Light_01.tscn" id="34_earb7"]
+[ext_resource type="PackedScene" uid="uid://fh7e5olx8o4f" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Ceiling_07.tscn" id="35_netsj"]
+[ext_resource type="PackedScene" uid="uid://c84rp6w3bhqer" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Door_02.tscn" id="36_ddbfe"]
+[ext_resource type="PackedScene" uid="uid://b4jf6tmf28s2" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Exterior_Window_Ground_02.tscn" id="37_pb5eh"]
+[ext_resource type="PackedScene" uid="uid://bvd6e5b3jnxbv" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_Interior_03.tscn" id="38_t5a1r"]
+[ext_resource type="PackedScene" uid="uid://b7gb2b1pfncp" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Interior_Window_Ground_01.tscn" id="39_kja3a"]
+[ext_resource type="PackedScene" uid="uid://4fr7fekrh2g1" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Steps_02.tscn" id="40_7qfwy"]
+[ext_resource type="PackedScene" uid="uid://bug7ykysf1eo6" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Ceiling_08.tscn" id="41_pu6t3"]
+[ext_resource type="PackedScene" uid="uid://bs0wocma7m5n4" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Interior_Door_01.tscn" id="42_6j0bk"]
+[ext_resource type="PackedScene" uid="uid://epdjeynetj7u" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Railing_01.tscn" id="43_8sa4o"]
+[ext_resource type="PackedScene" uid="uid://ciyci725y3jo6" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_Exterior_Floor_04.tscn" id="44_d8hhf"]
+[ext_resource type="PackedScene" uid="uid://6ep57tnkegs5" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Exterior_Window_02.tscn" id="45_cvck7"]
+[ext_resource type="PackedScene" uid="uid://c8by8g66wg8x6" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Roof_04.tscn" id="46_5vb6l"]
+[ext_resource type="PackedScene" uid="uid://cgt014sq7hbi8" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Steps_01.tscn" id="47_gq7nn"]
+[ext_resource type="PackedScene" uid="uid://bmxl0cv4i571p" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_Exterior_Floor_01.tscn" id="48_cas1c"]
+[ext_resource type="PackedScene" uid="uid://cqv1b2r6c2lbc" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Window_Blinds_01.tscn" id="49_i0o06"]
+[ext_resource type="PackedScene" uid="uid://cnrmyh4xivumn" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_Exterior_02.tscn" id="50_shvly"]
+[ext_resource type="PackedScene" uid="uid://dg3c8lm8owt4x" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Exterior_Door_01.tscn" id="51_dyo2r"]
+[ext_resource type="PackedScene" uid="uid://diupsigjnmvh" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Door_01.tscn" id="52_yryf5"]
+[ext_resource type="PackedScene" uid="uid://do7xamk5u7lrx" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_Exterior_Floor_03.tscn" id="53_yum0k"]
+[ext_resource type="PackedScene" uid="uid://bnklbu4ttfk2h" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Glass_01.tscn" id="54_lg3yp"]
+[ext_resource type="PackedScene" uid="uid://b323af5chhr06" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Ceiling_03.tscn" id="55_b73k7"]
+[ext_resource type="PackedScene" uid="uid://lmduugqgexj1" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Roof_01.tscn" id="56_t2agn"]
+[ext_resource type="PackedScene" uid="uid://gwbts5q7jcqe" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_VaultDoor_Frame_01.tscn" id="57_hyygu"]
+[ext_resource type="PackedScene" uid="uid://ctiax535syo41" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_Interior_04.tscn" id="58_mpfql"]
+[ext_resource type="PackedScene" uid="uid://bno0s32vlwxpu" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_02.tscn" id="59_wsbib"]
+[ext_resource type="PackedScene" uid="uid://qt6t732v1nen" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Roof_03.tscn" id="60_feviu"]
+[ext_resource type="PackedScene" uid="uid://xrj7r022tdiy" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Exterior_Ground_01.tscn" id="61_xshol"]
+[ext_resource type="PackedScene" uid="uid://cmxxnex1b2626" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Exterior_01.tscn" id="62_f2let"]
+[ext_resource type="PackedScene" uid="uid://bo1na56eokgm2" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Roof_02.tscn" id="63_4br3o"]
+[ext_resource type="PackedScene" uid="uid://ch5ninekmeh3q" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Interior_Window_Ground_02.tscn" id="64_f4nic"]
+[ext_resource type="PackedScene" uid="uid://qrwd8urcrnim" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_VaultGate_Door_01.tscn" id="65_g3bsy"]
+[ext_resource type="PackedScene" uid="uid://hvwc7qou4i0v" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_Interior_01.tscn" id="66_bn5sc"]
+[ext_resource type="PackedScene" uid="uid://dplorwsdmjh5s" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Wall_Interior_Window_01.tscn" id="67_3brtj"]
+[ext_resource type="PackedScene" uid="uid://cixc7hlsbdk6x" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Steps_Edge_01.tscn" id="68_e03n7"]
+[ext_resource type="PackedScene" uid="uid://4ansobq3s5d7" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Steps_04.tscn" id="69_ealyn"]
+[ext_resource type="PackedScene" uid="uid://lujyibp7o1ir" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_VaultGate_Wall_01.tscn" id="70_gtqv6"]
+[ext_resource type="PackedScene" uid="uid://6a5wio4qaf1j" path="res://Assets/Synty/PolygonHeist/Prefab/Environment/SM_Env_Pillar_01.tscn" id="71_tu8lu"]
+[ext_resource type="PackedScene" uid="uid://cek6sctoiuyo1" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Jewellery_02.tscn" id="72_eg6im"]
+[ext_resource type="PackedScene" uid="uid://bi1k601f2piju" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Jewellery_Necklace_03.tscn" id="73_cl6go"]
+[ext_resource type="PackedScene" uid="uid://ctuph8r2xdfd3" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Folder_03.tscn" id="74_ucnuv"]
+[ext_resource type="PackedScene" uid="uid://cvfnjjw43ui5q" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Note_06.tscn" id="75_852jl"]
+[ext_resource type="PackedScene" uid="uid://dwkky17p2brsn" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Jewellery_Rings_01.tscn" id="76_28m06"]
+[ext_resource type="PackedScene" uid="uid://plxtelbmafe" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Note_04.tscn" id="77_1ycqb"]
+[ext_resource type="PackedScene" uid="uid://bgk1iw1q4ueat" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_CoffeTable_01.tscn" id="78_62d4j"]
+[ext_resource type="PackedScene" uid="uid://rcpvtyq8ety0" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_RopeBarrier_02.tscn" id="79_yagv2"]
+[ext_resource type="PackedScene" uid="uid://cpcafv3vqgvjp" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Pillar_02.tscn" id="80_1sehx"]
+[ext_resource type="PackedScene" uid="uid://cjhrhqrwwhmbs" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Jewellery_Necklace_01.tscn" id="81_p8l8c"]
+[ext_resource type="PackedScene" uid="uid://bd3nb6hsc66ht" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Note_01.tscn" id="82_bqe5l"]
+[ext_resource type="PackedScene" uid="uid://dqxfa2n6kwjty" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_RopeBarrier_Pole_01.tscn" id="83_sqpl3"]
+[ext_resource type="PackedScene" uid="uid://dmxkwm1jcp3yq" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_SafeDepositBoxes_Empty_01.tscn" id="84_375ob"]
+[ext_resource type="PackedScene" uid="uid://v6nbsvkcjp6e" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Jewellery_Necklace_02.tscn" id="85_lcdwn"]
+[ext_resource type="PackedScene" uid="uid://mdbqfgcob1px" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Computer_Screen_01.tscn" id="86_44k34"]
+[ext_resource type="PackedScene" uid="uid://3w4df4ydgcsg" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Sign_Base_01.tscn" id="87_cmpgp"]
+[ext_resource type="PackedScene" uid="uid://fmvsyl4cpph5" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Sign_Bank_01.tscn" id="88_2hn2q"]
+[ext_resource type="PackedScene" uid="uid://bu6oadglm5t2h" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Plant_03.tscn" id="89_ooeey"]
+[ext_resource type="PackedScene" uid="uid://by8kij8ca861t" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Folder_01.tscn" id="90_v5lp4"]
+[ext_resource type="PackedScene" uid="uid://glvi6q2sajf5" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_AlarmButton_01.tscn" id="91_2h7my"]
+[ext_resource type="PackedScene" uid="uid://b4gcgmgmk5d0d" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Plant_02.tscn" id="92_0ca0u"]
+[ext_resource type="PackedScene" uid="uid://jkge72fner6" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Couch_01.tscn" id="93_eitwg"]
+[ext_resource type="PackedScene" uid="uid://dkk86q44n4fwt" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Rug_01.tscn" id="94_5fxij"]
+[ext_resource type="PackedScene" uid="uid://ce5j7o76rt3pj" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_CoffeeTable_02.tscn" id="95_8bve6"]
+[ext_resource type="PackedScene" uid="uid://cd3xxy75yre1e" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Desk_02.tscn" id="96_md2dt"]
+[ext_resource type="PackedScene" uid="uid://bxnadgpdemb7b" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Computer_01.tscn" id="97_3id1h"]
+[ext_resource type="PackedScene" uid="uid://bqkg2d302f6a0" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Shelf_01.tscn" id="98_ln4d5"]
+[ext_resource type="PackedScene" uid="uid://bii31wg0cifqx" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_SafeDepositBoxes_Half_01.tscn" id="99_jd500"]
+[ext_resource type="PackedScene" uid="uid://bpdbjutu5fh6m" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_SafeDepositBox_Cover_01.tscn" id="100_vtql1"]
+[ext_resource type="PackedScene" uid="uid://ddlxtqs5qhy3y" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Jewellery_04.tscn" id="101_5kxln"]
+[ext_resource type="PackedScene" uid="uid://c20e0geqmjqi" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Roll_01.tscn" id="102_1165q"]
+[ext_resource type="PackedScene" uid="uid://ch1l27xf50nsv" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_SafeDepositBox_Container_02.tscn" id="103_k0gqe"]
+[ext_resource type="PackedScene" uid="uid://byeujhenbkny8" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Folder_04.tscn" id="104_nuk2n"]
+[ext_resource type="PackedScene" uid="uid://cg8nosql3sitm" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_DisplayCase_01.tscn" id="105_33mh4"]
+[ext_resource type="PackedScene" uid="uid://dfgv2ciyil2ti" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Note_03.tscn" id="106_u3wgh"]
+[ext_resource type="PackedScene" uid="uid://cglgrybfjg5ed" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_RopeBarrier_01.tscn" id="107_slw3a"]
+[ext_resource type="PackedScene" uid="uid://dmgfgu2live6s" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Drill_01.tscn" id="108_evqwl"]
+[ext_resource type="PackedScene" uid="uid://bsotr53wo2cjs" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Statue_01.tscn" id="109_jhwn4"]
+[ext_resource type="PackedScene" uid="uid://cugntvnyirbll" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_TellerDesk_Barrier_01.tscn" id="110_25ce5"]
+[ext_resource type="PackedScene" uid="uid://bdvp52s3axduh" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_ATM_01.tscn" id="111_wgust"]
+[ext_resource type="PackedScene" uid="uid://dyropjbgrks1n" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Roll_02.tscn" id="112_amv2b"]
+[ext_resource type="PackedScene" uid="uid://13vrkp2sffi7" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Folder_02.tscn" id="113_apvcv"]
+[ext_resource type="PackedScene" uid="uid://ddmk1d3ays23s" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Sign_Money_Bank_01.tscn" id="114_fe4a8"]
+[ext_resource type="PackedScene" uid="uid://c2op8c3jxhdlq" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Flag_Pole_01.tscn" id="115_lxmti"]
+[ext_resource type="PackedScene" uid="uid://brqlo762cdt3o" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_MetalDetector_01.tscn" id="116_2dcek"]
+[ext_resource type="PackedScene" uid="uid://cdgrv11h4eawq" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_SafeDepositBox_Cover_03.tscn" id="117_ddwxo"]
+[ext_resource type="PackedScene" uid="uid://dx5axf7ty6gqp" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Camera_01.tscn" id="118_g6iff"]
+[ext_resource type="PackedScene" uid="uid://dw6usb1onw4c8" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Stack_01.tscn" id="119_y815d"]
+[ext_resource type="PackedScene" uid="uid://3ox66b7cbegi" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Sprinkler_01.tscn" id="120_ufmbf"]
+[ext_resource type="PackedScene" uid="uid://cp4kc5douwiih" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_TellerDesk_02.tscn" id="121_d6trw"]
+[ext_resource type="PackedScene" uid="uid://03eegtewkqyu" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_DeskLight_01.tscn" id="122_fsigh"]
+[ext_resource type="PackedScene" uid="uid://brecdg51plh16" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Note_05.tscn" id="123_eqjv1"]
+[ext_resource type="PackedScene" uid="uid://cdh8ndsdv7cy4" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Note_07.tscn" id="124_lx1m1"]
+[ext_resource type="PackedScene" uid="uid://dyti5fdygqjyb" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Jewellery_Necklace_04.tscn" id="125_bk86g"]
+[ext_resource type="PackedScene" uid="uid://d33egt45sq0x4" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Desk_01.tscn" id="126_e62l5"]
+[ext_resource type="PackedScene" uid="uid://dhomv3km8n4n3" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Plant_01.tscn" id="127_bnv21"]
+[ext_resource type="PackedScene" uid="uid://dec22hsecqxqa" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Fire_Detector_01.tscn" id="128_3d3bp"]
+[ext_resource type="PackedScene" uid="uid://b3du8otlu4twy" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Jewellery_Ring_01.tscn" id="129_xrubf"]
+[ext_resource type="PackedScene" uid="uid://dm0oo1u3mfu5e" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Bin_01.tscn" id="130_5sl24"]
+[ext_resource type="PackedScene" uid="uid://gf533718e6s2" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_MetalDetector_Baggage_01.tscn" id="131_pne5e"]
+[ext_resource type="PackedScene" uid="uid://cbsb72bcjthl4" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Stack_02.tscn" id="132_vtifl"]
+[ext_resource type="PackedScene" uid="uid://bkhruhc6ibew5" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Seat_01.tscn" id="133_bdh22"]
+[ext_resource type="PackedScene" uid="uid://3xwpdvtv1j5q" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_TellerDesk_Barrier_02.tscn" id="134_k7pjm"]
+[ext_resource type="PackedScene" uid="uid://cagt7i1owoiss" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_RopeBarrier_Pole_02.tscn" id="135_5v0dw"]
+[ext_resource type="PackedScene" uid="uid://inokq42y1qsb" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_GoldBar_02.tscn" id="136_mkiy7"]
+[ext_resource type="PackedScene" uid="uid://dky4xngnn2qot" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Box_01.tscn" id="137_2soed"]
+[ext_resource type="PackedScene" uid="uid://cxjjcdbbiq8be" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_SafeDepositBoxes_01.tscn" id="138_nacd0"]
+[ext_resource type="PackedScene" uid="uid://c1pbwue6qnhte" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Computer_Keyboard_01.tscn" id="139_6fbac"]
+[ext_resource type="PackedScene" uid="uid://bwf03n5qlhxvv" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Seat_02.tscn" id="140_gdqdg"]
+[ext_resource type="PackedScene" uid="uid://clat7pec0lcpg" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_TellerDesk_03.tscn" id="141_m8fae"]
+[ext_resource type="PackedScene" uid="uid://bohaxnw6pdaqk" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Table_01.tscn" id="142_ry06x"]
+[ext_resource type="PackedScene" uid="uid://bn72lwyxbs4cf" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Jewellery_03.tscn" id="143_xvnw2"]
+[ext_resource type="PackedScene" uid="uid://dmjpq13ap517b" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Drawers_01.tscn" id="144_ux0un"]
+[ext_resource type="PackedScene" uid="uid://cyltl3vtmqmsb" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Sign_Jewellery_01.tscn" id="145_wx360"]
+[ext_resource type="PackedScene" uid="uid://csa28nej8l5ac" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Pillar_01.tscn" id="146_mo4sj"]
+[ext_resource type="PackedScene" uid="uid://deq2lotiy6ei4" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_SafeDepositBox_Container_01.tscn" id="147_8qgww"]
+[ext_resource type="PackedScene" uid="uid://bjuvlv35rl2rt" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Flag_Wall_02.tscn" id="148_xq2qy"]
+[ext_resource type="PackedScene" uid="uid://dujn0ke2k6blm" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Rug_02.tscn" id="149_6qsvd"]
+[ext_resource type="PackedScene" uid="uid://bg5dy1ibqffte" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Desk_03.tscn" id="150_0mukh"]
+[ext_resource type="PackedScene" uid="uid://dc47pgg5uybdw" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_GoldBar_01.tscn" id="151_njoa2"]
+[ext_resource type="PackedScene" uid="uid://dx6eu0gjiysgp" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_SafeDepositBox_Cover_02.tscn" id="152_ver63"]
+[ext_resource type="PackedScene" uid="uid://bwlrl3d5x3140" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_RopeBarrier_03.tscn" id="153_dq7e3"]
+[ext_resource type="PackedScene" uid="uid://cdrww2px643gy" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_DisplayCase_02.tscn" id="154_ln5o0"]
+[ext_resource type="PackedScene" uid="uid://c205ui51lcvcd" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Flag_Wall_01.tscn" id="155_y2j6j"]
+[ext_resource type="PackedScene" uid="uid://b6myyd7k7fknw" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Note_02.tscn" id="156_3teu0"]
+[ext_resource type="PackedScene" uid="uid://dgwvvr2ejqcun" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Flag_Straight_01.tscn" id="157_rxlx4"]
+[ext_resource type="PackedScene" uid="uid://cmx5p87sy2via" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Stack_03.tscn" id="158_a3yd5"]
+[ext_resource type="PackedScene" uid="uid://opxip351s5da" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_AirVent_01.tscn" id="159_fjrek"]
+[ext_resource type="PackedScene" uid="uid://n3ep48a5b2jv" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_SafeDepositBoxes_Looted_01.tscn" id="160_txja7"]
+[ext_resource type="PackedScene" uid="uid://dg3bmbteb4ovj" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_TellerDesk_01.tscn" id="161_iklg5"]
+[ext_resource type="PackedScene" uid="uid://cf5sjsi6wpk1r" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_VaultTrolley_01.tscn" id="162_7c7l1"]
+[ext_resource type="PackedScene" uid="uid://dmj7776q5luye" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Couch_02.tscn" id="163_5m3x7"]
+[ext_resource type="PackedScene" uid="uid://b5usfxrh6oelx" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Table_02.tscn" id="164_uv223"]
+[ext_resource type="PackedScene" uid="uid://bouu5u7o31f4o" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Jewellery_01.tscn" id="165_e2046"]
+[ext_resource type="PackedScene" uid="uid://3wniep81abcc" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Aircon_01.tscn" id="166_24aa0"]
+[ext_resource type="PackedScene" uid="uid://32l1ru8og1t6" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Computer_Mouse_01.tscn" id="167_pwn7f"]
+[ext_resource type="PackedScene" uid="uid://dhy2igc6sv6mj" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Folder_05.tscn" id="168_vqdrd"]
+[ext_resource type="PackedScene" uid="uid://c1t0ms0sjd0bd" path="res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_WaterCooler_01.tscn" id="169_svktp"]
+[ext_resource type="PackedScene" uid="uid://vvf5mrxnyvi4" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_PistolBandit_01.tscn" id="170_p57nu"]
+[ext_resource type="PackedScene" uid="uid://cuhf4gropmrcn" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Crosshair_04.tscn" id="171_cl0hp"]
+[ext_resource type="PackedScene" uid="uid://dgclj8ou15rx7" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Grenade_Base_01.tscn" id="172_0laan"]
+[ext_resource type="PackedScene" uid="uid://dkyxwa5isjyq5" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_SniperSwat_01.tscn" id="173_a4hle"]
+[ext_resource type="PackedScene" uid="uid://d874mrlrom67" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_SMG_01.tscn" id="174_opbue"]
+[ext_resource type="PackedScene" uid="uid://o3k26tgg6dw" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Ammo_Shotgun_01.tscn" id="175_tyf1c"]
+[ext_resource type="PackedScene" uid="uid://bmhw1bexjn1yf" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Attachment_Grip_01.tscn" id="176_0y51c"]
+[ext_resource type="PackedScene" uid="uid://bldags1cuc4p2" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Crosshair_Sniper_01.tscn" id="177_h4i7j"]
+[ext_resource type="PackedScene" uid="uid://dwh6322ad62ku" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Crosshair_05.tscn" id="178_1nsi1"]
+[ext_resource type="PackedScene" uid="uid://b7m2db3vrydu1" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Ammo_BulletSmall_01.tscn" id="179_rv7h0"]
+[ext_resource type="PackedScene" uid="uid://nmnltl251xxv" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Ammo_BulletLarge_02.tscn" id="180_d5tqb"]
+[ext_resource type="PackedScene" uid="uid://bhfbd3whh6g5n" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_RifleSwat_01.tscn" id="181_hg2yo"]
+[ext_resource type="PackedScene" uid="uid://b0h8y3fbil73a" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_RifleBandit_01.tscn" id="182_uv0u0"]
+[ext_resource type="PackedScene" uid="uid://bx5xf8vdi6rob" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Attachment_Redot_01.tscn" id="183_cuagc"]
+[ext_resource type="PackedScene" uid="uid://dwamuhm1c0y8h" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_PistolSwat_01.tscn" id="184_tfrq1"]
+[ext_resource type="PackedScene" uid="uid://bwqupg7tpnn81" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Holster_01.tscn" id="185_2u706"]
+[ext_resource type="PackedScene" uid="uid://dc06vxixbbs4r" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Attachment_SniperScope_01.tscn" id="186_ycjy4"]
+[ext_resource type="PackedScene" uid="uid://bed0er4eunaf1" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Ammo_BulletLarge_01.tscn" id="187_xnxki"]
+[ext_resource type="PackedScene" uid="uid://cvxecsjnitcqx" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Ammo_BulletSmall_02.tscn" id="188_e6gb5"]
+[ext_resource type="PackedScene" uid="uid://b5ixwwnnx4cdh" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Attachment_Torch_01.tscn" id="189_n1v34"]
+[ext_resource type="PackedScene" uid="uid://basfrkwu65ui7" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Shotgun_01.tscn" id="190_luunr"]
+[ext_resource type="PackedScene" uid="uid://b7mt3xy3k1yjl" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Crosshair_03.tscn" id="191_fmmnq"]
+[ext_resource type="PackedScene" uid="uid://dac0rtk4saj34" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Crosshair_02.tscn" id="192_53w8j"]
+[ext_resource type="PackedScene" uid="uid://cpokrpj4ngmjn" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Flashbang_Base_01.tscn" id="193_f1lpc"]
+[ext_resource type="PackedScene" uid="uid://cwbfbrxc2gsyf" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Attachment_M4Rail_01.tscn" id="194_ks04l"]
+[ext_resource type="PackedScene" uid="uid://dnh7fwptgelvx" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Attachment_Silencer_01.tscn" id="195_72ohc"]
+[ext_resource type="PackedScene" uid="uid://bahsjahqojwtv" path="res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_Crosshair_01.tscn" id="196_jsbod"]
+[ext_resource type="PackedScene" uid="uid://ca38fuu16mpph" path="res://Assets/Synty/PolygonHeist/Prefab/Vehicles/SM_Veh_SwatVan_01.tscn" id="197_ej8xe"]
+[ext_resource type="PackedScene" uid="uid://dvmn7l5ydpd8k" path="res://Assets/Synty/PolygonHeist/Prefab/Vehicles/SM_Veh_Helicopter_01.tscn" id="198_07o3v"]
+[ext_resource type="PackedScene" uid="uid://bgqh4sjkkmvti" path="res://Assets/Synty/PolygonHeist/Prefab/Vehicles/SM_Veh_Car_Police_Heist_01.tscn" id="199_wkdyg"]
+[ext_resource type="Material" uid="uid://ckr1tk52sr3tm" path="res://Assets/Synty/PolygonHeist/Materials/Layout_Ground_01_mat.tres" id="200_guld8"]
+[ext_resource type="PackedScene" uid="uid://dphodvjmwxg1p" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_Bomb_01.tscn" id="201_gexx6"]
+[ext_resource type="PackedScene" uid="uid://dwhhen2hos5na" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_Mallet_01.tscn" id="202_ejclf"]
+[ext_resource type="PackedScene" uid="uid://bi18kt2o01nb7" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_Pouch_01.tscn" id="203_pem56"]
+[ext_resource type="PackedScene" uid="uid://fqowc8y7yk13" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_DuffleBag_Open_Full_01.tscn" id="204_ca187"]
+[ext_resource type="PackedScene" uid="uid://jgl78qsbrc3f" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_DuffleBag_01.tscn" id="205_pfooo"]
+[ext_resource type="PackedScene" uid="uid://cymielgyn4fse" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_DuffleBag_Empty_01.tscn" id="206_0wdbn"]
+[ext_resource type="PackedScene" uid="uid://7elk84l2og2w" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_DuffleBag_Full_01.tscn" id="207_v1du8"]
+[ext_resource type="PackedScene" uid="uid://ccm8a5jxhgf32" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_Rope_01.tscn" id="208_1a2mx"]
+[ext_resource type="PackedScene" uid="uid://b5y14x24nl6p4" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_Crowbar_01.tscn" id="209_1d380"]
+[ext_resource type="PackedScene" uid="uid://bygxk3fi1vnmc" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_AmmoPack_01.tscn" id="210_047eg"]
+[ext_resource type="PackedScene" uid="uid://gclvdcugd656" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_Wirecutter_01.tscn" id="211_47vs7"]
+[ext_resource type="PackedScene" uid="uid://cihtru42hsf2e" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_Briefcase_01.tscn" id="212_jbiqw"]
+[ext_resource type="PackedScene" uid="uid://b0jcfk3gabjnf" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_HealthKit_02.tscn" id="213_tvr0k"]
+[ext_resource type="PackedScene" uid="uid://bofbf3kxlj7fg" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_WalkieTalkie_01.tscn" id="214_wmfb0"]
+[ext_resource type="PackedScene" uid="uid://d2hhqi16ngmdt" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_Briefcase_02.tscn" id="215_1w11r"]
+[ext_resource type="PackedScene" uid="uid://611afub5k5r2" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_Wrench_01.tscn" id="216_7pp0c"]
+[ext_resource type="PackedScene" uid="uid://djtraoocgmat0" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_Handcuffs_01.tscn" id="217_nvndv"]
+[ext_resource type="PackedScene" uid="uid://cnf3g064yocmm" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_Hacksaw_01.tscn" id="218_idkgl"]
+[ext_resource type="PackedScene" uid="uid://c78m52ievuvtj" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_AmmoPack_02.tscn" id="219_ligg8"]
+[ext_resource type="PackedScene" uid="uid://c7ei3l6xowfpo" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_ScrewDriver_01.tscn" id="220_bqbne"]
+[ext_resource type="PackedScene" uid="uid://b2k7blljtaj4i" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_Hammer_01.tscn" id="221_4wmwp"]
+[ext_resource type="PackedScene" uid="uid://dr4iy4dbodbas" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_HealthKit_01.tscn" id="222_biqt4"]
+[ext_resource type="PackedScene" uid="uid://sabs0g7pw6av" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_DuffleBag_Open_Empty_01.tscn" id="223_0fa3e"]
+[ext_resource type="PackedScene" uid="uid://bv2cvug8l8qpy" path="res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_ZipTies_01.tscn" id="224_my50t"]
+[ext_resource type="PackedScene" uid="uid://b07uyklm4vynf" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Hair_Man_01.tscn" id="225_yb1le"]
+[ext_resource type="PackedScene" uid="uid://hnwk6yfrflvf" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Luchador_01.tscn" id="226_yd8vv"]
+[ext_resource type="PackedScene" uid="uid://t71o4x201sfi" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Gas_01.tscn" id="227_vnxds"]
+[ext_resource type="PackedScene" uid="uid://ckiammwxljs6n" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Simple_Man_01.tscn" id="228_40qja"]
+[ext_resource type="PackedScene" uid="uid://d4ck1nu2c1xmu" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Simple_Robber_01.tscn" id="229_kqt66"]
+[ext_resource type="PackedScene" uid="uid://dvc52l2rsuajv" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Hair_Woman_01.tscn" id="230_gk5my"]
+[ext_resource type="PackedScene" uid="uid://1jyphhlic3j4" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Horse_01.tscn" id="231_jth2g"]
+[ext_resource type="PackedScene" uid="uid://cr20o1ikohesj" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Hockey_01.tscn" id="232_ei62k"]
+[ext_resource type="PackedScene" uid="uid://wv6t71no1bt" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Simple_Woman_01.tscn" id="233_le3rv"]
+[ext_resource type="PackedScene" uid="uid://bwdtd4yfgxei6" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_WeldersMask_01.tscn" id="234_3g0yt"]
+[ext_resource type="PackedScene" uid="uid://hrxnpycxnume" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Trump_01.tscn" id="235_6wmoc"]
+[ext_resource type="PackedScene" uid="uid://31r3hkki728q" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Hair_Eyebrow_Man_01.tscn" id="236_pg0lr"]
+[ext_resource type="PackedScene" uid="uid://cxanlrrlgjhss" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Hat_01.tscn" id="237_43b0w"]
+[ext_resource type="PackedScene" uid="uid://dpuppyutyayk" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Chicken_01.tscn" id="238_uwlsu"]
+[ext_resource type="PackedScene" uid="uid://dobacnrda0ml8" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Construction_01.tscn" id="239_mah75"]
+[ext_resource type="PackedScene" uid="uid://cthbk4sa4kkda" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Fox_01.tscn" id="240_ljt6h"]
+[ext_resource type="PackedScene" uid="uid://d16ofm1kkkubo" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Beanie_01.tscn" id="241_oamfb"]
+[ext_resource type="PackedScene" uid="uid://1fehow5n6a76" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Clown_01.tscn" id="242_s6u3f"]
+[ext_resource type="PackedScene" uid="uid://lvwtn0omr2yn" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Alien_01.tscn" id="243_ppcbi"]
+[ext_resource type="PackedScene" uid="uid://dfr0osg6nodpu" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Tiger_01.tscn" id="244_tp7p2"]
+[ext_resource type="PackedScene" uid="uid://rgycufiagefb" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Hair_Eyebrow_Woman_01.tscn" id="245_unxen"]
+[ext_resource type="PackedScene" uid="uid://d3k3wuh3hoijx" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Glasses_01.tscn" id="246_cb0yn"]
+[ext_resource type="PackedScene" uid="uid://8xiv22vr4tys" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Panda_01.tscn" id="247_eqaat"]
+[ext_resource type="PackedScene" uid="uid://784hpjc2y5ud" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_PaperBag_01.tscn" id="248_1sweb"]
+[ext_resource type="PackedScene" uid="uid://bds037gqwyu1x" path="res://Assets/Synty/PolygonHeist/Prefab/Masks/SM_Item_Mask_Balaclava_01.tscn" id="249_o3v7f"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_d7qno"]
+resource_name = "Cube"
+
+[node name="Main" type="Node3D" unique_id=986692853]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1408109040]
+environment = ExtResource("1_kuv5k")
+
+[node name="Directional Light" type="DirectionalLight3D" parent="." unique_id=799401004]
+transform = Transform3D(0.43029225, 0.6915005, -0.58023757, 2.608557e-07, 0.64278734, 0.7660447, 0.90268964, -0.32962325, 0.2765862, 0, 3, 0)
+light_color = Color(1, 0.95686275, 0.8392157, 1)
+light_bake_mode = 0
+shadow_enabled = true
+shadow_normal_bias = 1.3
+shadow_transmittance_bias = -2.9
+shadow_opacity = 0.81
+shadow_blur = 1.55
+
+[node name="Main Camera" type="Camera3D" parent="." unique_id=1886065657]
+transform = Transform3D(0.6986757, 0.08637885, -0.7102049, 0.002650466, 0.9923654, 0.12330413, 0.7154336, -0.08803197, 0.6931127, -30.931429, 6.575198, 28.701283)
+cull_mask = 16777215
+current = true
+fov = 60.0
+near = 0.3
+far = 1000.0
+
+[node name="Environments" type="Node3D" parent="." unique_id=1767702288]
+
+[node name="SM_Env_Ceiling_Light_03" parent="Environments" unique_id=1635234097 instance=ExtResource("1_70fle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 3, -4)
+
+[node name="SM_Env_Sidewalk_01" parent="Environments" unique_id=100006127 instance=ExtResource("2_kuv5k")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 7)
+
+[node name="SM_Env_Pillar_Exterior_03" parent="Environments" unique_id=1340711399 instance=ExtResource("3_kwng8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -21)
+
+[node name="SM_Env_Sidewalk_Straight_01" parent="Environments" unique_id=1164348630 instance=ExtResource("4_egtr2")]
+transform = Transform3D(2.5629997e-06, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, 2.5629997e-06, 17, 0, 7)
+
+[node name="SM_Env_Road_01" parent="Environments" unique_id=53690084 instance=ExtResource("5_pg875")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 7)
+
+[node name="SM_Env_Ceiling_05" parent="Environments" unique_id=1888239156 instance=ExtResource("6_p0fn0")]
+transform = Transform3D(1, 0, 0, 0, -1, 4.649162e-06, 0, -4.649162e-06, -1, 0, 0, 1)
+
+[node name="SM_Env_Pillar_Interior_02" parent="Environments" unique_id=744361923 instance=ExtResource("7_3rm7u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -22)
+
+[node name="SM_Env_Steps_03" parent="Environments" unique_id=1177243494 instance=ExtResource("8_r1uxp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -24)
+
+[node name="SM_Env_Floor_01" parent="Environments" unique_id=561379509 instance=ExtResource("9_bgxvg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+
+[node name="SM_Env_Door_03" parent="Environments" unique_id=717296363 instance=ExtResource("10_gfqam")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -5)
+
+[node name="SM_Env_Ceiling_Light_02" parent="Environments" unique_id=454813927 instance=ExtResource("11_u5m7f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3, -4)
+
+[node name="SM_Env_Ceiling_02" parent="Environments" unique_id=103329803 instance=ExtResource("12_1dfbi")]
+transform = Transform3D(1, 0, 0, 0, -1, 4.649162e-06, 0, -4.649162e-06, -1, -18, 0, 1)
+
+[node name="SM_Env_Ceiling_06" parent="Environments" unique_id=2034732540 instance=ExtResource("13_mmekr")]
+transform = Transform3D(1, 0, 0, 0, -1, 4.649162e-06, 0, -4.649162e-06, -1, 6, 0, 1)
+
+[node name="SM_Env_Wall_Interior_01" parent="Environments" unique_id=530319253 instance=ExtResource("14_j8jcu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, -6)
+
+[node name="SM_Env_Pillar_Exterior_01" parent="Environments" unique_id=483738798 instance=ExtResource("15_lm0bp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -23)
+
+[node name="SM_Env_Ceiling_01" parent="Environments" unique_id=958758912 instance=ExtResource("16_xet22")]
+transform = Transform3D(1, 0, 0, 0, -1, 4.649162e-06, 0, -4.649162e-06, -1, -24, 0, 1)
+
+[node name="SM_Env_Pillar_Exterior_04" parent="Environments" unique_id=1027903487 instance=ExtResource("17_q11nn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -20)
+
+[node name="SM_Env_VaultGate_Frame_01" parent="Environments" unique_id=981257631 instance=ExtResource("18_v8v0l")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, -15)
+
+[node name="SM_Env_Wall_Glass_Ground_01" parent="Environments" unique_id=400335668 instance=ExtResource("19_deqnf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, -23)
+
+[node name="SM_Env_Roof_05" parent="Environments" unique_id=961596766 instance=ExtResource("20_ku5ro")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -12)
+
+[node name="SM_Env_Wall_Glass_DoorFrame_01" parent="Environments" unique_id=1991488462 instance=ExtResource("21_osv6m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, -21)
+
+[node name="SM_Env_Wall_Interior_DoubleDoor_01" parent="Environments" unique_id=949470973 instance=ExtResource("22_5mwk6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -6)
+
+[node name="SM_Env_Wall_Interior_Window_02" parent="Environments" unique_id=2048846024 instance=ExtResource("23_4q4o3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -6)
+
+[node name="SM_Env_Floor_02" parent="Environments" unique_id=2024672834 instance=ExtResource("24_n22bw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 2)
+
+[node name="SM_Env_Ceiling_04" parent="Environments" unique_id=1846188732 instance=ExtResource("25_ar88w")]
+transform = Transform3D(1, 0, 0, 0, -1, 4.649162e-06, 0, -4.649162e-06, -1, -6, 0, 1)
+
+[node name="SM_Env_Wall_Window_Panels_01" parent="Environments" unique_id=1390460250 instance=ExtResource("26_nsmp3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -7)
+
+[node name="SM_Env_Wall_Exterior_Window_Ground_01" parent="Environments" unique_id=2126794380 instance=ExtResource("27_trlju")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -9)
+
+[node name="SM_Env_Stairway_01" parent="Environments" unique_id=261501453 instance=ExtResource("28_kq8kr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, -24)
+
+[node name="SM_Env_Wall_Exterior_DoubleDoor_01" parent="Environments" unique_id=38801210 instance=ExtResource("29_3ioi1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -9)
+
+[node name="SM_Env_Skylight_01" parent="Environments" unique_id=219384820 instance=ExtResource("30_r1e3y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -17)
+
+[node name="SM_Env_Pillar_Exterior_Floor_02" parent="Environments" unique_id=871603985 instance=ExtResource("31_5t2cp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -22)
+
+[node name="SM_Env_Wall_Interior_Ground_01" parent="Environments" unique_id=405593425 instance=ExtResource("32_04upk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, -6)
+
+[node name="SM_Env_Wall_Exterior_Window_01" parent="Environments" unique_id=2023106953 instance=ExtResource("33_3c8x1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -9)
+
+[node name="SM_Env_Ceiling_Light_01" parent="Environments" unique_id=49228550 instance=ExtResource("34_earb7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 3, -4)
+
+[node name="SM_Env_Ceiling_07" parent="Environments" unique_id=937178806 instance=ExtResource("35_netsj")]
+transform = Transform3D(1, 0, 0, 0, -1, 4.649162e-06, 0, -4.649162e-06, -1, 12, 0, 1)
+
+[node name="SM_Env_Door_02" parent="Environments" unique_id=545375838 instance=ExtResource("36_ddbfe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4999998, 0, -5)
+
+[node name="SM_Env_Wall_Exterior_Window_Ground_02" parent="Environments" unique_id=535423920 instance=ExtResource("37_pb5eh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, -9)
+
+[node name="SM_Env_Pillar_Interior_03" parent="Environments" unique_id=523329815 instance=ExtResource("38_t5a1r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -21)
+
+[node name="SM_Env_Wall_Interior_Window_Ground_01" parent="Environments" unique_id=890224827 instance=ExtResource("39_kja3a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -6)
+
+[node name="SM_Env_Steps_02" parent="Environments" unique_id=898538586 instance=ExtResource("40_7qfwy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -24)
+
+[node name="SM_Env_Ceiling_08" parent="Environments" unique_id=920668271 instance=ExtResource("41_pu6t3")]
+transform = Transform3D(1, 0, 0, 0, -1, 4.649162e-06, 0, -4.649162e-06, -1, 18, 0, 1)
+
+[node name="SM_Env_Wall_Interior_Door_01" parent="Environments" unique_id=1724986588 instance=ExtResource("42_6j0bk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -6)
+
+[node name="SM_Env_Railing_01" parent="Environments" unique_id=850660022 instance=ExtResource("43_8sa4o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+
+[node name="SM_Env_Pillar_Exterior_Floor_04" parent="Environments" unique_id=1080433004 instance=ExtResource("44_d8hhf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -20)
+
+[node name="SM_Env_Wall_Exterior_Window_02" parent="Environments" unique_id=811824325 instance=ExtResource("45_cvck7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -9)
+
+[node name="SM_Env_Roof_04" parent="Environments" unique_id=1228719091 instance=ExtResource("46_5vb6l")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -12)
+
+[node name="SM_Env_Steps_01" parent="Environments" unique_id=1727561622 instance=ExtResource("47_gq7nn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -24)
+
+[node name="SM_Env_Pillar_Exterior_Floor_01" parent="Environments" unique_id=505583355 instance=ExtResource("48_cas1c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -23)
+
+[node name="SM_Env_Wall_Window_Blinds_01" parent="Environments" unique_id=1741332918 instance=ExtResource("49_i0o06")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -7)
+
+[node name="SM_Env_Pillar_Exterior_02" parent="Environments" unique_id=437888406 instance=ExtResource("50_shvly")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -22)
+
+[node name="SM_Env_Wall_Exterior_Door_01" parent="Environments" unique_id=1459048778 instance=ExtResource("51_dyo2r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -9)
+
+[node name="SM_Env_Door_01" parent="Environments" unique_id=1655762870 instance=ExtResource("52_yryf5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, -5)
+
+[node name="SM_Env_Pillar_Exterior_Floor_03" parent="Environments" unique_id=894166505 instance=ExtResource("53_yum0k")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -21)
+
+[node name="SM_Env_Wall_Glass_01" parent="Environments" unique_id=2143640064 instance=ExtResource("54_lg3yp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, -19)
+
+[node name="SM_Env_Ceiling_03" parent="Environments" unique_id=778302285 instance=ExtResource("55_b73k7")]
+transform = Transform3D(1, 0, 0, 0, -1, 4.649162e-06, 0, -4.649162e-06, -1, -12, 0, 1)
+
+[node name="SM_Env_Roof_01" parent="Environments" unique_id=2081480733 instance=ExtResource("56_t2agn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, -12)
+
+[node name="SM_Env_VaultDoor_Frame_01" parent="Environments" unique_id=65512295 instance=ExtResource("57_hyygu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, -13)
+
+[node name="SM_Env_Pillar_Interior_04" parent="Environments" unique_id=2071871036 instance=ExtResource("58_mpfql")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -20)
+
+[node name="SM_Env_Pillar_02" parent="Environments" unique_id=1686979623 instance=ExtResource("59_wsbib")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -23)
+
+[node name="SM_Env_Roof_03" parent="Environments" unique_id=576343814 instance=ExtResource("60_feviu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -12)
+
+[node name="SM_Env_Wall_Exterior_Ground_01" parent="Environments" unique_id=316294964 instance=ExtResource("61_xshol")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, -9)
+
+[node name="SM_Env_Wall_Exterior_01" parent="Environments" unique_id=1784374637 instance=ExtResource("62_f2let")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, -9)
+
+[node name="SM_Env_Roof_02" parent="Environments" unique_id=1885078133 instance=ExtResource("63_4br3o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -12)
+
+[node name="SM_Env_Wall_Interior_Window_Ground_02" parent="Environments" unique_id=1841948945 instance=ExtResource("64_f4nic")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, -6)
+
+[node name="SM_Env_VaultGate_Door_01" parent="Environments" unique_id=2137670244 instance=ExtResource("65_g3bsy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.24, 0, -15)
+
+[node name="SM_Env_Pillar_Interior_01" parent="Environments" unique_id=619824070 instance=ExtResource("66_bn5sc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -23)
+
+[node name="SM_Env_Wall_Interior_Window_01" parent="Environments" unique_id=909666047 instance=ExtResource("67_3brtj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+
+[node name="SM_Env_Steps_Edge_01" parent="Environments" unique_id=26985281 instance=ExtResource("68_e03n7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -19)
+
+[node name="SM_Env_Steps_04" parent="Environments" unique_id=905346794 instance=ExtResource("69_ealyn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, -24)
+
+[node name="SM_Env_VaultGate_Wall_01" parent="Environments" unique_id=548427768 instance=ExtResource("70_gtqv6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, -17)
+
+[node name="SM_Env_Pillar_01" parent="Environments" unique_id=1992798880 instance=ExtResource("71_tu8lu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -21)
+
+[node name="Props" type="Node3D" parent="." unique_id=1532238010]
+
+[node name="SM_Prop_Jewellery_02" parent="Props" unique_id=460301660 instance=ExtResource("72_eg6im")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 0, 16.75)
+
+[node name="SM_Prop_Jewellery_Necklace_03" parent="Props" unique_id=906761307 instance=ExtResource("73_cl6go")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.75, 0, 16.75)
+
+[node name="SM_Prop_Folder_03" parent="Props" unique_id=584428781 instance=ExtResource("74_ucnuv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0, 16.25)
+
+[node name="SM_Prop_Money_Note_06" parent="Props" unique_id=30094171 instance=ExtResource("75_852jl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.452, 0, 15.182)
+
+[node name="SM_Prop_Jewellery_Rings_01" parent="Props" unique_id=1895551918 instance=ExtResource("76_28m06")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.75, 0, 16.75)
+
+[node name="SM_Prop_Money_Note_04" parent="Props" unique_id=1426193902 instance=ExtResource("77_1ycqb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.452, 0, 15.332)
+
+[node name="SM_Prop_CoffeTable_01" parent="Props" unique_id=1619444110 instance=ExtResource("78_62d4j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 0, 14.5)
+
+[node name="SM_Prop_RopeBarrier_02" parent="Props" unique_id=732719061 instance=ExtResource("79_yagv2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.75, 0, 14.5)
+
+[node name="SM_Prop_Pillar_02" parent="Props" unique_id=601435334 instance=ExtResource("80_1sehx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.5, 0, 12.5)
+
+[node name="SM_Prop_Jewellery_Necklace_01" parent="Props" unique_id=882495351 instance=ExtResource("81_p8l8c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.75, 0.19, 16.75)
+
+[node name="SM_Prop_Money_Note_01" parent="Props" unique_id=1595219208 instance=ExtResource("82_bqe5l")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.452, 0, 16.092)
+
+[node name="SM_Prop_RopeBarrier_Pole_01" parent="Props" unique_id=6112999 instance=ExtResource("83_sqpl3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.75, 0, 14.08)
+
+[node name="SM_Prop_SafeDepositBoxes_Empty_01" parent="Props" unique_id=54846432 instance=ExtResource("84_375ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, 3)
+
+[node name="SM_Prop_Jewellery_Necklace_02" parent="Props" unique_id=1370943297 instance=ExtResource("85_lcdwn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.25, 0, 16.75)
+
+[node name="SM_Prop_Computer_Screen_01" parent="Props" unique_id=61725999 instance=ExtResource("86_44k34")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.75, 0, 15.5)
+
+[node name="SM_Prop_Sign_Base_01" parent="Props" unique_id=678030214 instance=ExtResource("87_cmpgp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 0, 4)
+
+[node name="SM_Prop_Sign_Bank_01" parent="Props" unique_id=706810711 instance=ExtResource("88_2hn2q")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0, 9)
+
+[node name="SM_Prop_Plant_03" parent="Props" unique_id=399434356 instance=ExtResource("89_ooeey")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.25, 0, 16)
+
+[node name="SM_Prop_Folder_01" parent="Props" unique_id=971362769 instance=ExtResource("90_v5lp4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.75, 0, 16.25)
+
+[node name="SM_Prop_AlarmButton_01" parent="Props" unique_id=1752167812 instance=ExtResource("91_2h7my")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 0, 16.25)
+
+[node name="SM_Prop_Plant_02" parent="Props" unique_id=1078366633 instance=ExtResource("92_0ca0u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.5, 0, 12.5)
+
+[node name="SM_Prop_Couch_01" parent="Props" unique_id=2051619645 instance=ExtResource("93_eitwg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0, 13)
+
+[node name="SM_Prop_Rug_01" parent="Props" unique_id=805975682 instance=ExtResource("94_5fxij")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 12)
+
+[node name="SM_Prop_CoffeeTable_02" parent="Props" unique_id=68472746 instance=ExtResource("95_8bve6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0, 15.5)
+
+[node name="SM_Prop_Desk_02" parent="Props" unique_id=995534078 instance=ExtResource("96_md2dt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.5, 0, 11)
+
+[node name="SM_Prop_Computer_01" parent="Props" unique_id=480569135 instance=ExtResource("97_3id1h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.809999, 0, 15.5)
+
+[node name="SM_Prop_Shelf_01" parent="Props" unique_id=506211521 instance=ExtResource("98_ln4d5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, 10)
+
+[node name="SM_Prop_SafeDepositBoxes_Half_01" parent="Props" unique_id=725803317 instance=ExtResource("99_jd500")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, 3)
+
+[node name="SM_Prop_SafeDepositBox_Cover_01" parent="Props" unique_id=669607213 instance=ExtResource("100_vtql1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.5, 15.5)
+
+[node name="SM_Prop_Jewellery_04" parent="Props" unique_id=1097351719 instance=ExtResource("101_5kxln")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0, 16.75)
+
+[node name="SM_Prop_Money_Roll_01" parent="Props" unique_id=694624802 instance=ExtResource("102_1165q")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.452, 0, 15.002)
+
+[node name="SM_Prop_SafeDepositBox_Container_02" parent="Props" unique_id=1602924704 instance=ExtResource("103_k0gqe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 16)
+
+[node name="SM_Prop_Folder_04" parent="Props" unique_id=530235966 instance=ExtResource("104_nuk2n")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.75, 0, 16.75)
+
+[node name="SM_Prop_DisplayCase_01" parent="Props" unique_id=1013824103 instance=ExtResource("105_33mh4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.93, 0, 9.85)
+
+[node name="SM_Prop_Money_Note_03" parent="Props" unique_id=1823949962 instance=ExtResource("106_u3wgh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.452, 0, 15.762)
+
+[node name="SM_Prop_RopeBarrier_01" parent="Props" unique_id=1890415630 instance=ExtResource("107_slw3a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.75, 0, 14.34)
+
+[node name="SM_Prop_Drill_01" parent="Props" unique_id=1636371764 instance=ExtResource("108_evqwl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 0.5, 12.5)
+
+[node name="SM_Prop_Statue_01" parent="Props" unique_id=583225336 instance=ExtResource("109_jhwn4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 0, 15.75)
+
+[node name="SM_Prop_TellerDesk_Barrier_01" parent="Props" unique_id=570241598 instance=ExtResource("110_25ce5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.5, 0, 13.5)
+
+[node name="SM_Prop_ATM_01" parent="Props" unique_id=480713704 instance=ExtResource("111_wgust")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0, 11.5)
+
+[node name="SM_Prop_Money_Roll_02" parent="Props" unique_id=483905253 instance=ExtResource("112_amv2b")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 0, 16)
+
+[node name="SM_Prop_Folder_02" parent="Props" unique_id=756041359 instance=ExtResource("113_apvcv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0, 16.75)
+
+[node name="SM_Prop_Sign_Money_Bank_01" parent="Props" unique_id=1852532932 instance=ExtResource("114_fe4a8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 0, 7)
+
+[node name="SM_Prop_Flag_Pole_01" parent="Props" unique_id=1227798295 instance=ExtResource("115_lxmti")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 0, 6.5)
+
+[node name="SM_Prop_MetalDetector_01" parent="Props" unique_id=364076015 instance=ExtResource("116_2dcek")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0, 5.5)
+
+[node name="SM_Prop_SafeDepositBox_Cover_03" parent="Props" unique_id=906476340 instance=ExtResource("117_ddwxo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.5, 15.75)
+
+[node name="SM_Prop_Camera_01" parent="Props" unique_id=2019707958 instance=ExtResource("118_g6iff")]
+transform = Transform3D(-1, -4.7683716e-07, 0, 4.7683716e-07, -1, 0, 0, 0, 1, -17.75, 0, 15.75)
+
+[node name="SM_Prop_Money_Stack_01" parent="Props" unique_id=1774907623 instance=ExtResource("119_y815d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.599, 0, 15.542)
+
+[node name="SM_Prop_Sprinkler_01" parent="Props" unique_id=630225105 instance=ExtResource("120_ufmbf")]
+transform = Transform3D(-1, -7.1525574e-07, 0, 7.1525574e-07, -1, 0, 0, 0, 1, -17.75, 0, 15.5)
+
+[node name="SM_Prop_TellerDesk_02" parent="Props" unique_id=40789436 instance=ExtResource("121_d6trw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0, 8)
+
+[node name="SM_Prop_DeskLight_01" parent="Props" unique_id=1026063466 instance=ExtResource("122_fsigh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.5, 0, 15.5)
+
+[node name="SM_Prop_Money_Note_05" parent="Props" unique_id=360254624 instance=ExtResource("123_eqjv1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.452, 0, 15.602)
+
+[node name="SM_Prop_Money_Note_07" parent="Props" unique_id=1466259794 instance=ExtResource("124_lx1m1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.452, 0, 15.462)
+
+[node name="SM_Prop_Jewellery_Necklace_04" parent="Props" unique_id=20630556 instance=ExtResource("125_bk86g")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.25, 0, 16.75)
+
+[node name="SM_Prop_Desk_01" parent="Props" unique_id=115591763 instance=ExtResource("126_e62l5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, 0, 11)
+
+[node name="SM_Prop_Plant_01" parent="Props" unique_id=1035588673 instance=ExtResource("127_bnv21")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 12.5)
+
+[node name="SM_Prop_Fire_Detector_01" parent="Props" unique_id=341920345 instance=ExtResource("128_3d3bp")]
+transform = Transform3D(-1, -7.1525574e-07, 0, 7.1525574e-07, -1, 0, 0, 0, 1, -18.5, 0, 16.75)
+
+[node name="SM_Prop_Jewellery_Ring_01" parent="Props" unique_id=1006923859 instance=ExtResource("129_xrubf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.25, 0, 16.75)
+
+[node name="SM_Prop_Bin_01" parent="Props" unique_id=463533079 instance=ExtResource("130_5sl24")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.25, 0, 15.5)
+
+[node name="SM_Prop_MetalDetector_Baggage_01" parent="Props" unique_id=918445977 instance=ExtResource("131_pne5e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 5.5)
+
+[node name="SM_Prop_Money_Stack_02" parent="Props" unique_id=891859673 instance=ExtResource("132_vtifl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.952, 0, 15.542)
+
+[node name="SM_Prop_Seat_01" parent="Props" unique_id=517094535 instance=ExtResource("133_bdh22")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 0, 14.5)
+
+[node name="SM_Prop_TellerDesk_Barrier_02" parent="Props" unique_id=833857864 instance=ExtResource("134_k7pjm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0, 13.5)
+
+[node name="SM_Prop_RopeBarrier_Pole_02" parent="Props" unique_id=617007966 instance=ExtResource("135_5v0dw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.221, 0, 14.224)
+
+[node name="SM_Prop_GoldBar_02" parent="Props" unique_id=1953416960 instance=ExtResource("136_mkiy7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, 16.75)
+
+[node name="SM_Prop_Box_01" parent="Props" unique_id=948916191 instance=ExtResource("137_2soed")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0, 13)
+
+[node name="SM_Prop_SafeDepositBoxes_01" parent="Props" unique_id=2097300688 instance=ExtResource("138_nacd0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 3)
+
+[node name="SM_Prop_Computer_Keyboard_01" parent="Props" unique_id=438536052 instance=ExtResource("139_6fbac")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.25, 0, 16.75)
+
+[node name="SM_Prop_Seat_02" parent="Props" unique_id=1825180439 instance=ExtResource("140_gdqdg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0, 14.5)
+
+[node name="SM_Prop_TellerDesk_03" parent="Props" unique_id=2103589166 instance=ExtResource("141_m8fae")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, 8)
+
+[node name="SM_Prop_Table_01" parent="Props" unique_id=1546523834 instance=ExtResource("142_ry06x")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 6)
+
+[node name="SM_Prop_Jewellery_03" parent="Props" unique_id=471686047 instance=ExtResource("143_xvnw2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 0, 16.75)
+
+[node name="SM_Prop_Drawers_01" parent="Props" unique_id=306654994 instance=ExtResource("144_ux0un")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 10)
+
+[node name="SM_Prop_Sign_Jewellery_01" parent="Props" unique_id=183559650 instance=ExtResource("145_wx360")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 0, 8)
+
+[node name="SM_Prop_Pillar_01" parent="Props" unique_id=884061917 instance=ExtResource("146_mo4sj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.5, 0, 13.5)
+
+[node name="SM_Prop_SafeDepositBox_Container_01" parent="Props" unique_id=1149543266 instance=ExtResource("147_8qgww")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, 16)
+
+[node name="SM_Prop_Flag_Wall_02" parent="Props" unique_id=1656092521 instance=ExtResource("148_xq2qy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 5)
+
+[node name="SM_Prop_Rug_02" parent="Props" unique_id=220607919 instance=ExtResource("149_6qsvd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, 12)
+
+[node name="SM_Prop_Desk_03" parent="Props" unique_id=744226444 instance=ExtResource("150_0mukh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0, 10.5)
+
+[node name="SM_Prop_GoldBar_01" parent="Props" unique_id=1484162110 instance=ExtResource("151_njoa2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.75, 0, 16.75)
+
+[node name="SM_Prop_SafeDepositBox_Cover_02" parent="Props" unique_id=1387913718 instance=ExtResource("152_ver63")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.5, 15.25)
+
+[node name="SM_Prop_RopeBarrier_03" parent="Props" unique_id=241691520 instance=ExtResource("153_dq7e3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.221, 0, 14.224)
+
+[node name="SM_Prop_DisplayCase_02" parent="Props" unique_id=419268732 instance=ExtResource("154_ln5o0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.92, 0, 11.24)
+
+[node name="SM_Prop_Flag_Wall_01" parent="Props" unique_id=171322943 instance=ExtResource("155_y2j6j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, 5)
+
+[node name="SM_Prop_Money_Note_02" parent="Props" unique_id=1037737175 instance=ExtResource("156_3teu0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.452, 0, 15.932)
+
+[node name="SM_Prop_Flag_Straight_01" parent="Props" unique_id=1910659611 instance=ExtResource("157_rxlx4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 0, 5.5)
+
+[node name="SM_Prop_Money_Stack_03" parent="Props" unique_id=649408719 instance=ExtResource("158_a3yd5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.227, 0, 15.542)
+
+[node name="SM_Prop_AirVent_01" parent="Props" unique_id=1726982229 instance=ExtResource("159_fjrek")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.75, 0.25, 16.25)
+
+[node name="SM_Prop_SafeDepositBoxes_Looted_01" parent="Props" unique_id=401743713 instance=ExtResource("160_txja7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, 5)
+
+[node name="SM_Prop_TellerDesk_01" parent="Props" unique_id=899029510 instance=ExtResource("161_iklg5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0, 8)
+
+[node name="SM_Prop_VaultTrolley_01" parent="Props" unique_id=716549 instance=ExtResource("162_7c7l1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 14.5)
+
+[node name="SM_Prop_Couch_02" parent="Props" unique_id=787764412 instance=ExtResource("163_5m3x7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 0, 13)
+
+[node name="SM_Prop_Table_02" parent="Props" unique_id=450399384 instance=ExtResource("164_uv223")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 0, 11.5)
+
+[node name="SM_Prop_Jewellery_01" parent="Props" unique_id=1650485683 instance=ExtResource("165_e2046")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0, 16.75)
+
+[node name="SM_Prop_Aircon_01" parent="Props" unique_id=1286199775 instance=ExtResource("166_24aa0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0.5, 12.5)
+
+[node name="SM_Prop_Computer_Mouse_01" parent="Props" unique_id=1833770499 instance=ExtResource("167_pwn7f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.25, 0, 16.5)
+
+[node name="SM_Prop_Folder_05" parent="Props" unique_id=1492686117 instance=ExtResource("168_vqdrd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.5, 0, 16)
+
+[node name="SM_Prop_WaterCooler_01" parent="Props" unique_id=533088213 instance=ExtResource("169_svktp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 0, 11.5)
+
+[node name="Weapons" type="Node3D" parent="." unique_id=289040730]
+
+[node name="SM_Wep_PistolBandit_01" parent="Weapons" unique_id=613536966 instance=ExtResource("170_p57nu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.75, 0.25, 10.5)
+
+[node name="SM_Wep_Crosshair_04" parent="Weapons" unique_id=207701339 instance=ExtResource("171_cl0hp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1509999, 0.25, 10.558)
+
+[node name="SM_Wep_Grenade_Base_01" parent="Weapons" unique_id=2112189125 instance=ExtResource("172_0laan")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.75, 0.25, 10.5)
+
+[node name="SM_Wep_SniperSwat_01" parent="Weapons" unique_id=1260527863 instance=ExtResource("173_a4hle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.25, 0.25, 10.5)
+
+[node name="SM_Wep_SMG_01" parent="Weapons" unique_id=1170230779 instance=ExtResource("174_opbue")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.25, 0.25, 10.5)
+
+[node name="SM_Wep_Ammo_Shotgun_01" parent="Weapons" unique_id=88570693 instance=ExtResource("175_tyf1c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3089999, 0.25, 10.521)
+
+[node name="SM_Wep_Attachment_Grip_01" parent="Weapons" unique_id=451741050 instance=ExtResource("176_0y51c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25000006, 0.25, 10.5)
+
+[node name="SM_Wep_Crosshair_Sniper_01" parent="Weapons" unique_id=1216058417 instance=ExtResource("177_h4i7j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1509999, 0.25, 10.452999)
+
+[node name="SM_Wep_Crosshair_05" parent="Weapons" unique_id=1879075544 instance=ExtResource("178_1nsi1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1509999, 0.25, 10.591)
+
+[node name="SM_Wep_Ammo_BulletSmall_01" parent="Weapons" unique_id=109709702 instance=ExtResource("179_rv7h0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3089999, 0.25, 10.745999)
+
+[node name="SM_Wep_Ammo_BulletLarge_02" parent="Weapons" unique_id=1076809013 instance=ExtResource("180_d5tqb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3089999, 0.25, 10.573)
+
+[node name="SM_Wep_RifleSwat_01" parent="Weapons" unique_id=449957610 instance=ExtResource("181_hg2yo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.25, 10.5)
+
+[node name="SM_Wep_RifleBandit_01" parent="Weapons" unique_id=251588738 instance=ExtResource("182_uv0u0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.75, 0.25, 10.5)
+
+[node name="SM_Wep_Attachment_Redot_01" parent="Weapons" unique_id=923329413 instance=ExtResource("183_cuagc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49999994, 0.25, 10.5)
+
+[node name="SM_Wep_PistolSwat_01" parent="Weapons" unique_id=647353476 instance=ExtResource("184_tfrq1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.25, 10.5)
+
+[node name="SM_Wep_Holster_01" parent="Weapons" unique_id=913929585 instance=ExtResource("185_2u706")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0.25, 10.5)
+
+[node name="SM_Wep_Attachment_SniperScope_01" parent="Weapons" unique_id=2126623286 instance=ExtResource("186_ycjy4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.25, 10.5)
+
+[node name="SM_Wep_Ammo_BulletLarge_01" parent="Weapons" unique_id=233224894 instance=ExtResource("187_xnxki")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3089999, 0.25, 10.676)
+
+[node name="SM_Wep_Ammo_BulletSmall_02" parent="Weapons" unique_id=1447650898 instance=ExtResource("188_e6gb5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3089999, 0.25, 10.622999)
+
+[node name="SM_Wep_Attachment_Torch_01" parent="Weapons" unique_id=825495060 instance=ExtResource("189_n1v34")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2154064e-08, 0.25, 10.5)
+
+[node name="SM_Wep_Shotgun_01" parent="Weapons" unique_id=628203818 instance=ExtResource("190_luunr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.25, 10.5)
+
+[node name="SM_Wep_Crosshair_03" parent="Weapons" unique_id=215168426 instance=ExtResource("191_fmmnq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1509999, 0.25, 10.603999)
+
+[node name="SM_Wep_Crosshair_02" parent="Weapons" unique_id=298244935 instance=ExtResource("192_53w8j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1509999, 0.25, 10.528)
+
+[node name="SM_Wep_Flashbang_Base_01" parent="Weapons" unique_id=1832201013 instance=ExtResource("193_f1lpc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.25, 10.5)
+
+[node name="SM_Wep_Attachment_M4Rail_01" parent="Weapons" unique_id=1475458454 instance=ExtResource("194_ks04l")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24999994, 0.25, 10.5)
+
+[node name="SM_Wep_Attachment_Silencer_01" parent="Weapons" unique_id=848012317 instance=ExtResource("195_72ohc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.74999994, 0.25, 10.5)
+
+[node name="SM_Wep_Crosshair_01" parent="Weapons" unique_id=196737393 instance=ExtResource("196_jsbod")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1509999, 0.25, 10.627999)
+
+[node name="Vehicles" type="Node3D" parent="." unique_id=457586741]
+
+[node name="SM_Veh_SwatVan_01" parent="Vehicles" unique_id=744838605 instance=ExtResource("197_ej8xe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.72, -0.05, 15.01)
+
+[node name="SM_Veh_Helicopter_01" parent="Vehicles" unique_id=1293196380 instance=ExtResource("198_07o3v")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.48, -0.05, 14.26)
+
+[node name="SM_Veh_Car_Police_Heist_01" parent="Vehicles" unique_id=1774210575 instance=ExtResource("199_wkdyg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.62, -0.05, 14.68)
+
+[node name="Items" type="Node3D" parent="." unique_id=1695518758]
+
+[node name="SM_Item_Bomb_01" parent="Items" unique_id=1899033263 instance=ExtResource("201_gexx6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.055, 0, 9)
+
+[node name="SM_Item_Mallet_01" parent="Items" unique_id=1654212987 instance=ExtResource("202_ejclf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.87, 0.078, 9)
+
+[node name="SM_Item_Pouch_01" parent="Items" unique_id=1792418979 instance=ExtResource("203_pem56")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.37, 0.166, 9)
+
+[node name="SM_Item_DuffleBag_Open_Full_01" parent="Items" unique_id=496799259 instance=ExtResource("204_ca187")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 0, 8.25)
+
+[node name="SM_Item_DuffleBag_01" parent="Items" unique_id=1650048042 instance=ExtResource("205_pfooo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 8.25)
+
+[node name="SM_Item_DuffleBag_Empty_01" parent="Items" unique_id=89788091 instance=ExtResource("206_0wdbn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.25, 0, 8.25)
+
+[node name="SM_Item_DuffleBag_Full_01" parent="Items" unique_id=187030952 instance=ExtResource("207_v1du8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8.25)
+
+[node name="SM_Item_Rope_01" parent="Items" unique_id=1933708381 instance=ExtResource("208_1a2mx")]
+transform = Transform3D(3.5762787e-07, 0, -1, 0, 1, 0, 1, 0, 3.5762787e-07, 1.219, 0, 9)
+
+[node name="SM_Item_Crowbar_01" parent="Items" unique_id=1080031568 instance=ExtResource("209_1d380")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.066, 0.041, 9)
+
+[node name="SM_Item_AmmoPack_01" parent="Items" unique_id=1590308941 instance=ExtResource("210_047eg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.243, 0, 9)
+
+[node name="SM_Item_Wirecutter_01" parent="Items" unique_id=517520274 instance=ExtResource("211_47vs7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.511, 0.068, 9)
+
+[node name="SM_Item_Briefcase_01" parent="Items" unique_id=1078396503 instance=ExtResource("212_jbiqw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.868, 0.06, 9.257)
+
+[node name="SM_Item_HealthKit_02" parent="Items" unique_id=715980364 instance=ExtResource("213_tvr0k")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.743, 0, 9)
+
+[node name="SM_Item_WalkieTalkie_01" parent="Items" unique_id=154511268 instance=ExtResource("214_wmfb0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.695, 0.077, 9)
+
+[node name="SM_Item_Briefcase_02" parent="Items" unique_id=2038121070 instance=ExtResource("215_1w11r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.634, 0.056, 9.25)
+
+[node name="SM_Item_Wrench_01" parent="Items" unique_id=1853178321 instance=ExtResource("216_7pp0c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.64, 0.162, 9)
+
+[node name="SM_Item_Handcuffs_01" parent="Items" unique_id=1407299351 instance=ExtResource("217_nvndv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.961, 0.104, 9)
+
+[node name="SM_Item_Hacksaw_01" parent="Items" unique_id=1464266846 instance=ExtResource("218_idkgl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.198, 0.11, 8.805)
+
+[node name="SM_Item_AmmoPack_02" parent="Items" unique_id=1222482969 instance=ExtResource("219_ligg8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.743, 0.126, 9)
+
+[node name="SM_Item_ScrewDriver_01" parent="Items" unique_id=406736444 instance=ExtResource("220_bqbne")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.76, 0.023, 9)
+
+[node name="SM_Item_Hammer_01" parent="Items" unique_id=1565651657 instance=ExtResource("221_4wmwp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.969, 0.079, 9)
+
+[node name="SM_Item_HealthKit_01" parent="Items" unique_id=35029182 instance=ExtResource("222_biqt4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.243, 0, 9)
+
+[node name="SM_Item_DuffleBag_Open_Empty_01" parent="Items" unique_id=2132222850 instance=ExtResource("223_0fa3e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 8.25)
+
+[node name="SM_Item_ZipTies_01" parent="Items" unique_id=663991261 instance=ExtResource("224_my50t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.469, 0.084, 9)
+
+[node name="Masks" type="Node3D" parent="." unique_id=1346120989]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, 6.5)
+
+[node name="SM_Item_Hair_Man_01" parent="Masks" unique_id=88649533 instance=ExtResource("225_yb1le")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0, 2.5)
+
+[node name="SM_Item_Mask_Luchador_01" parent="Masks" unique_id=1057769592 instance=ExtResource("226_yd8vv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 0, 2.5)
+
+[node name="SM_Item_Mask_Gas_01" parent="Masks" unique_id=844181168 instance=ExtResource("227_vnxds")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, 2.5)
+
+[node name="SM_Item_Mask_Simple_Man_01" parent="Masks" unique_id=123742378 instance=ExtResource("228_40qja")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 0, 2.5)
+
+[node name="SM_Item_Mask_Simple_Robber_01" parent="Masks" unique_id=1652409480 instance=ExtResource("229_kqt66")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 2.5)
+
+[node name="SM_Item_Hair_Woman_01" parent="Masks" unique_id=690382791 instance=ExtResource("230_gk5my")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.5, 0, 2.5)
+
+[node name="SM_Item_Mask_Horse_01" parent="Masks" unique_id=1224247605 instance=ExtResource("231_jth2g")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 2.5)
+
+[node name="SM_Item_Mask_Hockey_01" parent="Masks" unique_id=1122222092 instance=ExtResource("232_ei62k")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0, 2.5)
+
+[node name="SM_Item_Mask_Simple_Woman_01" parent="Masks" unique_id=1476087810 instance=ExtResource("233_le3rv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 0, 2.5)
+
+[node name="SM_Item_Mask_WeldersMask_01" parent="Masks" unique_id=1160741165 instance=ExtResource("234_3g0yt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0, 2.5)
+
+[node name="SM_Item_Mask_Trump_01" parent="Masks" unique_id=26887886 instance=ExtResource("235_6wmoc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 0, 2.5)
+
+[node name="SM_Item_Hair_Eyebrow_Man_01" parent="Masks" unique_id=63784433 instance=ExtResource("236_pg0lr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0, 2.5)
+
+[node name="SM_Item_Mask_Hat_01" parent="Masks" unique_id=1743229351 instance=ExtResource("237_43b0w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 2.5)
+
+[node name="SM_Item_Mask_Chicken_01" parent="Masks" unique_id=7708549 instance=ExtResource("238_uwlsu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 0, 2.5)
+
+[node name="SM_Item_Mask_Construction_01" parent="Masks" unique_id=670994140 instance=ExtResource("239_mah75")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 2.5)
+
+[node name="SM_Item_Mask_Fox_01" parent="Masks" unique_id=193522036 instance=ExtResource("240_ljt6h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0, 2.5)
+
+[node name="SM_Item_Mask_Beanie_01" parent="Masks" unique_id=2124245400 instance=ExtResource("241_oamfb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 2.5)
+
+[node name="SM_Item_Mask_Clown_01" parent="Masks" unique_id=415806039 instance=ExtResource("242_s6u3f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0, 2.5)
+
+[node name="SM_Item_Mask_Alien_01" parent="Masks" unique_id=1213002347 instance=ExtResource("243_ppcbi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, 2.5)
+
+[node name="SM_Item_Mask_Tiger_01" parent="Masks" unique_id=1503480205 instance=ExtResource("244_tp7p2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 0, 2.5)
+
+[node name="SM_Item_Hair_Eyebrow_Woman_01" parent="Masks" unique_id=1522942772 instance=ExtResource("245_unxen")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.5, 0, 2.5)
+
+[node name="SM_Item_Mask_Glasses_01" parent="Masks" unique_id=1098893613 instance=ExtResource("246_cb0yn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 2.5)
+
+[node name="SM_Item_Mask_Panda_01" parent="Masks" unique_id=290545606 instance=ExtResource("247_eqaat")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 0, 2.5)
+
+[node name="SM_Item_Mask_PaperBag_01" parent="Masks" unique_id=403825538 instance=ExtResource("248_1sweb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 2.5)
+
+[node name="SM_Item_Mask_Balaclava_01" parent="Masks" unique_id=928731447 instance=ExtResource("249_o3v7f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 0, 2.5)
+
+[node name="Cube" type="MeshInstance3D" parent="." unique_id=261959933]
+transform = Transform3D(50, 0, 0, 0, 1, 0, 0, 0, 50, 0, -0.55, 0)
+gi_mode = 2
+mesh = SubResource("BoxMesh_d7qno")
+surface_material_override/0 = ExtResource("200_guld8")
+
+[editable path="Environments/SM_Env_Ceiling_Light_03"]
+[editable path="Environments/SM_Env_Sidewalk_01"]
+[editable path="Environments/SM_Env_Pillar_Exterior_03"]
+[editable path="Environments/SM_Env_Sidewalk_Straight_01"]
+[editable path="Environments/SM_Env_Road_01"]
+[editable path="Environments/SM_Env_Ceiling_05"]
+[editable path="Environments/SM_Env_Pillar_Interior_02"]
+[editable path="Environments/SM_Env_Steps_03"]
+[editable path="Environments/SM_Env_Floor_01"]
+[editable path="Environments/SM_Env_Door_03"]
+[editable path="Environments/SM_Env_Ceiling_Light_02"]
+[editable path="Environments/SM_Env_Ceiling_02"]
+[editable path="Environments/SM_Env_Ceiling_06"]
+[editable path="Environments/SM_Env_Wall_Interior_01"]
+[editable path="Environments/SM_Env_Pillar_Exterior_01"]
+[editable path="Environments/SM_Env_Ceiling_01"]
+[editable path="Environments/SM_Env_Pillar_Exterior_04"]
+[editable path="Environments/SM_Env_VaultGate_Frame_01"]
+[editable path="Environments/SM_Env_Wall_Glass_Ground_01"]
+[editable path="Environments/SM_Env_Roof_05"]
+[editable path="Environments/SM_Env_Wall_Glass_DoorFrame_01"]
+[editable path="Environments/SM_Env_Wall_Interior_DoubleDoor_01"]
+[editable path="Environments/SM_Env_Wall_Interior_Window_02"]
+[editable path="Environments/SM_Env_Floor_02"]
+[editable path="Environments/SM_Env_Ceiling_04"]
+[editable path="Environments/SM_Env_Wall_Window_Panels_01"]
+[editable path="Environments/SM_Env_Wall_Exterior_Window_Ground_01"]
+[editable path="Environments/SM_Env_Stairway_01"]
+[editable path="Environments/SM_Env_Wall_Exterior_DoubleDoor_01"]
+[editable path="Environments/SM_Env_Skylight_01"]
+[editable path="Environments/SM_Env_Pillar_Exterior_Floor_02"]
+[editable path="Environments/SM_Env_Wall_Interior_Ground_01"]
+[editable path="Environments/SM_Env_Wall_Exterior_Window_01"]
+[editable path="Environments/SM_Env_Ceiling_Light_01"]
+[editable path="Environments/SM_Env_Ceiling_07"]
+[editable path="Environments/SM_Env_Door_02"]
+[editable path="Environments/SM_Env_Wall_Exterior_Window_Ground_02"]
+[editable path="Environments/SM_Env_Pillar_Interior_03"]
+[editable path="Environments/SM_Env_Wall_Interior_Window_Ground_01"]
+[editable path="Environments/SM_Env_Steps_02"]
+[editable path="Environments/SM_Env_Ceiling_08"]
+[editable path="Environments/SM_Env_Wall_Interior_Door_01"]
+[editable path="Environments/SM_Env_Railing_01"]
+[editable path="Environments/SM_Env_Pillar_Exterior_Floor_04"]
+[editable path="Environments/SM_Env_Wall_Exterior_Window_02"]
+[editable path="Environments/SM_Env_Roof_04"]
+[editable path="Environments/SM_Env_Steps_01"]
+[editable path="Environments/SM_Env_Pillar_Exterior_Floor_01"]
+[editable path="Environments/SM_Env_Wall_Window_Blinds_01"]
+[editable path="Environments/SM_Env_Pillar_Exterior_02"]
+[editable path="Environments/SM_Env_Wall_Exterior_Door_01"]
+[editable path="Environments/SM_Env_Door_01"]
+[editable path="Environments/SM_Env_Pillar_Exterior_Floor_03"]
+[editable path="Environments/SM_Env_Wall_Glass_01"]
+[editable path="Environments/SM_Env_Ceiling_03"]
+[editable path="Environments/SM_Env_Roof_01"]
+[editable path="Environments/SM_Env_VaultDoor_Frame_01"]
+[editable path="Environments/SM_Env_Pillar_Interior_04"]
+[editable path="Environments/SM_Env_Pillar_02"]
+[editable path="Environments/SM_Env_Roof_03"]
+[editable path="Environments/SM_Env_Wall_Exterior_Ground_01"]
+[editable path="Environments/SM_Env_Wall_Exterior_01"]
+[editable path="Environments/SM_Env_Roof_02"]
+[editable path="Environments/SM_Env_Wall_Interior_Window_Ground_02"]
+[editable path="Environments/SM_Env_VaultGate_Door_01"]
+[editable path="Environments/SM_Env_Pillar_Interior_01"]
+[editable path="Environments/SM_Env_Wall_Interior_Window_01"]
+[editable path="Environments/SM_Env_Steps_Edge_01"]
+[editable path="Environments/SM_Env_Steps_04"]
+[editable path="Environments/SM_Env_VaultGate_Wall_01"]
+[editable path="Environments/SM_Env_Pillar_01"]
+[editable path="Props/SM_Prop_Jewellery_02"]
+[editable path="Props/SM_Prop_Jewellery_Necklace_03"]
+[editable path="Props/SM_Prop_Folder_03"]
+[editable path="Props/SM_Prop_Money_Note_06"]
+[editable path="Props/SM_Prop_Jewellery_Rings_01"]
+[editable path="Props/SM_Prop_Money_Note_04"]
+[editable path="Props/SM_Prop_CoffeTable_01"]
+[editable path="Props/SM_Prop_RopeBarrier_02"]
+[editable path="Props/SM_Prop_Pillar_02"]
+[editable path="Props/SM_Prop_Jewellery_Necklace_01"]
+[editable path="Props/SM_Prop_Money_Note_01"]
+[editable path="Props/SM_Prop_RopeBarrier_Pole_01"]
+[editable path="Props/SM_Prop_SafeDepositBoxes_Empty_01"]
+[editable path="Props/SM_Prop_Jewellery_Necklace_02"]
+[editable path="Props/SM_Prop_Computer_Screen_01"]
+[editable path="Props/SM_Prop_Sign_Base_01"]
+[editable path="Props/SM_Prop_Sign_Bank_01"]
+[editable path="Props/SM_Prop_Plant_03"]
+[editable path="Props/SM_Prop_Folder_01"]
+[editable path="Props/SM_Prop_AlarmButton_01"]
+[editable path="Props/SM_Prop_Plant_02"]
+[editable path="Props/SM_Prop_Couch_01"]
+[editable path="Props/SM_Prop_Rug_01"]
+[editable path="Props/SM_Prop_CoffeeTable_02"]
+[editable path="Props/SM_Prop_Desk_02"]
+[editable path="Props/SM_Prop_Computer_01"]
+[editable path="Props/SM_Prop_Shelf_01"]
+[editable path="Props/SM_Prop_SafeDepositBoxes_Half_01"]
+[editable path="Props/SM_Prop_SafeDepositBox_Cover_01"]
+[editable path="Props/SM_Prop_Jewellery_04"]
+[editable path="Props/SM_Prop_Money_Roll_01"]
+[editable path="Props/SM_Prop_SafeDepositBox_Container_02"]
+[editable path="Props/SM_Prop_Folder_04"]
+[editable path="Props/SM_Prop_DisplayCase_01"]
+[editable path="Props/SM_Prop_Money_Note_03"]
+[editable path="Props/SM_Prop_RopeBarrier_01"]
+[editable path="Props/SM_Prop_Drill_01"]
+[editable path="Props/SM_Prop_Statue_01"]
+[editable path="Props/SM_Prop_TellerDesk_Barrier_01"]
+[editable path="Props/SM_Prop_ATM_01"]
+[editable path="Props/SM_Prop_Money_Roll_02"]
+[editable path="Props/SM_Prop_Folder_02"]
+[editable path="Props/SM_Prop_Sign_Money_Bank_01"]
+[editable path="Props/SM_Prop_Flag_Pole_01"]
+[editable path="Props/SM_Prop_MetalDetector_01"]
+[editable path="Props/SM_Prop_SafeDepositBox_Cover_03"]
+[editable path="Props/SM_Prop_Camera_01"]
+[editable path="Props/SM_Prop_Money_Stack_01"]
+[editable path="Props/SM_Prop_Sprinkler_01"]
+[editable path="Props/SM_Prop_TellerDesk_02"]
+[editable path="Props/SM_Prop_DeskLight_01"]
+[editable path="Props/SM_Prop_Money_Note_05"]
+[editable path="Props/SM_Prop_Money_Note_07"]
+[editable path="Props/SM_Prop_Jewellery_Necklace_04"]
+[editable path="Props/SM_Prop_Desk_01"]
+[editable path="Props/SM_Prop_Plant_01"]
+[editable path="Props/SM_Prop_Fire_Detector_01"]
+[editable path="Props/SM_Prop_Jewellery_Ring_01"]
+[editable path="Props/SM_Prop_Bin_01"]
+[editable path="Props/SM_Prop_MetalDetector_Baggage_01"]
+[editable path="Props/SM_Prop_Money_Stack_02"]
+[editable path="Props/SM_Prop_Seat_01"]
+[editable path="Props/SM_Prop_TellerDesk_Barrier_02"]
+[editable path="Props/SM_Prop_RopeBarrier_Pole_02"]
+[editable path="Props/SM_Prop_GoldBar_02"]
+[editable path="Props/SM_Prop_Box_01"]
+[editable path="Props/SM_Prop_SafeDepositBoxes_01"]
+[editable path="Props/SM_Prop_Computer_Keyboard_01"]
+[editable path="Props/SM_Prop_Seat_02"]
+[editable path="Props/SM_Prop_TellerDesk_03"]
+[editable path="Props/SM_Prop_Table_01"]
+[editable path="Props/SM_Prop_Jewellery_03"]
+[editable path="Props/SM_Prop_Drawers_01"]
+[editable path="Props/SM_Prop_Sign_Jewellery_01"]
+[editable path="Props/SM_Prop_Pillar_01"]
+[editable path="Props/SM_Prop_SafeDepositBox_Container_01"]
+[editable path="Props/SM_Prop_Flag_Wall_02"]
+[editable path="Props/SM_Prop_Rug_02"]
+[editable path="Props/SM_Prop_Desk_03"]
+[editable path="Props/SM_Prop_GoldBar_01"]
+[editable path="Props/SM_Prop_SafeDepositBox_Cover_02"]
+[editable path="Props/SM_Prop_RopeBarrier_03"]
+[editable path="Props/SM_Prop_DisplayCase_02"]
+[editable path="Props/SM_Prop_Flag_Wall_01"]
+[editable path="Props/SM_Prop_Money_Note_02"]
+[editable path="Props/SM_Prop_Flag_Straight_01"]
+[editable path="Props/SM_Prop_Money_Stack_03"]
+[editable path="Props/SM_Prop_AirVent_01"]
+[editable path="Props/SM_Prop_SafeDepositBoxes_Looted_01"]
+[editable path="Props/SM_Prop_TellerDesk_01"]
+[editable path="Props/SM_Prop_VaultTrolley_01"]
+[editable path="Props/SM_Prop_Couch_02"]
+[editable path="Props/SM_Prop_Table_02"]
+[editable path="Props/SM_Prop_Jewellery_01"]
+[editable path="Props/SM_Prop_Aircon_01"]
+[editable path="Props/SM_Prop_Computer_Mouse_01"]
+[editable path="Props/SM_Prop_Folder_05"]
+[editable path="Props/SM_Prop_WaterCooler_01"]
+[editable path="Weapons/SM_Wep_PistolBandit_01"]
+[editable path="Weapons/SM_Wep_Crosshair_04"]
+[editable path="Weapons/SM_Wep_Grenade_Base_01"]
+[editable path="Weapons/SM_Wep_SniperSwat_01"]
+[editable path="Weapons/SM_Wep_SMG_01"]
+[editable path="Weapons/SM_Wep_Ammo_Shotgun_01"]
+[editable path="Weapons/SM_Wep_Attachment_Grip_01"]
+[editable path="Weapons/SM_Wep_Crosshair_Sniper_01"]
+[editable path="Weapons/SM_Wep_Crosshair_05"]
+[editable path="Weapons/SM_Wep_Ammo_BulletSmall_01"]
+[editable path="Weapons/SM_Wep_Ammo_BulletLarge_02"]
+[editable path="Weapons/SM_Wep_RifleSwat_01"]
+[editable path="Weapons/SM_Wep_RifleBandit_01"]
+[editable path="Weapons/SM_Wep_Attachment_Redot_01"]
+[editable path="Weapons/SM_Wep_PistolSwat_01"]
+[editable path="Weapons/SM_Wep_Holster_01"]
+[editable path="Weapons/SM_Wep_Attachment_SniperScope_01"]
+[editable path="Weapons/SM_Wep_Ammo_BulletLarge_01"]
+[editable path="Weapons/SM_Wep_Ammo_BulletSmall_02"]
+[editable path="Weapons/SM_Wep_Attachment_Torch_01"]
+[editable path="Weapons/SM_Wep_Shotgun_01"]
+[editable path="Weapons/SM_Wep_Crosshair_03"]
+[editable path="Weapons/SM_Wep_Crosshair_02"]
+[editable path="Weapons/SM_Wep_Flashbang_Base_01"]
+[editable path="Weapons/SM_Wep_Attachment_M4Rail_01"]
+[editable path="Weapons/SM_Wep_Attachment_Silencer_01"]
+[editable path="Weapons/SM_Wep_Crosshair_01"]
+[editable path="Vehicles/SM_Veh_SwatVan_01"]
+[editable path="Vehicles/SM_Veh_Helicopter_01"]
+[editable path="Vehicles/SM_Veh_Car_Police_Heist_01"]
+[editable path="Items/SM_Item_Bomb_01"]
+[editable path="Items/SM_Item_Mallet_01"]
+[editable path="Items/SM_Item_Pouch_01"]
+[editable path="Items/SM_Item_DuffleBag_Open_Full_01"]
+[editable path="Items/SM_Item_DuffleBag_01"]
+[editable path="Items/SM_Item_DuffleBag_Empty_01"]
+[editable path="Items/SM_Item_DuffleBag_Full_01"]
+[editable path="Items/SM_Item_Rope_01"]
+[editable path="Items/SM_Item_Crowbar_01"]
+[editable path="Items/SM_Item_AmmoPack_01"]
+[editable path="Items/SM_Item_Wirecutter_01"]
+[editable path="Items/SM_Item_Briefcase_01"]
+[editable path="Items/SM_Item_HealthKit_02"]
+[editable path="Items/SM_Item_WalkieTalkie_01"]
+[editable path="Items/SM_Item_Briefcase_02"]
+[editable path="Items/SM_Item_Wrench_01"]
+[editable path="Items/SM_Item_Handcuffs_01"]
+[editable path="Items/SM_Item_Hacksaw_01"]
+[editable path="Items/SM_Item_AmmoPack_02"]
+[editable path="Items/SM_Item_ScrewDriver_01"]
+[editable path="Items/SM_Item_Hammer_01"]
+[editable path="Items/SM_Item_HealthKit_01"]
+[editable path="Items/SM_Item_DuffleBag_Open_Empty_01"]
+[editable path="Items/SM_Item_ZipTies_01"]
+[editable path="Masks/SM_Item_Hair_Man_01"]
+[editable path="Masks/SM_Item_Mask_Luchador_01"]
+[editable path="Masks/SM_Item_Mask_Gas_01"]
+[editable path="Masks/SM_Item_Mask_Simple_Man_01"]
+[editable path="Masks/SM_Item_Mask_Simple_Robber_01"]
+[editable path="Masks/SM_Item_Hair_Woman_01"]
+[editable path="Masks/SM_Item_Mask_Horse_01"]
+[editable path="Masks/SM_Item_Mask_Hockey_01"]
+[editable path="Masks/SM_Item_Mask_Simple_Woman_01"]
+[editable path="Masks/SM_Item_Mask_WeldersMask_01"]
+[editable path="Masks/SM_Item_Mask_Trump_01"]
+[editable path="Masks/SM_Item_Hair_Eyebrow_Man_01"]
+[editable path="Masks/SM_Item_Mask_Hat_01"]
+[editable path="Masks/SM_Item_Mask_Chicken_01"]
+[editable path="Masks/SM_Item_Mask_Construction_01"]
+[editable path="Masks/SM_Item_Mask_Fox_01"]
+[editable path="Masks/SM_Item_Mask_Beanie_01"]
+[editable path="Masks/SM_Item_Mask_Clown_01"]
+[editable path="Masks/SM_Item_Mask_Alien_01"]
+[editable path="Masks/SM_Item_Mask_Tiger_01"]
+[editable path="Masks/SM_Item_Hair_Eyebrow_Woman_01"]
+[editable path="Masks/SM_Item_Mask_Glasses_01"]
+[editable path="Masks/SM_Item_Mask_Panda_01"]
+[editable path="Masks/SM_Item_Mask_PaperBag_01"]
+[editable path="Masks/SM_Item_Mask_Balaclava_01"]

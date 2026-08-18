@@ -15,6 +15,10 @@ class_name Person
 @export var run_speed := 4.6
 ## Beyond this far from the destination a person breaks into a jog.
 @export var run_distance := 7.0
+## Forces the run gait however near the target is. A pedestrian-graph hop is about a tile,
+## which is under `run_distance`, so a civilian fleeing hop by hop would otherwise *walk*
+## away from a fire. Set by [Civilian] while panicking and cleared when it passes.
+var hurry := false
 @export var acceleration := 14.0
 ## Radians/sec the body turns to face where it is going.
 @export var turn_speed := 9.0
@@ -419,7 +423,7 @@ func _desired_velocity() -> Vector3:
 	step.y = 0.0
 	if step.length() < 0.05:
 		step = to_target
-	var speed := run_speed if to_target.length() > run_distance else walk_speed
+	var speed := run_speed if hurry or to_target.length() > run_distance else walk_speed
 	return step.normalized() * speed
 
 

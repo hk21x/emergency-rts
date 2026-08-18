@@ -1,0 +1,345 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Theme" path="res://ui/theme/emergency_ops.tres" id="theme"]
+[ext_resource type="Script" path="res://ui/unit_purchase_modal.gd" id="s_modal"]
+[ext_resource type="Texture2D" path="res://ui/art/icons/icon_truck.svg" id="i_truck"]
+
+[node name="UnitPurchaseModal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("theme")
+script = ExtResource("s_modal")
+
+[node name="Scrim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.008, 0.016, 0.024, 0.66)
+unique_name_in_owner = true
+
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+
+[node name="Shell" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(1060, 636)
+layout_mode = 2
+theme_type_variation = &"ERSModalShell"
+
+
+[node name="Rows" type="VBoxContainer" parent="Center/Shell"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+
+[node name="TitleBar" type="PanelContainer" parent="Center/Shell/Rows"]
+layout_mode = 2
+theme_type_variation = &"ERSTitleBar"
+
+
+[node name="Row" type="HBoxContainer" parent="Center/Shell/Rows/TitleBar"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+
+[node name="TitleIcon" type="TextureRect" parent="Center/Shell/Rows/TitleBar/Row"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("i_truck")
+stretch_mode = 5
+
+
+[node name="Title" type="Label" parent="Center/Shell/Rows/TitleBar/Row"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_type_variation = &"ERSTitle"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 17
+text = "REQUEST UNITS"
+vertical_alignment = 1
+
+
+[node name="Gap" type="Control" parent="Center/Shell/Rows/TitleBar/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+
+[node name="Budget" type="PanelContainer" parent="Center/Shell/Rows/TitleBar/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"ERSCostPill"
+custom_minimum_size = Vector2(160, 32)
+
+
+[node name="BudgetRow" type="HBoxContainer" parent="Center/Shell/Rows/TitleBar/Row/Budget"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+
+[node name="BudgetLabel" type="Label" parent="Center/Shell/Rows/TitleBar/Row/Budget/BudgetRow"]
+layout_mode = 2
+theme_type_variation = &"ERSEyebrow"
+theme_override_colors/font_color = Color(0.62, 0.776, 0.941, 1)
+text = "BUDGET"
+vertical_alignment = 1
+
+
+[node name="BudgetValue" type="Label" parent="Center/Shell/Rows/TitleBar/Row/Budget/BudgetRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "£ 12,450"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+
+[node name="CloseButton" type="Button" parent="Center/Shell/Rows/TitleBar/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 4
+flat = true
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "✕"
+
+
+[node name="TabWrap" type="MarginContainer" parent="Center/Shell/Rows"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 4
+
+
+[node name="Tabs" type="HBoxContainer" parent="Center/Shell/Rows/TabWrap"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+
+[node name="BodyWrap" type="MarginContainer" parent="Center/Shell/Rows"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 14
+
+
+[node name="Body" type="HBoxContainer" parent="Center/Shell/Rows/BodyWrap"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+
+[node name="Catalogue" type="ScrollContainer" parent="Center/Shell/Rows/BodyWrap/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+
+
+[node name="Grid" type="GridContainer" parent="Center/Shell/Rows/BodyWrap/Body/Catalogue"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+
+[node name="OrderPanel" type="PanelContainer" parent="Center/Shell/Rows/BodyWrap/Body"]
+custom_minimum_size = Vector2(286, 0)
+layout_mode = 2
+theme_type_variation = &"ERSOrderPanel"
+
+
+[node name="OrderCol" type="VBoxContainer" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+
+[node name="OrderHead" type="HBoxContainer" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol"]
+layout_mode = 2
+
+
+[node name="OrderTitle" type="Label" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol/OrderHead"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ERSEyebrow"
+text = "ORDER"
+
+
+[node name="OrderCount" type="Label" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol/OrderHead"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ERSEyebrow"
+theme_override_colors/font_color = Color(0.29, 0.612, 0.941, 1)
+text = "0 UNITS"
+horizontal_alignment = 2
+
+
+[node name="OrderList" type="VBoxContainer" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+
+[node name="EmptyHint" type="Label" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_type_variation = &"ERSBody"
+text = "No units requested\n\nPick a vehicle to begin"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+
+[node name="Spring" type="Control" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol"]
+layout_mode = 2
+size_flags_vertical = 3
+
+
+[node name="Summary" type="VBoxContainer" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+
+[node name="Subtotal" type="HBoxContainer" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol/Summary"]
+layout_mode = 2
+
+
+[node name="L" type="Label" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol/Summary/Subtotal"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ERSBody"
+text = "Subtotal"
+
+
+[node name="SubtotalValue" type="Label" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol/Summary/Subtotal"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "£ 0"
+horizontal_alignment = 2
+
+
+[node name="Fee" type="HBoxContainer" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol/Summary"]
+layout_mode = 2
+
+
+[node name="L" type="Label" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol/Summary/Fee"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ERSBody"
+text = "Deployment fee"
+
+
+[node name="FeeValue" type="Label" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol/Summary/Fee"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "£ 0"
+horizontal_alignment = 2
+
+
+[node name="Remaining" type="HBoxContainer" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol/Summary"]
+layout_mode = 2
+
+
+[node name="L" type="Label" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol/Summary/Remaining"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ERSBody"
+text = "Remaining"
+
+
+[node name="RemainingValue" type="Label" parent="Center/Shell/Rows/BodyWrap/Body/OrderPanel/OrderCol/Summary/Remaining"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.431, 0.816, 0.494, 1)
+theme_override_font_sizes/font_size = 13
+text = "£ 0"
+horizontal_alignment = 2
+
+
+[node name="Footer" type="PanelContainer" parent="Center/Shell/Rows"]
+layout_mode = 2
+theme_type_variation = &"ERSFooter"
+
+
+[node name="FooterRow" type="HBoxContainer" parent="Center/Shell/Rows/Footer"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+
+[node name="Hint" type="Label" parent="Center/Shell/Rows/Footer/FooterRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_type_variation = &"ERSBody"
+text = "Units arrive at the incident in dispatch order."
+
+
+[node name="TotalPanel" type="PanelContainer" parent="Center/Shell/Rows/Footer/FooterRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 44)
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"ERSCostPill"
+
+
+[node name="TotalRow" type="HBoxContainer" parent="Center/Shell/Rows/Footer/FooterRow/TotalPanel"]
+layout_mode = 2
+
+
+[node name="TotalLabel" type="Label" parent="Center/Shell/Rows/Footer/FooterRow/TotalPanel/TotalRow"]
+layout_mode = 2
+theme_type_variation = &"ERSEyebrow"
+text = "TOTAL"
+vertical_alignment = 1
+
+
+[node name="TotalValue" type="Label" parent="Center/Shell/Rows/Footer/FooterRow/TotalPanel/TotalRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 21
+text = "£ 0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+
+[node name="CancelButton" type="Button" parent="Center/Shell/Rows/Footer/FooterRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 44)
+layout_mode = 2
+size_flags_vertical = 4
+text = "CANCEL"
+
+
+[node name="DeployButton" type="Button" parent="Center/Shell/Rows/Footer/FooterRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"ERSPrimary"
+text = "DEPLOY"
+disabled = true
+

@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://cpokrpj4ngmjn"]
+
+[ext_resource type="ArrayMesh" uid="uid://bec4yjys3tkfe" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_Flashbang_Base_01.res" id="1_jjev0"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_82rho"]
+[ext_resource type="ArrayMesh" uid="uid://b01888syb5u6f" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_Flashbang_Clip_01.res" id="3_82rho"]
+[ext_resource type="ArrayMesh" uid="uid://hi0obkhqc8ix" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_Flashbang_Pin_01.res" id="4_35lst"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_jej4r"]
+points = PackedVector3Array(-0.0012460779, 0.061403967, 0.02665113, 0.022539634, 0.060726248, 0.014354706, 0.014467116, 0.09763745, 0.01618167, -0.014554691, 0.09763745, 0.01618167, -0.022592857, 0.060643606, 0.014325049, -0.017189912, -0.071231715, 0.021454956, 0.017102338, -0.071231715, 0.021454956, 0.014467116, 0.0923479, -0.028667945, 0.02502273, -0.04483351, -0.015475834, -0.014554691, 0.0923479, -0.028667945, -0.025110304, -0.04483351, -0.015475834, -0.022470174, -0.071231715, -0.018109512, 0.009186853, -0.071231715, -0.026028337, 0.014467116, 0.063321434, -0.033947162, -0.014554691, 0.063321434, -0.033947162, -0.003999077, -0.071231715, -0.028667945)
+
+[node name="SM_Wep_Flashbang_Base_01" type="MeshInstance3D" unique_id=1066706402]
+gi_mode = 2
+mesh = ExtResource("1_jjev0")
+surface_material_override/0 = ExtResource("2_82rho")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1986799502]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1949562826]
+shape = SubResource("ConvexPolygonShape3D_jej4r")
+
+[node name="SM_Wep_Flashbang_Clip_01" type="MeshInstance3D" parent="." unique_id=444275079]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7597242e-10, 0.10108903, 0.0077844835)
+gi_mode = 2
+mesh = ExtResource("3_82rho")
+surface_material_override/0 = ExtResource("2_82rho")
+
+[node name="SM_Wep_Flashbang_Pin_01" type="MeshInstance3D" parent="." unique_id=2031251462]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.017650727, 0.091988884, -0.020537173)
+gi_mode = 2
+mesh = ExtResource("4_35lst")
+surface_material_override/0 = ExtResource("2_82rho")

@@ -36,6 +36,8 @@ var _badge: UnitBadge
 ## Drawn instead of the badge for a standby chip: there is nothing on the map to
 ## photograph until somebody presses it, which is exactly what [ServiceMark] is for.
 var _mark: ServiceMark
+## Shown only for a hurt person; a vehicle has no health to draw. See [HealthBar].
+var _health: HealthBar
 var _name: Label
 var _stack: VBoxContainer
 
@@ -66,6 +68,10 @@ func _ready() -> void:
 	_mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_mark.visible = false
 	_stack.add_child(_mark)
+
+	_health = HealthBar.new()
+	_health.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stack.add_child(_health)
 
 	_name = Label.new()
 	_name.add_theme_font_size_override("font_size", 10)
@@ -103,6 +109,9 @@ func set_selected(selected: bool, lead: bool) -> void:
 func _refresh() -> void:
 	_badge.unit = unit
 	_badge.visible = unit != null
+	# People only: `health` is a `Person` field and a vehicle's damage is money, not a
+	# fraction. A standby chip has nobody to be hurt yet either.
+	_health.unit = unit as Person
 	_mark.visible = unit == null and not standby.is_empty()
 	theme_type_variation = &"UnitTile"
 

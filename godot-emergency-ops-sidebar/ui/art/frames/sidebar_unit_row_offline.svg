@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="284" height="62" viewBox="0 0 284 62" fill="none" role="img" aria-label="Unit row — offline">
+  <defs>
+    <linearGradient id="uroff_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#101620"/><stop offset="1" stop-color="#0A0F17"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="283" height="61" rx="4" fill="url(#uroff_g)" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H278" stroke="#FFFFFF" stroke-opacity="0.02" stroke-width="1" stroke-linecap="round"/>
+
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none" role="img" aria-label="Selection bracket">
+  <path d="M3 13 V3 H13" fill="none" stroke="#4A9CF0" stroke-width="2.2" stroke-linecap="square"/>
+  <path d="M37 13 V3 H27" fill="none" stroke="#4A9CF0" stroke-width="2.2" stroke-linecap="square"/>
+  <path d="M3 27 V37 H13" fill="none" stroke="#4A9CF0" stroke-width="2.2" stroke-linecap="square"/>
+  <path d="M37 27 V37 H27" fill="none" stroke="#4A9CF0" stroke-width="2.2" stroke-linecap="square"/>
+
+</svg>

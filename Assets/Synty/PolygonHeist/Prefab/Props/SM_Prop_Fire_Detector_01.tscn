@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dec22hsecqxqa"]
+
+[ext_resource type="ArrayMesh" uid="uid://c2jb3qb36ap6b" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_Fire_Detector_01.res" id="1_rrkkv"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_q48dv"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_3vdi7"]
+points = PackedVector3Array(0.21826555, -0.046653923, 0.013631389, -0.034098685, -0.09439331, 0.0681978, 0.06101863, -0.0771523, -0.09157024, 0.15686233, -0.046653923, -0.1568619, 0.20942043, -0.00083735585, -0.013117686, 0.15686233, -0.046653923, 0.15686284, -0.0136309415, -0.046653923, 0.21826608, -0.1568624, -0.046653923, 0.15686284, -0.21826561, -0.046653923, -0.01363045, -0.1568624, -0.046653923, -0.1568619, 0.013630897, -0.046653923, -0.21826513, 0.047729537, -0.046653923, -0.20459148, 0.013075396, -0.00083735585, -0.20946272, -0.15194842, -0.00040495396, 0.15190615, 0.04567851, -0.0009293556, 0.19591822, -0.2094632, -0.00083735585, -0.013117686)
+
+[node name="SM_Prop_Fire_Detector_01" type="MeshInstance3D" unique_id=191862951]
+gi_mode = 2
+mesh = ExtResource("1_rrkkv")
+surface_material_override/0 = ExtResource("2_q48dv")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=363744778]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=972698703]
+shape = SubResource("ConvexPolygonShape3D_3vdi7")

@@ -9,7 +9,23 @@ extends SceneTree
 ##
 ## Safe to re-run; it overwrites the same keys.
 
-const MAIN_SCENE := "res://Game/Playground.tscn"
+## **The main menu, not the district.** This said `Playground.tscn` until August 2026 --
+## correct when it was written, and stale from the moment the menu became its own scene.
+## Re-running the script then silently put the game back to booting straight into the
+## district, which is exactly the kind of quiet regression a one-shot config script can
+## cause months after anyone last read it. Caught by the script printing the previous
+## value, which is why it prints it.
+const MAIN_SCENE := "res://Game/MainMenu.tscn"
+
+## The launcher icon. The project shipped pointing at `SyntyLogo.svg` -- a vendor asset,
+## which is both the wrong identity for this game and a thing the vendor-dir rule says is
+## not ours to press into service. This one is the user's, added August 2026.
+##
+## **The project's `config/name` is deliberately left alone** at `Polygon_Starter`, ugly as
+## it is: it decides the `user://` folder, so renaming it orphans the saved career, the
+## records and the settings in `app_userdata/Polygon_Starter/`. Renaming is a migration,
+## not a rename, and nobody has asked for one.
+const ICON := "res://icon-256.png"
 
 ## The resolution the interface is laid out for. Every offset in HUD.tscn -- the 148px
 ## bar, the 210px minimap card -- is in these units.
@@ -40,6 +56,10 @@ func _init() -> void:
 	_action("car_reset", [_key(KEY_R)])
 
 	ProjectSettings.set_setting("application/run/main_scene", MAIN_SCENE)
+	if ResourceLoader.exists(ICON):
+		ProjectSettings.set_setting("application/config/icon", ICON)
+	else:
+		push_warning("launcher icon missing, leaving the old one: %s" % ICON)
 	_display()
 
 	var err := ProjectSettings.save()

@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://c20e0geqmjqi"]
+
+[ext_resource type="ArrayMesh" uid="uid://dog0t2vlmryoe" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_Money_Roll_01.res" id="1_k3l3a"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_fp2fo"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_18lvt"]
+points = PackedVector3Array(-0.03972081, -0.05886005, -0.002545327, -0.013968879, -0.058895294, -0.037522696, -0.03299549, -0.0600114, 0.023648888, -0.03299549, 0.0600114, 0.023648888, -0.03199368, 0.058190383, -0.024340566, 0.013709012, -0.059259497, -0.037751887, -0.013968879, 0.05888354, -0.037522696, 0.03908041, -0.058425352, -0.0043492727, 0.013561457, -0.058625076, 0.037769962, -0.013821326, -0.058272623, 0.037540767, 0.013561457, 0.05861333, 0.037777353, 0.039616264, 0.059200756, 0.0029774196, 0.013709012, 0.059247747, -0.037751887, 0.03373743, 0.05866032, -0.020873142, 0.036867112, -0.05419589, -0.009724151, 0.031508595, -0.057943664, 0.024646975)
+
+[node name="SM_Prop_Money_Roll_01" type="MeshInstance3D" unique_id=475318801]
+gi_mode = 2
+mesh = ExtResource("1_k3l3a")
+surface_material_override/0 = ExtResource("2_fp2fo")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1503459925]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=551617188]
+shape = SubResource("ConvexPolygonShape3D_18lvt")

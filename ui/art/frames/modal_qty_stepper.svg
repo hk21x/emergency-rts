@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="94" height="28" viewBox="0 0 94 28" fill="none" role="img" aria-label="Quantity stepper">
+  <defs>
+    <linearGradient id="qs_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+    <linearGradient id="qs_i" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0C121B"/><stop offset="1" stop-color="#080D14"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="27" height="27" rx="3" fill="url(#qs_b)" fill-opacity="1" stroke="#2E3D4F" stroke-width="1" stroke-opacity="1"/>
+  <rect x="30" y="0.5" width="34" height="27" rx="3" fill="url(#qs_i)" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <rect x="66.5" y="0.5" width="27" height="27" rx="3" fill="url(#qs_b)" fill-opacity="1" stroke="#2E3D4F" stroke-width="1" stroke-opacity="1"/>
+
+</svg>

@@ -554,8 +554,12 @@ func _ready() -> void:
 	# vehicle grows one without regenerating the scenes. Civilian bodies get none --
 	# a taxi with a siren switch would be wrong even unpressable.
 	if service != Service.NONE:
+		# Both speakers sit on the effects bus, so the settings slider can balance the
+		# district against the music without touching either one's own level.
+		AudioBuses.ensure()
 		_siren_audio = AudioStreamPlayer3D.new()
 		_siren_audio.name = "SirenAudio"
+		_siren_audio.bus = AudioBuses.SFX
 		# Quieter than the synthesised two-tone it replaced, because the recording is a
 		# properly mastered one and arrives near full scale where the generated tone
 		# peaked around half. Same loudness in the district, six fewer decibels here.
@@ -570,6 +574,7 @@ func _ready() -> void:
 		# siren -- seven of these in a station yard should be a hum, not a chorus.
 		_engine_audio = AudioStreamPlayer3D.new()
 		_engine_audio.name = "EngineAudio"
+		_engine_audio.bus = AudioBuses.SFX
 		_engine_audio.volume_db = -20.0
 		_engine_audio.unit_size = 5.0
 		_engine_audio.max_distance = 45.0
@@ -885,6 +890,10 @@ func _build_abilities() -> Array[Ability]:
 		list.append(LightsAbility.new())
 		list.append(SirenAbility.new())
 		list.append(ReturnAbility.new())
+	# Water carriers only: the tile is meaningless on anything without a tank, and the
+	# grid is built from this list, so an ambulance simply never offers it.
+	if carries_water:
+		list.append(ConnectAbility.new())
 	return list
 
 
@@ -905,13 +914,45 @@ func take_aboard(person: Person) -> bool:
 
 # --- Water ---------------------------------------------------------------------
 
+## The hydrant this appliance has a line to, or null. Set by [ConnectOrder]; cleared the
+## moment the engine is no longer parked beside it.
+var hydrant: Hydrant = null
+
+## True while the hose is drawing off the main rather than the tank.
+##
+## Re-derived every time rather than trusted once, because the connection is broken by the
+## engine *moving*, and nothing announces that. The rule is the same one refilling uses --
+## stopped, and within reach -- so a connection is possible exactly where a top-up was, and
+## a driver who pulls away has plainly unhooked whatever a flag might still say.
+func is_on_main() -> bool:
+	if hydrant == null or not is_instance_valid(hydrant):
+		return false
+	if absf(forward_speed) > 0.5:
+		return false
+	var offset := hydrant.global_position - global_position
+	offset.y = 0.0
+	return offset.length() <= hydrant_reach
+
+
+func connect_to_main(to: Hydrant) -> void:
+	hydrant = to
+
+
 ## Takes water out of the tank. Called by the crew working off this appliance.
+##
+## **Free while connected**, which is the whole mechanic: a crew fighting off the main are
+## limited by the fire, not by what they brought. Charged against the tank the moment the
+## line comes off.
 func draw_water(amount: float) -> void:
+	if is_on_main():
+		return
 	water = clampf(water - amount / maxf(tank_capacity, 0.01), 0.0, 1.0)
 
 
 func has_water() -> bool:
-	return carries_water and water > 0.0
+	# A connected appliance always has water, even on an empty tank -- that is what being
+	# on the main means, and without this a crew would down tools beside a running hydrant.
+	return carries_water and (water > 0.0 or is_on_main())
 
 
 ## Takes foam out of the tank. Charged against work done, exactly as water is.
@@ -928,6 +969,11 @@ func has_foam() -> bool:
 ## past a hydrant would make the tank a formality rather than a reason to park.
 func _update_water(delta: float) -> void:
 	is_refilling = false
+	# Driving away takes the line off. Done here rather than in the order because the order
+	# finished the moment the line went on -- the connection outlives it deliberately, so
+	# the crew can be sent elsewhere while the engine stands and supplies them.
+	if hydrant != null and not is_on_main() and absf(forward_speed) > 0.5:
+		hydrant = null
 	if absf(forward_speed) > 0.5:
 		return
 	var wants_water := carries_water and water < 1.0

@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://df4bg6etrdgco"]
+
+[ext_resource type="ArrayMesh" uid="uid://brxyvmiusobh" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Env_Wall_Window_Panels_01.res" id="1_y4ire"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_2lp63"]
+
+[node name="SM_Env_Wall_Window_Panels_01" type="MeshInstance3D" unique_id=1162865796]
+gi_mode = 2
+mesh = ExtResource("1_y4ire")
+surface_material_override/0 = ExtResource("2_2lp63")

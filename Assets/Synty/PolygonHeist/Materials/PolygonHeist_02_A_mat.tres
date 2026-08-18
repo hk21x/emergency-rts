@@ -1,0 +1,15 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://djfny73ykexlj"]
+
+[ext_resource type="Texture2D" uid="uid://bqd84fqm0h5u1" path="res://Assets/Synty/PolygonHeist/Textures/PolygonHeist_02_A.png" id="1_1rbxy"]
+[ext_resource type="Texture2D" uid="uid://bgl1vvw0w60il" path="res://Assets/Synty/PolygonHeist/Textures/Emissive_01.png" id="2_btxbb"]
+
+[resource]
+resource_name = "PolygonHeist_02_A_mat"
+depth_draw_mode = 1
+albedo_texture = ExtResource("1_1rbxy")
+roughness = 0.8
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_operator = 1
+emission_texture = ExtResource("2_btxbb")
+uv1_scale = Vector3(1, 1, 0)

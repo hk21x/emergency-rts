@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cuhf4gropmrcn"]
+
+[ext_resource type="ArrayMesh" uid="uid://d07s4t620sm62" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_Crosshair_04.res" id="1_u8w77"]
+[ext_resource type="Material" uid="uid://db3j2low1s1yj" path="res://Assets/Synty/PolygonHeist/Materials/Emission_Red_01_mat.tres" id="2_jf8w3"]
+
+[node name="SM_Wep_Crosshair_04" type="MeshInstance3D" unique_id=1681233071]
+gi_mode = 2
+mesh = ExtResource("1_u8w77")
+surface_material_override/0 = ExtResource("2_jf8w3")

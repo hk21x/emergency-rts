@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://bwdtd4yfgxei6"]
+
+[ext_resource type="ArrayMesh" uid="uid://d2m5y2gwug8g5" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_Mask_WeldersMask_01.res" id="1_n7cep"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_n4s3k"]
+
+[node name="SM_Item_Mask_WeldersMask_01" type="MeshInstance3D" unique_id=124277123]
+gi_mode = 2
+mesh = ExtResource("1_n7cep")
+surface_material_override/0 = ExtResource("2_n4s3k")

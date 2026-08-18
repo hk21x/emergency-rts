@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://c7ei3l6xowfpo"]
+
+[ext_resource type="ArrayMesh" uid="uid://cf5vn2dghe2bs" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_HandDrill_01.res" id="1_8vc1m"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_h3nqn"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_s6dwn"]
+points = PackedVector3Array(-0.0331908, -0.07038224, -0.006007768, -0.020757673, -0.06415945, -0.030876461, 0.022731513, -0.06415945, -0.030876461, 0.03517133, -0.06415945, -0.006007768, 0.03517133, -0.06415945, 0.00640833, 0.022731513, -0.06415945, 0.03127094, -0.020757673, -0.06415945, 0.03127094, -0.0331908, 0.09118387, 0.012625504, -0.020757673, 0.09118387, -0.030876461, 0.022731513, 0.09118387, -0.030876461, 0.03517133, 0.09118387, 0.00640833, 0.022731513, 0.09118387, 0.03127094, -0.020757673, 0.09118387, 0.03127094, -0.014541108, 0.3086419, 0.00640833, 0.010305073, 0.31490242, -0.012231024, 0.010305073, 0.3086419, 0.012625504)
+
+[node name="SM_Item_ScrewDriver_01" type="MeshInstance3D" unique_id=2074315062]
+gi_mode = 2
+mesh = ExtResource("1_8vc1m")
+surface_material_override/0 = ExtResource("2_h3nqn")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=175577152]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=589922733]
+shape = SubResource("ConvexPolygonShape3D_s6dwn")

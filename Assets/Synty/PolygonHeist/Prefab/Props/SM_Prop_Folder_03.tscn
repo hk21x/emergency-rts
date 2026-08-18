@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://ctuph8r2xdfd3"]
+
+[ext_resource type="ArrayMesh" uid="uid://b48vpqpisoj5j" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_Folder_03.res" id="1_ytjpo"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_0f0a4"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_5ya1p"]
+points = PackedVector3Array(0.07944679, 0.06626762, -0.25766948, 0.077121526, 0.07392706, -0.2500933, 0.2462019, 0.064064756, -0.19841488, 0.25622275, 0.03975538, -0.20463637, -0.24741985, 0.03975538, -0.23995832, -0.24022259, 0.06536468, -0.23303442, 0.28274187, 0.07511022, -0.010215029, -0.2827972, 0.07511022, 0.042767912, 0.25622275, 0.03975538, 0.16649514, -0.07075463, -0.0044109225, 0.25490043, -0.097163066, -0.0044109225, 0.24601975, -0.25633338, 0.03975538, 0.16649514, -0.21209788, 0.07511022, 0.14883417, 0.25024346, 0.065535925, 0.16253147, -0.06189646, 0.013266496, 0.25490043, -0.12683795, 0.063068405, 0.20457664)
+
+[node name="SM_Prop_Folder_03" type="MeshInstance3D" unique_id=1544259702]
+gi_mode = 2
+mesh = ExtResource("1_ytjpo")
+surface_material_override/0 = ExtResource("2_0f0a4")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1176346823]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=2098505270]
+shape = SubResource("ConvexPolygonShape3D_5ya1p")

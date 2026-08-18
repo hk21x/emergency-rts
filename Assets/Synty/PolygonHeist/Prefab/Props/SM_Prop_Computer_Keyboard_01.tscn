@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://c1pbwue6qnhte"]
+
+[ext_resource type="ArrayMesh" uid="uid://bulwxuya2dv4x" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_Computer_Keyboard_01.res" id="1_pw7wg"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_tpkw5"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_u5ipn"]
+points = PackedVector3Array(-0.3223019, -0.0051988102, -0.10750327, -0.33272395, -0.0051988102, -0.09711583, -0.3223019, 0.046789307, -0.10750327, 0.3223019, -0.0051988102, -0.10750327, -0.33272395, 0.046789307, -0.07631956, -0.33272395, -0.0051988102, 0.100438006, 0.3223019, 0.046789307, -0.10750327, 0.33272395, -0.0051988102, -0.09711583, -0.33272395, 0.036377434, 0.038049214, 0.33272395, 0.046789307, -0.07631956, -0.3223019, -0.0051988102, 0.110846825, -0.3223019, 0.025991006, 0.110846825, 0.33272395, -0.0051988102, 0.100438006, 0.33272395, 0.036377434, 0.038049214, 0.3223019, -0.0051988102, 0.110846825, 0.3223019, 0.025991006, 0.110846825)
+
+[node name="SM_Prop_Computer_Keyboard_01" type="MeshInstance3D" unique_id=20158451]
+gi_mode = 2
+mesh = ExtResource("1_pw7wg")
+surface_material_override/0 = ExtResource("2_tpkw5")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=928297713]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=689937051]
+shape = SubResource("ConvexPolygonShape3D_u5ipn")

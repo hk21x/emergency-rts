@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://b0h8y3fbil73a"]
+
+[ext_resource type="ArrayMesh" uid="uid://cu08iwqvdhadx" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_RifleBandit_01.res" id="1_17met"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_kdxj2"]
+[ext_resource type="ArrayMesh" uid="uid://bmhr4lnw1c0xe" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_RifleBandit_Mag_01.res" id="3_kdxj2"]
+[ext_resource type="ArrayMesh" uid="uid://b01la18jfdkps" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_RifleBandit_Slide_01.res" id="4_r0p75"]
+[ext_resource type="ArrayMesh" uid="uid://g8yscfykd1g3" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_RifleBandit_Trigger_01.res" id="5_vi8pg"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_cw5rb"]
+points = PackedVector3Array(-0.015793439, -0.09008494, 0.0025107563, -0.031542845, 0.08313307, 0.010304481, -0.023660049, -0.042861044, -0.31251973, 0.015699979, -0.09008494, 0.0025107563, 0.007822577, 0.0674316, 0.7192256, -0.015793439, 0.098906234, 0.7271219, -0.023665443, 0.0674316, 0.46705765, -0.023660049, 0.051634535, -0.31251973, -0.023665443, 0.14615403, 0.23088735, 0.023577377, 0.04372406, -0.32051855, 0.023577377, -0.042861044, -0.31251973, 0.023577377, 0.0674316, 0.46705765, 0.015699979, 0.08313307, 0.7271219, 0.007822577, 0.1540645, 0.70333046, 0.012203708, 0.11224173, 0.012150347, 0.023577377, 0.13038087, 0.46705765)
+
+[node name="SM_Wep_RifleBandit_01" type="MeshInstance3D" unique_id=518735725]
+gi_mode = 2
+mesh = ExtResource("1_17met")
+surface_material_override/0 = ExtResource("2_kdxj2")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1873067543]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=312611037]
+shape = SubResource("ConvexPolygonShape3D_cw5rb")
+
+[node name="SM_Wep_RifleBandit_Mag_01" type="MeshInstance3D" parent="." unique_id=1174927850]
+gi_mode = 2
+mesh = ExtResource("3_kdxj2")
+surface_material_override/0 = ExtResource("2_kdxj2")
+
+[node name="SM_Wep_RifleBandit_Slide_01" type="MeshInstance3D" parent="." unique_id=1660381142]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.019093089, 0.105400465, 0.18479565)
+gi_mode = 2
+mesh = ExtResource("4_r0p75")
+surface_material_override/0 = ExtResource("2_kdxj2")
+
+[node name="SM_Wep_RifleBandit_Trigger_01" type="MeshInstance3D" parent="." unique_id=1768379585]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.283333e-09, 0.036309786, 0.05501834)
+gi_mode = 2
+mesh = ExtResource("5_vi8pg")
+surface_material_override/0 = ExtResource("2_kdxj2")

@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://cixc7hlsbdk6x"]
+
+[ext_resource type="ArrayMesh" uid="uid://o33ghykxtbuc" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Env_Steps_Edge_01.res" id="1_gxfmx"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_1s6gy"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cwleg"]
+size = Vector3(5, 1.0755455, 0.409799)
+
+[node name="SM_Env_Steps_Edge_01" type="MeshInstance3D" unique_id=1276315527]
+gi_mode = 2
+mesh = ExtResource("1_gxfmx")
+surface_material_override/0 = ExtResource("2_1s6gy")
+
+[node name="BoxCollider" type="StaticBody3D" parent="." unique_id=1229975658]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoxCollider" unique_id=224159425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.5377728, 0.2048995)
+shape = SubResource("BoxShape3D_cwleg")

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56" fill="none" role="img" aria-label="Icon tile — pressed">
+  <defs>
+    <linearGradient id="itpre_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12508F"/><stop offset="1" stop-color="#0E3F73"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="55" height="55" rx="6" fill="url(#itpre_g)" fill-opacity="1" stroke="#1668C8" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H50" stroke="#FFFFFF" stroke-opacity="0.04" stroke-width="1" stroke-linecap="round"/>
+
+</svg>

@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://vla6jgp8wgts"]
+
+[ext_resource type="ArrayMesh" uid="uid://bckoes75sju0o" path="res://Assets/Synty/PolygonHeist/Model/extracted/SM_Env_Stairway_01.res" id="1_gd7wx"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_g4o3i"]
+[ext_resource type="Shape3D" uid="uid://8snwrgqorb5x" path="res://Assets/Synty/PolygonHeist/Model/Collisions/extracted/SM_Env_Stairway_01_Collision.res" id="3_g4o3i"]
+
+[node name="SM_Env_Stairway_01" type="MeshInstance3D" unique_id=1053828876]
+gi_mode = 2
+mesh = ExtResource("1_gd7wx")
+surface_material_override/0 = ExtResource("2_g4o3i")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1669336687]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=990475208]
+shape = ExtResource("3_g4o3i")

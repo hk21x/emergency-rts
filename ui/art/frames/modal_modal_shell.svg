@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="620" viewBox="0 0 960 620" fill="none" role="img" aria-label="Modal shell">
+  <defs>
+    <linearGradient id="md_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+    <linearGradient id="md_t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2277D8"/><stop offset="1" stop-color="#1A5DAE"/></linearGradient>
+    <linearGradient id="md_f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#131C28"/><stop offset="1" stop-color="#0C141E"/></linearGradient>
+
+  </defs>
+  <rect x="1" y="1" width="958" height="618" rx="8" fill="url(#md_g)" fill-opacity="1" stroke="#2E3D4F" stroke-width="1.4" stroke-opacity="1"/>
+  <path d="M1 9a8 8 0 0 1 8-8h942a8 8 0 0 1 8 8v39H1Z" fill="url(#md_t)"/>
+  <path d="M1 48 L959 48" stroke="#4A9CF0" stroke-width="1" stroke-opacity="0.45"/>
+  <path d="M1 540h958v71a8 8 0 0 1-8 8H9a8 8 0 0 1-8-8Z" fill="url(#md_f)"/>
+  <path d="M1 540 L959 540" stroke="#212D3C" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H954" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="1" stroke-linecap="round"/>
+
+</svg>

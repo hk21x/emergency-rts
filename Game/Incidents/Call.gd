@@ -160,7 +160,17 @@ func describe() -> String:
 	if fires > 0:
 		parts.append("%d fire%s" % [fires, "" if fires == 1 else "s"])
 	if hurt > 0:
-		parts.append("%d casualt%s" % [hurt, "y" if hurt == 1 else "ies"])
+		# **The triage line.** "4 casualties" is a count; "4 casualties, 2 critical" is a
+		# decision, and it is the decision a bus RTC is built around -- more patients than
+		# the ambulance has stretchers, so who rides first is the whole call. Only the
+		# worst tier is named: listing every tier turns a glanceable row into a table.
+		var critical := 0
+		for incident in live:
+			var casualty := incident as Casualty
+			if casualty and casualty.severity() == Casualty.Severity.CRITICAL:
+				critical += 1
+		parts.append("%d casualt%s%s" % [hurt, "y" if hurt == 1 else "ies",
+			"" if critical == 0 else ", %d critical" % critical])
 	if rowdy > 0:
 		parts.append("%d suspect%s" % [rowdy, "" if rowdy == 1 else "s"])
 	if cylinders > 0:

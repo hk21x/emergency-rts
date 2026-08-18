@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://c5jj2ee4s26r1"]
+
+[ext_resource type="ArrayMesh" uid="uid://csjhui04a3mp4" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Env_Skylight_01.res" id="1_dx30e"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_50cfc"]
+[ext_resource type="ArrayMesh" uid="uid://crc62xesfetxe" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Env_Skylight_Glass_01.res" id="3_50cfc"]
+[ext_resource type="Material" uid="uid://dlyw6oajnufkx" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_Glass_mat.tres" id="4_mr7n2"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_iwg8e"]
+size = Vector3(5, 1.3733366, 4.999999)
+
+[node name="SM_Env_Skylight_01" type="MeshInstance3D" unique_id=1620407395]
+gi_mode = 2
+mesh = ExtResource("1_dx30e")
+surface_material_override/0 = ExtResource("2_50cfc")
+
+[node name="BoxCollider" type="StaticBody3D" parent="." unique_id=1562907961]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoxCollider" unique_id=315467443]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.34909558, 2.4999995)
+shape = SubResource("BoxShape3D_iwg8e")
+
+[node name="SM_Env_Skylight_Glass_01" type="MeshInstance3D" parent="." unique_id=1625791857]
+gi_mode = 2
+mesh = ExtResource("3_50cfc")
+surface_material_override/0 = ExtResource("4_mr7n2")

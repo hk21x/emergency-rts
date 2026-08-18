@@ -146,6 +146,108 @@ const VEHICLES := [
 		# the cab rather than over the box.
 		"siren": {"height": 2.62, "along": 0.62, "spread": 0.32},
 	},
+	# **The prisoner transport**, from the Heist pack (August 2026). The cheapest unit in
+	# the game to add -- no new code at all, one entry here and one in `Station.TYPES` --
+	# and it answers a problem the disorder call created by design: `DISORDER_SIZE` runs
+	# to eight suspects at one kerb and a patrol car holds two, so the answer until now
+	# was driving back and forth while the rest of the crowd recruited.
+	{
+		"prefab": "res://Assets/Synty/PolygonHeist/Prefab/Vehicles/SM_Veh_SwatVan_01.tscn",
+		"out": "PoliceVan.tscn",
+		"display": "Police Van",
+		"service": Unit.Service.POLICE,
+		"seats": 2,
+		"stretchers": 0,
+		"cells": 6,
+		# Van-shaped: heavier than a patrol car, lighter than the appliance.
+		"max_speed": 22.0,
+		# **Missed when the van was added**, and the omission is invisible in the data:
+		# a vehicle with no `siren` key simply gets no lightbar built, so it responded to
+		# every call dark and silent while looking entirely correct on the forecourt.
+		# Measured off the prefab like the others -- hull tops at y 2.72 and the patrol
+		# car sits its beads 0.04 proud of 1.74, so 2.76. The windscreen glass ends at
+		# z 1.69 and the front wheels sit at z[1.41,2.44], so +1.30 is on the cab roof
+		# just behind the screen rather than adrift in the middle of a long box roof.
+		# Spread scaled off the patrol car's 0.34 by the extra half-width (1.23/1.09).
+		"siren": {"height": 2.76, "along": 1.30, "spread": 0.38},
+	},
+	# **A second patrol body**, from the Heist pack. Mechanically a faster interceptor:
+	# the same two cells as the patrol car, a higher top speed, and a price between the
+	# patrol car and the van. What it buys is arriving first, which is the same thing the
+	# doctor car sells and the reason both exist.
+	{
+		"prefab": "res://Assets/Synty/PolygonHeist/Prefab/Vehicles/SM_Veh_Car_Police_Heist_01.tscn",
+		"out": "Interceptor.tscn",
+		"display": "Interceptor",
+		"service": Unit.Service.POLICE,
+		"seats": 2,
+		"stretchers": 0,
+		"cells": 2,
+		# The quickest car on the road: past the patrol car's 26 and the doctor car's 27.
+		"max_speed": 28.0,
+		# **Derived rather than read straight off**, because this hull's 2.22 maximum is
+		# its antennae, not its roof. The patrol car sits its beads 0.34 above its own
+		# glass line (glass 1.44, siren 1.78), and this glass tops at 1.55 -- so 1.89.
+		# Half-width is 1.09, the same as the patrol car, so the spread carries over.
+		"siren": {"height": 1.89, "along": -0.19, "spread": 0.34},
+	},
+	# **The air rescue helicopter.** Same airframe as Air Support, wearing the Heist
+	# pack's fourth livery -- `PolygonHeist_04_A` carries RESCUE in red on amber exactly
+	# where `01_A` carries POLICE in white on blue, which is what makes this a palette
+	# swap and not a modelling job.
+	{
+		"prefab": "res://Assets/Synty/PolygonHeist/Prefab/Vehicles/SM_Veh_Helicopter_01.tscn",
+		"out": "RescueHelicopter.tscn",
+		"display": "Air Rescue",
+		"script": "res://Game/Units/Aircraft.gd",
+		"service": Unit.Service.FIRE,
+		# **Ours, not the pack's.** Synty ships `PolygonHeist_04_A.png` -- the atlas with
+		# RESCUE on it -- but no material for that atlas, only for 01 and 02. So this is a
+		# clone of the pack's own `PolygonHeist_01_A_mat` with the albedo swapped, kept in
+		# `Game/Materials/` because `Assets/Synty/` is vendor and never edited.
+		"palette": "res://Game/Materials/RescueLivery.tres",
+		"seats": 2,
+		"stretchers": 0,
+		"max_speed": 34.0,
+	},
+	# **The recovery truck.** The unit that gives a road traffic collision a *tail*: every
+	# incident in this game has ended when the last body left the scene, and a wreck that
+	# has to be lifted is the first thing that outlives the casualties.
+	{
+		"prefab": "res://Assets/PolygonTown/Prefabs/Vehicles/SM_Veh_Pickup_01.tscn",
+		"out": "TowTruck.tscn",
+		"display": "Recovery Truck",
+		"service": Unit.Service.POLICE,
+		"seats": 2,
+		"stretchers": 0,
+		"max_speed": 20.0,
+		# Same omission as the van's, found by the same check. This one is dispatched to
+		# collisions from the same forecourt, so responding dark was equally wrong.
+		#
+		# **Placed less confidently than the others.** The hull's 2.27 maximum is bodywork
+		# behind the cab, not the cab roof, so the beads go on the roof inferred from the
+		# windscreen instead: glass tops at y 1.97 and spans z[-0.38,1.07], which puts the
+		# cab roof near 2.00 and its middle near z 0.30. If they ever look like they are
+		# floating, that is the number to move.
+		"siren": {"height": 2.04, "along": 0.30, "spread": 0.36},
+	},
+	# **The helicopter**, and the one body here that does not drive. It is built by the
+	# same generator for the same reason everything else is -- one place that knows how a
+	# unit scene is assembled -- but its `script` is [Aircraft], a sibling of [Vehicle]
+	# rather than a subclass, so the driving fields are skipped for it. See the `drives`
+	# split in `_build_vehicle`.
+	{
+		"prefab": "res://Assets/Synty/PolygonHeist/Prefab/Vehicles/SM_Veh_Helicopter_01.tscn",
+		"out": "Helicopter.tscn",
+		"display": "Air Support",
+		"script": "res://Game/Units/Aircraft.gd",
+		"service": Unit.Service.POLICE,
+		"seats": 2,
+		"stretchers": 0,
+		# Faster than anything on the road, because it is the one unit that never has to
+		# follow one. That is the whole of its advantage and it should be felt.
+		"max_speed": 34.0,
+	},
 ]
 
 ## Ambient traffic. Same chassis treatment, different driver.
@@ -339,14 +441,28 @@ func _build_vehicle(config: Dictionary) -> bool:
 	# main section is the one that pitches -- the base is the turntable it pivots on and
 	# stays put, and the fly section rides the main one.
 	for part in chassis.get_children():
-		if "Ladder_01" in part.name:
+		if "Ladder_01" in part.name and root is Vehicle:
 			root.ladder_path = NodePath("Lean/Chassis/" + part.name)
 			break
 
-	root.carries_water = bool(config.get("water", false))
-	root.carries_foam = bool(config.get("foam", false))
-	root.cells = int(config.get("cells", 1))
-	root.tank_capacity = float(config.get("tank_capacity", 1.0))
+	# **Only a thing that drives gets the driving fields.** The generator builds every
+	# body the same way, but since August 2026 one of them is an [Aircraft] -- a sibling of
+	# [Vehicle] rather than a subclass, with no tank, no cells, no stretchers and no
+	# steering. Assigning those to it is not a no-op in GDScript, it is an error on an
+	# undeclared property, so the split is explicit.
+	var drives := root is Vehicle
+	if drives:
+		root.carries_water = bool(config.get("water", false))
+		root.carries_foam = bool(config.get("foam", false))
+		# **Absent means none.** This defaulted to 1, and a `.tscn` only stores properties
+		# that differ from the script's own default -- so the ambulance, the fire engine
+		# and the recovery truck, none of which mention cells, each silently got one. Two
+		# were inert because [LoadSuspectAbility] gates on POLICE service, but the recovery
+		# truck is police and could hold a prisoner in a vehicle with nowhere to put one.
+		# Found while mapping the catalogue onto a new shop UI, which had to read these
+		# numbers and printed "1 cells" against a tow truck.
+		root.cells = int(config.get("cells", 0))
+		root.tank_capacity = float(config.get("tank_capacity", 1.0))
 	root.display_name = str(config["display"])
 	# Ambient traffic inherits no service, so it stays NONE and the interface never
 	# colours a passing taxi as though it were dispatchable.
@@ -364,20 +480,22 @@ func _build_vehicle(config: Dictionary) -> bool:
 		root.portrait = load(portrait)
 	root.selection_ring_path = NodePath("SelectionRing")
 	root.seats = int(config["seats"])
-	root.stretchers = int(config["stretchers"])
 	root.max_speed = float(config["max_speed"])
-	root.max_steer_degrees = float(config.get("steer", root.max_steer_degrees))
-	root.slowdown_distance = float(config.get("slowdown", root.slowdown_distance))
 	var wheelbase := absf(front_z - rear_z)
-	root.wheel_radius = wheel_radius
-	root.wheelbase = wheelbase
+	if drives:
+		root.stretchers = int(config["stretchers"])
+		root.max_steer_degrees = float(config.get("steer", root.max_steer_degrees))
+		root.slowdown_distance = float(config.get("slowdown", root.slowdown_distance))
+		root.wheel_radius = wheel_radius
+		root.wheelbase = wheelbase
 	# **Where the crew step out, sized off this body rather than fixed.** The default 3.2
 	# was measured on a 5m van whose tail sits 2.3m back, and it survived the ambulance
 	# for the same reason. The appliance's tail is 4.4m back, so a fixed number puts four
 	# firefighters *inside* the truck -- and nothing catches it, because a vehicle is a
 	# CharacterBody3D and so is absent from the baked navigation the dismount point snaps
 	# to. Half the body, plus however far the hull sits off centre, plus room to stand.
-	root.dismount_back = aabb.size.z * 0.5 + absf(aabb.get_center().z) + 0.9
+	if drives:
+		root.dismount_back = aabb.size.z * 0.5 + absf(aabb.get_center().z) + 0.9
 
 	# Reported before saving: _save() frees the node.
 	print("%-22s hull %.2f x %.2f x %.2f   wheelbase %.2f   wheel r %.2f" % [
@@ -510,7 +628,16 @@ func _copy_materials(from: MeshInstance3D, to: MeshInstance3D, palette := "") ->
 			material = from.mesh.surface_get_material(surface)
 		if material == null:
 			continue
-		if coat and "PolygonCity_01_A" in material.resource_path:
+		# **The base coat of whichever pack, matched by suffix.** This read
+		# `"PolygonCity_01_A" in path`, which is the City pack's body material and nothing
+		# else -- so a palette on a Heist vehicle was accepted, ignored, and produced a
+		# scene identical to the unpainted one with no warning anywhere. Exactly the
+		# silent kind: the config looks applied and the model does not change.
+		#
+		# `ends_with` rather than `in`, because Heist ships `PolygonHeist_01_A_Glass_mat`
+		# and `_Shiny_mat` alongside `PolygonHeist_01_A_mat`, and repainting a windscreen
+		# with the bodywork atlas is how you get an opaque cockpit.
+		if coat and material.resource_path.ends_with("_01_A_mat.tres"):
 			material = coat
 		to.set_surface_override_material(surface, material)
 	to.cast_shadow = from.cast_shadow

@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://djtraoocgmat0"]
+
+[ext_resource type="ArrayMesh" uid="uid://f8venrlb8pc8" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_Handcuffs_01.res" id="1_gdaia"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_w3lei"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_upq0f"]
+points = PackedVector3Array(0.0020378828, 0.11295609, 0.0138976555, -0.01006823, 0.11291437, -0.010220133, -0.07678065, 0.03494203, 0.016814513, -0.05830536, -0.10014327, 0.025964225, 0.09448459, -0.08003483, 0.025964225, 0.10064302, 0.031166494, 0.016814513, 0.017305173, 0.11049469, 0.005280139, 0.017305173, 0.11049469, -0.0019864123, -0.075047866, 0.034462273, -0.016821437, 0.098816566, 0.030749306, -0.016821437, -0.10834553, -0.024694912, -0.016821437, -0.106963985, -0.0745071, 0.016814513, -0.05830536, -0.10014327, -0.026308892, 0.09851215, -0.08806569, -0.026308892, 0.124738164, -0.07281749, -0.016821437, 0.13087317, -0.021628588, 0.016814513)
+
+[node name="SM_Item_Handcuffs_01" type="MeshInstance3D" unique_id=605629929]
+gi_mode = 2
+mesh = ExtResource("1_gdaia")
+surface_material_override/0 = ExtResource("2_w3lei")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=2041946899]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1137098329]
+shape = SubResource("ConvexPolygonShape3D_upq0f")

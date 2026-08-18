@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://3ox66b7cbegi"]
+
+[ext_resource type="ArrayMesh" uid="uid://txupuajl7v8y" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_Sprinkler_01.res" id="1_cbjgc"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_jeugr"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_4ne5y"]
+points = PackedVector3Array(0.000973016, -0.044550672, 0.10946032, 0.07654199, -0.0022096485, 0.07127678, -0.07501404, -0.0017619282, 0.0749994, -0.038870543, -0.21815744, 0.04213392, 0.037680924, -0.21939398, 0.04262317, 0.004359506, -0.0019964427, -0.10428238, 0.107835695, -0.044550672, 0.0061414167, 0.107835695, -0.044550672, -0.00453721, 0.07599847, -0.0029771626, -0.07260813, -0.10570152, -0.002188325, -0.0009209439, -0.05586572, -0.21901023, 0.005779788, 0.00084759295, -0.21956454, -0.057887793, 0.057874456, -0.21956454, -0.00087839365, 0.075747624, -0.044550672, -0.0793514, -0.006134443, -0.044550672, -0.1078561, -0.08097176, -0.044550672, -0.07222523)
+
+[node name="SM_Prop_Sprinkler_01" type="MeshInstance3D" unique_id=268376238]
+gi_mode = 2
+mesh = ExtResource("1_cbjgc")
+surface_material_override/0 = ExtResource("2_jeugr")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=291479922]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1201449547]
+shape = SubResource("ConvexPolygonShape3D_4ne5y")

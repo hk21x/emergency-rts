@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bii31wg0cifqx"]
+
+[ext_resource type="ArrayMesh" uid="uid://c5a1yiion4ls4" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_SafeDepositBoxes_Half_01.res" id="1_yi8c8"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_708o5"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yi8c8"]
+size = Vector3(5, 3, 1.054997)
+
+[node name="SM_Prop_SafeDepositBoxes_Half_01" type="MeshInstance3D" unique_id=1028647921]
+gi_mode = 2
+mesh = ExtResource("1_yi8c8")
+surface_material_override/0 = ExtResource("2_708o5")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1772005557]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.5, -0.43121266)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1744600946]
+shape = SubResource("BoxShape3D_yi8c8")

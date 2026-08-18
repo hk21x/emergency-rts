@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://b6myyd7k7fknw"]
+
+[ext_resource type="ArrayMesh" uid="uid://w1cf7lvy6fc6" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_Money_Note_02.res" id="1_88c8k"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_yyvkt"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_88c8k"]
+size = Vector3(0.2735181, 0.003694185, 0.11140227)
+
+[node name="SM_Prop_Money_Note_02" type="MeshInstance3D" unique_id=290770058]
+gi_mode = 2
+mesh = ExtResource("1_88c8k")
+surface_material_override/0 = ExtResource("2_yyvkt")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1932014486]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3841858e-07, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=2121887283]
+shape = SubResource("BoxShape3D_88c8k")

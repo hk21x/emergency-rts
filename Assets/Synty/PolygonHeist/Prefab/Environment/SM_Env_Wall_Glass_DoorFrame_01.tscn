@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://djstksnqoveku"]
+
+[ext_resource type="ArrayMesh" uid="uid://b7l8kw7c0mrgd" path="res://Assets/Synty/PolygonHeist/Model/extracted/SM_Env_Wall_Glass_DoorFrame_01.res" id="1_e6jto"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_c18eb"]
+[ext_resource type="ArrayMesh" uid="uid://c3180nb4b6dt4" path="res://Assets/Synty/PolygonHeist/Model/extracted/SM_Env_Wall_Glass_DoorFrame_Glass_01.res" id="3_c18eb"]
+[ext_resource type="Shape3D" uid="uid://nlsxdo64phrc" path="res://Assets/Synty/PolygonHeist/Model/Collisions/extracted/SM_Env_Wall_Glass_DoorFrame_01_Collision.res" id="3_hhj8u"]
+[ext_resource type="Material" uid="uid://dlyw6oajnufkx" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_Glass_mat.tres" id="4_qsdft"]
+[ext_resource type="ArrayMesh" uid="uid://djmoi5oqsk6o0" path="res://Assets/Synty/PolygonHeist/Model/extracted/SM_Env_Wall_Glass_DoorFrame_Panels_01.res" id="5_hhj8u"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_aw3ko"]
+size = Vector3(4.925442, 2.735701, 0.04348755)
+
+[node name="SM_Env_Wall_Glass_DoorFrame_01" type="MeshInstance3D" unique_id=1465757132]
+gi_mode = 2
+mesh = ExtResource("1_e6jto")
+surface_material_override/0 = ExtResource("2_c18eb")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1367524640]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1861063731]
+shape = ExtResource("3_hhj8u")
+
+[node name="SM_Env_Wall_Glass_DoorFrame_Glass_01" type="MeshInstance3D" parent="." unique_id=2047204575]
+gi_mode = 2
+mesh = ExtResource("3_c18eb")
+surface_material_override/0 = ExtResource("4_qsdft")
+
+[node name="SM_Env_Wall_Glass_DoorFrame_Panels_01" type="MeshInstance3D" parent="." unique_id=2090162745]
+gi_mode = 2
+mesh = ExtResource("5_hhj8u")
+surface_material_override/0 = ExtResource("2_c18eb")
+
+[node name="BoxCollider" type="StaticBody3D" parent="SM_Env_Wall_Glass_DoorFrame_Panels_01" unique_id=1802396873]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SM_Env_Wall_Glass_DoorFrame_Panels_01/BoxCollider" unique_id=2023982631]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4999983, 1.3717263, 0.08723068)
+shape = SubResource("BoxShape3D_aw3ko")

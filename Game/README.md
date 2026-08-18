@@ -11,7 +11,7 @@ unmodified, though the POLYGON City pack was relocated on import — see `PROGRE
 
 **All 15 planned phases are done, plus 16 (the world reacts), 17 (audio), 18 (game
 framing), 19 (the fire service) and all of phase 20 — the career economy and the
-campaign scenarios.** 1006 automated checks, all passing.
+campaign scenarios.** 1089 automated checks, all passing.
 
 A 260m city district — twenty-five blocks of varied size, with parks, parking lots and
 four tower families — with 60 pedestrians and 22 civilian cars going about their business.
@@ -41,9 +41,10 @@ because a mechanic finally needed them. Audio is complete and **mostly synthesis
 the siren is a recording, and engine, crackle, radio and city bed are still written
 sample by sample, ready for recordings to replace them the same way. The **fire service**
 now has a real appliance — a POLYGON Town aerial, 3.11 x 2.84 x 8.82 against the van in
-orange paint it replaced — but its **crew is still borrowed**: no pack on disk contains a
-firefighter, so they remain police models repainted, and the paint check in the suite
-still guards them for exactly that reason. Everything under them is real.
+orange paint it replaced — and, since August 2026, **a real crew**: the POLYGON City
+Characters pack supplied a firefighter and a paramedic in their own kit, closing the last
+asset gap in the game. The paint check in the suite still guards them; it simply guards a
+real turnout kit now instead of a repaint.
 
 `PROGRESS.md` is the status document — what each phase cost and what it taught.
 `NEXT.md` is what is still to do. This file is the technical reference: how each system
@@ -144,6 +145,7 @@ Keys are bound to **physical** keycodes, so the layout holds on AZERTY and QWERT
 | `UI/Icons/`, `UI/Keys/` | Curated icons and keycaps from the pack under `Assets/padding` |
 | `UI/Portrait.gd` | Who is selected and what they are doing |
 | `UI/Roster.gd`, `UnitChip.gd` | Every unit under command, as clickable avatars |
+| `UI/HealthBar.gd` | A hurt crew member's health, under their chip. People only, and only when hurt |
 | `UI/CommandGrid.gd`, `CommandIcon.gd` | Command tiles, drawn from ability metadata |
 | `UI/UnitBadge.gd` | A unit as a circular avatar, used at three sizes |
 | `UI/StatusStrip.gd` | Shift clock and what is outstanding, top-centre |
@@ -2244,13 +2246,26 @@ anything is burning.
 ### The paramedic and the firefighter are wearing police blues
 
 The City pack ships police characters and nothing else — no paramedic, no firefighter —
-and no fire appliance either. Paramedics wear `Character_Female_Police`, picked because a
-second uniformed responder at least reads as an emergency worker and is tellable from the
-male officers at a glance. The **fire service goes further and repaints**: the firefighter
-is `Character_Male_Police` and the engine is the **van** body, both folded through
-`PolygonCity_02_A` so that at RTS distance the appliance and its crew read as fire rather
-than as more police. `build_portraits.gd` shoots their avatars through the same palette, or
-the shop would sell a red engine off a white photograph.
+and no fire appliance either. For most of this project's life that was worked around: the
+paramedic wore `Character_Female_Police` and the firefighter was `Character_Male_Police`
+folded through `PolygonCity_02_A`, so that at RTS distance the crew read as fire rather
+than as more police.
+
+**Both were replaced in August 2026** from the POLYGON City Characters pack
+(`SK_Character_FireFighter`, `SK_Character_Paramedic`), which ships them in their own kit.
+The repaint machinery is gone from `build_character.gd` and `build_portraits.gd`; both now
+shoot the thing the unit actually is.
+
+**The pack sits on a third skeleton**, and that is the part worth remembering. It is mostly
+Unreal-mannequin naming with some bones capitalised (`Pelvis`, `UpperArm_L`, `Hand_L`,
+`Thigh_L`, `Foot_L`), the head lowercase, Synty's merged finger chains, and **no `Root`** —
+close enough to the mannequin map to look reusable and different enough that it is not, since
+bone names are matched exactly and case-sensitively. `setup_retarget.CITY_CHARACTERS` is its
+map; it renames the rig onto the same `SkeletonProfileHumanoid` the Starter characters and
+the animation library already share, after which one shared `AnimationLibrary` drives all
+three rigs. The targets are built by **scanning the pack directory** rather than listing
+nineteen import paths, because a character that misses the map imports under its own bone
+names and then silently plays nothing at all — it does not fail, it just stands still.
 
 The engine was the patrol car's own hull until August 2026, which read as a saloon with an
 odd paint job. The van is 30cm wider and 26cm taller on a longer wheelbase — and, unasked
@@ -3189,7 +3204,7 @@ directly with `godot --path . res://Game/AnimationViewer.tscn`.
 `--fixed-fps 60` decouples the headless loop from the wall clock: same fixed-step
 physics, same checks, ~20 seconds instead of ~9 minutes.
 
-1006 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
+1089 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
 shift through the station (the map ships empty), and every bought unit is clickable
 from the opening view; the crowd strolls, runs from a fire and cannot be selected or
 picked through; traffic drives the roads and yields; units start parked, drive to a

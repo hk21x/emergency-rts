@@ -54,6 +54,69 @@ const TYPES := [
 			"Takes a detained suspect in the back."],
 	},
 	{
+		# **The prisoner transport.** Cheapest unit in the game to add and the one with the
+		# clearest job: `Director.DISORDER_SIZE` runs to eight suspects at a single kerb by
+		# design, and a patrol car holds two, so the answer was driving back and forth
+		# while the rest of the crowd carried on recruiting.
+		"id": &"van", "label": "Police Van", "scene": "res://Game/Vehicles/PoliceVan.tscn",
+		"service": Unit.Service.POLICE, "vehicle": true, "price": 800,
+		"portrait": "PoliceVan",
+		"blurb": ["Six cells in the back, seats 2.",
+			"For a scene that produces more suspects than a car can hold."],
+	},
+	{
+		# **The interceptor**, the Heist pack's second police body. Same two cells as the
+		# patrol car and the quickest thing on the road, so what the extra £300 buys is
+		# arrival time -- the same trade the doctor car offers the medical service.
+		"id": &"interceptor", "label": "Interceptor",
+		"scene": "res://Game/Vehicles/Interceptor.tscn",
+		"service": Unit.Service.POLICE, "vehicle": true, "price": 900,
+		"portrait": "Interceptor",
+		"blurb": ["The quickest car on the road. Two cells, seats 2.",
+			"For getting to the far side of the district first."],
+	},
+	{
+		# **Air rescue**, and the fire service's first unit that does not drive. Same
+		# airframe and same flight model as Air Support -- what differs is the service it
+		# answers to and the livery it wears, which is the Heist pack's RESCUE atlas
+		# rather than a second model.
+		"id": &"rescue_heli", "label": "Air Rescue",
+		"scene": "res://Game/Vehicles/RescueHelicopter.tscn",
+		"service": Unit.Service.FIRE, "vehicle": true, "price": 1800,
+		"portrait": "RescueHelicopter",
+		"blurb": ["Flies over the district, ignoring the roads.",
+			"Lands on open ground only -- never on a building."],
+	},
+	{
+		# **The recovery truck.** Built in Phase B and left out of this catalogue, which
+		# made it unbuyable and therefore not in the game at all -- the scene, the portrait
+		# and the lightbar all existed and nothing could reach them. Found by a player
+		# asking how to get one.
+		#
+		# It is honestly described below. Until `Wreck` lands it has no verb of its own:
+		# what it offers today is a second POLICE body that seats two and turns up with
+		# lights on. The job it was built for -- clearing a collision so the road reopens,
+		# the first thing in this game that outlives the casualties -- is still to come.
+		"id": &"truck", "label": "Recovery Truck",
+		"scene": "res://Game/Vehicles/TowTruck.tscn",
+		"service": Unit.Service.POLICE, "vehicle": true, "price": 700,
+		"portrait": "TowTruck",
+		"blurb": ["Seats 2. Slower than a patrol car.",
+			"Clearing wrecks comes later -- for now it is a second pair of hands."],
+	},
+	{
+		# **Air support.** The only unit that does not touch the road network: it flies
+		# straight, over everything, and lands on open ground. What you buy is arriving
+		# first at a call across the district -- and having to choose somewhere legal to
+		# put it down when you get there.
+		"id": &"helicopter", "label": "Air Support",
+		"scene": "res://Game/Vehicles/Helicopter.tscn",
+		"service": Unit.Service.POLICE, "vehicle": true, "price": 1800,
+		"portrait": "Helicopter",
+		"blurb": ["Flies over the district, ignoring the roads.",
+			"Lands on open ground only -- never on a building."],
+	},
+	{
 		"id": &"ambulance", "label": "Ambulance",
 		"scene": "res://Game/Vehicles/Ambulance.tscn",
 		"service": Unit.Service.MEDICAL, "vehicle": true, "price": 900,

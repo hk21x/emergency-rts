@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Game/HUD.gd" id="1_hud"]
 [ext_resource type="Script" path="res://Game/UI/GameMenu.gd" id="12_menu"]
-[ext_resource type="Script" path="res://Game/UI/ShopPanel.gd" id="13_shop"]
+[ext_resource type="Script" path="res://Game/UI/RequisitionPanel.gd" id="13_shop"]
 [ext_resource type="Script" path="res://Game/Soundscape.gd" id="14_sound"]
 [ext_resource type="Script" path="res://Game/UI/SelectionBox.gd" id="2_box"]
 [ext_resource type="Script" path="res://Game/UI/Minimap.gd" id="3_minimap"]
@@ -427,7 +427,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("13_shop")
 
-; The game's framing: the title card, the pause menu (P) and settings. Last child of
+; The game's framing: the title card, the pause menu (Esc) and settings. Last child of
 ; Root so it draws over everything, including the bar. PROCESS_MODE_ALWAYS is what
 ; lets it run -- and hear the keyboard -- while it has the rest of the tree paused.
 [node name="Menu" type="Control" parent="Root"]

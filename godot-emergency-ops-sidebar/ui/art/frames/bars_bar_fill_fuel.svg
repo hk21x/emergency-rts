@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="14" viewBox="0 0 220 14" fill="none" role="img" aria-label="Bar fill — fuel">
+  <defs>
+    <linearGradient id="bffue_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D8AA33"/><stop offset="1" stop-color="#A57C18"/></linearGradient>
+
+  </defs>
+  <rect x="0" y="0" width="220" height="14" rx="2" fill="url(#bffue_g)" fill-opacity="1"/>
+  <path d="M3 2.4h214" stroke="#FFFFFF" stroke-opacity="0.26" stroke-width="1" stroke-linecap="round"/>
+
+</svg>

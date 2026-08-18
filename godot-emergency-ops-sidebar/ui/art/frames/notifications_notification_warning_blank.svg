@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="34" viewBox="0 0 360 34" fill="none" role="img" aria-label="Notification — warning (blank)">
+  <defs>
+    <linearGradient id="ntwa_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#221B0C"/><stop offset="1" stop-color="#0A1017"/></linearGradient>
+    <linearGradient id="ntwa_a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C79A2A"/><stop offset="1" stop-color="#C79A2A"/></linearGradient>
+    <clipPath id="ntwa_c"><rect x="42" y="0" width="276" height="34"/></clipPath>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="359" height="33" rx="3" fill="url(#ntwa_g)" fill-opacity="1" stroke="#54401A" stroke-width="1" stroke-opacity="1"/>
+  <rect x="1" y="1" width="32" height="32" rx="2" fill="#C79A2A" fill-opacity="1"/>
+
+</svg>

@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cf5sjsi6wpk1r"]
+
+[ext_resource type="ArrayMesh" uid="uid://blgnq0y4qjsvs" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_VaultTrolley_01.res" id="1_y215d"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_vh6xq"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_2yjo6"]
+points = PackedVector3Array(-0.18027663, 1.0732577, 0.37392527, 0.53504694, 0.8426277, 0.39259708, 0.5467087, 0.8493019, -0.3926521, -0.18027663, 1.0731517, -0.38359427, -0.5423391, 1.0570489, 0.36288106, -0.396788, 0.42374343, 0.41007704, 0.53823745, 0.02848364, 0.3601796, 0.54648864, 0.1793413, -0.3926521, -0.396788, 0.42384937, -0.40163046, -0.5772141, 0.9107467, -0.38359427, -0.53507805, 1.0498451, -0.36690882, -0.5600516, 1.039463, 0.3628016, -0.36466333, 0.02848364, 0.3601796, -0.34266013, -0.009018898, 0.30178052, 0.50589275, 0.008567037, -0.33608046, -0.3686239, 0.022974793, -0.3381463)
+
+[node name="SM_Prop_VaultTrolley_01" type="MeshInstance3D" unique_id=1172638785]
+gi_mode = 2
+mesh = ExtResource("1_y215d")
+surface_material_override/0 = ExtResource("2_vh6xq")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1714652503]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=364562347]
+shape = SubResource("ConvexPolygonShape3D_2yjo6")

@@ -20,6 +20,12 @@ class_name AudioBuses
 
 const MUSIC := &"Music"
 const UI := &"UI"
+## Everything the *world* makes: sirens, engines, the fire's crackle, the city bed and
+## the dispatch radio. Added a session after Music, and the reason is the asymmetry it
+## fixed -- with Music on its own bus and effects on Master, the only way to quieten the
+## sirens was to quieten the music with them, which is precisely the balance the music
+## slider had just been added to let you set.
+const SFX := &"Sfx"
 
 ## Where the music sits relative to everything else, before the player touches anything.
 ## A bed is meant to be noticed on the way in and forgotten by the first shout.
@@ -36,7 +42,7 @@ const MUSIC_DEFAULT_DB := -26.0
 ## time, as many times as you like -- which is the point, since the HUD, the main menu and
 ## the suite all need them and none of them owns the others.
 static func ensure() -> void:
-	for name: StringName in [MUSIC, UI]:
+	for name: StringName in [MUSIC, UI, SFX]:
 		if AudioServer.get_bus_index(name) >= 0:
 			continue
 		var index := AudioServer.get_bus_count()
@@ -47,19 +53,37 @@ static func ensure() -> void:
 		AudioServer.set_bus_send(index, &"Master")
 
 
-## The music bus's level as a linear 0..1, for the settings slider to read and write.
-static func music_volume() -> float:
-	var index := AudioServer.get_bus_index(MUSIC)
+## A bus's level as a linear 0..1, for a settings slider to read and write.
+static func volume(bus: StringName) -> float:
+	var index := AudioServer.get_bus_index(bus)
 	if index < 0:
 		return 1.0
 	return db_to_linear(AudioServer.get_bus_volume_db(index))
 
 
-static func set_music_volume(linear: float) -> void:
+static func set_volume(bus: StringName, linear: float) -> void:
 	ensure()
-	var index := AudioServer.get_bus_index(MUSIC)
+	var index := AudioServer.get_bus_index(bus)
 	if index < 0:
 		return
 	# Clamped off zero before the log: `linear_to_db(0)` is -inf, which serialises into
 	# the settings file as `inf` and comes back as a bus that can never be turned up.
 	AudioServer.set_bus_volume_db(index, linear_to_db(maxf(linear, 0.0001)))
+
+
+## Kept as named wrappers because `set_music_volume` reads better at the call site than
+## `set_volume(AudioBuses.MUSIC, ...)`, and because the music one already had callers.
+static func music_volume() -> float:
+	return volume(MUSIC)
+
+
+static func set_music_volume(linear: float) -> void:
+	set_volume(MUSIC, linear)
+
+
+static func sfx_volume() -> float:
+	return volume(SFX)
+
+
+static func set_sfx_volume(linear: float) -> void:
+	set_volume(SFX, linear)

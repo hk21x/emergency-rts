@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dc06vxixbbs4r"]
+
+[ext_resource type="ArrayMesh" uid="uid://bfmvldmdb5qhb" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_Attachment_SniperScope_01.res" id="1_ibjv6"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_uecxc"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_1rrg2"]
+points = PackedVector3Array(0.015556917, 0.00620242, -0.053400934, -0.013346437, 0.006902773, -0.052508682, -0.0162481, 0.026719162, -0.18987978, 0.025281407, 0.032654203, -0.18987978, 0.043083504, 0.032645226, 0.0058972836, 0.019347377, 0.014831125, 0.1899262, -0.028124878, 0.020775143, 0.1899262, -0.045926973, 0.032645226, 0.0058972836, -0.0162481, 0.07417255, -0.18987978, 0.025281407, 0.068237506, -0.18987978, 0.04309222, 0.056367427, 0.1899262, -0.022182131, 0.086042635, 0.1899262, -0.045926973, 0.06231145, 0.011845693, -0.016239386, 0.09793067, 0.0058972836, 0.007461887, 0.09793067, 0.011845693, 0.031215444, 0.08010759, 0.1899262)
+
+[node name="SM_Wep_Attachment_SniperScope_01" type="MeshInstance3D" unique_id=875637453]
+gi_mode = 2
+mesh = ExtResource("1_ibjv6")
+surface_material_override/0 = ExtResource("2_uecxc")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=472922805]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=916494601]
+shape = SubResource("ConvexPolygonShape3D_1rrg2")

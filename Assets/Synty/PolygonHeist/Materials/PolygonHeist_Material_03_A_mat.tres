@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://ce7hlitsx1gqr"]
+
+[ext_resource type="Texture2D" uid="uid://d3dfdw3yrfpb0" path="res://Assets/Synty/PolygonHeist/Textures/PolygonHeist_03_A.png" id="1_5okbx"]
+
+[resource]
+resource_name = "PolygonHeist_Material_03_A_mat"
+depth_draw_mode = 1
+albedo_texture = ExtResource("1_5okbx")
+roughness = 0.8
+uv1_scale = Vector3(1, 1, 0)

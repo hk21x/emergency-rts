@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://glvi6q2sajf5"]
+
+[ext_resource type="ArrayMesh" uid="uid://bofwxb7kumb7i" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_AlarmButton_01.res" id="1_wjl18"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_ijcp7"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_h1mu7"]
+points = PackedVector3Array(0.12916654, 0.058680046, 0.16333072, -0.1311163, 0.05869341, 0.16333072, -0.1265048, -1.3877788e-17, 0.15747921, 0.12450409, -1.3877788e-17, 0.15747921, 0.12916654, 0.058680046, -0.16333072, 0.05561167, 0.13231067, 0.00450854, 0.030363008, 0.13647921, 0.04821901, -0.031319126, 0.13423462, 0.046620235, -0.05302635, 0.13225724, 0.008985102, -0.1311163, 0.05869341, -0.16333072, -0.1265048, -1.3877788e-17, -0.15751119, 0.12450409, -1.3877788e-17, -0.15751119, 0.030363008, 0.13647921, -0.048250996, 0.05561167, 0.13231067, -0.004540518, -0.031319126, 0.13423462, -0.04665222, -0.05302635, 0.13225724, -0.009017095)
+
+[node name="SM_Prop_AlarmButton_01" type="MeshInstance3D" unique_id=667633466]
+gi_mode = 2
+mesh = ExtResource("1_wjl18")
+surface_material_override/0 = ExtResource("2_ijcp7")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1732963640]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1224339809]
+shape = SubResource("ConvexPolygonShape3D_h1mu7")

@@ -20,6 +20,13 @@ extends SceneTree
 const MAP_DIR := "res://Game/Rigs/"
 const SYNTY_MAP := MAP_DIR + "synty_bone_map.tres"
 const MANNEQUIN_MAP := MAP_DIR + "mannequin_bone_map.tres"
+const CITY_CHARACTERS_MAP := MAP_DIR + "city_characters_bone_map.tres"
+
+## Where the POLYGON City Characters pack lives, and the skeleton inside each of its 19
+## scenes. Scanned rather than listed: the pack is one file per character and hand-listing
+## nineteen import paths is nineteen chances to miss one.
+const CITY_CHARACTERS_DIR := "res://Assets/Polygon-Characters/Characters/"
+const CITY_CHARACTERS_SKELETON := "Root/Skeleton3D"
 
 ## profile bone name -> bone name in the Synty POLYGON Starter rig.
 const SYNTY := {
@@ -85,6 +92,47 @@ const MANNEQUIN := {
 	"RightLittleDistal": "pinky_03_r",
 }
 
+## profile bone name -> bone name in the POLYGON City Characters pack.
+##
+## **A third rig, and a hybrid one.** It is mostly the Unreal mannequin's naming, which is
+## why the existing `MANNEQUIN` map is so nearly right -- but a handful of bones are
+## capitalised (`Pelvis`, `UpperArm_L`, `Hand_L`, `Thigh_L`, `Foot_L`) where the mannequin
+## has them lowercase, the head is `head` where the mannequin has `Head`, and the fingers
+## follow Synty's merged convention rather than the mannequin's five separate chains. Bone
+## names are matched exactly and case-sensitively, so near enough is not enough and this
+## could not simply reuse `MANNEQUIN`.
+##
+## **No Root.** This rig starts at `Pelvis`; the `_ik_*` bones are IK helpers, not a
+## character root, and mapping one to `Root` would put the whole skeleton under a bone the
+## animations never move.
+const CITY_CHARACTERS := {
+	"Hips": "Pelvis",
+	"Spine": "spine_01", "Chest": "spine_02", "UpperChest": "spine_03",
+	"Neck": "neck_01", "Head": "head",
+	"LeftShoulder": "clavicle_l", "LeftUpperArm": "UpperArm_L",
+	"LeftLowerArm": "lowerarm_l", "LeftHand": "Hand_L",
+	"RightShoulder": "clavicle_r", "RightUpperArm": "UpperArm_R",
+	"RightLowerArm": "lowerarm_r", "RightHand": "Hand_R",
+	"LeftUpperLeg": "Thigh_L", "LeftLowerLeg": "calf_l",
+	"LeftFoot": "Foot_L", "LeftToes": "ball_l",
+	"RightUpperLeg": "Thigh_R", "RightLowerLeg": "calf_r",
+	"RightFoot": "Foot_R", "RightToes": "ball_r",
+	# Merged middle/ring/little, exactly as the Starter rig does it.
+	"LeftThumbMetacarpal": "thumb_01_l", "LeftThumbProximal": "thumb_02_l",
+	"LeftThumbDistal": "thumb_03_l",
+	"LeftIndexProximal": "indexFinger_01_l", "LeftIndexIntermediate": "indexFinger_02_l",
+	"LeftIndexDistal": "indexFinger_03_l",
+	"LeftMiddleProximal": "finger_01_l", "LeftMiddleIntermediate": "finger_02_l",
+	"LeftMiddleDistal": "finger_03_l",
+	"RightThumbMetacarpal": "thumb_01_r", "RightThumbProximal": "thumb_02_r",
+	"RightThumbDistal": "thumb_03_r",
+	"RightIndexProximal": "indexFinger_01_r", "RightIndexIntermediate": "indexFinger_02_r",
+	"RightIndexDistal": "indexFinger_03_r",
+	"RightMiddleProximal": "finger_01_r", "RightMiddleIntermediate": "finger_02_r",
+	"RightMiddleDistal": "finger_03_r",
+}
+
+
 ## Which skeleton inside each imported scene gets which map.
 const TARGETS := [
 	{
@@ -120,8 +168,12 @@ func _init() -> void:
 		_failed = true
 	if not _save_map(MANNEQUIN, MANNEQUIN_MAP, profile_bones, "Mannequin"):
 		_failed = true
+	if not _save_map(CITY_CHARACTERS, CITY_CHARACTERS_MAP, profile_bones, "CityChars"):
+		_failed = true
 
 	for target in TARGETS:
+		_patch_import(target)
+	for target in _city_character_targets():
 		_patch_import(target)
 
 	if _failed:
@@ -130,6 +182,31 @@ func _init() -> void:
 		return
 	print("\nretarget configured. Now run:  --headless --path . --import")
 	quit()
+
+
+## One target per character file in the pack, built by scanning the directory.
+##
+## Listed by scan rather than by hand because the pack is nineteen separate scenes and a
+## hand-written list is nineteen chances to forget one -- and a character that misses the
+## map imports with its own bone names, so it silently plays no animation at all rather
+## than failing loudly.
+func _city_character_targets() -> Array[Dictionary]:
+	var targets: Array[Dictionary] = []
+	var dir := DirAccess.open(CITY_CHARACTERS_DIR)
+	if dir == null:
+		push_error("no character pack at %s" % CITY_CHARACTERS_DIR)
+		_failed = true
+		return targets
+	for file in dir.get_files():
+		if not file.ends_with(".fbx"):
+			continue
+		targets.append({
+			"import": CITY_CHARACTERS_DIR + file + ".import",
+			"skeleton": CITY_CHARACTERS_SKELETON,
+			"map": CITY_CHARACTERS,
+			"map_path": CITY_CHARACTERS_MAP,
+		})
+	return targets
 
 
 func _profile_bone_names() -> PackedStringArray:

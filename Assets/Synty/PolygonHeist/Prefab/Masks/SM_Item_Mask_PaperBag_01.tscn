@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://784hpjc2y5ud"]
+
+[ext_resource type="ArrayMesh" uid="uid://ck5dbxpit2tjj" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_Mask_PaperBag_01.res" id="1_f1vhh"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_g2x7k"]
+
+[node name="SM_Item_Mask_PaperBag_01" type="MeshInstance3D" unique_id=1596829138]
+gi_mode = 2
+mesh = ExtResource("1_f1vhh")
+surface_material_override/0 = ExtResource("2_g2x7k")

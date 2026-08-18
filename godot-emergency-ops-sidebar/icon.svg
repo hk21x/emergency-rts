@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="tri_bg" x1="0" y1="0" x2="0.55" y2="1"><stop offset="0" stop-color="#1B3053"/><stop offset="1" stop-color="#070C14"/></linearGradient>
+    <radialGradient id="tri_glow" cx="0.32" cy="0.15" r="0.85"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.18"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+    <linearGradient id="tri_rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.32"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.05"/><stop offset="1" stop-color="#4A9CF0" stop-opacity="0.50"/></linearGradient>
+    <clipPath id="tri_clip"><path d="M100 4 L192 36 V104 C192 152 152 188 100 228 C48 188 8 152 8 104 V36 Z"/></clipPath>
+    <linearGradient id="tri_fire" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DC5340"/><stop offset="1" stop-color="#8E2318"/></linearGradient>
+    <linearGradient id="tri_pol" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3F98F2"/><stop offset="1" stop-color="#10488F"/></linearGradient>
+    <linearGradient id="tri_amb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#54C06B"/><stop offset="1" stop-color="#1F6231"/></linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="114" fill="url(#tri_bg)"/>
+  <rect width="512" height="512" rx="114" fill="url(#tri_glow)"/>
+  <rect x="6" y="6" width="500" height="500" rx="108" fill="none" stroke="url(#tri_rim)" stroke-width="6"/>
+  <g transform="translate(75.4 44.5) scale(1.8057142857142858)">
+   <path d="M100 4 L192 36 V104 C192 152 152 188 100 228 C48 188 8 152 8 104 V36 Z" fill="#080E16"/>
+   <g clip-path="url(#tri_clip)">
+    <rect width="67" height="232" fill="url(#tri_fire)"/>
+    <rect x="67" width="66" height="232" fill="url(#tri_pol)"/>
+    <rect x="133" width="67" height="232" fill="url(#tri_amb)"/>
+    <path d="M8 18 H192 V54 C140 78 60 78 8 54 Z" fill="#FFFFFF" fill-opacity="0.17"/>
+    <path d="M65 0 V232 M135 0 V232" stroke="#081018" stroke-width="4" stroke-opacity="0.35"/>
+   </g>
+   <path d="M100 4 L192 36 V104 C192 152 152 188 100 228 C48 188 8 152 8 104 V36 Z" fill="none" stroke="#EDF3FA" stroke-width="12" stroke-linejoin="round"/>
+  </g>
+</svg>

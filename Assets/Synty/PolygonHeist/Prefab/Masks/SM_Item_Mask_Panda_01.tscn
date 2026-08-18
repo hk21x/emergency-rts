@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://8xiv22vr4tys"]
+
+[ext_resource type="ArrayMesh" uid="uid://560r6aww1fab" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_Mask_Panda_01.res" id="1_l3a1d"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_lh44e"]
+
+[node name="SM_Item_Mask_Panda_01" type="MeshInstance3D" unique_id=194952076]
+gi_mode = 2
+mesh = ExtResource("1_l3a1d")
+surface_material_override/0 = ExtResource("2_lh44e")

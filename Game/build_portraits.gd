@@ -44,7 +44,6 @@ const OUT_DIR := "res://Game/UI/Portraits/"
 ## orange -- and it quietly dressed the firefighter in green for as long as it stood.
 ## 02_A is the warmest of the twelve on both the van and the crew, so the appliance and
 ## the people who ride it now share one palette.
-const ALT_FIRE := "res://Assets/Synty/PolygonCity/Materials/Alts/PolygonCity_02_A_mat.tres"
 
 ## The doctor's car. 04_A is the one palette in the pack that is orange on the patrol-car
 ## hull -- see the table above, where it is also flat charcoal on the van and olive on a
@@ -87,13 +86,44 @@ const GROUPS := [
 			# prefab's, so without this the orange car would wear the blue patrol car's
 			# avatar in the roster and the shop.
 			{"prefab": "SM_Veh_Car_Police_01", "out": "DoctorCar", "palette": ALT_DOCTOR},
+			# The August 2026 batch, all wearing their own paint. Same rule as the
+			# appliance: keep these in step with `build_vehicles.VEHICLES`, because the
+			# shop must sell the vehicle that turns up on the forecourt.
+			{"prefab": "res://Assets/Synty/PolygonHeist/Prefab/Vehicles/SM_Veh_SwatVan_01.tscn",
+				"out": "PoliceVan"},
+			{"prefab": "res://Assets/PolygonTown/Prefabs/Vehicles/SM_Veh_Pickup_01.tscn",
+				"out": "TowTruck"},
+			# The helicopter is 10.9m long -- half again the appliance -- so it is the new
+			# worst case for the group's shared scale. `OVERFLOW` exists for exactly this
+			# and was sized on the appliance; check the cards still read after this lands.
+			{"prefab": "res://Assets/Synty/PolygonHeist/Prefab/Vehicles/SM_Veh_Helicopter_01.tscn",
+				"out": "Helicopter"},
+			{"prefab": "res://Assets/Synty/PolygonHeist/Prefab/Vehicles/SM_Veh_Car_Police_Heist_01.tscn",
+				"out": "Interceptor"},
+			# Same airframe as Helicopter above, wearing the rescue atlas. The palette has
+			# to be named here too or the shop card shows a police machine beside a label
+			# that says Air Rescue.
+			{"prefab": "res://Assets/Synty/PolygonHeist/Prefab/Vehicles/SM_Veh_Helicopter_01.tscn",
+				"out": "RescueHelicopter",
+				"palette": "res://Game/Materials/RescueLivery.tres"},
 		],
 	},
 	{
 		"dir": CHARACTER_PREFABS,
-		"names": ["Character_Male_Police", "Character_Female_Police",
-			{"prefab": "Character_Male_Police", "out": "Firefighter",
-				"palette": ALT_FIRE},
+		"names": ["Character_Male_Police",
+			# **The real crew, since August 2026.** Both were shot off police bodies --
+			# the paramedic off the female officer, the firefighter off the male one
+			# repainted warm with a City alt palette -- because the City pack has neither. The
+			# City Characters pack has both in their own kit, so these are shot from the
+			# thing the unit actually is. Full `res://` paths, which `_scene_path` has
+			# always accepted; the fire engine has used one since phase 19.
+			#
+			# No palette on either: a real fire kit needs no repaint to read warm, and
+			# the paint-warmth check now guards the kit rather than the trick.
+			{"prefab": "res://Assets/Polygon-Characters/Characters/SK_Character_Paramedic.fbx",
+				"out": "Paramedic"},
+			{"prefab": "res://Assets/Polygon-Characters/Characters/SK_Character_FireFighter.fbx",
+				"out": "Firefighter"},
 			# The doctor, shot from the same shirted body Game/Doctor.tscn wears. No
 			# palette: this one is not a repaint, it is a different civilian body, chosen
 			# because a doctor and a paramedic share a service and therefore a
@@ -245,7 +275,15 @@ func _repaint(node: Node, coat: Material) -> void:
 	for mesh in _meshes(node):
 		for surface in mesh.mesh.get_surface_count():
 			var active := mesh.get_active_material(surface)
-			if active and "PolygonCity_01_A" in active.resource_path:
+			# **Matched by suffix, and this is the second copy of the same bug.** It read
+			# `"PolygonCity_01_A" in path`, so a Heist-pack vehicle's palette was accepted
+			# and ignored -- `build_vehicles` had the identical guard and the identical
+			# fault, and fixing it there left the shop card still showing a police
+			# helicopter beside a label reading Air Rescue. The only reason it was caught
+			# is that the rendered portrait was looked at.
+			#
+			# `ends_with`, not `in`, so `PolygonHeist_01_A_Glass_mat` keeps its glass.
+			if active and active.resource_path.ends_with("_01_A_mat.tres"):
 				mesh.set_surface_override_material(surface, coat)
 
 

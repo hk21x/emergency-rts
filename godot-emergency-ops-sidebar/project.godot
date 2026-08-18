@@ -1,0 +1,24 @@
+config_version=5
+
+[application]
+
+config/name="Emergency Ops UI"
+run/main_scene="res://ui/main_menu.tscn"
+config/icon="res://icon.svg"
+config/features=PackedStringArray("4.4", "GL Compatibility")
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[gui]
+
+theme/custom="res://ui/theme/emergency_ops.tres"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

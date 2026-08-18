@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dkwsdff4o2p6w"]
+
+[ext_resource type="Texture2D" uid="uid://cqt81py7jcnuv" path="res://Assets/Synty/PolygonHeist/Textures/SimplePeopleMasks_01_Black.png" id="1_ss11a"]
+
+[resource]
+resource_name = "SimplePeople_Masks_01_Black_mat"
+depth_draw_mode = 1
+albedo_texture = ExtResource("1_ss11a")
+uv1_scale = Vector3(1, 1, 0)

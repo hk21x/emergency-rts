@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="286" height="420" viewBox="0 0 286 420" fill="none" role="img" aria-label="Order panel">
+  <defs>
+    <linearGradient id="op_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0C121B"/><stop offset="1" stop-color="#080D14"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="285" height="419" rx="5" fill="url(#op_g)" fill-opacity="1" stroke="#2E3D4F" stroke-width="1" stroke-opacity="1"/>
+  <path d="M0 36 L286 36" stroke="#212D3C" stroke-width="1" stroke-opacity="1"/>
+
+</svg>

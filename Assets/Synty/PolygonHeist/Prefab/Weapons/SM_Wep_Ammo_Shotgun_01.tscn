@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://o3k26tgg6dw"]
+
+[ext_resource type="ArrayMesh" uid="uid://dxf183c4yy3d3" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_Ammo_Shotgun.res" id="1_uewd2"]
+[ext_resource type="Material" uid="uid://ce7hlitsx1gqr" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_Material_03_A_mat.tres" id="2_lu5eb"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_f0ef8"]
+points = PackedVector3Array(-0.013775479, -0.04067092, 0.002877215, -0.011229565, -0.04067092, -0.007290482, -0.008686388, -0.04067092, 0.011777944, -0.013775479, 0.04067092, 0.002877215, -0.011229565, 0.04067092, -0.007290482, -0.006893298, -0.03787619, -0.011543383, 0.009102162, -0.04067092, -0.011105081, 0.009102162, -0.04067092, 0.010504129, -0.008686388, 0.04067092, 0.011777944, -0.006893298, 0.037868228, -0.011543383, 0.009102162, 0.04067092, -0.011105081, 0.014191253, -0.04067092, -0.0022020685, 0.011645338, -0.04067092, 0.0066918125, 0.009102162, 0.04067092, 0.010504129, 0.014191253, 0.04067092, -0.0022020685, 0.011645338, 0.04067092, 0.0066918125)
+
+[node name="SM_Wep_Ammo_Shotgun_01" type="MeshInstance3D" unique_id=1473727729]
+gi_mode = 2
+mesh = ExtResource("1_uewd2")
+surface_material_override/0 = ExtResource("2_lu5eb")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1172950074]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1104589851]
+shape = SubResource("ConvexPolygonShape3D_f0ef8")

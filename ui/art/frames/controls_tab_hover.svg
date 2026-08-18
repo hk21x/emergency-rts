@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="32" viewBox="0 0 64 32" fill="none" role="img" aria-label="Tab — hover">
+  <defs>
+    <linearGradient id="tbhov_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B2735"/><stop offset="1" stop-color="#131C27"/></linearGradient>
+
+  </defs>
+  <path d="M0.5 3.5a3 3 0 0 1 3-3h57a3 3 0 0 1 3 3V32H0.5Z" fill="url(#tbhov_g)" stroke="#2E3D4F" stroke-width="1"/>
+
+</svg>

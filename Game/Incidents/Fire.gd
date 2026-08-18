@@ -143,6 +143,21 @@ const SPREAD_TRIES := 8
 ## note there; an appliance working a car fire was billing more than the call paid.
 @export var scorch_per_second := 0.9
 
+## How close a person has to be to a fire to be hurt by it, and how fast.
+##
+## **3.2 is chosen against `ExtinguishOrder.REACH` (5.0), not picked for feel.** A unit
+## working a fire closes to REACH and stands there, so a firefighter on the hose is 1.8m
+## outside this and never singed; one the player walked *past* the fire, or parked a crew
+## on top of, is inside it. That is the whole mechanic: fire does not punish fighting it,
+## it punishes standing in it.
+##
+## The design this preserves is deliberate and predates the harm — `ExtinguishOrder` holds
+## a firefighter at work range precisely so the fire service stays playable, and a radius
+## at or above REACH would make every building fire a war of attrition against your own
+## crew. If REACH ever moves, this must move with it; the suite pins the gap.
+@export var singe_range := 3.2
+@export var singe_per_second := 0.55
+
 @export_group("Visuals")
 @export var min_flame_scale := 0.5
 @export var max_flame_scale := 2.4
@@ -187,8 +202,10 @@ func _ready() -> void:
 			burn.loop_mode = AudioStreamWAV.LOOP_FORWARD
 			burn.loop_begin = 0
 			burn.loop_end = burn.data.size() / 2
+			AudioBuses.ensure()
 			_crackle = AudioStreamPlayer3D.new()
 			_crackle.name = "Crackle"
+			_crackle.bus = AudioBuses.SFX
 			_crackle.stream = burn
 			_crackle.unit_size = 6.0
 			_crackle.max_distance = 40.0
@@ -204,6 +221,7 @@ func _physics_process(delta: float) -> void:
 	_update_flame()
 
 	_scorch(delta)
+	_singe(delta)
 
 	if intensity < spread_threshold:
 		# Knocked back below the threshold, so it has to build again before spreading.
@@ -321,6 +339,67 @@ func _scorch(delta: float) -> void:
 		# up at the edge of a dying fire is charged pennies and one parked in it is not.
 		var bite := (1.0 - gap / scorch_range) * intensity * scorch_per_second * delta
 		vehicle.scorch(bite)
+
+
+## Burns whoever is standing in it.
+##
+## **The most common call in the game could not hurt you until August 2026.**
+## `Hazard._hurt_people()` has always had a complete, tested chain — crew take harm and go
+## down, civilians convert to casualties wearing what they were wearing — and it fired only
+## when a gas cylinder went off, which is the rarest kind in the table. This is that chain
+## pointed at fire, which is the second most common.
+##
+## Written here rather than shared with `Hazard`: a blast is instantaneous and symmetric,
+## a fire is continuous and grows, so the two want different shapes even where they want
+## the same outcome. What is copied is the *rule*, and the ordering trap with it.
+##
+## **Civilians are tested before crew, and that order is load-bearing** — `Civilian extends
+## Person`, so a `as Person` cast catches shoppers too, and getting it the wrong way round
+## both converts a bystander and down-states them on the same frame.
+func _singe(delta: float) -> void:
+	for node in get_tree().get_nodes_in_group(Unit.GROUP):
+		var civilian := node as Civilian
+		if civilian == null:
+			var crew := node as Person
+			if crew == null:
+				continue
+			var bite := _singe_falloff(crew.global_position)
+			if bite > 0.0:
+				crew.hurt(bite * singe_per_second * delta)
+			continue
+
+		# **Only a fire that has got away catches onlookers.** Below the spread threshold
+		# it is a bin fire someone is standing near; above it, it is out of hand. The
+		# crowd flees fires perfectly well, so anyone still inside this radius at that
+		# size was caught rather than careless.
+		if intensity < spread_threshold or _singe_falloff(civilian.global_position) <= 0.0:
+			continue
+		# The missing child is a civilian by construction and never fodder: converting
+		# them frees the body their own report is scanning for, and the search call would
+		# quietly close as done. Straight from `Hazard._hurt_people`, same reason.
+		if civilian is ChildWanderer:
+			continue
+		var casualty := (load("res://Game/Incidents/Casualty.tscn") as PackedScene) \
+			.instantiate() as Casualty
+		if casualty == null:
+			continue
+		casualty.outfit = civilian.outfit_scene()
+		casualty.flavour = "Caught by the fire"
+		get_parent().add_child(casualty)
+		casualty.global_position = civilian.global_position
+		civilian.queue_free()
+
+
+## How hard the fire bites at [param point]: 0 outside the radius, 1 in the middle of a
+## fire at full intensity. Scaled by `intensity` so a dying fire stops hurting before it
+## stops burning.
+func _singe_falloff(point: Vector3) -> float:
+	var offset := point - global_position
+	offset.y = 0.0
+	var gap := offset.length()
+	if gap >= singe_range:
+		return 0.0
+	return (1.0 - gap / singe_range) * intensity
 
 
 ## Reads the kind's row and applies it: the rates, whether a hose is needed, whether it

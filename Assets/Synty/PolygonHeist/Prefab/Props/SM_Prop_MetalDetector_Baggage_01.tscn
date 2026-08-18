@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://gf533718e6s2"]
+
+[ext_resource type="ArrayMesh" uid="uid://fxgocdnospdd" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_MetalDetector_Baggage_01.res" id="1_sgrow"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_07e3j"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_quigg"]
+points = PackedVector3Array(-0.41808915, 0.0017062553, 0.42440128, 0.49819702, 0.084533654, 0.4935118, 0.30961508, 0.44387227, 0.8125323, -0.29886296, 0.44387227, 0.8125323, -0.48725194, 0.084533654, 0.4935118, -0.48725194, 0.084533654, -0.49167058, 0.42430758, 0.010209449, -0.4179527, 0.48961192, 1.0890126, 0.48477364, 0.49819702, 0.084533654, -0.49167058, -0.04516968, 1.6103843, 0.25456417, -0.4833935, 1.0918471, 0.48953986, -0.4833935, 1.0918471, -0.4876987, -0.29886296, 0.44387227, -0.8105322, 0.48961192, 1.0890126, -0.48293248, 0.005472541, 1.6100694, -0.40476608, 0.30961508, 0.44387227, -0.8105322)
+
+[node name="SM_Prop_MetalDetector_Baggage_01" type="MeshInstance3D" unique_id=1247035501]
+gi_mode = 2
+mesh = ExtResource("1_sgrow")
+surface_material_override/0 = ExtResource("2_07e3j")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=9060749]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1833556489]
+shape = SubResource("ConvexPolygonShape3D_quigg")

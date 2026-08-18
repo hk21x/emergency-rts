@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://3wniep81abcc"]
+
+[ext_resource type="ArrayMesh" uid="uid://djf0ctwmmt7nb" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_Aircon_01.res" id="1_4c5x5"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_ebyem"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_785m8"]
+size = Vector3(1.8422241, 0.44812965, 0.44812918)
+
+[node name="SM_Prop_Aircon_01" type="MeshInstance3D" unique_id=1424034925]
+gi_mode = 2
+mesh = ExtResource("1_4c5x5")
+surface_material_override/0 = ExtResource("2_ebyem")
+
+[node name="BoxCollider" type="StaticBody3D" parent="." unique_id=1446972223]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoxCollider" unique_id=1001781878]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22406483, 0.22406459)
+shape = SubResource("BoxShape3D_785m8")

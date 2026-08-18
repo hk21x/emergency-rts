@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="42" viewBox="0 0 200 42" fill="none" role="img" aria-label="Menu item — disabled">
+  <defs>
+    <linearGradient id="midis_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0F1620"/><stop offset="1" stop-color="#0B1119"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="199" height="41" rx="4" fill="url(#midis_g)" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H194" stroke="#FFFFFF" stroke-opacity="0.03" stroke-width="1" stroke-linecap="round"/>
+
+</svg>

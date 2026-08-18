@@ -60,9 +60,20 @@ would need either a voice pack or speech synthesis; and per-surface tyre noise.
 POLYGON Town and a particle pack landed in August 2026. The fire appliance and the
 fire/smoke FX were taken from them (see PROGRESS.md). What remains, and why it was not:
 
-- **The crew is still a repainted police model.** No pack on disk holds a firefighter --
-  Town's characters are a suburban family, a shopkeeper and two schoolchildren. The
-  paint-warmth check in the suite exists for exactly this and still guards them.
+- ~~**The crew is still a repainted police model.**~~ **Closed August 2026.** The
+  POLYGON City Characters pack arrived with `SK_Character_FireFighter` and
+  `SK_Character_Paramedic` in their own kit, and both are now what the units are built
+  from. The paint-warmth check did not need re-pointing -- it guards the real turnout kit
+  now instead of the repaint trick, and passes with more margin than it did (+0.18).
+
+  **The pack sits on a third rig**, and that is the transferable part: mostly Unreal
+  mannequin naming, some bones capitalised (`Pelvis`, `UpperArm_L`, `Foot_L`), Synty's
+  merged fingers, and no `Root`. It needed its own bone map --
+  `setup_retarget.CITY_CHARACTERS` -- which renames it onto the same
+  `SkeletonProfileHumanoid` the Starter rig and the animation library already share. So a
+  new character pack is **a bone map plus a `--import`**, not a project, *provided its
+  naming is close to one of the three already mapped*. Without the map a character
+  imports under its own bone names and silently plays nothing at all.
 - **Town's people cannot be used for the crowd.** They are skinned to a *different*
   skeleton (`Ankle_L`, `Clavicle_L`, `Elbow_L`) from the City pack's humanoid rig
   (`Hips`, `Spine`, `UpperChest`, `LeftShoulder`), and `Game/Rigs/ual_standard.tres` is
@@ -824,15 +835,18 @@ would make the drive out part of the decision. It would need
 
 ## Deliberately not on the list
 
-- **Fire-service *models*.** The service itself shipped in August 2026, but POLYGON City
-  has no appliance and no firefighter. The engine is the pack's **van** body repainted
-  (phase 21 — it was the patrol car's hull before that, which read as a saloon) and the
-  crew are police models in the same palette. A style-matched fire pack would replace
-  both without touching a mechanic: the engine's `prefab` in `build_vehicles.VEHICLES`,
-  the crew's `source` in `build_character.gd`, and the two portrait entries. Ladder
-  rescues are the mechanic that would then become worth building.
-- **Proper paramedic uniforms.** Same reason. Paramedics wear police blues and are told
-  apart by their service colour everywhere in the interface.
+- ~~**Fire-service models**~~ and ~~**proper paramedic uniforms**~~. **Both closed
+  August 2026**, and the route was exactly the one predicted here: the engine's `prefab`
+  in `build_vehicles.VEHICLES` (a real Town aerial, phase 21), the crew's `source` in
+  `build_character.gd`, and the two portrait entries -- **no mechanic was touched**. What
+  the prediction missed is that the crew also needed a third bone map, because the
+  character pack ships on its own skeleton.
+
+  **Ladder rescues** were named here as the mechanic that becomes worth building once the
+  models land. The models have landed and the ladder already animates, but the mechanic is
+  still blocked -- on level design rather than art: a rescue from an upper floor needs
+  `CityGrid` to model addressable building floors, and buildings are footprints whose
+  interiors `standable()` refuses.
 - **Multiplayer co-op** and a **mod editor.** Both were real Emergency 4 features. Both
   roughly double the work.
 - **Save/load mid-shift.** A shift is 5–15 minutes and the career itself already
@@ -1311,6 +1325,36 @@ Anything picked up from here should follow what the rest of the project does:
   gives a **negative** y from `(v1-v0).cross(v2-v0)` — the opposite of the obvious guess,
   and worth verifying against `SurfaceTool.generate_normals()` or a front-face raycast
   before trusting either polarity.
+- **Some guards cannot be checked by their consequences.** August 2026: a fullscreen call
+  is guarded against headless runs, and the natural assertion — that the headless viewport
+  does not resize — is unfalsifiable, because Godot's headless display server has no window
+  and `window_set_mode` is a silent no-op. Removing the guard reddened nothing. The fix was
+  to make the guard *report its decision* (`_apply_fullscreen()` returns whether it reached
+  the display server) and assert that instead.
+
+  Generalises: when the thing being prevented is invisible in the environment the suite
+  runs in, no assertion about the environment can see it. Give the code a way to say what
+  it chose.
+- **A one-shot config script is a landmine, and `setup_project.gd` is the one here.** Its
+  `MAIN_SCENE` constant said `Playground.tscn` for months after the menu became the boot
+  scene, so re-running it — which is advertised as safe — silently un-did that. It was
+  caught only because the script prints the previous value first. Before running any
+  "safe to re-run" configuration script, read its constants against what the project
+  currently is, and prefer scripts that print what they are about to overwrite.
+- **If the risk is a mis-wired control, press the control.** August 2026: a check named
+  "RESET CAREER opens a confirmation" and then called `ask_reset_career()` directly.
+  Sabotage pointed the card's button straight at the wipe and the check stayed green — the
+  one thing that could break was the one thing never exercised. Calling the method tests
+  the method; only `pressed.emit()` on the found button tests the wiring.
+
+  Same family as the ideal-fixture entry above: both are checks that avoid the real path
+  and then claim to cover it.
+- **An assertion that mixes fixed chrome with variable content needs to know the chrome,
+  and usually cannot.** The first structural check on the settings card compared its height
+  against "sections stacked minus the tallest" — and failed on a *correct* card, because
+  the card's chrome (241px) coincidentally equalled the two smaller sections combined.
+  The form that works measures a *relationship the fault changes*: a tabbed card's height
+  follows the tab shown; a flattened one's does not. No pixel budget, nothing to re-tune.
 - **One unexplained red, August 2026 — keep full suite logs.** A run printed
   `1 check(s) failed of 639` and then went green 18 consecutive times, twice under a
   restored tree in the sabotage agent's own runs. The FAIL line was lost to a `tail`,

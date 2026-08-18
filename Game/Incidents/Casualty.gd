@@ -255,6 +255,34 @@ func _stand_up_swinging() -> void:
 	queue_free()
 
 
+## How urgent this one is, as a tier. **Derived, never stored** -- every input already
+## exists and a stored copy is a second truth to keep in step.
+##
+## The order is the order a dispatcher would read it in. Anyone already stable or on the
+## way is off the list whatever their health says; an unassessed casualty is unknown rather
+## than assumed well, because the drunk call exists precisely to punish assuming; and
+## `needs_doctor` is critical regardless of health, because a paramedic cannot fix them at
+## all -- they can only hold them, and holding is not treating.
+##
+## Exists because `bus_rtc` puts three to five casualties at one junction against an
+## ambulance that carries two. The decision that call is *for* is who rides first, and
+## until now the board said "4 casualties" and nothing else.
+enum Severity { STABLE, UNKNOWN, SERIOUS, CRITICAL }
+
+## Below this, they are running out of time.
+const CRITICAL_AT := 0.35
+
+
+func severity() -> Severity:
+	if is_stable or is_carried or is_loaded:
+		return Severity.STABLE
+	if needs_assessment:
+		return Severity.UNKNOWN
+	if needs_doctor or health < CRITICAL_AT:
+		return Severity.CRITICAL
+	return Severity.SERIOUS
+
+
 func describe_state() -> String:
 	# **Said first, and said even when they are stable.** Trapped is the thing standing
 	# between this call and its next step, so it outranks every other description --

@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dqxfa2n6kwjty"]
+
+[ext_resource type="ArrayMesh" uid="uid://c2esxs5s8jyg0" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_RopeBarrier_Pole_01.res" id="1_lttdi"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_r3mue"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_0m8xj"]
+points = PackedVector3Array(-0.1965236, 0.024883673, -0.03506282, -0.17996404, -0.008169711, 0.08069867, -0.04756522, 1.0174034, 0.04757954, -0.04756522, 1.0174034, -0.035101697, -0.14688377, 0.024883673, -0.15090206, -0.14688377, -0.008169711, 0.14689809, -0.031044528, -0.008169711, -0.20058078, 0.03507714, 0.024883673, 0.19653791, 0.035116002, 1.0174034, 0.04757954, 0.05163671, 1.0340321, -0.018542126, -0.014484957, 1.0340321, -0.05162239, -0.031044528, -0.008169711, 0.19653791, 0.15091637, 0.008254964, -0.15090206, 0.20059508, -0.008169711, -0.03506282, 0.15091637, 0.024883673, 0.14689809, 0.20059508, -0.008169711, 0.031058833)
+
+[node name="SM_Prop_RopeBarrier_Pole_01" type="MeshInstance3D" unique_id=859823661]
+gi_mode = 2
+mesh = ExtResource("1_lttdi")
+surface_material_override/0 = ExtResource("2_r3mue")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=374319232]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=2002928788]
+shape = SubResource("ConvexPolygonShape3D_0m8xj")

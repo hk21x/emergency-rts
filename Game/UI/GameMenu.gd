@@ -1,7 +1,7 @@
 extends Control
 class_name GameMenu
 
-## The game's framing: the title card a session opens on, the pause menu under `P`,
+## The game's framing: the title card a session opens on, the pause menu under `Esc`,
 ## and the settings screen behind both.
 ##
 ## An overlay in the HUD rather than a separate scene, deliberately: the district
@@ -20,7 +20,7 @@ class_name GameMenu
 ## the second save-shaped thing in the project, after Mission's records and before
 ## the station's career.
 
-enum Screen { HIDDEN, TITLE, PAUSE, SETTINGS, SCENARIOS }
+enum Screen { HIDDEN, TITLE, PAUSE, SETTINGS, SCENARIOS, CONFIRM }
 
 const TITLE_TEXT := "EMERGENCY RTS"
 ## Both halves of the old line went stale: the roster stopped being a fixed issue when
@@ -61,6 +61,19 @@ const TIME_CHOICES := ["DAY", "DUSK", "NIGHT"]
 ## director rolls the weather from its seeded stream when a shift opens, so every shift
 ## has its own sky and a reproduced seed is rained on identically.
 const WEATHER_CHOICES := ["CLEAR", "RAIN", "FOG", "SNOW", "SHIFT'S OWN"]
+
+## The settings sections, in tab order, and how many setting groups each holds.
+##
+## A table rather than four hard-coded pages, so a check can count the headers actually
+## built against the count declared here -- which is what stops the next overflow being
+## "fixed" by quietly dropping a setting. DISPLAY carries one row today and that is
+## deliberate: it is the declared home for the display and accessibility settings still
+## to come (camera pan speed, text size, reduce motion, colourblind service colours).
+const SETTINGS_SECTIONS := [
+	{"id": &"sound", "tab": "SOUND", "groups": 3},
+	{"id": &"display", "tab": "DISPLAY", "groups": 1},
+	{"id": &"shift", "tab": "THE SHIFT", "groups": 4},
+]
 ## The index of that policy entry: everything below it is a Daylight.Weather verbatim.
 const SHIFT_WEATHER := 4
 
@@ -94,6 +107,12 @@ var master_volume := 1.0
 ## Music volume as a linear 0..1, applied to the Music bus. Starts below unity because a
 ## bed at the same level as the game is not a bed.
 var music_volume := db_to_linear(AudioBuses.MUSIC_DEFAULT_DB)
+## Effects volume as a linear 0..1: sirens, engines, the fire, the city bed, the radio.
+## Full by default -- these are the game, and Master is where "quieter overall" lives.
+var sfx_volume := 1.0
+## Whether the window is filling the screen. Off by default: a game that seizes the whole
+## display on first run is a game you have to fight to get back out of.
+var fullscreen := false
 var shift_minutes := 5
 ## Index into PACE_CHOICES. Steady by default: calmer than the game shipped, with the
 ## old pace still one button away.
@@ -166,12 +185,20 @@ var _settings_from: Screen = Screen.TITLE
 var _dim: ColorRect
 var _title_card: Control
 var _scenario_card: Control
+var _confirm_card: Control
 ## The list inside the scenario card, refilled every time it opens.
 var _scenario_rows: VBoxContainer
 var _pause_card: Control
 var _settings_card: Control
 var _volume_slider: HSlider
 var _music_slider: HSlider
+var _sfx_slider: HSlider
+var _screen_buttons: Array[Button] = []
+## One page per entry in [constant SETTINGS_SECTIONS], and the tabs that show them.
+var _settings_pages: Array[Control] = []
+var _tab_buttons: Array[Button] = []
+## Which section is up. Survives the card closing; see [method _show_settings_tab].
+var _settings_tab := 0
 var _length_buttons: Array[Button] = []
 var _pace_buttons: Array[Button] = []
 var _time_buttons: Array[Button] = []
@@ -192,6 +219,7 @@ func _ready() -> void:
 	_pause_card = _build_pause()
 	_settings_card = _build_settings()
 	_scenario_card = _build_scenarios()
+	_confirm_card = _build_confirm()
 
 	# The session opens here -- unless the main menu has already been through and sent
 	# the player somewhere. Arriving at a second title card, having just pressed PLAY on
@@ -232,6 +260,12 @@ func _input(event: InputEvent) -> void:
 			if key.physical_keycode == KEY_ESCAPE:
 				close_settings()
 				get_viewport().set_input_as_handled()
+		Screen.CONFIRM:
+			# Escape means **no**, which is the whole reason this is a screen rather than
+			# an inline toggle: a destructive question needs the reflex key to decline it.
+			if key.physical_keycode == KEY_ESCAPE:
+				close_confirm()
+			get_viewport().set_input_as_handled()
 		Screen.SCENARIOS:
 			# Back to the title, not into the game: this card is a step on the way in,
 			# and Escape from it should undo the step. Everything else is swallowed
@@ -244,7 +278,7 @@ func _input(event: InputEvent) -> void:
 ## Whether something nearer the player already means something by Escape.
 ##
 ## Escape was "cancel" long before it was "pause": it disarms an armed ability
-## ([RTSController]) and closes the shop ([ShopPanel]). Moving pause onto the same key
+## ([RTSController]) and closes the shop ([RequisitionPanel]). Moving pause onto the same key
 ## puts three claims on it, and the order they are resolved in cannot be left to the
 ## tree -- this node's `_input` runs *before* both of them, so without this guard
 ## Escape-to-cancel would have opened the pause menu instead, which is the most annoying
@@ -255,7 +289,7 @@ func _input(event: InputEvent) -> void:
 func _escape_is_spoken_for() -> bool:
 	if controller and controller.armed_ability:
 		return true
-	var shop := get_parent().get_node_or_null("Shop") as ShopPanel
+	var shop := get_parent().get_node_or_null("Shop") as RequisitionPanel
 	return shop != null and shop.visible
 
 
@@ -423,10 +457,22 @@ func _switch(next: Screen) -> void:
 		_settings_card.visible = screen == Screen.SETTINGS
 	if _scenario_card:
 		_scenario_card.visible = screen == Screen.SCENARIOS
-	# The one line that freezes the district: everything else inherits PAUSABLE.
-	# The title deliberately does not pause -- the living city is the backdrop.
-	get_tree().paused = screen == Screen.PAUSE \
-		or (screen == Screen.SETTINGS and _settings_from == Screen.PAUSE)
+	if _confirm_card:
+		_confirm_card.visible = screen == Screen.CONFIRM
+	get_tree().paused = _should_pause()
+
+
+## Whether this screen freezes the district. Everything else inherits PAUSABLE.
+##
+## Extracted from `_switch` when the confirm screen arrived and made the inline boolean a
+## third clause. The rule in words: the pause card freezes it, and so does anything
+## reached *from* the pause card -- settings, and the confirm behind settings. The title
+## deliberately does not, because the living city is its backdrop.
+func _should_pause() -> bool:
+	if screen == Screen.PAUSE:
+		return true
+	return screen in [Screen.SETTINGS, Screen.CONFIRM] \
+		and _settings_from == Screen.PAUSE
 
 
 # --- Settings -----------------------------------------------------------------
@@ -435,6 +481,42 @@ func set_music_volume(value: float) -> void:
 	music_volume = clampf(value, 0.0, 1.0)
 	AudioBuses.set_music_volume(music_volume)
 	_save_settings()
+
+
+func set_sfx_volume(value: float) -> void:
+	sfx_volume = clampf(value, 0.0, 1.0)
+	AudioBuses.set_sfx_volume(sfx_volume)
+	_save_settings()
+
+
+## Fills the screen, or gives the window back.
+##
+## **Guarded on there being a screen at all.** The suite and every generator run headless,
+## where the display server is the dummy one and sizing a window is meaningless -- and the
+## suite in particular pins `root.size` to the 1600x900 stretch base so its synthesised
+## clicks land where it thinks they do. A fullscreen call in that context would either
+## warn or move the coordinate space out from under a thousand checks.
+func set_fullscreen(value: bool) -> void:
+	fullscreen = value
+	_apply_fullscreen()
+	_save_settings()
+	for i in _screen_buttons.size():
+		_screen_buttons[i].button_pressed = (i == 1) == fullscreen
+
+
+func _apply_fullscreen() -> bool:
+	# **Returns whether it actually asked the display server for anything**, which exists
+	# for the check rather than for any caller. Sabotage proved the obvious assertion --
+	# that the headless viewport does not resize -- cannot fail: Godot's headless display
+	# server has no window at all (`get_window_list()` is empty, `screen_get_size()` is
+	# zero) and `window_set_mode` is a silent no-op there, neither warning nor resizing.
+	# An assertion on the *guard's decision* can fail; one on its invisible consequences
+	# cannot.
+	if DisplayServer.get_name() == "headless":
+		return false
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if fullscreen
+		else DisplayServer.WINDOW_MODE_WINDOWED)
+	return true
 
 
 func set_volume(value: float) -> void:
@@ -447,8 +529,8 @@ func set_shift_minutes(minutes: int) -> void:
 	shift_minutes = minutes
 	if director:
 		director.shift_length = minutes * 60.0
-	for button in _length_buttons:
-		button.button_pressed = int(button.get_meta(&"minutes")) == minutes
+	for i in _length_buttons.size():
+		_length_buttons[i].button_pressed = int(SHIFT_CHOICES[i]) == minutes
 	_save_settings()
 
 
@@ -503,6 +585,7 @@ func _on_shift_started() -> void:
 func _apply_volume() -> void:
 	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(master_volume, 0.0001)))
 	AudioBuses.set_music_volume(music_volume)
+	AudioBuses.set_sfx_volume(sfx_volume)
 
 
 func _load_settings() -> void:
@@ -512,6 +595,9 @@ func _load_settings() -> void:
 	master_volume = clampf(float(settings.get_value("settings", "volume", 1.0)), 0.0, 1.0)
 	music_volume = clampf(float(settings.get_value("settings", "music",
 		db_to_linear(AudioBuses.MUSIC_DEFAULT_DB))), 0.0, 1.0)
+	sfx_volume = clampf(float(settings.get_value("settings", "sfx", 1.0)), 0.0, 1.0)
+	fullscreen = bool(settings.get_value("settings", "fullscreen", false))
+	_apply_fullscreen()
 	var stored := int(settings.get_value("settings", "shift_minutes", 5))
 	shift_minutes = stored if stored in SHIFT_CHOICES else 5
 	call_pace = clampi(int(settings.get_value("settings", "call_pace", 1)),
@@ -526,6 +612,8 @@ func _save_settings() -> void:
 	var settings := ConfigFile.new()
 	settings.set_value("settings", "volume", master_volume)
 	settings.set_value("settings", "music", music_volume)
+	settings.set_value("settings", "sfx", sfx_volume)
+	settings.set_value("settings", "fullscreen", fullscreen)
 	settings.set_value("settings", "shift_minutes", shift_minutes)
 	settings.set_value("settings", "call_pace", call_pace)
 	settings.set_value("settings", "time_of_day", time_of_day)
@@ -632,123 +720,146 @@ func _icon(name: String) -> Texture2D:
 
 
 func _build_pause() -> Control:
-	var body := _card()
-	_label(body, "PAUSED", &"BannerLabel")
+	var body := _card("PauseCard")
+	_label(body, "PAUSED", &"BannerLabel").add_theme_font_size_override("font_size", 34)
 	_gap(body, 10.0)
 	_button(body, "RESUME", resume, "PrimaryButton")
 	_button(body, "RESTART SHIFT", restart_shift)
 	_button(body, "SETTINGS", open_settings)
 	_button(body, "QUIT TO TITLE", quit_to_title, "DangerButton")
 	_button(body, "QUIT GAME", quit_game, "DangerButton")
-	return body.get_parent().get_parent()
+	return _card_root(body)
 
 
 func _build_settings() -> Control:
-	var body := _card()
-	_label(body, "SETTINGS", &"BannerLabel")
+	var body := _card("SettingsCard")
+	# Smaller than the kit's 54px banner, which is a third of the card's height budget
+	# spent on the word "SETTINGS". The title card already does this to its own.
+	_label(body, "SETTINGS", &"BannerLabel").add_theme_font_size_override("font_size", 34)
+
+	# **The tab strip.** Sections are sibling pages and exactly one is visible, so the
+	# card is as tall as the *tallest* section rather than the sum of all of them -- which
+	# is the whole reason this exists. Flat, it measured ~770 of 900 and the next setting
+	# would have run off the bottom unclickable.
+	#
+	# Ordinary toggle buttons, not a TabContainer: the kit has no theme entry for one, and
+	# an unthemed stock control is exactly the defect `build_theme.gd`'s slider work was
+	# written to fix. These wear the button art the rest of the game wears.
+	var tabs := HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 8)
+	tabs.alignment = BoxContainer.ALIGNMENT_CENTER
+	body.add_child(tabs)
+	for i in SETTINGS_SECTIONS.size():
+		var tab := Button.new()
+		tab.text = str(SETTINGS_SECTIONS[i]["tab"])
+		tab.toggle_mode = true
+		tab.button_pressed = i == _settings_tab
+		tab.focus_mode = Control.FOCUS_NONE
+		# Wide enough that the strip is never narrower than the widest row inside a page
+		# (WEATHER, at 422). A card that changed width as you clicked between tabs would
+		# read as cheap.
+		tab.custom_minimum_size = Vector2(142.0, 34.0)
+		# **Never `open_settings`.** That records `_settings_from`, so a tab press would
+		# rewrite where BACK goes -- pause, settings, switch tab, back, and you are on the
+		# title screen with the district still frozen behind it.
+		tab.pressed.connect(_show_settings_tab.bind(i))
+		tabs.add_child(tab)
+		_tab_buttons.append(tab)
 	_gap(body, 10.0)
 
-	_label(body, "MASTER VOLUME", &"HeaderLabel")
-	_volume_slider = HSlider.new()
-	_volume_slider.min_value = 0.0
-	_volume_slider.max_value = 1.0
-	_volume_slider.step = 0.05
-	_volume_slider.value = master_volume
-	_volume_slider.custom_minimum_size = Vector2(240.0, 20.0)
-	_volume_slider.focus_mode = Control.FOCUS_NONE
-	_volume_slider.value_changed.connect(set_volume)
-	body.add_child(_volume_slider)
-	_gap(body, 10.0)
+	for i in SETTINGS_SECTIONS.size():
+		var page := VBoxContainer.new()
+		page.add_theme_constant_override("separation", 7)
+		page.visible = i == _settings_tab
+		body.add_child(page)
+		_settings_pages.append(page)
+		_fill_settings_page(page, StringName(SETTINGS_SECTIONS[i]["id"]))
 
-	# **Balance, not level.** Master is the whole game; this is how loud the bed sits
-	# under it. Separate because the only way to quieten music on a single bus is to
-	# quieten the sirens with it, and the sirens are information.
-	_label(body, "MUSIC", &"HeaderLabel")
-	_music_slider = HSlider.new()
-	_music_slider.min_value = 0.0
-	_music_slider.max_value = 1.0
-	_music_slider.step = 0.05
-	_music_slider.value = music_volume
-	_music_slider.custom_minimum_size = Vector2(240.0, 20.0)
-	_music_slider.focus_mode = Control.FOCUS_NONE
-	_music_slider.value_changed.connect(set_music_volume)
-	body.add_child(_music_slider)
-	_gap(body, 10.0)
-
-	_label(body, "SHIFT LENGTH", &"HeaderLabel")
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	body.add_child(row)
-	for minutes in SHIFT_CHOICES:
-		var choice := Button.new()
-		choice.text = "%d MIN" % minutes
-		choice.toggle_mode = true
-		choice.button_pressed = minutes == shift_minutes
-		choice.focus_mode = Control.FOCUS_NONE
-		choice.custom_minimum_size = Vector2(74.0, 34.0)
-		choice.set_meta(&"minutes", minutes)
-		choice.pressed.connect(set_shift_minutes.bind(int(minutes)))
-		row.add_child(choice)
-		_length_buttons.append(choice)
-	_gap(body, 10.0)
-
-	_label(body, "CALL RATE", &"HeaderLabel")
-	var pace_row := HBoxContainer.new()
-	pace_row.add_theme_constant_override("separation", 8)
-	pace_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	body.add_child(pace_row)
-	for i in PACE_CHOICES.size():
-		var choice := Button.new()
-		choice.text = str(PACE_CHOICES[i]["label"])
-		choice.toggle_mode = true
-		choice.button_pressed = i == call_pace
-		choice.focus_mode = Control.FOCUS_NONE
-		choice.custom_minimum_size = Vector2(78.0, 34.0)
-		choice.pressed.connect(set_call_pace.bind(i))
-		pace_row.add_child(choice)
-		_pace_buttons.append(choice)
-	_gap(body, 10.0)
-
-	_label(body, "TIME OF DAY", &"HeaderLabel")
-	var time_row := HBoxContainer.new()
-	time_row.add_theme_constant_override("separation", 8)
-	time_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	body.add_child(time_row)
-	for i in TIME_CHOICES.size():
-		var choice := Button.new()
-		choice.text = str(TIME_CHOICES[i])
-		choice.toggle_mode = true
-		choice.button_pressed = i == time_of_day
-		choice.focus_mode = Control.FOCUS_NONE
-		choice.custom_minimum_size = Vector2(78.0, 34.0)
-		choice.pressed.connect(set_time_of_day.bind(i))
-		time_row.add_child(choice)
-		_time_buttons.append(choice)
-	_gap(body, 10.0)
-
-	_label(body, "WEATHER", &"HeaderLabel")
-	var weather_row := HBoxContainer.new()
-	weather_row.add_theme_constant_override("separation", 8)
-	weather_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	body.add_child(weather_row)
-	for i in WEATHER_CHOICES.size():
-		var choice := Button.new()
-		choice.text = str(WEATHER_CHOICES[i])
-		choice.toggle_mode = true
-		choice.button_pressed = i == wet_weather
-		choice.focus_mode = Control.FOCUS_NONE
-		choice.custom_minimum_size = Vector2(78.0, 34.0)
-		choice.pressed.connect(set_weather.bind(i))
-		weather_row.add_child(choice)
-		_weather_buttons.append(choice)
 	_gap(body, 12.0)
-
-	# The career hard-reset: fleet dissolved, purse back to the starter budget.
-	# In settings rather than on a face button, so it takes deliberate digging.
-	_button(body, "RESET CAREER", reset_career, "DangerButton")
+	# The career hard-reset: fleet dissolved, purse back to the starter budget. Behind a
+	# confirmation since August 2026 -- it sat directly above BACK, and a card is a bad
+	# place to keep an irreversible button one misclick from the way out.
+	_button(body, "RESET CAREER", ask_reset_career, "DangerButton")
 	_button(body, "BACK", close_settings, "TertiaryButton")
-	return body.get_parent().get_parent()
+	return _card_root(body)
+
+
+## Fills one section. Split out so the page list and the controls cannot disagree about
+## which setting lives where -- the section table decides, and a check counts the headers
+## against it.
+func _fill_settings_page(page: VBoxContainer, id: StringName) -> void:
+	match id:
+		&"sound":
+			_label(page, "MASTER VOLUME", &"HeaderLabel")
+			_volume_slider = _slider(page, master_volume, set_volume)
+			_gap(page, 10.0)
+			# **Balance, not level.** Master is the whole game; this is how loud the bed
+			# sits under it.
+			_label(page, "MUSIC", &"HeaderLabel")
+			_music_slider = _slider(page, music_volume, set_music_volume)
+			_gap(page, 10.0)
+			# The slider whose absence was a defect rather than a gap: with music on its
+			# own bus and everything else on Master, quietening the sirens meant
+			# quietening the music with them.
+			_label(page, "SOUND EFFECTS", &"HeaderLabel")
+			_sfx_slider = _slider(page, sfx_volume, set_sfx_volume)
+		&"display":
+			# Two buttons rather than a checkbox, to match the choice rows elsewhere and
+			# because "WINDOW / FULLSCREEN" says what each state is where a tick only says
+			# what it is not.
+			_label(page, "DISPLAY", &"HeaderLabel")
+			_screen_buttons = _choice_row(page, ["WINDOW", "FULLSCREEN"], 1 if fullscreen
+				else 0, func(i: int) -> void: set_fullscreen(i == 1), 112.0)
+		&"shift":
+			_label(page, "SHIFT LENGTH", &"HeaderLabel")
+			# The one row whose setter does not take an index: it takes minutes, and the
+			# suite calls it that way, so the translation happens here rather than by
+			# bending `_choice_row`.
+			var lengths: Array = []
+			for minutes in SHIFT_CHOICES:
+				lengths.append("%d MIN" % minutes)
+			_length_buttons = _choice_row(page, lengths,
+				SHIFT_CHOICES.find(shift_minutes),
+				func(i: int) -> void: set_shift_minutes(int(SHIFT_CHOICES[i])), 74.0)
+			_gap(page, 10.0)
+			_label(page, "CALL RATE", &"HeaderLabel")
+			var paces: Array = []
+			for choice: Dictionary in PACE_CHOICES:
+				paces.append(str(choice["label"]))
+			_pace_buttons = _choice_row(page, paces, call_pace, set_call_pace)
+			_gap(page, 10.0)
+			_label(page, "TIME OF DAY", &"HeaderLabel")
+			_time_buttons = _choice_row(page, TIME_CHOICES, time_of_day, set_time_of_day)
+			_gap(page, 10.0)
+			_label(page, "WEATHER", &"HeaderLabel")
+			_weather_buttons = _choice_row(page, WEATHER_CHOICES, wet_weather, set_weather)
+
+
+## Shows one section and lights its tab.
+##
+## The landing tab is remembered rather than reset on every open: pause, settings, back,
+## settings while tuning one thing is the common loop, and being thrown back to the first
+## tab each time is the kind of small rudeness nobody reports and everybody feels.
+func _show_settings_tab(index: int) -> void:
+	_settings_tab = clampi(index, 0, _settings_pages.size() - 1)
+	for i in _settings_pages.size():
+		_settings_pages[i].visible = i == _settings_tab
+	for i in _tab_buttons.size():
+		_tab_buttons[i].button_pressed = i == _settings_tab
+
+
+## Asks before wiping. The settings card's button comes here; only the confirm card's
+## own button reaches [method reset_career].
+##
+## **Does not touch `_settings_from`**, unlike `open_settings` -- the symmetry invites the
+## bug. This screen always goes back to SETTINGS, and SETTINGS still remembers whether it
+## was opened from the title or from the pause card, so BACK behind it stays correct.
+func ask_reset_career() -> void:
+	_switch(Screen.CONFIRM)
+
+
+func close_confirm() -> void:
+	_switch(Screen.SETTINGS)
 
 
 ## Wipes the career back to the starting purse. The station is found by group the
@@ -767,9 +878,30 @@ func reset_career() -> void:
 ## between visits. A card built at startup would still be offering a warehouse fire to
 ## someone who has since sold the engine -- or, more likely, refusing one to someone
 ## who has just bought it.
+## The confirm card. **CANCEL first and primary, RESET second and danger** -- reversed
+## from every other card here, and that is the point: the affirming press is deliberately
+## not where the finger already is, so a double-click on RESET CAREER cannot take a career
+## with it.
+func _build_confirm() -> Control:
+	var body := _card("ConfirmCard")
+	_label(body, "RESET CAREER?", &"BannerLabel") \
+		.add_theme_font_size_override("font_size", 34)
+	var told := _label(body,
+		"The fleet is dissolved and the purse goes back to £%d.\nRecords and settings are kept."
+		% Station.STARTING_FUNDS, &"DimLabel")
+	told.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	told.custom_minimum_size = Vector2(360.0, 0.0)
+	_gap(body, 12.0)
+	_button(body, "CANCEL", close_confirm, "PrimaryButton")
+	_button(body, "RESET", func() -> void:
+		reset_career()
+		close_confirm(), "DangerButton")
+	return _card_root(body)
+
+
 func _build_scenarios() -> Control:
-	var body := _card()
-	_label(body, "SCENARIOS", &"BannerLabel")
+	var body := _card("ScenariosCard")
+	_label(body, "SCENARIOS", &"BannerLabel").add_theme_font_size_override("font_size", 34)
 	_label(body, "A written shift, against the clock.", &"DimLabel")
 	_gap(body, 10.0)
 	_scenario_rows = VBoxContainer.new()
@@ -777,7 +909,7 @@ func _build_scenarios() -> Control:
 	body.add_child(_scenario_rows)
 	_gap(body, 8.0)
 	_button(body, "BACK", show_title, "TertiaryButton")
-	return body.get_parent().get_parent()
+	return _card_root(body)
 
 
 func open_scenarios() -> void:
@@ -864,12 +996,18 @@ func _scene_root() -> Node:
 
 
 ## A centred card: CenterContainer -> CardPanel -> VBox, returning the VBox.
-func _card() -> VBoxContainer:
+##
+## **The panel is named** so a check can measure the card itself. The CenterContainer
+## around it is full-rect, so its rect is always exactly the viewport and a fit check
+## pointed at it would pass for ever; the panel is the node with the height. Same reason
+## and same shape as the storefront the [RequisitionPanel] replaced.
+func _card(card_name: String) -> VBoxContainer:
 	var centre := CenterContainer.new()
 	centre.set_anchors_preset(Control.PRESET_FULL_RECT)
 	centre.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(centre)
 	var panel := PanelContainer.new()
+	panel.name = card_name
 	panel.theme_type_variation = &"CardPanel"
 	centre.add_child(panel)
 	var body := VBoxContainer.new()
@@ -877,6 +1015,58 @@ func _card() -> VBoxContainer:
 	body.alignment = BoxContainer.ALIGNMENT_CENTER
 	panel.add_child(body)
 	return body
+
+
+## The node `_switch` shows and hides, given the VBox `_card` handed back. Written once
+## because `body.get_parent().get_parent()` encodes the card's depth, and it appeared in
+## every builder -- so a wrapper added inside `_card` would have broken all of them
+## silently.
+func _card_root(body: Node) -> Control:
+	return body.get_parent().get_parent() as Control
+
+
+## A settings slider. Three of these differed only in their value and their setter, and
+## the `step` was written out three times -- one number in three places, which NEXT.md
+## records drifting once already: 0.05 rounded the music default 0.126 up to 0.15, so the
+## bed played about 1.5dB louder than the constant claimed.
+func _slider(parent: Node, value: float, setter: Callable) -> HSlider:
+	var slider := HSlider.new()
+	slider.min_value = 0.0
+	slider.max_value = 1.0
+	slider.step = 0.05
+	slider.value = value
+	slider.custom_minimum_size = Vector2(240.0, 20.0)
+	slider.focus_mode = Control.FOCUS_NONE
+	slider.value_changed.connect(setter)
+	parent.add_child(slider)
+	return slider
+
+
+## A row of mutually exclusive toggles, one per caption, with [param chosen] pressed.
+##
+## Five of these were written out longhand, ~17 lines each, which is what made every new
+## setting expensive enough to think twice about. [param setter] is called with the index
+## of whichever was pressed; a setting whose own setter takes something else -- shift
+## length takes minutes -- binds its own translation at the call site rather than
+## bending this.
+func _choice_row(parent: Node, captions: Array, chosen: int, setter: Callable,
+		width := 78.0) -> Array[Button]:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	parent.add_child(row)
+	var made: Array[Button] = []
+	for i in captions.size():
+		var choice := Button.new()
+		choice.text = str(captions[i])
+		choice.toggle_mode = true
+		choice.button_pressed = i == chosen
+		choice.focus_mode = Control.FOCUS_NONE
+		choice.custom_minimum_size = Vector2(width, 34.0)
+		choice.pressed.connect(setter.bind(i))
+		row.add_child(choice)
+		made.append(choice)
+	return made
 
 
 func _label(parent: Node, text: String, variation: StringName) -> Label:

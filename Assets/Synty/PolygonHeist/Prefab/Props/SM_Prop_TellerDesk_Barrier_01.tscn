@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://cugntvnyirbll"]
+
+[ext_resource type="ArrayMesh" uid="uid://pr14cbonvcyb" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_TellerDesk_Barrier_01.res" id="1_g3vxp"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_h4fes"]
+[ext_resource type="ArrayMesh" uid="uid://qesur5ybghij" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_TellerDesk_Barrier_Glass_01.res" id="3_h4fes"]
+[ext_resource type="Material" uid="uid://dlyw6oajnufkx" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_Glass_mat.tres" id="4_uu7j5"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_jdg25"]
+points = PackedVector3Array(-0.69894385, 1.576947, -0.031199738, -0.69894385, 1.576947, 0.043257937, 0.6917496, 1.576947, -0.031199738, -0.37604594, 0.0622522, -0.18022448, -0.67389613, 0.40977487, -0.056031115, -0.67389613, 0.40977487, 0.06808932, -0.5234736, 1.392452, 0.15293899, 0.6917496, 1.576947, 0.043257937, 0.6667019, 0.40977487, -0.056031115, 0.3685795, 0.0622522, -0.18022448, -0.3512705, 0.040629257, -0.16782703, -0.37604594, -0.012261391, 0.19228268, 0.5160072, 1.392452, 0.15293899, 0.5674639, 0.6580498, 0.16741484, 0.6667019, 0.40977487, 0.06808932, 0.3685795, -0.012261391, 0.19228268)
+
+[node name="SM_Prop_TellerDesk_Barrier_01" type="MeshInstance3D" unique_id=1207171791]
+gi_mode = 2
+mesh = ExtResource("1_g3vxp")
+surface_material_override/0 = ExtResource("2_h4fes")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1017768392]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=316657567]
+shape = SubResource("ConvexPolygonShape3D_jdg25")
+
+[node name="SM_Prop_TellerDesk_Barrier_Glass_01" type="MeshInstance3D" parent="." unique_id=262587540]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84684026, 0.0033988953)
+gi_mode = 2
+mesh = ExtResource("3_h4fes")
+surface_material_override/0 = ExtResource("4_uu7j5")

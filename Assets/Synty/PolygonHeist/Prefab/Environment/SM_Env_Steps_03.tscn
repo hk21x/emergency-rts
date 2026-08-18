@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://h6enjqyv363v"]
+
+[ext_resource type="ArrayMesh" uid="uid://yl7frfbfvye2" path="res://Assets/Synty/PolygonHeist/Model/extracted/SM_Env_Steps_03.res" id="1_dfl88"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_ngwli"]
+[ext_resource type="Shape3D" uid="uid://u17pips5gr42" path="res://Assets/Synty/PolygonHeist/Model/Collisions/extracted/SM_Env_Steps_03_Collision.res" id="3_ngwli"]
+
+[node name="SM_Env_Steps_03" type="MeshInstance3D" unique_id=1642207309]
+gi_mode = 2
+mesh = ExtResource("1_dfl88")
+surface_material_override/0 = ExtResource("2_ngwli")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1357702077]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1830108545]
+shape = ExtResource("3_ngwli")

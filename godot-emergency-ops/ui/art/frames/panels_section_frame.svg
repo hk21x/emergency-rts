@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="180" viewBox="0 0 300 180" fill="none" role="img" aria-label="Section frame">
+  <defs>
+    <linearGradient id="ps_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0E141D"/><stop offset="1" stop-color="#0A1017"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="299" height="179" rx="6" fill="url(#ps_g)" fill-opacity="1" stroke="#18222E" stroke-width="1" stroke-opacity="1"/>
+  <path d="M0 40 L300 40" stroke="#212D3C" stroke-width="1" stroke-opacity="1"/>
+
+</svg>

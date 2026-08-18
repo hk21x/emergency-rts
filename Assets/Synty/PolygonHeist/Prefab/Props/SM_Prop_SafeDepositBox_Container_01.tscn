@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://deq2lotiy6ei4"]
+
+[ext_resource type="ArrayMesh" uid="uid://dfox821hnyhl5" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_SafeDepositBox_Container_01.res" id="1_o3uj5"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_vspgg"]
+[ext_resource type="ArrayMesh" uid="uid://d3hkol6mn4iw2" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_SafeDepositBox_Container_Lid_01.res" id="3_vspgg"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ham08"]
+points = PackedVector3Array(0.007124126, 0.29424646, -0.039425015, -0.17317554, 0.13809697, -0.047199607, -0.0047819614, 0, -0.057997644, -0.0047819614, 0, -0.9090585, 0.007124126, 0.32298505, -0.6851497, -0.5383131, 0.29424646, -0.039425015, -0.5333478, 0.12270017, -0.047199607, -0.5264604, 0, -0.057997644, -0.5264604, 0, -0.9090585, -0.5340952, 0.29209659, -0.92192984, -3.0219555e-05, 0.29067388, -0.9171787, -0.010654926, 0.31223574, -0.89929706, -0.5383131, 0.32298505, -0.6851497, -0.52058744, 0.31223574, -0.89929706)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o3uj5"]
+size = Vector3(0.53617024, 0.031224012, 0.6496763)
+
+[node name="SM_Prop_SafeDepositBox_Container_01" type="MeshInstance3D" unique_id=304194699]
+gi_mode = 2
+mesh = ExtResource("1_o3uj5")
+surface_material_override/0 = ExtResource("2_vspgg")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=2129959489]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=503361697]
+shape = SubResource("ConvexPolygonShape3D_ham08")
+
+[node name="SM_Prop_SafeDepositBox_Container_Lid_01" type="MeshInstance3D" parent="." unique_id=1568197438]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.02296866e-07, 0.28101623, -0.6968298)
+gi_mode = 2
+mesh = ExtResource("3_vspgg")
+surface_material_override/0 = ExtResource("2_vspgg")
+
+[node name="MeshCollider" type="StaticBody3D" parent="SM_Prop_SafeDepositBox_Container_Lid_01" unique_id=697368500]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.268085, 0.015612006, 0.32483816)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SM_Prop_SafeDepositBox_Container_Lid_01/MeshCollider" unique_id=1251794282]
+shape = SubResource("BoxShape3D_o3uj5")

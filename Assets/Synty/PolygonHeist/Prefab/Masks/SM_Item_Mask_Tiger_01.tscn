@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://dfr0osg6nodpu"]
+
+[ext_resource type="ArrayMesh" uid="uid://30yay5vjy70f" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_Mask_Tiger_01.res" id="1_w7au0"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_gujaf"]
+
+[node name="SM_Item_Mask_Tiger_01" type="MeshInstance3D" unique_id=1168303770]
+gi_mode = 2
+mesh = ExtResource("1_w7au0")
+surface_material_override/0 = ExtResource("2_gujaf")

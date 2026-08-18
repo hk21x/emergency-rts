@@ -29,10 +29,15 @@ var _music: AudioStreamPlayer
 
 func _ready() -> void:
 	AudioBuses.ensure()
+	# The city bed and the radio are effects, not music -- they belong with the sirens
+	# on the bus the player balances against the bed.
 	_ambience = _player(CITY_STREAM, ambience_db, true)
 	if _ambience:
+		_ambience.bus = AudioBuses.SFX
 		_ambience.play()
 	_radio = _player(RADIO_STREAM, radio_db, false)
+	if _radio:
+		_radio.bus = AudioBuses.SFX
 
 	# **The music is the district's, not the title screen's.** This node lives in
 	# `HUD.tscn`, which the main menu deliberately does not use -- so "plays in the game

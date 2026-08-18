@@ -145,7 +145,7 @@ func _point_at_the_next_thing() -> void:
 		if _spotlight == null:
 			return
 	var targets: Array[Control] = []
-	var shop := get_node_or_null("../HUD/Root/Shop") as ShopPanel
+	var shop := get_node_or_null("../HUD/Root/Shop") as RequisitionPanel
 
 	if not _to_buy.is_empty():
 		if shop and shop.visible:

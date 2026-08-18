@@ -9,8 +9,8 @@ Read before working: `PROGRESS.md` (status + what each phase taught), `NEXT.md`
 the traps).
 
 All 15 planned phases are done, and so are 16 (the world reacts), 17 (audio), 18
-(game framing) and 19 (the fire service, on a real appliance since August 2026 --
-the crew is still a repainted police model). **Phase 20 is done** -- the career
+(game framing) and 19 (the fire service, on a real appliance and, since August 2026,
+a real fire crew -- the POLYGON City Characters pack closed the last asset gap). **Phase 20 is done** -- the career
 economy and, since August 2026, the campaign scenarios: three designed shifts picked
 from the title card, each a timeline of calls against a par time. Everything else left
 is in NEXT.md.
@@ -37,9 +37,9 @@ simulated seconds are real seconds when the scene is the 6,700-node tutorial tow
 
 ## Verification rules
 
-- **The suite is the arbiter.** 1006 checks, exits non-zero on failure. A change to
+- **The suite is the arbiter.** 1089 checks, exits non-zero on failure. A change to
   `Game/` is not done until it is green. It **reports its own total** —
-  `all checks passed (1006)` — so take the count from a run rather than from here or
+  `all checks passed (1089)` — so take the count from a run rather than from here or
   from memory; that number is why these documents have carried a stale figure twice.
 - **Do not run the suite inline — delegate it.** Ask the `godot-test-runner` agent
   and get one line back. A full run is ~550 lines of output, and output in the main
@@ -76,7 +76,14 @@ simulated seconds are real seconds when the scene is the 6,700-node tutorial tow
   before reporting. It also reports *collateral*: a sabotage that reddens thirty
   checks broke the game rather than the behaviour, and proves much less than it looks.
 - **Never run `godot-check-sabotage` in the background, and never alongside anything
-  else that reads the tree.** It deliberately breaks source for a minute at a time, so
+  else that reads the tree.** That includes **resuming one with `SendMessage`**, which
+  always launches in the background -- there is no synchronous continuation. The hazard is
+  any path that starts the agent, not the `run_in_background` flag: an August 2026 turn
+  ran every cycle correctly with `run_in_background: false`, then continued one with
+  `SendMessage` and the Stop gate ran the suite against a tree with `cells = 1` injected
+  into `TowTruck.tscn`, blocking on a failure that did not exist. If a cycle must be
+  continued, hold the turn open with a background watcher that waits for the restore run
+  to print `all checks passed` before letting the gate fire. It deliberately breaks source for a minute at a time, so
   for that minute the working copy is a lie. Backgrounding one raced the Stop gate,
   which ran the suite against the sabotaged tree and blocked the turn on a failure that
   did not exist. Run it synchronously, one at a time, and let it finish.
@@ -130,7 +137,7 @@ and civilians by their own `build_*.gd`. The rule for changes:
   same shape.
 - Adding a verb = a new `Ability` (+`Order`); it gets its command tile, hotkey and
   right-click meaning from the scoring ladder with no UI changes. Hotkeys `Z X C V
-  B N M G H J K L T` are the command keys; `W A S D Q E F R F1 F2 F3 F4 F5 Esc Enter
+  B N M G H J K L P T U Y` are the command keys; `W A S D Q E F R F1 F2 F3 F4 F5 Esc Enter
   Space 1-9` are taken. **`P` is free** as of August 2026 -- pause moved to `Esc`.
   `F3` files a black-box record, `F4` toggles the navigation overlay, and `F5` opens
   the call spawner -- pick any call kind instead of waiting for the director's

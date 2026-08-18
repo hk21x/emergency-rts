@@ -40,35 +40,32 @@ const CHARACTERS := [
 		# Keeps whatever the City prefab already assigned.
 		"material": "",
 	},
-	# The paramedic, and an honest note about it: the City pack has no paramedic and no
-	# firefighter, only police. This is the female police character, picked because a
-	# second uniformed responder at least reads as an emergency worker and is instantly
-	# tellable from the male officers at a glance. The uniform is wrong and no amount of
-	# code fixes it -- what makes them a paramedic is their service, which the interface
-	# shows in medical green everywhere, and the fact that they are the only unit on the
-	# map that can treat anybody.
+	# **A real paramedic, since August 2026.** Both of these were repainted police for
+	# the whole life of the project -- the City pack has neither a paramedic nor a
+	# firefighter, only police, and the standing note here said so apologetically. The
+	# POLYGON City Characters pack arrived with both, in their own kit.
+	#
+	# They carry their own material off the FBX, so `material` stays empty. The old
+	# firefighter entry repainted a police body to `PolygonCity_02_A` to at least read
+	# warm beside the appliance; a real fire kit needs no such trick, and the
+	# paint-warmth check that guarded it now guards the kit itself.
+	#
+	# **These sit on a third rig.** The pack is mostly Unreal-mannequin naming with some
+	# bones capitalised and Synty's merged fingers, so it needed its own bone map --
+	# `setup_retarget.CITY_CHARACTERS`, which renames it onto the same humanoid profile
+	# the Starter rig and the animation library already share. Without that map they
+	# import with their own bone names and silently play nothing at all.
 	{
-		"source": "res://Assets/Synty/PolygonCity/Prefabs/Characters/Character_Female_Police.tscn",
-		"keep": "Character_Female_Police",
+		"source": "res://Assets/Polygon-Characters/Characters/SK_Character_Paramedic.fbx",
+		"keep": "SK_Character_Paramedic",
 		"out": "Paramedic.tscn",
 		"material": "",
 	},
-	# The firefighter, with the same caveat as the paramedic and one addition: the
-	# uniform is police blues, so this one is repainted to match the appliance it rides
-	# on. Still not a fire kit -- what makes them a firefighter is their service, the
-	# hose reach they work at, and being the only unit that can put a building out.
-	#
-	# 02_A, and it has to be **sampled on this mesh** rather than picked by name: an
-	# alt palette is a texture atlas, so a mesh's UVs decide which swatch it lands on.
-	# 04_A stood here from phase 19 because it is orange on the *patrol car's* hull --
-	# on this body it averages rgb(0.39,0.39,0.30) and the fire crew were quietly
-	# green. 02_A is the warmest of the twelve here, and is what the appliance wears
-	# (build_vehicles.VEHICLES / build_portraits.ALT_FIRE -- keep all three in step).
 	{
-		"source": "res://Assets/Synty/PolygonCity/Prefabs/Characters/Character_Male_Police.tscn",
-		"keep": "Character_Male_Police",
+		"source": "res://Assets/Polygon-Characters/Characters/SK_Character_FireFighter.fbx",
+		"keep": "SK_Character_FireFighter",
 		"out": "Firefighter.tscn",
-		"material": "res://Assets/Synty/PolygonCity/Materials/Alts/PolygonCity_02_A_mat.tres",
+		"material": "",
 	},
 ]
 

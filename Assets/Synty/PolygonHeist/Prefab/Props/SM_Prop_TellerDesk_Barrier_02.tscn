@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://3xwpdvtv1j5q"]
+
+[ext_resource type="ArrayMesh" uid="uid://dkhpidms7ndn0" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_TellerDesk_Barrier_02.res" id="1_u2inv"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_r0wmf"]
+[ext_resource type="ArrayMesh" uid="uid://wsrjontxrhun" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_TellerDesk_Barrier_Glass_02.res" id="3_r0wmf"]
+[ext_resource type="Material" uid="uid://dlyw6oajnufkx" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_Glass_mat.tres" id="4_72ooh"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_3itlm"]
+points = PackedVector3Array(0.87998265, 1.1689559, 0.052190438, 0.880155, -0.013725519, 0.052211978, 0.880155, 0.12380634, -0.030291792, 0.87998265, 1.1689559, -0.030302562, -0.8799827, 1.1689559, 0.052190438, -0.880155, 0.12380634, 0.052211978, -0.880155, -0.013725519, 0.052211978, 0.8525855, -0.013725519, -0.05780741, 0.8525855, 0.0961379, -0.05780741, -0.8799827, 1.1689559, -0.030302562, -0.880155, 0.12380634, -0.030291792, -0.85258555, -0.013725519, -0.05780741, -0.85258555, 0.0961379, -0.05780741)
+
+[node name="SM_Prop_TellerDesk_Barrier_02" type="MeshInstance3D" unique_id=771985386]
+gi_mode = 2
+mesh = ExtResource("1_u2inv")
+surface_material_override/0 = ExtResource("2_r0wmf")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=102455320]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1756061911]
+shape = SubResource("ConvexPolygonShape3D_3itlm")
+
+[node name="SM_Prop_TellerDesk_Barrier_Glass_02" type="MeshInstance3D" parent="." unique_id=1241194054]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7683716e-07, 0.59447074, 0)
+gi_mode = 2
+mesh = ExtResource("3_r0wmf")
+surface_material_override/0 = ExtResource("4_72ooh")

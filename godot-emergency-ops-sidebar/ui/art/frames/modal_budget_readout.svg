@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="32" viewBox="0 0 160 32" fill="none" role="img" aria-label="Budget readout">
+  <defs>
+    <linearGradient id="br_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0E2748"/><stop offset="1" stop-color="#0A1B33"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="159" height="31" rx="4" fill="url(#br_g)" fill-opacity="1" stroke="#4A9CF0" stroke-width="1" stroke-opacity="0.55"/>
+
+</svg>

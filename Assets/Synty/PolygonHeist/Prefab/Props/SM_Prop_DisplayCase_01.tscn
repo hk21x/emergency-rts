@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://cg8nosql3sitm"]
+
+[ext_resource type="ArrayMesh" uid="uid://ktw4yqnoxm20" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_DisplayCase_01.res" id="1_rftdn"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_xfbgx"]
+[ext_resource type="ArrayMesh" uid="uid://bc2mau7flk8g7" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_DisplayCase_Glass_01.res" id="3_xfbgx"]
+[ext_resource type="Material" uid="uid://dlyw6oajnufkx" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_Glass_mat.tres" id="4_hjf56"]
+[ext_resource type="ArrayMesh" uid="uid://dff7qnhvammjr" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_DisplayCase_Glass_1_Broken.res" id="5_1iedd"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_mqpwd"]
+points = PackedVector3Array(1.3148487, 1.2534605, 0.2795955, 1.3148487, 0.18490261, 0.27965182, 1.3148487, 1.2534605, -0.29570705, -1.3148487, 1.2534605, 0.2795955, 1.2208941, 0.024907254, -0.2752068, -1.3148487, 0.18490261, 0.27965182, 1.2723761, 0, 0.2703591, -1.3148487, 1.2534605, -0.29570705, -1.2211516, 0.024907254, -0.2752068, -1.2726334, 0, 0.2703591)
+
+[node name="SM_Prop_DisplayCase_01" type="MeshInstance3D" unique_id=1480912950]
+gi_mode = 2
+mesh = ExtResource("1_rftdn")
+surface_material_override/0 = ExtResource("2_xfbgx")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=199662039]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1240855224]
+shape = SubResource("ConvexPolygonShape3D_mqpwd")
+
+[node name="SM_Prop_DisplayCase_Glass_01" type="MeshInstance3D" parent="." unique_id=865716807]
+gi_mode = 2
+mesh = ExtResource("3_xfbgx")
+surface_material_override/0 = ExtResource("4_hjf56")
+
+[node name="SM_Prop_DisplayCase_Glass_1_Broken" type="MeshInstance3D" parent="." unique_id=1504129316]
+visible = false
+gi_mode = 2
+mesh = ExtResource("5_1iedd")
+surface_material_override/0 = ExtResource("4_hjf56")

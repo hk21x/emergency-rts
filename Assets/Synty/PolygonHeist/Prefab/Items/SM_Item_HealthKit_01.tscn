@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://dr4iy4dbodbas"]
+
+[ext_resource type="ArrayMesh" uid="uid://c0xnlxrlul2uo" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_HealthKit_01.res" id="1_el5ds"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_55ket"]
+[ext_resource type="ArrayMesh" uid="uid://ck0ewrc0b42ex" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_HealthKit_Lid_01.res" id="3_55ket"]
+[ext_resource type="ArrayMesh" uid="uid://capmi6vku5kg1" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_HealthKit_Supplies_01.res" id="4_1t8wx"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_kcbvr"]
+points = PackedVector3Array(-0.15426625, 0.011086923, -0.13335569, -0.13808244, -0.0042412775, -0.10792521, -0.18323241, 0.016812555, 0.112516016, -0.17546275, 0.04512533, -0.115075074, 0.15397806, 0.03961805, -0.13314617, 0.1542287, 0.011086923, -0.13335569, 0.13804488, -0.0042412775, -0.10792521, -0.13278332, -0.0042412775, 0.11505644, -0.1531205, 0.0111500025, 0.13420133, -0.14954, 0.044581883, 0.12550627, 0.18115397, 0.045135036, 0.111258894, 0.18255039, 0.045329124, -0.1102823, 0.1819775, 0.016831964, -0.11562506, 0.13804488, -0.0042412775, 0.10973987, 0.17216696, 0.016802851, 0.12427531, 0.15236686, 0.039409403, 0.13354658)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_el5ds"]
+points = PackedVector3Array(-0.15607741, 0.01165249, -0.01035204, -0.15172966, -5.7611614e-06, -0.0051993094, -0.18820667, 0.01165249, 0.012443192, -0.15607741, 0.038510017, -0.01035204, 0.15604058, 0.01165249, -0.01035204, -0.17575291, -0.001698222, 0.021068415, -0.18297462, 0.0016866978, 0.016755803, 0.15165594, -5.7611614e-06, -0.0051993094, 0.11551055, -0.022730729, 0.265235, -0.18820667, 0.01165249, 0.23983541, -0.18820667, 0.033514798, 0.012443192, -0.14185506, 0.05315061, 0.002081723, 0.15604058, 0.038510017, -0.01035204, 0.18820667, 0.01165249, 0.012443192, -0.17575291, -0.001698222, 0.2312102, -0.18297462, 0.0016866978, 0.2355228, 0.18293777, 0.0016866978, 0.016755803, 0.17571604, -0.001698222, 0.021068415, 0.13065404, -0.022730729, 0.265235, 0.11551055, -0.020085234, 0.2757365, -0.15172966, -5.7611614e-06, 0.25744992, -0.18820667, 0.033514798, 0.23983541, -0.15607741, 0.01165249, 0.26263064, -0.17107353, 0.04601928, 0.02280466, -0.14185506, 0.05315061, 0.25019687, -0.09760366, 0.061202116, 0.023700787, 0.14181823, 0.05315061, 0.002081723, 0.18820667, 0.033514798, 0.012443192, 0.18820667, 0.01165249, 0.23983541, 0.18293777, 0.0016866978, 0.2355228, 0.17571604, -0.001698222, 0.2312102, 0.13065404, -0.020085234, 0.2757365, 0.11399987, 0.00093905814, 0.2715359, -0.15607741, 0.038510017, 0.26263064, -0.17107353, 0.04601928, 0.22947395, -0.09760366, 0.061202116, 0.19444098, 0.14181823, 0.05315061, 0.25019687, 0.09756681, 0.061202116, 0.023700787, 0.17103666, 0.04601928, 0.02280466, 0.18820667, 0.033514798, 0.23983541, 0.15604058, 0.01165249, 0.26263064, 0.13216469, 0.00093905814, 0.2715359, 0.15604058, 0.038510017, 0.26263064, 0.09756681, 0.061202116, 0.19444098, 0.17103666, 0.04601928, 0.22947395)
+
+[node name="SM_Item_HealthKit_01" type="MeshInstance3D" unique_id=1581451082]
+gi_mode = 2
+mesh = ExtResource("1_el5ds")
+surface_material_override/0 = ExtResource("2_55ket")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=97073684]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=720446778]
+shape = SubResource("ConvexPolygonShape3D_kcbvr")
+
+[node name="SM_Item_HealthKit_Lid_01" type="MeshInstance3D" parent="." unique_id=703761562]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.037, -0.124)
+gi_mode = 2
+mesh = ExtResource("3_55ket")
+surface_material_override/0 = ExtResource("2_55ket")
+
+[node name="MeshCollider" type="StaticBody3D" parent="SM_Item_HealthKit_Lid_01" unique_id=1890555702]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SM_Item_HealthKit_Lid_01/MeshCollider" unique_id=1085133523]
+shape = SubResource("ConvexPolygonShape3D_el5ds")
+
+[node name="SM_Item_HealthKit_Supplies_01" type="MeshInstance3D" parent="." unique_id=257101088]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.005448818, 0.004478339, 0.0010130405)
+gi_mode = 2
+mesh = ExtResource("4_1t8wx")
+surface_material_override/0 = ExtResource("2_55ket")

@@ -1,0 +1,143 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Theme" path="res://ui/theme/emergency_ops.tres" id="theme"]
+[ext_resource type="Script" path="res://ui/unit_sidebar.gd" id="s_sidebar"]
+[ext_resource type="Texture2D" path="res://ui/art/icons/icon_truck.svg" id="i_truck"]
+
+[node name="UnitSidebar" type="PanelContainer"]
+custom_minimum_size = Vector2(300, 0)
+anchors_preset = 0
+theme = ExtResource("theme")
+theme_type_variation = &"ERSSidebar"
+script = ExtResource("s_sidebar")
+
+[node name="Rows" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+
+[node name="Header" type="PanelContainer" parent="Rows"]
+layout_mode = 2
+theme_type_variation = &"ERSSidebarHeader"
+
+
+[node name="Row" type="HBoxContainer" parent="Rows/Header"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+
+[node name="Glyph" type="TextureRect" parent="Rows/Header/Row"]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("i_truck")
+stretch_mode = 5
+modulate = Color(0.561, 0.627, 0.698, 1)
+
+
+[node name="Title" type="Label" parent="Rows/Header/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_type_variation = &"ERSTitle"
+theme_override_font_sizes/font_size = 15
+text = "UNITS"
+vertical_alignment = 1
+
+
+[node name="CountBadge" type="PanelContainer" parent="Rows/Header/Row"]
+custom_minimum_size = Vector2(34, 22)
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"ERSCountBadge"
+
+
+[node name="CountValue" type="Label" parent="Rows/Header/Row/CountBadge"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+
+[node name="CollapseButton" type="Button" parent="Rows/Header/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+flat = true
+theme_override_font_sizes/font_size = 18
+text = "‹"
+
+
+[node name="Body" type="VBoxContainer" parent="Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+
+[node name="ChipWrap" type="MarginContainer" parent="Rows/Body"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+
+[node name="Chips" type="HBoxContainer" parent="Rows/Body/ChipWrap"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+
+[node name="Scroll" type="ScrollContainer" parent="Rows/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+
+[node name="ListWrap" type="MarginContainer" parent="Rows/Body/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+
+[node name="Stack" type="VBoxContainer" parent="Rows/Body/Scroll/ListWrap"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+
+[node name="List" type="VBoxContainer" parent="Rows/Body/Scroll/ListWrap/Stack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+
+[node name="EmptyHint" type="Label" parent="Rows/Body/Scroll/ListWrap/Stack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+theme_type_variation = &"ERSBody"
+text = "No units deployed\n\nRequest one to begin"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+
+[node name="Footer" type="PanelContainer" parent="Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ERSSidebarFooter"
+
+
+[node name="RequestButton" type="Button" parent="Rows/Footer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+theme_type_variation = &"ERSPrimary"
+text = "＋  REQUEST UNITS"
+

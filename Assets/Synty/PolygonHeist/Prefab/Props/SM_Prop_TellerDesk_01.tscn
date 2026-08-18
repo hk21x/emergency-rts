@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dg3bmbteb4ovj"]
+
+[ext_resource type="ArrayMesh" uid="uid://cnif5vcawnder" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_TellerDesk_01.res" id="1_vwqqa"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_6j3pl"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_eq160"]
+points = PackedVector3Array(0.8565837, 1.2880235, 0.23739552, 1.1975275, 0.87927526, 0.46327055, 1.1808778, 0.8762494, -0.4662548, 0.83372176, 1.2711289, -0.24037975, -0.85683215, 1.2880235, 0.23739552, 1.2693442, 0.73390615, 0.49133503, 1.2693442, 0.73390615, -0.5007284, -1.1977758, 0.87927526, 0.46327055, -1.1811262, 0.8762494, -0.4662548, -0.83397007, 1.2711289, -0.24037975, -1.2693442, 0.73390615, 0.49133503, 1.200261, 0.016768513, 0.35178965, 1.2318207, 0, -0.37060264, -1.2693442, 0.73390615, -0.5007284, -1.232069, 0, -0.37060264, -1.2005093, 0.016768513, 0.35178965)
+
+[node name="SM_Prop_TellerDesk_01" type="MeshInstance3D" unique_id=810596075]
+gi_mode = 2
+mesh = ExtResource("1_vwqqa")
+surface_material_override/0 = ExtResource("2_6j3pl")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=30372282]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=87178895]
+shape = SubResource("ConvexPolygonShape3D_eq160")

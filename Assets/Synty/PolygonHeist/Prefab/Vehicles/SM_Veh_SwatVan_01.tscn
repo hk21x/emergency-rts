@@ -1,0 +1,122 @@
+[gd_scene format=3 uid="uid://ca38fuu16mpph"]
+
+[ext_resource type="ArrayMesh" uid="uid://wrktqissxlpd" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Veh_SwatVan_01.res" id="1_2fnsv"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_lm4vi"]
+[ext_resource type="ArrayMesh" uid="uid://b6tl363pgwg5j" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Veh_SwatVan_Door_l.res" id="3_lm4vi"]
+[ext_resource type="ArrayMesh" uid="uid://cwqmo535a06km" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Veh_SwatVan_Door_l_Glass.res" id="4_8ucwn"]
+[ext_resource type="Material" uid="uid://dlyw6oajnufkx" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_Glass_mat.tres" id="5_6wuiw"]
+[ext_resource type="ArrayMesh" uid="uid://y7rkn6iilsmk" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Veh_SwatVan_Door_r.res" id="6_wu6m6"]
+[ext_resource type="ArrayMesh" uid="uid://d16xtbs4aku4d" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Veh_SwatVan_Door_r_Glass.res" id="7_6wuiw"]
+[ext_resource type="ArrayMesh" uid="uid://b26lm8rdc4yry" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Veh_SwatVan_Glass.res" id="8_v8cmu"]
+[ext_resource type="ArrayMesh" uid="uid://fdhbx2hiw81i" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Veh_SwatVan_Steering_Wheel_01.res" id="9_w8gvb"]
+[ext_resource type="ArrayMesh" uid="uid://7d1qdtebqa85" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Veh_SwatVan_Wheel_fl.res" id="10_ot83w"]
+[ext_resource type="ArrayMesh" uid="uid://d64adr4qv2nv" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Veh_SwatVan_Wheel_fr.res" id="11_q3raa"]
+[ext_resource type="ArrayMesh" uid="uid://b3g0revrlqojh" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Veh_SwatVan_Wheel_rl.res" id="12_gu0dm"]
+[ext_resource type="ArrayMesh" uid="uid://djkk5rxjd2wn4" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Veh_SwatVan_Wheel_rr.res" id="13_om0vn"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_2fnsv"]
+points = PackedVector3Array(-1.0873134, 1.1318781, -2.8643675, -1.1840672, 0.6481563, 2.8424625, -0.7497434, 2.6987622, 0.9569, 0.9437788, 2.5823054, -2.7667992, 1.0405326, 0.26117873, -2.4771247, 1.2340403, 2.0018392, 2.3588636, -1.0873134, 2.3888166, -2.8643675, -1.0873134, 0.26117873, -2.4771247, -1.2810674, 2.0018392, 2.3588636, 0.8470249, 0.5514119, 3.1321368, 1.2340403, 0.74490064, -2.7667992, 0.78741527, 2.6899383, 0.9514738, -0.29927248, 1.1508888, 3.1745, -0.64982617, 0.44487312, 2.1994712, -1.1840672, 0.74490064, -2.7674053, -0.89380574, 2.5823054, -2.7674053, 1.2340403, 0.84164506, 2.4552197, 0.42538846, 0.4410303, 2.566031, -0.89380574, 0.5514119, 3.132743, 0.43717018, 1.5186095, 2.9956853, 1.2340403, 1.325367, -2.0898821, 1.0405326, 0.5514119, 3.0357807, -0.4102827, 0.35792315, -2.670443, 1.0307477, 2.3969998, -2.4046922, -1.2810674, 1.6148616, 2.1655452, 1.1507505, 0.5251341, 1.3142372, 1.1370404, 0.9383894, 2.9388187, -1.0873134, 0.26117873, -2.2838063, -0.39201355, 1.5186095, 2.9956853, 0.34700444, 1.0554485, 3.1966, 1.0405326, 0.26117873, -2.2838063, 1.0307477, 2.3969998, 1.0216823)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_cqojr"]
+radius = 0.51205343
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_q3nas"]
+radius = 0.51205343
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_volwa"]
+radius = 0.51205343
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_88spa"]
+radius = 0.51205343
+
+[node name="SM_Veh_SwatVan_01" type="MeshInstance3D" unique_id=314202316]
+gi_mode = 2
+mesh = ExtResource("1_2fnsv")
+surface_material_override/0 = ExtResource("2_lm4vi")
+surface_material_override/1 = ExtResource("2_lm4vi")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=917419646]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1003988112]
+shape = SubResource("ConvexPolygonShape3D_2fnsv")
+
+[node name="SM_Veh_SwatVan_Door_l" type="MeshInstance3D" parent="." unique_id=1515911153]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5810692, 0.89400744, -2.7407148)
+gi_mode = 2
+mesh = ExtResource("3_lm4vi")
+surface_material_override/0 = ExtResource("2_lm4vi")
+
+[node name="SM_Veh_SwatVan_Door_l_Glass" type="MeshInstance3D" parent="SM_Veh_SwatVan_Door_l" unique_id=6785962]
+gi_mode = 2
+mesh = ExtResource("4_8ucwn")
+surface_material_override/0 = ExtResource("5_6wuiw")
+
+[node name="SM_Veh_SwatVan_Door_r" type="MeshInstance3D" parent="." unique_id=1041588070]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5810692, 0.89400744, -2.7407148)
+gi_mode = 2
+mesh = ExtResource("6_wu6m6")
+surface_material_override/0 = ExtResource("2_lm4vi")
+
+[node name="SM_Veh_SwatVan_Door_r_Glass" type="MeshInstance3D" parent="SM_Veh_SwatVan_Door_r" unique_id=1023973481]
+gi_mode = 2
+mesh = ExtResource("7_6wuiw")
+surface_material_override/0 = ExtResource("5_6wuiw")
+
+[node name="SM_Veh_SwatVan_Glass" type="MeshInstance3D" parent="." unique_id=1411189830]
+gi_mode = 2
+mesh = ExtResource("8_v8cmu")
+surface_material_override/0 = ExtResource("5_6wuiw")
+
+[node name="SM_Veh_SwatVan_Steering_Wheel_01" type="MeshInstance3D" parent="." unique_id=479719694]
+transform = Transform3D(1, 0, 0, 0, 0.35329518, 0.9355119, 0, -0.9355119, 0.35329518, 0.43126976, 1.767006, 1.1746166)
+gi_mode = 2
+mesh = ExtResource("9_w8gvb")
+surface_material_override/0 = ExtResource("2_lm4vi")
+
+[node name="SM_Veh_SwatVan_Wheel_fl" type="MeshInstance3D" parent="." unique_id=1136901992]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.94007564, 0.48300764, 1.927024)
+gi_mode = 2
+mesh = ExtResource("10_ot83w")
+surface_material_override/0 = ExtResource("2_lm4vi")
+
+[node name="SphereCollider" type="StaticBody3D" parent="SM_Veh_SwatVan_Wheel_fl" unique_id=83656197]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SM_Veh_SwatVan_Wheel_fl/SphereCollider" unique_id=134329547]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2154064e-08, 0, 0)
+shape = SubResource("SphereShape3D_cqojr")
+
+[node name="SM_Veh_SwatVan_Wheel_fr" type="MeshInstance3D" parent="." unique_id=819535924]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9400718, 0.48300764, 1.9270238)
+gi_mode = 2
+mesh = ExtResource("11_q3raa")
+surface_material_override/0 = ExtResource("2_lm4vi")
+
+[node name="SphereCollider" type="StaticBody3D" parent="SM_Veh_SwatVan_Wheel_fr" unique_id=1221870049]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SM_Veh_SwatVan_Wheel_fr/SphereCollider" unique_id=1311672006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.1920929e-07)
+shape = SubResource("SphereShape3D_q3nas")
+
+[node name="SM_Veh_SwatVan_Wheel_rl" type="MeshInstance3D" parent="." unique_id=1338587083]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.94007564, 0.48300764, -1.7129705)
+gi_mode = 2
+mesh = ExtResource("12_gu0dm")
+surface_material_override/0 = ExtResource("2_lm4vi")
+
+[node name="SphereCollider" type="StaticBody3D" parent="SM_Veh_SwatVan_Wheel_rl" unique_id=522873321]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SM_Veh_SwatVan_Wheel_rl/SphereCollider" unique_id=20547074]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.9604645e-08)
+shape = SubResource("SphereShape3D_volwa")
+
+[node name="SM_Veh_SwatVan_Wheel_rr" type="MeshInstance3D" parent="." unique_id=2042364332]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9400718, 0.48300764, -1.7129705)
+gi_mode = 2
+mesh = ExtResource("13_om0vn")
+surface_material_override/0 = ExtResource("2_lm4vi")
+
+[node name="SphereCollider" type="StaticBody3D" parent="SM_Veh_SwatVan_Wheel_rr" unique_id=1651131115]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SM_Veh_SwatVan_Wheel_rr/SphereCollider" unique_id=81719275]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4703484e-08, 0, 0)
+shape = SubResource("SphereShape3D_88spa")

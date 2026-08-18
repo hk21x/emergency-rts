@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="303" height="132" viewBox="0 0 303 132" fill="none" role="img" aria-label="Unit card — hover">
+  <defs>
+    <linearGradient id="uchov_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22303F"/><stop offset="1" stop-color="#16202C"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="302" height="131" rx="5" fill="url(#uchov_g)" fill-opacity="1" stroke="#2E3D4F" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H297" stroke="#FFFFFF" stroke-opacity="0.09" stroke-width="1" stroke-linecap="round"/>
+
+</svg>

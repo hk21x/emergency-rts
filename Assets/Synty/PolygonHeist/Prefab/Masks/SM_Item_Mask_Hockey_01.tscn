@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cr20o1ikohesj"]
+
+[ext_resource type="ArrayMesh" uid="uid://bamqp2l6ath1h" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_Mask_Hockey_01.res" id="1_dmbah"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_o6qix"]
+
+[node name="SM_Item_Mask_Hockey_01" type="MeshInstance3D" unique_id=1617922928]
+gi_mode = 2
+mesh = ExtResource("1_dmbah")
+surface_material_override/0 = ExtResource("2_o6qix")

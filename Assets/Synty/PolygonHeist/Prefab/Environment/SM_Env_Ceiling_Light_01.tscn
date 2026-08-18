@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://byw87ptakqhv7"]
+
+[ext_resource type="ArrayMesh" uid="uid://crnmi18baic81" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Env_Ceiling_Light_01.res" id="1_78gvv"]
+[ext_resource type="Material" uid="uid://f1oj7va0yfac" path="res://Assets/Synty/PolygonHeist/Materials/Emission_01_mat.tres" id="2_r4ma7"]
+
+[node name="SM_Env_Ceiling_Light_01" type="MeshInstance3D" unique_id=2099679209]
+gi_mode = 2
+mesh = ExtResource("1_78gvv")
+surface_material_override/0 = ExtResource("2_r4ma7")

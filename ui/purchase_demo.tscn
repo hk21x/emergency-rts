@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Theme" path="res://ui/theme/emergency_ops.tres" id="theme"]
+[ext_resource type="Script" path="res://ui/purchase_demo.gd" id="s_demo"]
+[ext_resource type="PackedScene" path="res://ui/unit_purchase_modal.tscn" id="modal"]
+
+[node name="PurchaseDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("theme")
+script = ExtResource("s_demo")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.031, 0.051, 0.078, 1)
+
+[node name="Modal" parent="." instance=ExtResource("modal")]
+unique_name_in_owner = true
+layout_mode = 1

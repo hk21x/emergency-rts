@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bv2cvug8l8qpy"]
+
+[ext_resource type="ArrayMesh" uid="uid://cy4vvjimfg41q" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_ZipTies_01.res" id="1_ispq2"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_vx2i0"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_bjvsi"]
+points = PackedVector3Array(-0.014364421, 0.0069431914, -0.05185156, -0.069135875, -0.0076755984, -0.011629295, -0.069135875, 0.0069431914, -0.011629295, -0.054527096, 0.010598962, 0.09799449, 0.07333401, 0.0069431914, -0.022590024, 0.033148438, -0.0076755984, -0.048181526, 0.0075487345, -0.0076755984, -0.05185156, -0.14227132, -0.0076755984, 0.10530165, -0.054527096, -0.011331369, 0.11627884, -0.14227132, 0.0069431914, 0.112608805, -0.03261394, 0.010598962, 0.11627884, 0.091652215, 0.0069431914, 0.0358343, 0.091652215, -0.0076755984, 0.024873566, 0.07333401, -0.0076755984, -0.022590024, 0.062388882, -0.0076755984, 0.09067088, 0.06602962, 0.0069431914, 0.08703376)
+
+[node name="SM_Item_ZipTies_01" type="MeshInstance3D" unique_id=1743458512]
+gi_mode = 2
+mesh = ExtResource("1_ispq2")
+surface_material_override/0 = ExtResource("2_vx2i0")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1174168150]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1634158919]
+shape = SubResource("ConvexPolygonShape3D_bjvsi")

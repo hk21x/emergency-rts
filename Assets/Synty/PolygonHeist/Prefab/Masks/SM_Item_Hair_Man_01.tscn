@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://b07uyklm4vynf"]
+
+[ext_resource type="ArrayMesh" uid="uid://cwvlscf2u2flb" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_Hair_Man_01.res" id="1_0guox"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_g2fvv"]
+
+[node name="SM_Item_Hair_Man_01" type="MeshInstance3D" unique_id=1019373597]
+gi_mode = 2
+mesh = ExtResource("1_0guox")
+surface_material_override/0 = ExtResource("2_g2fvv")

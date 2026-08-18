@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://b3du8otlu4twy"]
+
+[ext_resource type="ArrayMesh" uid="uid://csgn0y3vd6fl5" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_Jewellery_Ring_01.res" id="1_3351g"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_0otuh"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_nif1b"]
+points = PackedVector3Array(0.05182007, 1.6484197e-09, 0.015220527, 0.049416855, 0.04697565, 0.027431179, 0.026038304, 0.00056497497, 0.05336049, -0.050904796, 0.0003691176, 0.028488878, -0.050904796, 0.0003691176, -0.02849068, -0.025766565, 0.0003691176, -0.053624097, 0.026028246, 0.00058004097, -0.053341348, 0.04933642, 0.059857044, -0.024165636, -0.0038158596, 0.075977616, 0.0064238273, 0.026138857, 0.042252474, 0.051873427, -0.025726343, 0.042252474, 0.051873427, -0.0490144, 0.04697565, 0.027431179, -0.050271314, 0.05711504, -0.026480006, -0.024539819, 0.06443709, -0.0478853, 0.024912111, 0.06442956, -0.04784341, -0.00064844266, 0.076956905, -0.010384146)
+
+[node name="SM_Prop_Jewellery_Ring_01" type="MeshInstance3D" unique_id=55660524]
+gi_mode = 2
+mesh = ExtResource("1_3351g")
+surface_material_override/0 = ExtResource("2_0otuh")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1004126346]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=811973764]
+shape = SubResource("ConvexPolygonShape3D_nif1b")

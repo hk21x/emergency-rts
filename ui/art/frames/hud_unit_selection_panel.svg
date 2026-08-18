@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="140" viewBox="0 0 240 140" fill="none" role="img" aria-label="Unit selection panel">
+  <defs>
+    <linearGradient id="us_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="239" height="139" rx="4" fill="url(#us_g)" fill-opacity="1" stroke="#212D3C" stroke-width="1" stroke-opacity="1"/>
+  <path d="M0 26 L240 26" stroke="#212D3C" stroke-width="1" stroke-opacity="1"/>
+
+</svg>

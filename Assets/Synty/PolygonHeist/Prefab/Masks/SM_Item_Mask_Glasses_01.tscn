@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://d3k3wuh3hoijx"]
+
+[ext_resource type="ArrayMesh" uid="uid://dcry2swymya40" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_Mask_Glasses_01.res" id="1_keeah"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_sy0jd"]
+
+[node name="SM_Item_Mask_Glasses_01" type="MeshInstance3D" unique_id=1238904113]
+gi_mode = 2
+mesh = ExtResource("1_keeah")
+surface_material_override/0 = ExtResource("2_sy0jd")

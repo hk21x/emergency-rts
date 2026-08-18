@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bldags1cuc4p2"]
+
+[ext_resource type="ArrayMesh" uid="uid://bs0d743yrgrii" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_Crosshair_Sniper_01.res" id="1_xd6c2"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_4pt44"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ibd10"]
+points = PackedVector3Array(-0.0016633477, 0.02655125, 0.0018591131, -0.0016633477, 0.02655125, -0.0014597923, -0.0058165267, 0.024877504, 0.0018591131, 0.020739913, 0.015760258, 0.0018591131, 0.01908176, 0.019071367, -0.0014597923, -0.02655124, 0.0016529616, -0.0014597923, -0.019081753, 0.019071367, 0.0018591131, 0.026551247, -0.0016581453, 0.0018591131, 0.026551247, 0.0016477648, -0.0014597923, -0.019081753, -0.019076552, -0.0014597923, -0.02655124, -0.0016581453, 0.0018591131, 0.01908176, -0.019076552, 0.0018591131, 0.01908176, -0.019076552, -0.0014597923, -0.019081753, -0.019076552, 0.0018591131, 0.0016477611, -0.026551235, -0.0014597923, 0.0057957433, -0.024887884, 0.0018591131)
+
+[node name="SM_Wep_Crosshair_Sniper_01" type="MeshInstance3D" unique_id=1561331347]
+gi_mode = 2
+mesh = ExtResource("1_xd6c2")
+surface_material_override/0 = ExtResource("2_4pt44")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1839021625]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=606900474]
+shape = SubResource("ConvexPolygonShape3D_ibd10")

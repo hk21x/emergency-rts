@@ -1,0 +1,185 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Theme" path="res://ui/theme/emergency_ops.tres" id="theme"]
+[ext_resource type="Script" path="res://ui/main_menu.gd" id="s_menu"]
+[ext_resource type="Script" path="res://ui/components/menu_item.gd" id="s_item"]
+[ext_resource type="Script" path="res://ui/components/notification_layer.gd" id="s_notice"]
+[ext_resource type="Texture2D" path="res://ui/art/frames/menu_title_plate.svg" id="t_title"]
+[ext_resource type="Texture2D" path="res://ui/art/icons/icon_play.svg" id="icon_play"]
+[ext_resource type="Texture2D" path="res://ui/art/icons/icon_group.svg" id="icon_group"]
+[ext_resource type="Texture2D" path="res://ui/art/icons/icon_folder.svg" id="icon_folder"]
+[ext_resource type="Texture2D" path="res://ui/art/icons/icon_gear.svg" id="icon_gear"]
+[ext_resource type="Texture2D" path="res://ui/art/icons/icon_sliders.svg" id="icon_sliders"]
+[ext_resource type="Texture2D" path="res://ui/art/icons/icon_star.svg" id="icon_star"]
+[ext_resource type="Texture2D" path="res://ui/art/icons/icon_exit.svg" id="icon_exit"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("theme")
+script = ExtResource("s_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0314, 0.051, 0.0784, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="Body" type="HBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 32
+
+[node name="LeftColumn" type="VBoxContainer" parent="Margin/Body"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TitlePlate" type="TextureRect" parent="Margin/Body/LeftColumn"]
+custom_minimum_size = Vector2(260, 80)
+layout_mode = 2
+texture = ExtResource("t_title")
+stretch_mode = 5
+
+[node name="MenuPanel" type="PanelContainer" parent="Margin/Body/LeftColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Pad" type="MarginContainer" parent="Margin/Body/LeftColumn/MenuPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="MenuColumn" type="VBoxContainer" parent="Margin/Body/LeftColumn/MenuPanel/Pad"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SinglePlayer" type="Button" parent="Margin/Body/LeftColumn/MenuPanel/Pad/MenuColumn"]
+custom_minimum_size = Vector2(200, 42)
+layout_mode = 2
+theme_type_variation = &"ERSMenuItem"
+script = ExtResource("s_item")
+label_text = "SINGLE PLAYER"
+glyph = ExtResource("icon_play")
+
+[node name="Multiplayer" type="Button" parent="Margin/Body/LeftColumn/MenuPanel/Pad/MenuColumn"]
+custom_minimum_size = Vector2(200, 42)
+layout_mode = 2
+theme_type_variation = &"ERSMenuItem"
+script = ExtResource("s_item")
+label_text = "MULTIPLAYER"
+glyph = ExtResource("icon_group")
+
+[node name="LoadGame" type="Button" parent="Margin/Body/LeftColumn/MenuPanel/Pad/MenuColumn"]
+custom_minimum_size = Vector2(200, 42)
+layout_mode = 2
+theme_type_variation = &"ERSMenuItem"
+script = ExtResource("s_item")
+label_text = "LOAD GAME"
+glyph = ExtResource("icon_folder")
+
+[node name="Options" type="Button" parent="Margin/Body/LeftColumn/MenuPanel/Pad/MenuColumn"]
+custom_minimum_size = Vector2(200, 42)
+layout_mode = 2
+theme_type_variation = &"ERSMenuItem"
+script = ExtResource("s_item")
+label_text = "OPTIONS"
+glyph = ExtResource("icon_gear")
+
+[node name="Mods" type="Button" parent="Margin/Body/LeftColumn/MenuPanel/Pad/MenuColumn"]
+custom_minimum_size = Vector2(200, 42)
+layout_mode = 2
+theme_type_variation = &"ERSMenuItem"
+script = ExtResource("s_item")
+label_text = "MODS"
+glyph = ExtResource("icon_sliders")
+
+[node name="Credits" type="Button" parent="Margin/Body/LeftColumn/MenuPanel/Pad/MenuColumn"]
+custom_minimum_size = Vector2(200, 42)
+layout_mode = 2
+theme_type_variation = &"ERSMenuItem"
+script = ExtResource("s_item")
+label_text = "CREDITS"
+glyph = ExtResource("icon_star")
+
+[node name="Exit" type="Button" parent="Margin/Body/LeftColumn/MenuPanel/Pad/MenuColumn"]
+custom_minimum_size = Vector2(200, 42)
+layout_mode = 2
+theme_type_variation = &"ERSMenuItem"
+script = ExtResource("s_item")
+label_text = "EXIT"
+glyph = ExtResource("icon_exit")
+
+[node name="VersionPlate" type="PanelContainer" parent="Margin/Body/LeftColumn"]
+layout_mode = 2
+theme_type_variation = &"ERSInset"
+
+[node name="Pad" type="MarginContainer" parent="Margin/Body/LeftColumn/VersionPlate"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Lines" type="VBoxContainer" parent="Margin/Body/LeftColumn/VersionPlate/Pad"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Version" type="Label" parent="Margin/Body/LeftColumn/VersionPlate/Pad/Lines"]
+layout_mode = 2
+theme_type_variation = &"ERSEyebrow"
+text = "VERSION 1.0"
+
+[node name="Studio" type="Label" parent="Margin/Body/LeftColumn/VersionPlate/Pad/Lines"]
+layout_mode = 2
+theme_type_variation = &"ERSBody"
+text = "Your studio name"
+
+[node name="Rights" type="Label" parent="Margin/Body/LeftColumn/VersionPlate/Pad/Lines"]
+layout_mode = 2
+theme_type_variation = &"ERSBody"
+text = "All rights reserved."
+
+[node name="Stage" type="PanelContainer" parent="Margin/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ERSInset"
+
+[node name="StageHint" type="Label" parent="Margin/Body/Stage"]
+layout_mode = 2
+theme_type_variation = &"ERSBody"
+text = "Key art goes here"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NotificationLayer" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("s_notice")

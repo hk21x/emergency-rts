@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://t71o4x201sfi"]
+
+[ext_resource type="ArrayMesh" uid="uid://bpdjooeeqmtpb" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_Mask_Gas_01.res" id="1_vm15h"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_ja3yh"]
+
+[node name="SM_Item_Mask_Gas_01" type="MeshInstance3D" unique_id=441274674]
+gi_mode = 2
+mesh = ExtResource("1_vm15h")
+surface_material_override/0 = ExtResource("2_ja3yh")

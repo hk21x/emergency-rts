@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://bgk1iw1q4ueat"]
+
+[ext_resource type="ArrayMesh" uid="uid://omnrvl07fcow" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_CoffeTable_01.res" id="1_5511h"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_y10e7"]
+[ext_resource type="ArrayMesh" uid="uid://ceidkw0xxq50w" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_CoffeTable_Glass_01.res" id="3_y10e7"]
+[ext_resource type="Material" uid="uid://dlyw6oajnufkx" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_Glass_mat.tres" id="4_mp1mu"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_tghp2"]
+points = PackedVector3Array(-0.57627606, 0.0001822356, -0.36255231, -0.5767277, -2.7755576e-17, 0.35803756, -0.5689371, 0.46542972, -0.35803804, 0.5761631, 0.0001822356, -0.36255231, 0.5767277, -2.7755576e-17, 0.35803756, -0.5689371, 0.46542972, 0.3531001, 0.56882423, 0.46542972, -0.35803804, 0.56882423, 0.46542972, 0.3531001)
+
+[node name="SM_Prop_CoffeTable_01" type="MeshInstance3D" unique_id=1830871676]
+gi_mode = 2
+mesh = ExtResource("1_5511h")
+surface_material_override/0 = ExtResource("2_y10e7")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1489865473]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=57928280]
+shape = SubResource("ConvexPolygonShape3D_tghp2")
+
+[node name="SM_Prop_CoffeTable_Glass_01" type="MeshInstance3D" parent="." unique_id=357407191]
+gi_mode = 2
+mesh = ExtResource("3_y10e7")
+surface_material_override/0 = ExtResource("4_mp1mu")

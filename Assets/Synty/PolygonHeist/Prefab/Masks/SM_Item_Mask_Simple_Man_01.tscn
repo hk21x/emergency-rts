@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://ckiammwxljs6n"]
+
+[ext_resource type="ArrayMesh" uid="uid://bsiyl8ha3wydf" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_Mask_Simple_Man_01.res" id="1_jq5d0"]
+[ext_resource type="Material" uid="uid://c0sgp037r62v3" path="res://Assets/Synty/PolygonHeist/Materials/SimplePeople_Masks_White_01_Blonde_mat.tres" id="2_x3dyt"]
+
+[node name="SM_Item_Mask_Simple_Man_01" type="MeshInstance3D" unique_id=189370616]
+gi_mode = 2
+mesh = ExtResource("1_jq5d0")
+surface_material_override/0 = ExtResource("2_x3dyt")

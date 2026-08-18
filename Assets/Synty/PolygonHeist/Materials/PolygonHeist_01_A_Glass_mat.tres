@@ -1,0 +1,12 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dlyw6oajnufkx"]
+
+[ext_resource type="Texture2D" uid="uid://x6twh0v8i0na" path="res://Assets/Synty/PolygonHeist/Textures/PolygonHeist_01_A.png" id="1_2tq7i"]
+
+[resource]
+resource_name = "PolygonHeist_01_A_Glass_mat"
+transparency = 1
+depth_draw_mode = 1
+albedo_color = Color(1, 1, 1, 0.30588236)
+albedo_texture = ExtResource("1_2tq7i")
+metallic = 0.25399998
+uv1_scale = Vector3(1, 1, 0)

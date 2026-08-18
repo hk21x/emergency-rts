@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="32" viewBox="0 0 64 32" fill="none" role="img" aria-label="Tab — active">
+  <defs>
+    <linearGradient id="tbact_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <path d="M0.5 3.5a3 3 0 0 1 3-3h57a3 3 0 0 1 3 3V32H0.5Z" fill="url(#tbact_g)" stroke="#2E3D4F" stroke-width="1"/>
+  <rect x="2" y="27" width="60" height="3" rx="1.5" fill="#1668C8" fill-opacity="1"/>
+
+</svg>

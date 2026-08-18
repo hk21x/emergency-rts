@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://dno3u6dm61fal"]
+
+[ext_resource type="ArrayMesh" uid="uid://bs71plrmbkvje" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_Glass_Shard_01.res" id="1_g44no"]
+[ext_resource type="Material" uid="uid://dlyw6oajnufkx" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_Glass_mat.tres" id="2_g44no"]
+
+[node name="SM_Prop_Glass_Shard_01" type="MeshInstance3D" unique_id=1664267819]
+mesh = ExtResource("1_g44no")
+surface_material_override/0 = ExtResource("2_g44no")

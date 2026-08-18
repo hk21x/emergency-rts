@@ -6,7 +6,7 @@ class_name DispatchPanel
 ##
 ## Buying does NOT live here any more. It started as per-row chips and the feedback
 ## was immediate: too small to find, too small to mean anything. The heading --
-## "DISPATCH · £1,250 · BUY" -- opens the [ShopPanel], a proper storefront with the
+## "DISPATCH · £1,250 · BUY" -- opens the [RequisitionPanel], a proper storefront with the
 ## unit's portrait and what it is for; clicking a row that owns nothing opens it
 ## too, because the only sensible reading of that click is "I want one".
 ##
@@ -17,7 +17,7 @@ class_name DispatchPanel
 var station: Station: set = _set_station
 var controller: RTSController
 ## The storefront this panel opens. Wired by the HUD.
-var shop: ShopPanel
+var shop: RequisitionPanel
 
 ## One column, since August 2026, when this block moved out of the bottom bar and into
 ## the left-hand strip under the roster.

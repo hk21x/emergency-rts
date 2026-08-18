@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://c1t0ms0sjd0bd"]
+
+[ext_resource type="ArrayMesh" uid="uid://d4mtu6na5yxli" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_WaterCooler_01.res" id="1_1f4mv"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_n5f6t"]
+[ext_resource type="ArrayMesh" uid="uid://2ffhqpvvr07y" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_WaterCooler_Tank_01.res" id="3_n5f6t"]
+[ext_resource type="Material" uid="uid://dlyw6oajnufkx" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_Glass_mat.tres" id="4_f0vmo"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_wxilj"]
+points = PackedVector3Array(0.14777112, 0.5751661, 0.24794373, -0.15314943, 0.5751661, 0.24794373, 0.19211376, 0.015781231, 0.1863653, 0.19211376, 1.0488182, 0.1863653, -0.19211376, 0.030423703, 0.18131319, -0.19211376, 1.035449, 0.18131319, 0.19211376, 0.015781231, -0.20312303, 0.19211376, 1.0488182, -0.20312303, 0.14126453, 1.0997486, -0.16928351, 0.14085081, 1.098157, 0.15204915, -0.14622912, 1.098157, 0.15204915, -0.19211376, 0.030423703, -0.19759433, -0.19211376, 1.035449, -0.19759433, -0.14660521, 1.0997486, -0.16928351, -0.14777113, 0.06257348, -0.2389167, 0.15130651, 0.08761422, -0.22685838)
+
+[node name="SM_Prop_WaterCooler_01" type="MeshInstance3D" unique_id=845846800]
+gi_mode = 2
+mesh = ExtResource("1_1f4mv")
+surface_material_override/0 = ExtResource("2_n5f6t")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=2023225457]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1177511152]
+shape = SubResource("ConvexPolygonShape3D_wxilj")
+
+[node name="SM_Prop_WaterCooler_Tank_01" type="MeshInstance3D" parent="." unique_id=110175044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1236358, -0.01204285)
+gi_mode = 2
+mesh = ExtResource("3_n5f6t")
+surface_material_override/0 = ExtResource("4_f0vmo")

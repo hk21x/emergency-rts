@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://bhfbd3whh6g5n"]
+
+[ext_resource type="ArrayMesh" uid="uid://bp2q0sivvvs1s" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_RifleSwat_01.res" id="1_prhl7"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_xmwhe"]
+[ext_resource type="ArrayMesh" uid="uid://07srpdbe5eva" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_RifleSwat_ChargeHandle_01.res" id="3_xmwhe"]
+[ext_resource type="ArrayMesh" uid="uid://c3dgmmwk57f08" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_RifleSwat_Mag_01.res" id="4_v8owj"]
+[ext_resource type="ArrayMesh" uid="uid://ukx160ciu16u" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_RifleSwat_Slide_01.res" id="5_g1mb0"]
+[ext_resource type="ArrayMesh" uid="uid://bd4o4e7evjd6d" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_RifleSwat_Stock_01.res" id="6_7hjvn"]
+[ext_resource type="ArrayMesh" uid="uid://nk8amuakbov2" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Wep_RifleSwat_Trigger_01.res" id="7_w6vqc"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_jcg4c"]
+points = PackedVector3Array(0.029011492, -0.103057854, -0.019273877, -0.027564459, -0.103057854, -0.0050949305, -0.027564459, -0.08890659, -0.08999139, 0.029011492, -0.08890659, -0.08999139, 0.043162752, 0.12327921, 0.4333005, 0.029011492, 0.094976686, 0.67381096, 0.014869932, 0.08085313, 0.67381096, -0.055857282, 0.08085313, -0.047543168, -0.027564459, 0.094976686, 0.67381096, -0.04171572, 0.08085313, 0.4333005, -0.027564459, 0.12327921, -0.23151505, 0.029011492, 0.109127946, -0.23151505, 0.014869932, 0.17985654, 0.48983908, -0.027564459, 0.12327921, 0.67381096, -0.04171572, 0.13737509, 0.09389186, -0.013413202, 0.17985654, 0.44739085)
+
+[node name="SM_Wep_RifleSwat_01" type="MeshInstance3D" unique_id=1081293062]
+gi_mode = 2
+mesh = ExtResource("1_prhl7")
+surface_material_override/0 = ExtResource("2_xmwhe")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1899104905]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=966421412]
+shape = SubResource("ConvexPolygonShape3D_jcg4c")
+
+[node name="SM_Wep_RifleSwat_ChargeHandle_01" type="MeshInstance3D" parent="." unique_id=1284144950]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.722046e-09, 0.13014367, 0.050079465)
+gi_mode = 2
+mesh = ExtResource("3_xmwhe")
+surface_material_override/0 = ExtResource("2_xmwhe")
+
+[node name="SM_Wep_RifleSwat_Mag_01" type="MeshInstance3D" parent="." unique_id=4227809]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.015060052, 0.16137211)
+gi_mode = 2
+mesh = ExtResource("4_v8owj")
+surface_material_override/0 = ExtResource("2_xmwhe")
+
+[node name="SM_Wep_RifleSwat_Slide_01" type="MeshInstance3D" parent="." unique_id=2071201875]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.006450404, 0.10696656, 0.1459795)
+gi_mode = 2
+mesh = ExtResource("5_g1mb0")
+surface_material_override/0 = ExtResource("2_xmwhe")
+
+[node name="SM_Wep_RifleSwat_Stock_01" type="MeshInstance3D" parent="." unique_id=1493870691]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5516807e-18, 0.10405138, -0.21590042)
+gi_mode = 2
+mesh = ExtResource("6_7hjvn")
+surface_material_override/0 = ExtResource("2_xmwhe")
+
+[node name="SM_Wep_RifleSwat_Trigger_01" type="MeshInstance3D" parent="." unique_id=931020374]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03727925, 0.055305142)
+gi_mode = 2
+mesh = ExtResource("7_w6vqc")
+surface_material_override/0 = ExtResource("2_xmwhe")

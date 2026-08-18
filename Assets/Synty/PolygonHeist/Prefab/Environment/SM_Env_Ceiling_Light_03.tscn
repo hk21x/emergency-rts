@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://bjmdf6b0xybst"]
+
+[ext_resource type="ArrayMesh" uid="uid://bvnem36bqb7hx" path="res://Assets/Synty/PolygonHeist/Model/extracted/SM_Env_Ceiling_Light_03.res" id="1_vdo50"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_dca0b"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_wcmln"]
+points = PackedVector3Array(-0.28196156, -0.09793568, -0.2773732, -0.2604992, 0, -0.25591084, 0.27737367, -0.09793568, -0.2773732, 0.24939597, -0.12592708, -0.24945024, -0.030216902, -0.34958452, -0.025628537, -0.28196156, -0.09793568, 0.28196204, -0.2604992, 0, 0.26044494, 0.25585657, 0, -0.25591084, 0.27737367, -0.09793568, 0.28196204, 0.025629014, -0.34958452, 0.03021738, 0.022946239, -0.33216688, -0.023000479, -0.030216902, -0.34958452, 0.03021738, 0.25585657, 0, 0.26044494)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_di5d4"]
+points = PackedVector3Array(-0.032012843, -1.3013979, -0.027424477, -0.032012843, -1.3013979, 0.03201332, -0.030261591, -0.34958458, -0.025673226, 0.027424954, -1.3013979, -0.027424477, 0.027424954, -1.3013979, 0.03201332, -0.030261591, -0.34958458, 0.030256253, 0.02294501, -0.3945852, -0.022950351, 0.025667887, -0.34958458, 0.030256253)
+
+[node name="SM_Env_Ceiling_Light_03" type="MeshInstance3D" unique_id=1995994919]
+gi_mode = 2
+mesh = ExtResource("1_vdo50")
+surface_material_override/0 = ExtResource("2_dca0b")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1584506840]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1624058905]
+shape = SubResource("ConvexPolygonShape3D_wcmln")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="MeshCollider" unique_id=508941923]
+shape = SubResource("ConvexPolygonShape3D_di5d4")

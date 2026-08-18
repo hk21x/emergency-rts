@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cthbk4sa4kkda"]
+
+[ext_resource type="ArrayMesh" uid="uid://b4id0jp3yk8g6" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_Mask_Fox_01.res" id="1_y67jw"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_klmsf"]
+
+[node name="SM_Item_Mask_Fox_01" type="MeshInstance3D" unique_id=1201136651]
+gi_mode = 2
+mesh = ExtResource("1_y67jw")
+surface_material_override/0 = ExtResource("2_klmsf")

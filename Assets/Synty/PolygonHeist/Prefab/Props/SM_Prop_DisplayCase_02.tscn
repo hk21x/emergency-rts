@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://cdrww2px643gy"]
+
+[ext_resource type="ArrayMesh" uid="uid://dikrw1efl1adt" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_DisplayCase_02.res" id="1_tr4ix"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_6cjsb"]
+[ext_resource type="ArrayMesh" uid="uid://xef5ag1lqoem" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_DisplayCase_Glass_02.res" id="3_6cjsb"]
+[ext_resource type="Material" uid="uid://dlyw6oajnufkx" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_Glass_mat.tres" id="4_t1dfm"]
+[ext_resource type="ArrayMesh" uid="uid://ccpp45kthh7wv" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_DisplayCase_Glass_02_Broken.res" id="5_5u0er"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2dmmn"]
+size = Vector3(0.56140137, 0.5097599, 0.56142807)
+
+[node name="SM_Prop_DisplayCase_02" type="MeshInstance3D" unique_id=58601406]
+gi_mode = 2
+mesh = ExtResource("1_tr4ix")
+surface_material_override/0 = ExtResource("2_6cjsb")
+
+[node name="BoxCollider" type="StaticBody3D" parent="." unique_id=808448293]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoxCollider" unique_id=593227912]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25487995, 0)
+shape = SubResource("BoxShape3D_2dmmn")
+
+[node name="SM_Prop_DisplayCase_Glass_02" type="MeshInstance3D" parent="." unique_id=1561646640]
+gi_mode = 2
+mesh = ExtResource("3_6cjsb")
+surface_material_override/0 = ExtResource("4_t1dfm")
+
+[node name="SM_Prop_DisplayCase_Glass_02_Broken" type="MeshInstance3D" parent="." unique_id=595016761]
+visible = false
+gi_mode = 2
+mesh = ExtResource("5_5u0er")
+surface_material_override/0 = ExtResource("4_t1dfm")

@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://sabs0g7pw6av"]
+
+[ext_resource type="ArrayMesh" uid="uid://bvm3hxyxx7cxi" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_DuffleBag_Open_Empty_01.res" id="1_kil6k"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_0yjdb"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_7ukti"]
+points = PackedVector3Array(0.2791876, 0.16287763, -0.112998545, 0.26055154, 0.023280207, -0.21532932, 0.19535261, 0.18150035, -0.15016998, 0.24197009, 0.13494357, 0.12894377, 0.26782015, 0.043779764, 0.14151645, -0.102277905, -0.004653856, -0.28048867, -0.078122064, 0.027617, -0.26195762, 0.23453757, 0.010215156, 0.12894377, -0.13774654, 0.1400639, -0.19942215, -0.27912924, 0.16287763, -0.13163893, -0.26994783, 0.13494357, 0.12894377, -0.07451509, 0.060525626, 0.2779575, 0.037192017, 0.0046574976, 0.2779575, -0.25120246, 0.0046574976, -0.25255543, -0.2768339, 0.07947633, 0.14151645, -0.24808735, 0.017558552, 0.13151297)
+
+[node name="SM_Item_DuffleBag_Open_Empty_01" type="MeshInstance3D" unique_id=1944155219]
+gi_mode = 2
+mesh = ExtResource("1_kil6k")
+surface_material_override/0 = ExtResource("2_0yjdb")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1632144913]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1595918683]
+shape = SubResource("ConvexPolygonShape3D_7ukti")

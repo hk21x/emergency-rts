@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://bds037gqwyu1x"]
+
+[ext_resource type="ArrayMesh" uid="uid://drj03pfei8466" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Item_Mask_Balaclava_01.res" id="1_d3osk"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_fnngw"]
+
+[node name="SM_Item_Mask_Balaclava_01" type="MeshInstance3D" unique_id=1809476605]
+gi_mode = 2
+mesh = ExtResource("1_d3osk")
+surface_material_override/0 = ExtResource("2_fnngw")

@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://cd3xxy75yre1e"]
+
+[ext_resource type="ArrayMesh" uid="uid://2x13qt03g8ue" path="res://assets/Synty/PolygonHeist/Model/extracted/SM_Prop_Desk_02.res" id="1_4jgnu"]
+[ext_resource type="Material" uid="uid://damukqfx7ra3o" path="res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_01_A_mat.tres" id="2_4h4iu"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4jgnu"]
+size = Vector3(1.9765015, 0.868927, 0.8744507)
+
+[node name="SM_Prop_Desk_02" type="MeshInstance3D" unique_id=1838617138]
+gi_mode = 2
+mesh = ExtResource("1_4jgnu")
+surface_material_override/0 = ExtResource("2_4h4iu")
+
+[node name="MeshCollider" type="StaticBody3D" parent="." unique_id=1203461409]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshCollider" unique_id=1499331044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.008880615, 0.43110657, -0.0008239746)
+shape = SubResource("BoxShape3D_4jgnu")

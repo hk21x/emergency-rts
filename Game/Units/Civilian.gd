@@ -22,12 +22,32 @@ class_name Civilian
 const OFF_LATTICE_STEP_MIN := 5.0
 const OFF_LATTICE_STEP_MAX := 14.0
 
+## How much noise a panicking civilian's hop choice carries. Comparable to a tile, so a
+## near-best hop frequently beats the best one and a fleeing crowd scatters instead of
+## filing away in a column.
+const PANIC_JITTER := 4.0
+
 @export_group("Fleeing")
 ## A fire closer than this sends them the other way.
 @export var flee_radius := 14.0
 ## How often the surroundings are checked. Cheap, but there is no reason to do it
 ## every frame -- a fire does not appear between one step and the next.
 @export var scan_interval := 0.4
+## Inside this of something genuinely dangerous, a civilian stops fleeing tidily.
+##
+## **Panic is bounded by construction: it never leaves the pedestrian graph.** It changes
+## *how* they move -- running rather than walking, scattering rather than filing down the
+## single best line -- and never *where* they may go. That is deliberate and it is the
+## bound the suite's 7,200-sample legality check keeps asserting, unweakened: a shopper who
+## sprints into the carriageway has swapped one incident for another, and traffic cannot
+## see pedestrians, so a panicking civilian in the road would be run over by a car that
+## never braked.
+@export var panic_radius := 7.0
+
+## Heat at which a cylinder reads as dangerous as a fire. Below this it is a prop; at this
+## it is about to go, and the crowd has always had the right reaction and never been told
+## to have it.
+@export var primed_heat := 0.75
 
 @export_group("Gathering")
 ## A body on the pavement or somebody kicking off draws a crowd from this far.
@@ -39,6 +59,9 @@ const OFF_LATTICE_STEP_MAX := 14.0
 ## True while running from something. Public so a test can assert the reaction rather
 ## than infer it from which way they happen to be walking.
 var is_fleeing := false
+## True while fleeing something close enough to panic about. Public so a check can assert
+## the carve-out's bounds rather than infer them from a gait.
+var is_panicking := false
 ## True while stood (or on the way to stand) gawping at a scene. Public for the same
 ## reason [member is_fleeing] is.
 var is_watching := false
@@ -90,10 +113,12 @@ func _think(delta: float) -> void:
 		var keep_out := _cordon_at(global_position)
 		var away := keep_out.global_position if keep_out else Vector3.ZERO
 		if keep_out == null:
-			var fire := _nearest_fire()
-			away = fire.global_position if fire else Vector3.ZERO
-			if fire == null:
+			var threat := _nearest_threat()
+			away = threat if threat != Vector3.INF else Vector3.ZERO
+			if threat == Vector3.INF:
 				is_fleeing = false
+				is_panicking = false
+				hurry = false
 				_update_watching()
 				return
 
@@ -101,6 +126,11 @@ func _think(delta: float) -> void:
 		# still too close. Re-rolling the destination on every scan -- which is
 		# what this did first -- leaves them changing their mind five times a
 		# second and dithering on the spot while the fire burns beside them.
+		# Panic is a *reading of the distance*, not a state with a timer: step far enough
+		# away and it passes on its own, which is why it can never leak.
+		is_panicking = away != Vector3.ZERO \
+			and _flat_distance(away) < panic_radius
+		hurry = is_panicking
 		if not is_fleeing or not is_navigating():
 			_flee_from(away)
 		is_fleeing = true
@@ -206,6 +236,26 @@ func _approach(point: Vector3) -> void:
 ## The nearest fire worth running from, or null. Casualties are deliberately not
 ## included: a body on the pavement is a reason to gather, not to flee, and making
 ## the crowd scatter from one would read as them running from the ambulance.
+## Where the nearest thing worth running from is, or `Vector3.INF`.
+##
+## **A cylinder about to go now counts.** The crowd has fled fires since phase 16 and stood
+## placidly beside a hazard at 0.9 heat the whole time -- the one place the existing panic
+## would have done the right thing if simply told. `Hazard` carries the heat; this reads it.
+func _nearest_threat() -> Vector3:
+	var fire := _nearest_fire()
+	var best := _flat_distance(fire.global_position) if fire else INF
+	var spot := fire.global_position if fire else Vector3.INF
+	for node in get_tree().get_nodes_in_group(Incident.GROUP):
+		var hazard := node as Hazard
+		if hazard == null or not hazard.active or hazard.heat < primed_heat:
+			continue
+		var gap := _flat_distance(hazard.global_position)
+		if gap < best and gap < flee_radius:
+			best = gap
+			spot = hazard.global_position
+	return spot
+
+
 func _nearest_fire() -> Fire:
 	var closest: Fire = null
 	var best := flee_radius
@@ -238,12 +288,18 @@ func _flee_from(point: Vector3) -> void:
 	var moves := _moves_here()
 	if moves.is_empty():
 		return
+	# **Panicking widens the jitter rather than changing the rule.** Calm, the walk takes
+	# whichever legal hop puts the most distance between them and the trouble, so a crowd
+	# files away down one line like a queue. Frightened, the tie-break noise is large
+	# enough that a near-best hop often wins, and the same crowd comes apart. Both are
+	# choices *among legal moves*: panic cannot put anyone somewhere a stroll could not.
+	var jitter := PANIC_JITTER if is_panicking else 0.5
 	var best := moves[0]
 	var best_score := -INF
 	for move in moves:
 		var spot := CityGrid.tile_centre(move.x, move.y)
 		var score := Vector2(spot.x - point.x, spot.z - point.z).length() \
-			+ _rng.randf_range(0.0, 0.5)
+			+ _rng.randf_range(0.0, jitter)
 		if score > best_score:
 			best_score = score
 			best = move
