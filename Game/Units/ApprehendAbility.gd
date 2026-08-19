@@ -36,6 +36,13 @@ func score(_unit: Unit, target: Target) -> int:
 	var suspect := target.incident as Suspect
 	if suspect == null or not suspect.active or suspect.is_detained:
 		return NOT_APPLICABLE
+	# **Nobody walks up to a weapon.** An armed suspect is not an arrest until armed
+	# response has talked them down -- [DisarmAbility] is the only verb offered on one, and
+	# it is offered to exactly one kind of unit. Declining here rather than letting the
+	# order fail is what teaches the player they need the ARV: the tile simply is not
+	# there, and the right-click means Move instead.
+	if suspect.armed:
+		return NOT_APPLICABLE
 	return 30
 
 

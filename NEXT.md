@@ -8,12 +8,119 @@ this is where they are going.
 the career economy first, then the campaign scenarios that were its other half. The
 interface has since been rebuilt on the user's UI kit and floated off its docked bar.
 
-So there is no roadmap left, and everything below is a **gap rather than a plan**:
+So there is no roadmap left, and most of what follows is a **gap rather than a plan**:
 things that are missing and would each stand alone. The two that were flagged here as
 worth reading first have both since been closed — the crowd refills now, and the
 economy has a sink — so pick by what you want the game to be, not by urgency.
 
+**The one exception is the section immediately below.** "Debts owed" is not a menu: it is
+what the last stretch of work left unfinished, including four features' worth of checks
+that have never been proven to detect anything and a live hotkey collision that the
+reference file still describes as impossible. Clear those before starting something new.
+
 ---
+
+## Debts owed (August 2026) — do these before anything new
+
+Not gaps. Things the last stretch of work left behind, listed because each one is a
+promise this project made to itself and has not kept.
+
+### ~~Four features' worth of checks have never been seen to fail~~ — closed August 2026
+
+All four are done: the **wreck**, the **ARV**, the **pistol pose** and the **roster
+sidebar**, each fault reinstated one at a time and watched go red. The exercise found four
+real gaps rather than merely confirming what was there — all written up in PROGRESS.md:
+
+- **The wreck**: `WorkOrder.VEHICLE_STANDOFF` could be zeroed with the suite entirely green,
+  because `ClearOrder.VEHICLE_REACH` absorbed the fault. Closed with an assertion on the aim
+  point.
+- **The ARV**: the speciality gate — the entire reason the unit exists — had nothing
+  watching it. Closed, and then proven to be the only assertion in the suite that catches it.
+- **The roster**: its worst shipped bug (rows stuck on AVAILABLE) had no check, and the
+  check written for it took **three rewrites** before it could see the bug.
+- **Readability**: every `resolve()` assertion printed `<RefCounted#-92233708...>`, so the
+  failing line — often a sabotage's only evidence — could not tell Disarm from Apprehend
+  from Move. They name the ability now.
+
+**What to carry forward.** A sabotage produced a green suite four times over, from four
+completely different causes: a competing constant absorbing the fault, a second gate
+enforcing the same rule upstream, a scenario that never provoked it, and an assertion a
+sentinel satisfied. Only one of those is "the check is bad" in the ordinary sense. Green
+under sabotage starts a diagnosis rather than ending one, and the question to ask of the
+output is not whether the measurement *moved* but whether it *shows the fault*.
+
+**Still worth doing**, in the same family: `Glyph._fallback` ends in `_: _unknown(...)`, so
+a typo'd `icon()` key draws a generic symbol and ships silently. Nothing asserts every
+ability's icon resolves. Three verbs already share `shield` (`apprehend`, `escort`,
+`disarm`) and an armed officer offers all three, so that grid carries three identical tiles.
+
+### ~~`Clear` and `Lights` both answer to `J`~~ — closed August 2026
+
+`Game/README.md` states the rationale as fact: *one lives on foot rosters, the other on
+vehicles, so they never meet*. That stopped being true the moment `can_tow` gave the
+recovery truck `ClearAbility` — it is a `Vehicle`, so it also has `LightsAbility`, and one
+of the two tiles is now unreachable from the keyboard on the only unit that needs the
+winch.
+
+**Fixed.** Clear is `O` — the only letter the camera does not poll and no other verb had
+taken — and `COMMAND_KEYS` now carries `Y U I O P` as well, so the four verbs added since
+the helicopter have defined slots in the row instead of being filed last together.
+
+The repair that matters is the check, not the key: `_test_no_unit_offers_two_verbs_on_one_key`
+sweeps all fourteen unit scenes (92 bound verbs) for a key that answers twice, a key the
+camera polls, and a key with no slot in `COMMAND_KEYS`. It has to add each unit to the tree
+to do it — `_abilities` is built in `_ready`, so reading them off a bare `instantiate()`
+returns an empty list and passes everything, which is the vacuous version of this check.
+
+**What is still open here** is the other half of that roadmap item: nothing asserts that
+every `icon()` key resolves in `Glyph.gd`. `Glyph._fallback` ends in `_: _unknown(...)`, so
+a typo'd icon key draws a generic symbol and ships. Worth noting while looking: three verbs
+already share `shield` (`apprehend`, `escort`, `disarm`) and an armed officer offers all
+three, so that grid has three identical tiles. Not a defect — but not a design either.
+
+### `ShopPanel.gd` is dead; `Roster.gd` is not
+
+`Game/UI/ShopPanel.gd` has **zero references anywhere** — the requisition modal replaced
+it entirely. Delete it.
+
+`Game/UI/Roster.gd` looks equally dead and is not: `RosterSidebar` loads it by path under
+`LEGACY_ROSTER=1` as a bisect escape hatch. Deleting it means deciding that hatch has
+served its purpose — which it arguably has, now that the crash it was built to bisect is
+found and fixed. That is a call to make deliberately rather than by tidying.
+
+### Twelve probes and a diagnostic still on disk
+
+`Game/probe_*.gd` (twelve of them) and `Game/diagnose_driving.gd`, referenced only from
+comments. **Move the measurements those comments cite into `Game/README.md` first** — a
+live comment pointing at a deleted file is worse than the dead file it points at.
+
+### The suite is one 12,815-line file, and it is the next thing to grow
+
+`Game/smoke_test.gd` is now **12,815 lines** — comfortably the largest file in the project
+and around a third of all the GDScript in it. It has grown ~1,000 lines in a month, and
+anything done to the campaign adds a hundred checks on top of that.
+
+Split it as a **pure move**, proving nothing broke by check-count identity: `all checks
+passed (1123)` before and after, with no other change in the same pass. A
+`Game/Tests/TestCase.gd` holding the fixture, N files cut along the section comments
+already in the file, and a ~100-line runner summing per-file counts.
+
+The per-file counts are the real prize rather than the tidiness. A runtime error inside a
+check **skips the rest of that check silently** — the suite still reports green and only
+the total falls, which is how two checks stopped short for months and cost three out of six
+hundred without anybody noticing. Per-file totals make that failure mode legible for the
+first time.
+
+### The game has never been built
+
+There is no `export_presets.cfg`. Not once, in twenty-one phases. It is the largest single
+unknown in anything downstream of "ship this", and it wants smoke-testing **early** rather
+than at the end: make a macOS build, launch it, and confirm the `user://` paths, the icon,
+and that the CC0 audio and kit assets survive the export filter.
+
+`config/name` is also still `Polygon_Starter`, and it sets both the window title *and* the
+`user://` folder — so renaming it orphans every saved career, record and setting unless a
+migration copies the old folder forward. Decide before the first public build, not after.
 
 ## Standing gaps
 
@@ -87,6 +194,17 @@ fire/smoke FX were taken from them (see PROGRESS.md). What remains, and why it w
   `build_map.gd`), and seven more vehicle bodies (bus, school bus, pickup, delivery and
   garbage trucks) for the ambient fleet. The traffic bodies want measuring first: a bus
   is far longer than anything currently driving, and the driving checks are sensitive.
+- **The Heist pack is spent, and it was the cheapest pack yet.** It arrived on the *same*
+  rig as the existing characters, so everything in it was a drop-in through machinery that
+  already existed. `SM_Veh_SwatVan_01` became the prisoner van (two dictionary rows and a
+  portrait — no new code at all), `SM_Chr_Male_SWAT_01` became armed response,
+  `SM_Veh_Car_Police_Heist_01` a second patrol body, and `SM_Veh_Helicopter_01` the air
+  unit. What is **still untaken** is the interesting half: bank interiors, an ATM, a vault
+  and an alarm, which together make an **armed robbery** authorable as a call kind — and
+  which would give the SWAT van a second job and the ARV a reason to exist beyond one
+  director roll. The pack's `PolygonHeist_04_A` atlas is also where the helicopter's
+  Rescue livery came from; it was nearly missed, because grepping filenames for "rescue"
+  finds nothing and only a per-atlas diff turned it up.
 - **Weight.** `Assets/PolygonTown` is 44MB, almost all of it buildings, props and
   characters the game does not use. If the repo size ever matters, a `.gdignore` in its
   `Scenes/` and `Prefabs/Buildings/` would cost nothing -- the pattern already exists at
@@ -113,6 +231,28 @@ What a second pass could add, in rough order of value:
 - **A campaign order** — scenarios unlocking in sequence rather than all three at
   once, which is the point at which this stops being a list and starts being a
   campaign.
+
+**One of them is a live bug rather than an addition.** `Mission.fail_on_casualty_lost`
+defaults to `true` and nothing overrides it for a scenario, so **a single dead casualty
+ends a designed shift on a bare red banner** — no debrief, no par time, no retry, in a
+mode whose whole point is being replayed until it is beaten. `_evaluate()` runs the
+incident rules whenever `scoring` is false, which is exactly the scenario case; the LOST
+arm needs the `show_shout()` with a RETRY that WON and OVER already have, and the flag
+needs to be a per-scenario key. Roughly fifteen lines, and it is the first thing to do
+here.
+
+The other prerequisite is **scenario provisioning**: scenarios are currently gated behind
+units the career has to buy, while only *freeplay* fills the purse — so the campaign is
+locked behind grinding the mode it is an alternative to. `Station.career_path` is a `var`
+rather than a `const` precisely so a scene can carry its own book, and the tutorial already
+does this. Repoint it to `user://campaign-<id>.cfg` on `ScenarioDirector.begin()`, issue
+the units, restore on exit.
+
+> **This is the single largest exposure to a known trap in this codebase.** Anything that
+> purchases units without repointing `career_path` first overwrites the player's real
+> fleet and purse, silently — that already happened once, from a throwaway probe that had
+> no business touching the books. Whatever is built here wants a check proving
+> `user://career.cfg` is byte-identical across a scenario run.
 
 ### The crowd: refilled, but still orderly
 

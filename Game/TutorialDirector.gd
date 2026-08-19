@@ -152,10 +152,14 @@ func _point_at_the_next_thing() -> void:
 			for id in _to_buy:
 				targets.append(shop.card_button(id))
 		else:
-			targets.append(get_node_or_null("../HUD/Root/World/BuyButton") as Control)
+			# The corner buy button was retired when the sidebar gained REQUEST UNITS;
+			# the tutorial points at whichever door actually exists.
+			var panel := get_node_or_null(
+				"../HUD/Root/Bar/Row/RosterBlock/Body/Roster") as RosterSidebar
+			targets.append(panel.request_button() if panel else null)
 	elif not _to_send.is_empty():
 		var roster := get_node_or_null(
-			"../HUD/Root/Bar/Row/RosterBlock/Body/Roster") as Roster
+			"../HUD/Root/Bar/Row/RosterBlock/Body/Roster") as RosterSidebar
 		if roster:
 			for id in _to_send:
 				targets.append(roster.standby_chip(id))

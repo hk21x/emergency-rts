@@ -124,6 +124,8 @@ const GROUPS := [
 				"out": "Paramedic"},
 			{"prefab": "res://Assets/Polygon-Characters/Characters/SK_Character_FireFighter.fbx",
 				"out": "Firefighter"},
+			{"prefab": "res://Assets/Synty/PolygonHeist/Prefab/Characters/SM_Chr_Male_SWAT_01.tscn",
+				"keep": "Character_Male_SWAT_01", "out": "ArmedOfficer"},
 			# The doctor, shot from the same shirted body Game/Doctor.tscn wears. No
 			# palette: this one is not a repaint, it is a different civilian body, chosen
 			# because a doctor and a paramedic share a service and therefore a

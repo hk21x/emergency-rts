@@ -67,6 +67,27 @@ const CHARACTERS := [
 		"out": "Firefighter.tscn",
 		"material": "",
 	},
+	# **Armed response**, from the Heist pack. That pack's rig uses the same bone names
+	# the City characters do -- `Ankle_L`, `Clavicle_L`, `Hips` -- so it needs no third
+	# retarget map and drops straight through this pipeline.
+	{
+		# **The FBX, not the prefab.** The prefab embeds its own `Skeleton3D` with the raw
+		# Synty bone names baked in, so patching the pack's import settings never reaches
+		# it -- the SWAT officer imported un-retargeted and stood in bind pose. The FBX is
+		# what `setup_retarget.gd` patches, and it carries the same wardrobe.
+		"source": "res://Assets/Synty/PolygonHeist/Model/Characters.fbx",
+		# The *mesh*, not the file. These prefabs are wardrobes -- one skeleton wearing a
+		# dozen alternative bodies -- and the root node's name is the pack's file name,
+		# not the outfit. The police entry above keeps `Character_Male_Police` for the
+		# same reason.
+		"keep": "Character_Male_SWAT_01",
+		"out": "ArmedOfficer.tscn",
+		# **Named, not inherited.** An empty string means "keep whatever the source
+		# assigned", which is what every other entry here wants -- but the materials live
+		# on the pack's *prefabs*, not in the FBX this is built from, so inheriting got
+		# nothing and the officer turned out plain white.
+		"material": "res://Assets/Synty/PolygonHeist/Materials/PolygonHeist_Character_01_mat.tres",
+	},
 ]
 
 ## The public. Same treatment as the officer above -- these prefabs ship on the same

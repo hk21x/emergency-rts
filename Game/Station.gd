@@ -154,6 +154,18 @@ const TYPES := [
 			"secures scenes with a cordon."],
 	},
 	{
+		# **Armed response.** Same service as an officer, different speciality -- and the
+		# speciality is what changes the verbs. Priced well above an officer because the
+		# scenes that need one are rare and the answer to them should feel like a decision
+		# rather than a default hire.
+		"id": &"arv", "label": "Armed Response",
+		"scene": "res://Game/ArmedOfficer.tscn",
+		"service": Unit.Service.POLICE, "vehicle": false, "price": 550,
+		"portrait": "ArmedOfficer",
+		"blurb": ["The only unit that can face an armed suspect.",
+			"Talks them down; anyone can make the arrest after."],
+	},
+	{
 		"id": &"firefighter", "label": "Firefighter",
 		"scene": "res://Game/Firefighter.tscn",
 		"service": Unit.Service.FIRE, "vehicle": false, "price": 300,

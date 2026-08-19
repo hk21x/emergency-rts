@@ -118,6 +118,12 @@ const KINDS := [
 	# engine.** A casualty nobody on the roster can stabilise is not a hard call, it is a
 	# broken one: paramedics would hold them indefinitely and the call would never close.
 	{"id": &"collapse", "weight": 14, "needs_doctor": true},
+	# **Gated on owning armed response, on exactly the terms a collapse is gated on owning
+	# a doctor.** An armed suspect is not an arrest any officer can make -- Apprehend is
+	# not even offered on one -- so a career without an ARV would get a call it could only
+	# watch. Rarer than a plain crime call: the answer to it costs £550 and should feel
+	# like a decision rather than a default hire.
+	{"id": &"armed_suspect", "weight": 7, "needs_arv": true},
 	# **The RTC at the size where dispatch order matters.** One ambulance carries two
 	# stretchers, so three-plus casualties force the triage question the two-body RTC
 	# never asks: who rides first? Sized by the medical roster, gentled per casualty.
@@ -319,6 +325,13 @@ func open_kind(kind: StringName) -> void:
 			var junction := _pick_junction()
 			if junction.x >= 0:
 				_spawn_rtc(junction)
+		&"armed_suspect":
+			var armed_spot := _pick_pavement(true)
+			if armed_spot != Vector3.INF:
+				var suspect := _spawn_suspect(armed_spot)
+				if suspect:
+					suspect.armed = true
+					suspect.flavour = "Suspect reported armed"
 		&"crime":
 			# Kerbside only: the escorting patrol car has to be able to pull up
 			# within reach, and a car cannot follow a suspect into a park.
@@ -367,6 +380,8 @@ func _pick_kind() -> StringName:
 	var total := 0
 	for kind in KINDS:
 		if kind.get("needs_fire_service", false) and not _can_fight_buildings():
+			continue
+		if kind.get("needs_arv", false) and not _has_armed_response():
 			continue
 		if kind.get("needs_doctor", false) and not _has_doctor():
 			continue
@@ -483,6 +498,13 @@ const BUS_SPOTS := [
 func _has_doctor() -> bool:
 	var station := get_tree().get_first_node_in_group(Station.GROUP) as Station
 	return station != null and station.owns(&"doctor")
+
+
+## Whether anybody on the roster can face a weapon. The armed-suspect call is held back
+## until they do -- the same rule that holds building fires back until there is an engine.
+func _has_armed_response() -> bool:
+	var station := get_tree().get_first_node_in_group(Station.GROUP) as Station
+	return station != null and station.owns(&"arv")
 
 
 func _can_fight_buildings() -> bool:
@@ -773,10 +795,31 @@ func _spawn_trapped() -> void:
 
 ## A collision at a crossroads: two casualties in the road, close enough that the board
 ## reads them as one job. Police to secure, a paramedic each, an ambulance out.
+## **A collision now leaves something behind.** Two casualties and a written-off car:
+## the bodies are dealt with in the first minute, and the street stays shut until a
+## recovery truck arrives. Every other call in this game finishes when the last casualty
+## is loaded; this is the first with a tail, and the reason to own a truck at all.
 func _spawn_rtc(cell: Vector2i) -> void:
 	var centre := CityGrid.junction(cell)
-	_spawn_casualty(centre + Vector3(-1.8, 0.0, 1.2), "Road traffic collision")
-	_spawn_casualty(centre + Vector3(2.0, 0.0, -1.5), "Road traffic collision")
+	# The car lies down one of the junction's own streets, as if it arrived that way --
+	# the same arrangement the bus collision uses, and for the same reason.
+	var exits := CityGrid.neighbours(cell)
+	var along := Vector3(0.0, 0.0, 1.0)
+	if not exits.is_empty():
+		var toward: Vector2i = exits[_rng.randi_range(0, exits.size() - 1)]
+		along = (CityGrid.junction(toward) - centre).normalized()
+	var across := Vector3(-along.z, 0.0, along.x)
+
+	# **Thrown clear, on the far side of the junction from the car.** They were placed
+	# 2.2m and 2.5m from the centre, and the wreck sat on the centre with a 5.5m blocker
+	# around it -- so the casualties spawned underneath it and could not be reached.
+	var away := centre - along * 1.6
+	_spawn_casualty(away + across * 1.7, "Road traffic collision")
+	_spawn_casualty(away - across * 1.5, "Road traffic collision")
+	var wreck := _spawn("res://Game/Incidents/Wreck.tscn") as Wreck
+	if wreck:
+		wreck.global_position = centre + along * 3.4
+		wreck.flavour = "Vehicle written off, road blocked"
 
 
 ## The RTC grown to the size the medical roster can face: a bus on its side of the

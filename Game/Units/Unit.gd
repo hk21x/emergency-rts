@@ -301,6 +301,25 @@ func icon() -> StringName:
 
 ## Abilities this unit type offers. Order matters only for breaking score ties, and
 ## for the left-to-right order of the command bar.
+## Removes every collider from [param node] and its children.
+##
+## **For props a unit carries.** The Synty prefabs wrap their meshes in a `MeshCollider`
+## StaticBody3D, and a held weapon is parented inside the character and teleported onto the
+## hand bone every frame -- so the prop's own collider shoves its carrier. An armed
+## response officer drifted three metres a second across the road with zero velocity and
+## no orders, which is what that looks like from outside.
+##
+## [Debris] and [Wreck] each carry a private copy of this for their scattered props; this
+## is the one people use.
+static func strip_collision(node: Node) -> void:
+	for child in node.get_children():
+		if child is CollisionObject3D or child is CollisionShape3D:
+			node.remove_child(child)
+			child.queue_free()
+			continue
+		strip_collision(child)
+
+
 func _build_abilities() -> Array[Ability]:
 	return [MoveAbility.new(), StopAbility.new()]
 

@@ -51,7 +51,7 @@ const QUEUED_SCALE := 0.55
 
 const COMMAND_KEYS := [
 	KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B, KEY_N, KEY_M, KEY_G, KEY_H, KEY_J, KEY_K, KEY_L,
-	KEY_T]
+	KEY_T, KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P]
 
 @export var move_marker_path: NodePath
 @export var selection_box_path: NodePath

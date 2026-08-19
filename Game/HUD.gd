@@ -34,7 +34,7 @@ extends CanvasLayer
 @onready var _debrief_card: DebriefCard = $Root/World/DebriefCard
 @onready var _dispatch: DispatchPanel = $Root/Bar/Row/DispatchBlock/Body/Dispatch
 @onready var _portrait: Portrait = $Root/Bar/Row/PortraitBlock/Portrait
-@onready var _roster: Roster = $Root/Bar/Row/RosterBlock/Body/Roster
+@onready var _roster: RosterSidebar = $Root/Bar/Row/RosterBlock/Body/Roster
 @onready var _commands: CommandGrid = $Root/Bar/Row/CommandBlock/Body/CommandGrid
 
 var _mission: Mission

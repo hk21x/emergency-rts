@@ -221,6 +221,9 @@ const VEHICLES := [
 		"seats": 2,
 		"stretchers": 0,
 		"max_speed": 20.0,
+		# **The winch.** The only body in the fleet that can recover a [Wreck], which is
+		# the job this unit was bought for.
+		"tows": true,
 		# Same omission as the van's, found by the same check. This one is dispatched to
 		# collisions from the same forecourt, so responding dark was equally wrong.
 		#
@@ -462,6 +465,7 @@ func _build_vehicle(config: Dictionary) -> bool:
 		# Found while mapping the catalogue onto a new shop UI, which had to read these
 		# numbers and printed "1 cells" against a tow truck.
 		root.cells = int(config.get("cells", 0))
+		root.can_tow = bool(config.get("tows", false))
 		root.tank_capacity = float(config.get("tank_capacity", 1.0))
 	root.display_name = str(config["display"])
 	# Ambient traffic inherits no service, so it stays NONE and the interface never

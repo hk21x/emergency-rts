@@ -32,8 +32,8 @@ found along the way.
 | 17. Audio | **done** | Siren, engine note, fire crackle, dispatch radio, city bed — all synthesised |
 | 18. Game framing | **done** | Title card, pause, persisted settings, restart and quit-to-title |
 | 19. Fire service | **done** | A third service: appliance, crew, hose reach, water, building fires |
-| 20. Structure | **half** | The career economy shipped; campaign scenarios are still to author |
-| 21. Feel & consequence | **part** | Weather, time of day, radio log, debrief — plus the driving faults found from play and fixed |
+| 20. Structure | **done** | The career economy, then the three campaign scenarios that were its other half |
+| 21. Feel & consequence | **part** | Weather, time of day, radio log, debrief, the driving faults found from play and fixed — then a dangerous district, an air unit, a recovery truck and armed response |
 
 The fire service is **fully dressed** as of August 2026. The engine is a real appliance —
 PolygonTown's fire truck, with a working ladder and its own hose nozzle in the crew's
@@ -41,6 +41,16 @@ hands — and the crew are a real firefighter and paramedic from the POLYGON Cit
 pack. The swap cost exactly what this note predicted (the crew's `source` in
 `build_character.gd` and two portrait entries) plus one thing it did not: a third bone map,
 because the pack ships on its own skeleton.
+
+**The fleet has since left the road and grown a tail.** A helicopter flies above the
+navigation mesh entirely — there is no air layer and none is needed, since nothing in the
+sky is an obstacle. A recovery truck winches away the wreck a collision leaves behind, so
+a road traffic collision is the first incident that outlives its casualties. And an armed
+response unit talks a weapon down before an ordinary officer can make the arrest, which is
+the first time `Person.speciality` has decided what a unit *can do* rather than only how
+fast it does it. The shop and the roster are the user's UI kit now — a requisition modal
+and a status sidebar, both drop-ins that kept the old public surface so nothing outside
+them had to change.
 
 Explicitly parked: **multiplayer co-op**, a **mod editor**, and **save/load**
 (a shift is 5–15 minutes; there is nothing yet worth saving mid-shift).
@@ -120,8 +130,11 @@ The phases are done; what has landed on top of them, in order:
   the old drawn primitives kept as fallback, keycap icons on a controls card
   sectioned by function behind a visible CONTROLS chip, and a command bar that
   provably cannot grow.
-- **The suite runs in ~20 seconds** — `--fixed-fps 60` decouples the headless loop
-  from the wall clock; it was ~9 minutes of real-time pacing before.
+- **The suite runs in ~60 seconds** — `--fixed-fps 60` decouples the headless loop
+  from the wall clock; it was ~9 minutes of real-time pacing before. This line said
+  "~20 seconds" for months after it stopped being true: the suite has roughly doubled
+  since, and most of the wall clock is a handful of end-to-end *drives*, where the
+  simulated seconds are real seconds because the scene is a 6,700-node town.
 
 ### Phase 16 — the world reacts (August 2026)
 
@@ -613,6 +626,237 @@ sibling stays green, which is the whole fault in two lines.
   `overrun_grace` (90s): past it, whatever is still on the board closes as failed and
   the shift ends. Generous enough that it only ever fires on a job that was not going to
   finish.
+
+### Three tries to make one check see one bug (August 2026)
+
+The roster sidebar was the last unproven feature, and five of its six legs went red on the
+first attempt: narrowing the filter to POLICE reddened the census at 4 chips of 7, widening
+it to accept civilians reddened the stray leg, giving vehicles a condition reddened the
+health-bar leg, forcing the selection ring off reddened the marking, and gutting `_act_on`
+reddened the click path.
+
+The sixth was the one that mattered — **the two-population fix**, the roster's worst shipped
+bug, the one the player reported as *"the status of the units only seems to stay as
+Available"*. Nothing was watching it, because nothing outside the panel could read what a
+row said. A `status_of()` accessor and a check were written for it. It then took **three
+rewrites to make that check see the bug**, and each failure was a different way of not
+testing what you think you are testing:
+
+1. **Under-provoked scenario.** It drove a car already on the map. `_restate()` services
+   those every frame whether or not the rebuild fires, and the fault only reaches a row that
+   began life bound to a station entry. Reverting the fix left the suite completely green.
+2. **The subject chosen through the thing under test.** Rewritten to dispatch a paramedic
+   from the house — and it identified which unit that was with `_chip_for(unit) != null`,
+   which is *precisely the condition the fault destroys*. Under the fault the loop skipped
+   the unit that had just come out and silently fell back to one already on the map. The
+   world knows who was dispatched; asking the panel is asking the defendant. It is a set
+   difference over the unit group now.
+3. **A sentinel that satisfied its own negation.** With the subject finally right, one leg
+   still passed: with no row, `said` falls back to `-1`, and `-1 != AVAILABLE` is perfectly
+   true, so the leg asserting *"a row stopped reading AVAILABLE"* passed on a unit that had
+   no row to read. `row != null and ...` now.
+
+Only on the fourth run did both legs go red, measuring `no row of its own`, with zero
+collateral.
+
+**The general lesson is about how a green run has to be read.** Across this whole exercise a
+sabotage produced a green suite four separate times, and the four causes were completely
+different: a competing constant absorbing the fault (the wreck's standoff), a second gate
+enforcing the same rule upstream (the ARV's speciality), a scenario that never provoked it,
+and an assertion a sentinel satisfied. Only one of those four is "the check is bad" in the
+ordinary sense. **Green under sabotage is the start of a diagnosis, not the end of one** —
+and the reliable question is not whether the printed measurement *moved* but whether it
+*shows the fault*. Here it moved from `EN ROUTE` to `no row of its own` and the check still
+passed.
+
+### The gate the whole unit exists for was unguarded (August 2026)
+
+Armed response's checks had never been proven either. Reading them before sabotaging turned
+up the hole without needing a run: three legs covered the arrest gate and the ARV's own
+verb, and **none covered the speciality gate** — drop `Person.ARMED` from
+`DisarmAbility.score()` and an ordinary constable resolves to Disarm, at which point `an
+ordinary officer is not offered the arrest` still reads true (a Disarm is indeed not an
+Apprehend) and every leg stays green on a game where any officer can talk down a gunman.
+
+The new leg asserts what the right-click must actually *mean* — `MoveAbility` — which is
+`ApprehendAbility`'s own documented claim and had been equally unwatched. Proven the hard
+way: with the fault fully present it is **the only assertion in 1,118 that catches it**.
+
+"Fully present" needed two edits, and that is the transferable part. The speciality gate is
+enforced **twice** — in `DisarmAbility.score()` and again in `Person._build_abilities()`,
+which only puts the verb in an armed officer's list at all. Sabotaging the first alone left
+the suite green not because the check was blind but because the second gate stopped the
+fault ever reaching it. **Defence in depth reads exactly like a vacuous check** from the
+outside, and telling them apart means knowing how many places enforce the rule before
+concluding anything from a green run.
+
+The other three legs went red cleanly. Deleting the armed guard from
+`ApprehendAbility.score()` reddened the arrest leg. Pointing `DisarmOrder.CLIP` at `Idle`
+reddened the pose. And commenting out the weapon's `strip_collision` reproduced the original
+19m drift exactly — **2.45m in two seconds against 0.06m healthy** — taking three downstream
+legs with it, all of them consequences of an officer being shoved out of the walk-up.
+
+One repair fell out of reading the failure lines: every `resolve()` assertion formatted the
+ability with `%s`, which prints `<RefCounted#-92233708...>`. The failing line — often the
+only evidence a sabotage produces — could not distinguish Disarm from Apprehend from Move,
+which is the exact distinction those legs are drawn to make. They name the ability now.
+
+### Sabotage found a fix that was doing nothing (August 2026)
+
+The wreck's checks had never been proven to detect anything, so all four of the faults that
+feature shipped with were reinstated one at a time to watch them go red. Three did, cleanly
+and with no collateral: deleting the truck's `ClearAbility` reddened four legs and dropped
+its verb count 7 → 6; cutting `ClearOrder.VEHICLE_REACH` from 8.0 back to the on-foot 3.6
+reddened the tow; and putting the wreck back on the junction centre reddened the trapped-
+casualty leg at **2.2m, the exact figure from the original bug report**, against 5.2m
+healthy.
+
+**The fourth did not.** Zeroing `WorkOrder.VEHICLE_STANDOFF` — reinstating the "truck aimed
+inside its own blocker" bug in full — left the suite completely green. Measured, the fault
+is entirely present: aimed at the centre the truck does wedge against the blocker, at
+5.36m instead of 6.58m. It just still winches, because 5.36m is inside `VEHICLE_REACH`'s
+8.0. The standoff and the reach are **competing satisfiers** for "the truck ends up in
+working range", and only one of them was being measured. Note the direction, which is what
+makes it nasty: zeroing the standoff moves the truck *closer*, so no bound on the resting
+distance could ever have caught it.
+
+The repair is an assertion on the **aim point** rather than the outcome — `move_target`
+must sit at least the blocker's inscribed radius (2.75m, read off the `BoxShape3D` at
+runtime rather than typed in) from the wreck's centre. It reads 3.40m healthy, 0.00m
+zeroed, 2.00m at two, so it tracks the constant continuously rather than special-casing
+zero.
+
+Two things worth keeping. The comment above that check **described a failure that no longer
+reproduces** — it said the truck "circled at 8m winching nothing", which was true when the
+reach was smaller and stopped being true when the reach was raised; a comment can go stale
+against the code it sits on. And the finding was only reachable by measuring a quantity the
+suite never prints. "Watch the check go red" assumes the sabotaged run's own output shows
+whether the fault arrived; here it could not, and a probe had to establish that the truck
+really was wedging before the green could be read as *vacuous* rather than as *the fault
+not being a fault*.
+
+### A key that answered twice, and the invariant that stopped holding (August 2026)
+
+`Clear` and `Lights` both returned `KEY_J`. That was deliberate and it was written down as
+fact in the reference file: *one lives on foot rosters, the other on vehicles, so they
+never meet.* It held for as long as the sentence was true.
+
+Then `can_tow` gave the recovery truck the winch. A truck is a `Vehicle`, so it has a
+lightbar, and it was suddenly the one unit in the game carrying both verbs —
+`_handle_hotkey` takes the first match in tile order, so `Clear` won and **the truck's
+lights were unreachable from the keyboard**. It shipped that way, and it was found while
+updating the documentation rather than by playing or by any check.
+
+Measured before fixing, across all fourteen unit scenes: exactly one clash, on
+`TowTruck.tscn`, and every other unit clean. `Clear` moved to `O` rather than `Lights`
+moving, because `Lights` and `Siren` sit together on `J`/`K` across every vehicle in the
+game and one of those two had to stay put. `O` is the only letter the camera does not poll
+and no other verb had taken — which is to say the next verb after this one has no key at
+all, and that is now a fact worth planning around rather than discovering.
+
+The sweep also turned up something quieter: `Disarm`, `Connect`, `Take off` and `Land` had
+no slot in `COMMAND_KEYS` at all. `_key_order` files anything unlisted *last*, so all four
+were tied at the end of the row and the documented promise — a tile's position matches the
+key under the player's hand — had already stopped being true for the four newest verbs.
+`COMMAND_KEYS` carries `Y U I O P` now.
+
+**The lesson is not the key.** It is that an invariant maintained by reasoning about which
+units happen to exist stops holding the moment a new unit does, and nothing tells you. The
+check that replaces the reasoning sweeps every unit scene for a key that answers twice, a
+key the camera polls, and a key with no slot in the row — and it has to add each unit to
+the tree to do it, because `_abilities` is built in `_ready` and reading them off a bare
+`instantiate()` returns an empty list that passes everything. The first probe written to
+find this reported zero abilities on all fourteen units and looked perfectly healthy.
+
+### The RTC grew a tail (August 2026)
+
+Every incident in the game had ended when the last casualty left. `Wreck` is the first one
+that does not: a collision leaves a car in the road with a solid `Blocker` on the world
+layer, and it stays there — traffic routing around it, the street half shut — until a
+recovery truck winches it away at `clear_per_second` 0.1, about ten seconds on station.
+
+**It shipped broken three times, and all three were the same failure of method.** The
+check called `wreck.clear(1.0)` directly, so it proved a float counts up. Then `WorkOrder`
+aimed the truck at the wreck's centre, which is inside its own blocker, so the truck wedged
+against the thing it had come to collect. Then — after both were fixed — the truck still
+lifted nothing, because it did not carry `ClearAbility` at all: `can_tow` gated whether the
+ability would *score*, nothing put it in the unit's list, and every check had been
+building `ClearAbility.new()` by hand so none of them could see the gap.
+
+The player found all three, in that order, from the same sentence: *it never appears to
+reach the vehicle*. **A check that reaches past the interface vouches for nothing** — it
+is the third time this project has learned that in a month, after `land_at()` and after
+`wreck.clear()`, and it is now the first thing to ask of any new check.
+
+The casualties needed moving too: they were being thrown 2.2–2.5m from the wreck's centre
+and the blocker reaches 2.75m, so some of them spawned **inside the car** and could not be
+reached at all.
+
+### Armed response, and a hook that finally did its job (August 2026)
+
+`Person.speciality` had existed since the doctor and had never gated a capability — the
+doctor treats *faster*, which any paramedic can also do. The ARV is the first unit where
+the speciality decides what a verb even is.
+
+An armed `Suspect` is not offered `ApprehendAbility`: it scores `NOT_APPLICABLE` while the
+weapon is up, so an ordinary officer's right-click falls through the ladder to Move.
+`DisarmAbility` scores 34 against Apprehend's 30 and only for `speciality == ARMED`, so
+armed response makes the scene safe and somebody else makes the arrest. That division is
+the call: an ARV on its own achieves nothing.
+
+Three faults on the way in, each with a transferable moral:
+
+- **A T-posed officer.** Two causes at once. The Heist pack was not in `setup_retarget`,
+  so the rig kept raw Synty bone names and matched nothing; and the generator was building
+  from the *prefab*, which embeds its own skeleton that the `.import` patch cannot reach.
+  Both had to change — build from the FBX, and add the pack's bone map.
+- **A white officer.** Materials live on the prefabs, not on the FBX, so building from the
+  FBX inherits nothing and the mesh renders untextured. `_copy_materials` also turned out
+  to be hardcoded to `PolygonCity_01_A`, meaning every Heist palette handed to it had been
+  **accepted and silently ignored** — the same bug independently present in
+  `build_portraits.gd`.
+- **An officer sliding 19.5m in six seconds with zero velocity.** Synty's weapon prefabs
+  ship a `MeshCollider` `StaticBody3D`. Parented into a character and teleported to the
+  hand each frame, it shoves its own carrier across the map. `Unit.strip_collision()` is
+  now shared.
+
+The weapon is a pistol rather than the rifle it started as, because the shared animation
+library has six pistol clips and **no rifle clips at all**. `DisarmOrder` plays
+`Pistol_Idle` while the officer works — and the check for that first reported a failure
+that was not one, because it sampled the animation *after* the order finished, by which
+point the pose is released and it reads `Idle`.
+
+### The crash was three panels from anything on screen (August 2026)
+
+The game started dying in play with `EXC_BAD_ACCESS` (SIGBUS) inside Metal. Never
+headlessly — headless has no Metal, so the renderer's faults are structurally invisible to
+the suite, and no amount of check-writing was ever going to find this one.
+
+**Three diagnoses were confidently wrong**: deferred signals, the pooled roster rows, the
+`AtlasTexture` cropping. Five attempts to reproduce it failed outright. What broke it open
+was the player's observation that *spawning armed response* did it reliably, which made a
+20-second staged probe possible at a 33–50% crash rate — and with a rate, a bisect.
+
+| Variant | Crashes |
+| --- | --- |
+| Baseline sidebar | 4–7 of 12 |
+| Rows with no children | 6 of 12 |
+| No rows at all | 7 of 12 |
+| Sidebar never refreshed | **0 of 12** |
+| Refresh without selection marking | 3 of 12 |
+| Refresh without the layout call | 6 of 12 |
+| **Catalogue cached** | **0 of 24** |
+
+The rows were innocent. `ShopCatalogue.units()` **instantiates and frees thirteen vehicle
+scenes** to measure them for the shop, and `RosterSidebar._rebuild()` called it once per
+unit — roughly 533 instantiate-and-free cycles per rebuild, several times a second, on the
+renderer's own resources. One `static var _cache` ended it. A later play session produced
+no crash report, which is the only evidence that actually counts.
+
+Two things to keep. **Rate, then bisect**: nothing could be learned until there was a
+number to compare against, and the four failed reproductions were all attempts to reason
+from the symptom instead. And **the fault was in a file nobody had edited** — the crash
+arrived with the sidebar, and the sidebar was not the cause.
 
 ### Phase 20 finished: campaign scenarios (August 2026)
 
@@ -1268,6 +1512,42 @@ cannot fail. It was caught by a sabotage agent *reading* it, which is the only m
 this project has for that class of rot. The check's own message had the same problem and was
 reworded: it said "full song at cruise height" against a reading taken "low down", when the
 two samples now differ because one is mid-spool and not because one is higher.
+
+### The roster became a status sidebar (August 2026)
+
+The left-hand chip strip was replaced with the kit's docked sidebar: units grouped by
+status, filtered by service, each row carrying a callsign, a task and a condition bar.
+Same tactic as the shop -- [RosterSidebar] keeps [Roster]'s public names (`controller`,
+`station`, `standby_chip`) so [HUD] and [TutorialDirector] needed no changes.
+
+**Two design decisions had to be made rather than inherited, and both are worth stating.**
+The old roster put each service on its own line, which the player had asked for; the
+sidebar groups by *status* and separates services with a filter instead. The check changed
+with it -- from "no line mixes two services" to "filtering to a service shows only that
+service, and the filters between them account for every row". And the kit's sidebar tracks
+one selected unit where this game lets you box-select a dozen, so selection is marked from
+the controller rather than from the kit's own `selected`.
+
+**A ten-failure cascade through the arrest sequence, and it was mine.** The officer would
+be given Apprehend and never complete it; nothing in the failures mentioned the roster and
+it read as a police bug. The cause was `_restate` calling the sidebar's `_rebuild()`
+whenever anything changed -- which destroys and recreates every row, and rows are
+[Button]s. Doing that continuously broke behaviour several systems away.
+
+It was found by *measurement rather than reading*: disabling the panel's `_process`
+entirely turned 15 failures into 10 and the arrests came back, which localised it to the
+sidebar; disabling the two halves separately localised it to the rebuild. **A UI panel that
+rebuilds itself every frame is not merely wasteful -- it can break the game underneath it**,
+and no amount of staring at an arrest would have found that.
+
+Two smaller things. A near-identical trap to the modal's: the kit's row *always* draws a
+condition bar, which would have put a full green bar under every patrol car -- and a
+vehicle's damage is a repair bill in pounds, not health. The bar is hidden for anything
+without a `health`, and for anyone at full health, which is what the strip it replaced did.
+And the rows are driven in checks by their own `selected` signal rather than by a pushed
+click, for the reason established during the shop swap: synthetic input reaches controls
+outside a `ScrollContainer` and not the ones inside it. That weakness is named in the
+checks rather than papered over.
 
 ### The shop became a requisition modal (August 2026)
 
@@ -2416,7 +2696,7 @@ proved the driving fix and the manhole rule had **no witness at all** until a
 behavioural drive check and a direct assertion were added, and then caught that the
 new manhole check drew its subjects from the very constant it tested.
 
-**1089 automated checks**, all passing. Run them with any Godot 4.6+ binary
+**1123 automated checks**, all passing. Run them with any Godot 4.6+ binary
 (`--fixed-fps 60` decouples the loop from the wall clock — ~20s instead of ~9min):
 
     godot --headless --fixed-fps 60 --path . --script res://Game/smoke_test.gd

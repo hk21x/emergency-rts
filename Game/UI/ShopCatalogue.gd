@@ -23,8 +23,25 @@ const CATEGORY := {
 }
 
 
+## Built once and kept.
+##
+## **This is a hot function that instantiates scenes.** Every call walks the whole
+## catalogue and, for each row, loads and instantiates a vehicle scene to read `seats`,
+## `cells` and `stretchers` off it, then frees it again. That is fine for building a shop
+## once; it is catastrophic when the roster sidebar calls it per unit per rebuild --
+## roughly 533 full scene create-and-destroy cycles a rebuild on a 41-unit fleet, on the
+## main thread, with the renderer running. The game died with a bus error inside Metal,
+## intermittently, on any dispatch.
+##
+## Nothing here changes at runtime: the catalogue is a constant and the scenes are on
+## disk. So the answer is computed once.
+static var _cache: Array[UnitDef] = []
+
+
 ## One [UnitDef] per catalogue row, in catalogue order.
 static func units() -> Array[UnitDef]:
+	if not _cache.is_empty():
+		return _cache
 	var out: Array[UnitDef] = []
 	for config: Dictionary in Station.TYPES:
 		var def := UnitDef.new()
@@ -47,7 +64,8 @@ static func units() -> Array[UnitDef]:
 		# front end would be a rules change disguised as a skin.
 		def.stock = 0
 		out.append(def)
-	return out
+	_cache = out
+	return _cache
 
 
 ## The tabs actually populated, so an empty SUPPORT tab is never shown.

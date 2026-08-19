@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="42" height="5" viewBox="0 0 42 5" fill="none" role="img" aria-label="Condition fill — fair">
+  <defs>
+    <linearGradient id="cbfa_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D8AA33"/><stop offset="1" stop-color="#A57C18"/></linearGradient>
+
+  </defs>
+  <rect x="0" y="0" width="42" height="5" rx="2" fill="url(#cbfa_g)" fill-opacity="1"/>
+
+</svg>

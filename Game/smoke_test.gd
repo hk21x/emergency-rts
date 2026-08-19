@@ -46,7 +46,7 @@ var _unit_panel: PanelContainer
 var _command_panel: PanelContainer
 var _help: PanelContainer
 var _portrait: Portrait
-var _roster: Roster
+var _roster: RosterSidebar
 var _grid: CommandGrid
 var _call_list: CallList
 var _board: CallBoard
@@ -135,7 +135,7 @@ func _run() -> void:
 	_help = scene.get_node_or_null("HUD/Root/World/HelpPanel") as PanelContainer
 	_portrait = scene.get_node_or_null(
 		"HUD/Root/Bar/Row/PortraitBlock/Portrait") as Portrait
-	_roster = scene.get_node_or_null("HUD/Root/Bar/Row/RosterBlock/Body/Roster") as Roster
+	_roster = scene.get_node_or_null("HUD/Root/Bar/Row/RosterBlock/Body/Roster") as RosterSidebar
 	_grid = scene.get_node_or_null(
 		"HUD/Root/Bar/Row/CommandBlock/Body/CommandGrid") as CommandGrid
 	_call_list = scene.get_node_or_null("HUD/Root/World/CallList") as CallList
@@ -280,10 +280,12 @@ func _run() -> void:
 	await _test_bar_does_not_swallow_world_clicks()
 	await _test_command_grid_follows_the_selection()
 	await _test_command_hotkeys_run_abilities()
+	await _test_no_unit_offers_two_verbs_on_one_key()
 	await _test_roster_lists_everything_under_command()
 	await _test_the_roster_groups_by_service()
 	await _test_the_roster_shows_a_hurt_crew_member()
 	await _test_roster_marks_the_selection()
+	await _test_the_roster_says_what_a_unit_is_doing()
 	await _test_roster_chip_selects_a_unit()
 	await _test_portrait_names_the_lead()
 	await _test_units_carry_a_service_and_a_portrait()
@@ -375,6 +377,8 @@ func _run() -> void:
 	await _test_water_shows_where_it_is_landing()
 	await _test_a_fire_wants_the_right_stuff_on_it()
 	await _test_a_trapped_casualty_needs_cutting_free_first()
+	await _test_armed_response_disarms_before_anyone_arrests()
+	await _test_a_collision_leaves_a_wreck_for_the_truck()
 	await _test_a_shed_load_shuts_the_street()
 	await _test_a_crew_clears_a_shed_load()
 	await _test_calls_can_be_spawned_on_demand()
@@ -3566,6 +3570,85 @@ func _test_command_hotkeys_run_abilities() -> void:
 ## The roster lists the whole shift, not the selection. That is what makes it a control
 ## rather than a readout: the parked ambulance can be sent from here without first
 ## finding it in the street.
+## Every unit's own command grid, swept for keys that answer twice.
+##
+## **Written because the game shipped one and nothing noticed.** `Clear` and `Lights` both
+## returned `KEY_J`, on the documented reasoning that one is a foot verb and the other a
+## vehicle verb so they could never meet -- and then `can_tow` gave the recovery truck the
+## winch, which made it the one unit carrying both. `_handle_hotkey` takes the first match
+## in tile order, so the truck's lightbar became unreachable from the keyboard while the
+## reference file still described the situation as impossible.
+##
+## Three legs, because the near misses differ. A key that answers twice on one unit is the
+## fault above. A key the camera *polls* (`W A S D Q E`) is worse -- `Input.get_vector`
+## reads it whether or not the event was consumed, so the command would fire and the camera
+## would move. And a key outside [constant RTSController.COMMAND_KEYS] has no defined slot
+## in the row, so `_key_order` files it last alongside every other unplaced verb and the
+## tile order stops meaning anything.
+func _test_no_unit_offers_two_verbs_on_one_key() -> void:
+	# Polled by RTSCamera, or claimed by the shell. A command on any of these is a command
+	# that also does something else.
+	var reserved := [KEY_W, KEY_A, KEY_S, KEY_D, KEY_Q, KEY_E, KEY_F, KEY_R,
+		KEY_ESCAPE, KEY_ENTER, KEY_SPACE, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5,
+		KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9]
+	var paths: Array[String] = ["res://Game/Person.tscn", "res://Game/Paramedic.tscn",
+		"res://Game/Firefighter.tscn", "res://Game/Doctor.tscn",
+		"res://Game/ArmedOfficer.tscn"]
+	var dir := DirAccess.open("res://Game/Vehicles")
+	if dir:
+		for file in dir.get_files():
+			if file.ends_with(".tscn"):
+				paths.append("res://Game/Vehicles/%s" % file)
+
+	var swept := 0
+	var verbs := 0
+	var clashes: Array[String] = []
+	var stolen: Array[String] = []
+	var unplaced: Array[String] = []
+	for path in paths:
+		var packed := load(path) as PackedScene
+		if packed == null:
+			continue
+		var unit := packed.instantiate() as Unit
+		if unit == null:
+			continue
+		# Abilities are built in `_ready`, so the unit has to be in the tree: reading them
+		# off a bare `instantiate()` returns an empty list and passes everything.
+		_scene.add_child(unit)
+		await _idle(1)
+		swept += 1
+		var seen := {}
+		for ability in unit.abilities():
+			var key: int = ability.hotkey()
+			if key == KEY_NONE:
+				continue
+			verbs += 1
+			var named := OS.get_keycode_string(key)
+			if seen.has(key):
+				clashes.append("%s: %s and %s both on %s"
+					% [path.get_file(), seen[key], ability.id(), named])
+			seen[key] = ability.id()
+			if reserved.has(key):
+				stolen.append("%s: %s on %s" % [path.get_file(), ability.id(), named])
+			if not RTSController.COMMAND_KEYS.has(key):
+				unplaced.append("%s: %s on %s" % [path.get_file(), ability.id(), named])
+		unit.queue_free()
+		await _idle(1)
+
+	# Two-sided: a folder that read as empty would leave all three lists empty and pass.
+	_check(swept >= 12 and verbs >= 60,
+		"%d unit scenes swept, offering %d bound verbs between them" % [swept, verbs])
+	_check(clashes.is_empty(),
+		"no unit offers two verbs on one key (%s)"
+		% ("none" if clashes.is_empty() else "; ".join(clashes)))
+	_check(stolen.is_empty(),
+		"and none takes a key the camera polls (%s)"
+		% ("none" if stolen.is_empty() else "; ".join(stolen)))
+	_check(unplaced.is_empty(),
+		"and every one has a slot in COMMAND_KEYS (%s)"
+		% ("none" if unplaced.is_empty() else "; ".join(unplaced)))
+
+
 func _test_roster_lists_everything_under_command() -> void:
 	_controller.clear_selection()
 	await _idle(3)
@@ -3588,10 +3671,11 @@ func _test_roster_lists_everything_under_command() -> void:
 	for chip in _visible_chips():
 		# A standby chip legitimately has no unit -- it stands for one still in the
 		# station. Only a chip that is neither is a stray.
-		if not chip.standby.is_empty():
+		if not _roster.standby_for(chip).is_empty():
 			continue
-		if chip.unit == null or chip.unit.service == Unit.Service.NONE:
-			strays.append(str(chip.unit))
+		var listed := _roster.unit_for(chip)
+		if listed == null or listed.service == Unit.Service.NONE:
+			strays.append(str(listed))
 	_check(strays.is_empty() and _visible_chips().size() == commanded.size(),
 		"and refuses a civilian standing in the middle of the map%s" % (
 			"" if strays.is_empty() else " -- listed " + ", ".join(strays)))
@@ -3608,38 +3692,50 @@ func _test_roster_lists_everything_under_command() -> void:
 ## the failure. That form survives the rows being rebuilt, reordered or reparented.
 func _test_the_roster_groups_by_service() -> void:
 	var roster := _scene.get_node_or_null(
-		"HUD/Root/Bar/Row/RosterBlock/Body/Roster") as Roster
+		"HUD/Root/Bar/Row/RosterBlock/Body/Roster") as RosterSidebar
 	if roster == null:
 		_check(false, "the HUD carries a roster")
 		return
 	await _idle(3)
 
-	# `service -> row`, built from what is actually on screen.
-	var seen := {}
-	var mixed := PackedStringArray()
-	for chip in _visible_chips():
-		var service: int = chip.unit.service if chip.unit \
-			else int(chip.standby.get("service", Unit.Service.NONE))
-		var row := chip.get_parent()
-		if seen.has(service) and seen[service] != row:
-			mixed.append("service %d split across rows" % service)
-		seen[service] = row
-	# The other direction: no row may carry two services.
-	var owners := {}
-	for service in seen:
-		var row: Variant = seen[service]
-		if owners.has(row):
-			mixed.append("services %d and %d share a row" % [owners[row], service])
-		owners[row] = service
+	# **The design changed here and the check changed with it.** The roster this replaced
+	# put each service on its own line, and this asserted that no line ever mixed two.
+	# The sidebar groups by *status* instead -- available, en route, on scene -- and keeps
+	# the services apart with a filter. So the surviving question is the one that was
+	# really being asked: **can the player see one service without the others?**
+	var everything := roster.rows().size()
+	_check(everything >= 2, "the roster lists something to filter (%d rows)" % everything)
 
-	_check(not seen.is_empty(), "the roster has chips to group (%d)" % seen.size())
-	_check(mixed.is_empty(), "each service keeps its own line (%s)" % (
-		"clear" if mixed.is_empty() else ", ".join(mixed)))
+	var per_service := {}
+	for service: int in [Unit.Service.POLICE, Unit.Service.MEDICAL, Unit.Service.FIRE]:
+		var category: StringName = ShopCatalogue.CATEGORY.get(service, &"support")
+		roster.filter_to(category)
+		await _idle(2)
+		var strays := PackedStringArray()
+		var shown := 0
+		for row in roster.rows():
+			shown += 1
+			var listed := roster.unit_for(row)
+			var waiting := roster.standby_for(row)
+			var of: int = listed.service if listed \
+				else int(waiting.get("service", Unit.Service.NONE))
+			if of != service:
+				strays.append(str(of))
+		per_service[service] = shown
+		_check(strays.is_empty(),
+			"filtering to %s shows only that service (%d shown, %d strays)"
+			% [category, shown, strays.size()])
+	roster.filter_to(&"all")
+	await _idle(2)
 
-	# And the fixture really does have more than one service on the strip, or the two
-	# assertions above are true of any roster at all.
-	_check(seen.size() >= 2,
-		"with at least two services on it to keep apart (%d)" % seen.size())
+	# Both directions: a filter that showed *nothing* would satisfy the assertions above,
+	# and the parts have to add back up to the whole.
+	var summed := 0
+	for service in per_service:
+		summed += int(per_service[service])
+	_check(summed == everything,
+		"and the filters between them account for every row (%d of %d)"
+		% [summed, everything])
 
 
 ## The roster shows a hurt crew member's health, and never invents one for a vehicle.
@@ -3651,31 +3747,33 @@ func _test_the_roster_groups_by_service() -> void:
 func _test_the_roster_shows_a_hurt_crew_member() -> void:
 	_controller.clear_selection()
 	await _idle(3)
-	var hurt_chip: UnitChip = null
-	var car_chip: UnitChip = null
+	var hurt_chip: Control = null
+	var car_chip: Control = null
 	for chip in _visible_chips():
-		if chip.unit == _officer:
+		var listed := _roster.unit_for(chip)
+		if listed == _officer:
 			hurt_chip = chip
-		elif chip.unit == _car:
+		elif listed == _car:
 			car_chip = chip
 	if hurt_chip == null or car_chip == null:
 		_check(false, "a person and a vehicle on the roster to compare")
 		return
 
-	_check(not hurt_chip._health.visible,
+	_check(not _roster.shows_condition(hurt_chip),
 		"an unhurt crew member shows no health bar")
 	var kept := _officer.health
 	_officer.hurt(0.5)
 	await _idle(4)
-	_check(hurt_chip._health.visible,
+	_check(_roster.shows_condition(hurt_chip),
 		"and a hurt one does (health %.2f)" % _officer.health)
-	_check(not car_chip._health.visible,
+	_check(not _roster.shows_condition(car_chip),
 		"while a vehicle never does -- it has a repair bill, not health")
 
 	# Back to full, and the bar goes away again rather than sitting at 100%.
 	_officer.health = kept
 	await _idle(4)
-	_check(not hurt_chip._health.visible, "and it hides again once they are patched up")
+	_check(not _roster.shows_condition(hurt_chip),
+		"and it hides again once they are patched up")
 
 
 func _test_roster_marks_the_selection() -> void:
@@ -3683,8 +3781,8 @@ func _test_roster_marks_the_selection() -> void:
 	await _idle(3)
 	var marked := PackedStringArray()
 	for chip in _visible_chips():
-		if chip._badge.highlighted:
-			marked.append(chip.unit.display_name)
+		if _roster.is_row_selected(chip):
+			marked.append(_roster.unit_for(chip).display_name)
 	_check(marked.size() == 2,
 		"selecting two rings two chips (%d: %s)" % [marked.size(), ", ".join(marked)])
 	_check(marked.has(_cars[0].display_name) and marked.has(_cars[1].display_name),
@@ -3694,7 +3792,7 @@ func _test_roster_marks_the_selection() -> void:
 	await _idle(3)
 	var still := 0
 	for chip in _visible_chips():
-		if chip._badge.highlighted:
+		if _roster.is_row_selected(chip):
 			still += 1
 	_check(still == 0, "clearing the selection un-rings them (%d still ringed)" % still)
 
@@ -3702,6 +3800,92 @@ func _test_roster_marks_the_selection() -> void:
 ## Sending one unit from the bar is the reason the roster exists, so it is clicked for
 ## real rather than called directly -- which also proves a chip is reachable inside the
 ## bar, and that the bar does not intercept its own children's clicks.
+## A row must stop saying AVAILABLE once its unit is doing something.
+##
+## **The roster's worst shipped bug, and nothing was watching it.** Every row read
+## AVAILABLE / Station for the whole shift however far the unit drove -- the player
+## reported it as "the status of the units only seems to stay as Available". `_refresh`
+## compared the *total* of the two populations, and dispatching a unit moves it from the
+## house to the map, so `wanted` gained one exactly as `waiting` lost one, the total never
+## moved, and the rebuild never fired. The row stayed bound to the station entry it was
+## born as.
+##
+## **The unit has to come out of the station for this to mean anything**, and the first
+## version of this check did not do that -- it drove a car that was already on the map,
+## which `_restate()` services every frame whether or not the rebuild fires. Reverting the
+## fix left it entirely green. `_restate` skips any row whose `_behind` entry is still a
+## Dictionary, so the fault is only reachable through a row that began as a station entry:
+## the scenario was under-provoked, and the repair belonged there rather than in the
+## assertion.
+func _test_the_roster_says_what_a_unit_is_doing() -> void:
+	_controller.clear_selection()
+	await _idle(4)
+	# Two-sided, on a unit that was already out: a row jammed on EN ROUTE would otherwise
+	# pass the half that matters most.
+	var parked := _chip_for(_car)
+	if parked == null:
+		_check(false, "the patrol car has a row on the roster")
+		return
+	_car.stop_navigating()
+	_car.clear_orders()
+	await _idle(6)
+	_check(_roster.status_of(parked) == UnitInstance.Status.AVAILABLE,
+		"a parked car reads AVAILABLE (%s)"
+		% UnitInstance.STATUS_LABEL.get(_roster.status_of(parked), "?"))
+
+	# **Out of the house through the standby chip**, which is the door the player uses and
+	# the only one that leaves a row bound to a station entry.
+	_buy(&"paramedic", 1)
+	await _idle(4)
+	var chip := _dispatch_row(&"paramedic")
+	_check(chip != null, "a standby chip for the paramedic just bought")
+	if chip == null:
+		return
+	# **Identified by set difference, never by "has a row".** The first rewrite picked the
+	# dispatched unit with `_chip_for(unit) != null` -- which is exactly the condition the
+	# fault destroys, so under the fault the loop skipped the paramedic that had just come
+	# out of the house and silently fell back to one that was already on the map, whose row
+	# `_restate()` services every frame. The check then measured the wrong unit and passed.
+	# The world knows who was dispatched; the panel under test must not be asked.
+	var before := {}
+	for unit in _commanded_units():
+		before[unit] = true
+	(chip as UnitRow).selected.emit((chip as UnitRow).unit)
+	await _idle(6)
+	var sent: Unit = null
+	var after := _commanded_units()
+	for unit in after:
+		if not before.has(unit):
+			sent = unit
+	_check(after.size() == before.size() + 1 and sent != null,
+		"and it comes out onto the forecourt (%d units, was %d)"
+		% [after.size(), before.size()])
+	if sent == null:
+		return
+
+	sent.issue(MoveOrder.new(sent.global_position + Vector3(0.0, 0.0, -14.0)))
+	# Long enough for the panel to notice and rebuild, not so long the walk can finish.
+	await _idle(30)
+	var row := _chip_for(sent)
+	var said: int = _roster.status_of(row) if row else -1
+	# **`row != null` is load-bearing.** Under the fault the dispatched unit has no row at
+	# all, `said` falls back to the -1 sentinel, and `-1 != AVAILABLE` is perfectly true --
+	# so the leg claiming "a row stopped reading AVAILABLE" passed on a unit that had no row
+	# to read. A sentinel that satisfies its own negation is the quiet way an assertion goes
+	# vacuous while its printed measurement plainly shows the fault.
+	_check(row != null and said != UnitInstance.Status.AVAILABLE,
+		"a unit sent from the station stops reading AVAILABLE (%s)"
+		% UnitInstance.STATUS_LABEL.get(said, "no row of its own"))
+	_check(said == UnitInstance.Status.EN_ROUTE,
+		"-- it reads EN ROUTE (%s)"
+		% UnitInstance.STATUS_LABEL.get(said, "no row of its own"))
+
+	sent.stop_navigating()
+	sent.clear_orders()
+	_dissolve(sent, &"paramedic")
+	await _idle(4)
+
+
 func _test_roster_chip_selects_a_unit() -> void:
 	_controller.clear_selection()
 	await _idle(3)
@@ -3710,15 +3894,21 @@ func _test_roster_chip_selects_a_unit() -> void:
 		_check(false, "the ambulance has a chip to click")
 		return
 
-	await _click(MOUSE_BUTTON_LEFT, target.get_global_rect().get_center())
+	# **Driven through the row's own signal, not a pushed click.** Measured during the shop
+	# swap: synthetic input reaches controls outside a `ScrollContainer` and not the ones
+	# inside it, and these rows live in one. Everything downstream of the row is exercised
+	# -- the panel's handler, the controller, the selection -- but that a mouse click lands
+	# on the row is unproven, and saying so beats asserting something weaker in silence.
+	(target as UnitRow).selected.emit((target as UnitRow).unit)
+	await _idle(3)
 	_check(_controller.selection.size() == 1 and _controller.primary() == _ambulance,
 		"clicking the ambulance's chip selected it, and only it (%d selected)"
 			% _controller.selection.size())
 
 
-func _chip_for(unit: Unit) -> UnitChip:
+func _chip_for(unit: Unit) -> Control:
 	for chip in _visible_chips():
-		if chip.unit == unit:
+		if _roster.unit_for(chip) == unit:
 			return chip
 	return null
 
@@ -3812,12 +4002,26 @@ func _armed_id() -> StringName:
 	return _controller.armed_ability.id() if _controller.armed_ability else &"none"
 
 
-func _visible_chips() -> Array[UnitChip]:
-	var found: Array[UnitChip] = []
-	for chip in _roster._chips:
-		if chip.visible:
-			found.append(chip)
-	return found
+## What a right-click would mean, named.
+##
+## `"%s" % ability` prints `<RefCounted#-92233708...>`, so every `resolve()` assertion in
+## this file used to fail with a line a reader could learn nothing from -- it could not tell
+## Disarm from Apprehend from Move, which is precisely the distinction those legs exist to
+## draw. Found while sabotage-proving the armed-response check, where the failing line was
+## the only evidence available.
+func _resolved_id(unit: Unit, target: Target) -> StringName:
+	var ability := unit.resolve(target)
+	return ability.id() if ability else &"nothing"
+
+
+## The rows currently on the roster.
+##
+## Was `_visible_chips`, walking `Roster._chips` directly. It asks [RosterSidebar] now,
+## because reaching into the panel's private members is what made ten checks fail at once
+## the moment the panel was replaced -- the checks were coupled to an implementation, not
+## to a behaviour.
+func _visible_chips() -> Array:
+	return _roster.rows() if _roster else []
 
 
 # --- Calls -------------------------------------------------------------------
@@ -4219,7 +4423,6 @@ func _hud_panels() -> Dictionary:
 		"roster": "HUD/Root/Bar/Row/RosterBlock",
 		"commands": "HUD/Root/Bar/Row/CommandBlock",
 		"dispatch": "HUD/Root/Bar/Row/DispatchBlock",
-		"buy": "HUD/Root/World/BuyButton",
 	}
 	var found := {}
 	for name in wanted:
@@ -6156,9 +6359,8 @@ func _test_dispatch_puts_a_unit_on_the_forecourt() -> void:
 	_check(row != null, "the roster offers a standby chip for a paramedic just bought")
 	var clicked: Unit = null
 	if row != null:
-		# The centre of the chip. The old dispatch row was 126px wide and this clicked
-		# 60px in; a chip is 48 wide, so that offset would now land outside it.
-		await _click(MOUSE_BUTTON_LEFT, row.get_global_rect().get_center())
+		# Through the row's signal, for the reason given on the selection check above.
+		(row as UnitRow).selected.emit((row as UnitRow).unit)
 		await _idle(4)
 		_check(units_node.get_child_count() == before_click + 1
 				and _station.available(&"paramedic") == 0,
@@ -7626,6 +7828,258 @@ func _test_a_trapped_casualty_needs_cutting_free_first() -> void:
 ## The shed load shuts the street three ways, and each has its own witness: the board
 ## reads it as a scene hazard, the traffic-facing cordon stands raised without cones,
 ## and a vehicle's own road_is_blocked sees it -- which is what buys the reroute.
+## A collision leaves a written-off car, and only the recovery truck can shift it.
+##
+## **The first incident that outlives its casualties.** Every other call in this game ends
+## when the last body leaves; this one keeps the street shut afterwards, which is the
+## whole reason to own a truck. So the check is in three parts: the RTC leaves a wreck,
+## the wreck is offered to the winch and refused to everything else, and clearing it
+## actually resolves.
+## Armed response: the first unit whose verbs come from its speciality, not its service.
+##
+## **Driven entirely through `resolve()`.** Every check written for the wreck earlier today
+## built its ability by hand and passed while the feature did not work at all -- the unit
+## did not carry the verb, so a right-click meant Move. So this asks the officers what a
+## right-click actually resolves to, which is the only question the player asks.
+func _test_armed_response_disarms_before_anyone_arrests() -> void:
+	await _clear_calls()
+	await _park_the_shift()
+	_stand_down()
+	_buy(&"arv", 1)
+	var arv := _station.dispatch(&"arv") as Person
+	if arv == null:
+		_check(false, "an armed response officer to send")
+		_stand_to()
+		return
+	_check(arv.service == Unit.Service.POLICE and arv.speciality == Person.ARMED,
+		"the ARV is police with an 'armed' speciality (%d/'%s')"
+		% [arv.service, arv.speciality])
+
+	# **Dressed.** The SWAT materials live on the pack's prefabs, not in the FBX this
+	# character is built from, so inheriting them got nothing and the officer turned out
+	# plain white. Asked of the mesh rather than the file, because the file looked fine.
+	var dressed := 0
+	var meshes := 0
+	for node in arv.find_children("*", "MeshInstance3D", true, false):
+		var mesh := node as MeshInstance3D
+		if mesh.mesh == null:
+			continue
+		meshes += 1
+		if mesh.get_active_material(0) != null:
+			dressed += 1
+	_check(meshes > 0 and dressed == meshes,
+		"and is wearing something (%d of %d meshes have a material)" % [dressed, meshes])
+
+	# **Stands still.** The weapon prefabs ship wrapped in a StaticBody3D, and a collider
+	# parented inside the officer and teleported onto the hand each frame shoves its own
+	# carrier: this drifted 19m in six seconds with zero velocity and no orders.
+	await _idle(6)
+	var stood := arv.global_position
+	await _idle(120)
+	_check(arv.global_position.distance_to(stood) < 0.25,
+		"and stands still when idle (%.2fm in two seconds)"
+		% arv.global_position.distance_to(stood))
+
+	_director._rng.seed = 7
+	_director.open_kind(&"armed_suspect")
+	await _idle(10)
+	var suspects := get_nodes_in_group(Suspect.SUSPECT_GROUP)
+	if suspects.is_empty():
+		_check(false, "an armed suspect on the map")
+		_dissolve(arv, &"arv")
+		_stand_to()
+		return
+	var suspect := suspects[0] as Suspect
+	_check(suspect.armed, "the call puts a weapon in their hands")
+	await _idle(6)
+	var pistol := suspect.get_node_or_null("HeldWeapon") as Node3D
+	_check(pistol != null and pistol.visible,
+		"and the weapon is visible on them -- which is how the player tells them apart")
+
+	var target := Target.new()
+	target.position = suspect.global_position
+	target.incident = suspect
+	# **Both sides.** An ARV that is never offered Disarm and an ordinary officer who is
+	# offered an arrest are equally wrong, and checking one would pass on a verb that
+	# answered the same way to everybody.
+	_check(_officer.resolve(target) is not ApprehendAbility,
+		"an ordinary officer is not offered the arrest (%s)"
+		% _resolved_id(_officer, target))
+	_check(arv.resolve(target) is DisarmAbility,
+		"armed response is offered Disarm (%s)" % _resolved_id(arv, target))
+	# **And an ordinary officer cannot disarm them either**, which is the leg the two above
+	# leave open. Drop `Person.ARMED` from `DisarmAbility.score()` and a constable resolves
+	# to Disarm: the arrest leg still reads "not an arrest", both legs stay green, and the
+	# speciality gate -- the entire reason this unit exists -- is unguarded. What the
+	# right-click has to mean is Move, which is `ApprehendAbility`'s own documented claim
+	# and was equally unwatched.
+	_check(_officer.resolve(target) is MoveAbility,
+		"and for them a right-click means Move, not Disarm (%s)"
+		% _resolved_id(_officer, target))
+
+	# Talk them down, then the arrest is anybody's -- which is the point of the unit.
+	await _place_unit(arv, suspect.global_position + Vector3(3.0, 0.0, 0.0))
+	arv.issue(arv.resolve(target).make_order(arv, target))
+	var down := false
+	# **Sampled while the work is happening, not after it.** The pose belongs to the order,
+	# so it is gone the moment the order finishes -- reading it afterwards finds `Idle` and
+	# says nothing about what the player saw.
+	var posed := ""
+	var player := arv.get_node_or_null("Character/AnimationPlayer") as AnimationPlayer
+	for i in 600:
+		await physics_frame
+		if suspect.disarmed > 0.0 and posed.is_empty() and player:
+			posed = str(player.current_animation)
+		if not suspect.armed:
+			down = true
+			break
+	_check(down, "and talks the weapon down (%.2f)" % suspect.disarmed)
+	# **The pose while they work.** The library has six pistol clips and no rifle ones,
+	# which is why the ARV carries a pistol: the walk in is the ordinary locomotion with
+	# the gun in hand, and `Pistol_Idle` is the one pose drawn for standing off somebody
+	# with a weapon up. It used to hold the extinguisher's torch pose instead.
+	_check(posed == "Pistol_Idle",
+		"holding the weapon on them while they do it ('%s')" % posed)
+	await _idle(6)
+	_check(pistol == null or not pistol.visible,
+		"the weapon leaves their hand when they give it up")
+	_check(arv.get_node_or_null("HeldWeapon") != null,
+		"and armed response is carrying one of its own")
+	_check(_officer.resolve(target) is ApprehendAbility,
+		"after which an ordinary officer can make the arrest (%s)"
+		% _resolved_id(_officer, target))
+
+	_dissolve(arv, &"arv")
+	await _idle(2)
+	await _clear_calls()
+	_stand_to()
+
+
+func _test_a_collision_leaves_a_wreck_for_the_truck() -> void:
+	await _clear_calls()
+	await _park_the_shift()
+	_stand_down()
+	_director._rng.seed = 21
+	_director._spawn_rtc(Vector2i(2, 2))
+	await _idle(6)
+
+	var wrecks := get_nodes_in_group(Wreck.WRECK_GROUP)
+	if wrecks.size() != 1:
+		_check(false, "a wreck left at the collision (%d)" % wrecks.size())
+		_stand_to()
+		return
+	var wreck := wrecks[0] as Wreck
+	# **Nobody is under the car.** Reported from play: the casualties were placed 2.2m and
+	# 2.5m from the junction centre and the wreck sat on the centre inside a 5.5m blocker,
+	# so they spawned beneath it and could not be reached. Asserted against the wreck's own
+	# published clearance rather than a number copied here, so moving one moves both.
+	var trapped := PackedStringArray()
+	var nearest := 999.0
+	for node in get_nodes_in_group(Casualty.CASUALTY_GROUP):
+		var casualty := node as Casualty
+		if casualty == null:
+			continue
+		var gap := _flat_distance(casualty.global_position, wreck.global_position)
+		nearest = minf(nearest, gap)
+		if gap < Wreck.CLEAR_RADIUS:
+			trapped.append("%.1fm" % gap)
+	_check(trapped.is_empty(),
+		"no casualty is trapped under the car (nearest %.1fm, needs %.1f)"
+		% [nearest, Wreck.CLEAR_RADIUS])
+
+	var cordon := wreck.get_node_or_null("Cordon") as Cordon
+	_check(cordon != null and cordon.raised,
+		"a raised cordon turns the traffic away from it")
+	_check(wreck.get_node_or_null("Blocker") != null,
+		"and something solid is actually in the road")
+
+	# **The winch is the gate.** Both sides asserted: a truck that is never offered the
+	# job and a patrol car that is offered it are equally wrong, and only checking one
+	# would pass on an ability that answered the same way to everybody.
+	var target := Target.new()
+	target.position = wreck.global_position
+	target.incident = wreck
+	_buy(&"truck", 1)
+	var truck := _station.dispatch(&"truck") as Vehicle
+	if truck == null:
+		_check(false, "a recovery truck to send")
+		_stand_to()
+		return
+	_check(truck.can_tow, "the recovery truck carries a winch")
+
+	# **Asked of the truck's own verbs, not of a hand-built ability.** Every check here
+	# used to construct `ClearAbility.new()` and score it -- which passed while the truck
+	# did not carry the verb at all, so a right-click on a wreck resolved to Move and it
+	# drove over and lifted nothing. Reported from play, invisible to the suite.
+	var clear: Ability = null
+	for ability in truck.abilities():
+		if ability is ClearAbility:
+			clear = ability
+	_check(clear != null, "and the verb to use it with (%d verbs)" % truck.abilities().size())
+	_check(truck.resolve(target) is ClearAbility,
+		"so right-clicking a wreck means Clear, not Move (%s)"
+		% _resolved_id(truck, target))
+	var car_clear := false
+	for ability in _car.abilities():
+		if ability is ClearAbility:
+			car_clear = true
+	_check(not car_clear, "a patrol car has no winch, so it is never offered the job")
+
+	# **The truck actually drives there and winches it.** The first cut of this called
+	# `wreck.clear(1.0)` directly and passed -- while the feature did not work at all: the
+	# truck did not carry the ability, so a right-click resolved to Move and it drove over,
+	# stopped, and lifted nothing. A check that reaches past the interface tests the
+	# incident and vouches for the game.
+	#
+	# Started 20m out rather than from the forecourt, because the point here is the last
+	# few metres and the approach -- a 55m drive would cost the suite twenty seconds to
+	# re-prove the autopilot.
+	truck.global_position = wreck.global_position + Vector3(0.0, 0.0, 20.0)
+	truck.velocity = Vector3.ZERO
+	await _idle(20)
+	truck.issue(truck.resolve(target).make_order(truck, target))
+	await _idle(2)
+
+	# **Where the order aims, not where the truck ends up.** Sabotaging
+	# `WorkOrder.VEHICLE_STANDOFF` to 0 -- reinstating the shipped bug in full -- left every
+	# other leg of this check green: aimed at the centre the truck wedges against the
+	# blocker at 5.36m, which is still inside `ClearOrder.VEHICLE_REACH` (8.0), so it
+	# winches anyway and marginally sooner. The standoff and the reach are competing
+	# satisfiers for "ends up in working range", and only the reach was being measured.
+	# Note the direction: zeroing the standoff moves the truck *closer*, so no bound on the
+	# resting distance can catch it. The aim point is the only place the fault is visible.
+	var blocker := wreck.get_node_or_null("Blocker/BlockerShape") as CollisionShape3D
+	var box := blocker.shape as BoxShape3D if blocker else null
+	# The inscribed radius of a square blocker: the least distance that is certainly
+	# outside it. The blocker is 5.5m square, so this is 2.75 -- and the standoff is 3.4,
+	# which clears it on an axis-aligned approach and *would not* on a perfect diagonal
+	# (the corner is 3.89 out). Harmless today because the road grid is axis-aligned and
+	# the truck arrives along a street, but it is the constant to revisit if a wreck is
+	# ever laid on a junction diagonal.
+	var clearance: float = minf(box.size.x, box.size.z) * 0.5 if box else 2.75
+	var aim := truck.move_target
+	aim.y = wreck.global_position.y
+	var aimed := aim.distance_to(wreck.global_position)
+	_check(aimed >= clearance,
+		"the order aims the truck outside the blocker, not at the wreck (%.2fm, needs %.2f)"
+		% [aimed, clearance])
+
+	var towed := false
+	for i in 900:
+		await physics_frame
+		if not is_instance_valid(wreck):
+			towed = true
+			break
+	_check(towed, "the truck drives to it and winches it away")
+	_check(get_nodes_in_group(Wreck.WRECK_GROUP).is_empty(),
+		"and nothing of it is left in the road")
+
+	_dissolve(truck, &"truck")
+	await _idle(2)
+	await _clear_calls()
+	_stand_to()
+
+
 func _test_a_shed_load_shuts_the_street() -> void:
 	await _clear_calls()
 	await _park_the_shift()
@@ -9356,9 +9810,12 @@ func _test_the_interface_clicks() -> void:
 	_check(clicks._click.bus == AudioBuses.UI,
 		"on the UI bus (%s)" % clicks._click.bus)
 
-	# A real control, clicked where it is: the corner buy button, which the watcher had
-	# to have found on its own -- nothing in `HUD.gd` tells it that button exists.
-	var buy := _scene.get_node_or_null("HUD/Root/World/BuyButton") as Button
+	# A real control, clicked where it is: the sidebar's REQUEST UNITS button, which the
+	# watcher had to have found on its own -- nothing tells it that button exists. It was
+	# the corner buy button until that was retired in favour of this one.
+	var panel := _scene.get_node_or_null(
+		"HUD/Root/Bar/Row/RosterBlock/Body/Roster") as RosterSidebar
+	var buy := panel.request_button() if panel else null
 	var shop := _scene.get_node_or_null("HUD/Root/Shop") as RequisitionPanel
 	if buy == null:
 		_check(false, "a button to press")
@@ -10391,7 +10848,12 @@ func _test_the_shift_ends_with_a_summary() -> void:
 		"time running out does not end a shift with a job on the board (%d)"
 		% _mission.state)
 
-	_resolve_call(_board.open_calls()[0])
+	# **Every open call, not just the first.** A collision leaves a written-off car behind
+	# it now, so one incident on the board can outlive the casualties that opened it --
+	# which is the point of the wreck. Clearing one job and expecting the shift to end was
+	# an assumption that only held while every call finished in one go.
+	for call in _board.open_calls().duplicate():
+		_resolve_call(call)
 	var over := false
 	for i in 120:
 		await physics_frame
@@ -11231,18 +11693,21 @@ func _test_the_shop_previews_and_sells() -> void:
 	# **The corner buy button is the front door.** Clicked through the real interface
 	# rather than by calling `open_shop()`, because a button wired to nothing looks
 	# identical to a button wired correctly from everywhere except a click.
-	var corner_buy := _scene.get_node_or_null("HUD/Root/World/BuyButton") as Button
+	var door_panel := _scene.get_node_or_null(
+		"HUD/Root/Bar/Row/RosterBlock/Body/Roster") as RosterSidebar
+	var corner_buy := door_panel.request_button() if door_panel else null
 	if corner_buy == null:
-		_check(false, "the corner carries a buy button")
+		_check(false, "the roster carries a REQUEST UNITS button")
 		return
 	_station.funds = 10000
 	_station.roster_changed.emit()
 	await _click(MOUSE_BUTTON_LEFT, corner_buy.get_global_rect().get_center())
-	_check(shop.visible, "clicking the corner buy button opens the shop")
+	_check(shop.visible, "clicking REQUEST UNITS opens the shop")
 	# The icon is loaded behind a `ResourceLoader.exists()` guard, so a glyph that never
 	# imported costs the picture and not the button -- right behaviour, and completely
 	# invisible. It happened the day the cart was drawn.
-	_check(corner_buy.icon != null, "and carries its cart icon")
+	_check(corner_buy.text.contains("REQUEST"), "and it says what it does (%s)"
+		% corner_buy.text)
 
 	# Every unit in the catalogue has a card, and every card carries its rendered
 	# portrait -- the preview is the point of a shop.
@@ -11446,17 +11911,19 @@ func _wrecks() -> Array[Node3D]:
 ## sending a unit out moved onto the roster's dimmed standby chips. Same helper name and
 ## same job -- find the control that dispatches this type -- so the checks that use it
 ## did not have to change.
-func _dispatch_row(id: StringName) -> UnitChip:
+func _dispatch_row(id: StringName) -> Control:
 	var roster := _scene.get_node_or_null(
-		"HUD/Root/Bar/Row/RosterBlock/Body/Roster") as Roster
+		"HUD/Root/Bar/Row/RosterBlock/Body/Roster") as RosterSidebar
 	if roster == null:
 		return null
-	# The pool, not the children: chips live inside per-service rows since the roster was
-	# grouped, so a walk of the roster's own children now finds three containers.
-	for chip in roster._chips:
-		if chip.visible and not chip.standby.is_empty() \
-				and chip.standby.get("id", &"") == id:
-			return chip
+	# Asked of the panel rather than walked out of its internals. This reached into
+	# `roster._chips` and kept working for exactly as long as the panel had a member by
+	# that name; the swap turned it into a runtime error that silently truncated the check
+	# around it.
+	for row in roster.rows():
+		var waiting := roster.standby_for(row)
+		if not waiting.is_empty() and waiting.get("id", &"") == id:
+			return row
 	return null
 
 
@@ -12025,7 +12492,9 @@ func _test_the_tutorial_town_boots() -> void:
 		# it is talking about -- and the failure worth catching is not "nothing glows" but
 		# "the wrong thing glows", which is why this asserts *which* control it is.
 		var spotlight := town.get_node_or_null("HUD/Spotlight") as Spotlight
-		var cart := town.get_node_or_null("HUD/Root/World/BuyButton") as Control
+		var tutor_panel := town.get_node_or_null(
+			"HUD/Root/Bar/Row/RosterBlock/Body/Roster") as RosterSidebar
+		var cart: Control = tutor_panel.request_button() if tutor_panel else null
 		# **Long enough for a teaching tick.** The prompt -- and with it the spotlight --
 		# is re-read four times a second, so the four frames that suffice for a direct
 		# `_lesson()` call are a sixteenth of what the glow needs.
@@ -12061,7 +12530,7 @@ func _test_the_tutorial_town_boots() -> void:
 		# Bought but parked: the glow follows the words onto the roster chips.
 		await _idle(20)
 		var tutor_roster := town.get_node_or_null(
-			"HUD/Root/Bar/Row/RosterBlock/Body/Roster") as Roster
+			"HUD/Root/Bar/Row/RosterBlock/Body/Roster") as RosterSidebar
 		var chip := tutor_roster.standby_chip(&"ambulance") if tutor_roster else null
 		_check(chip != null and spotlight != null and spotlight._targets.has(chip),
 			"and once bought, the standby chip is what is lit")
@@ -12182,6 +12651,11 @@ func _resolve_call(call: Call) -> void:
 		var hazard := incident as Hazard
 		if hazard:
 			hazard.cool(2.0)
+			continue
+		# A shed load and a written-off car are both worked down to nothing. They share
+		# the name because they share the verb -- see [ClearAbility].
+		if incident.has_method("clear"):
+			incident.call("clear", 1.0)
 
 
 ## Stands the director down and returns the mission to the scripted rules, so the

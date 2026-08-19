@@ -25,7 +25,7 @@ outer_radius = 5.3152294
 rings = 48
 ring_segments = 8
 
-[node name="Vehicle" type="CharacterBody3D" unique_id=1453390419]
+[node name="Vehicle" type="CharacterBody3D" unique_id=1908653547]
 collision_mask = 67
 platform_floor_layers = 1
 script = ExtResource("1_h3wrt")
@@ -35,53 +35,53 @@ service = 1
 portrait = ExtResource("2_u55qm")
 selection_ring_path = NodePath("SelectionRing")
 
-[node name="Lean" type="Node3D" parent="." unique_id=395828060]
+[node name="Lean" type="Node3D" parent="." unique_id=453392983]
 
-[node name="Chassis" type="Node3D" parent="Lean" unique_id=1947655667]
+[node name="Chassis" type="Node3D" parent="Lean" unique_id=419158129]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
-[node name="Body" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1916838709]
+[node name="Body" type="MeshInstance3D" parent="Lean/Chassis" unique_id=402466799]
 mesh = ExtResource("3_5yhl0")
 surface_material_override/0 = ExtResource("4_j2a2o")
 
-[node name="SM_Veh_Helicopter_Blades_Back_01" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1715893424]
+[node name="SM_Veh_Helicopter_Blades_Back_01" type="MeshInstance3D" parent="Lean/Chassis" unique_id=213930056]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16942494, 2.2076652, -5.8120604)
 mesh = ExtResource("5_yjnej")
 surface_material_override/0 = ExtResource("4_j2a2o")
 
-[node name="SM_Veh_Helicopter_Blades_Main_01" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1497617489]
+[node name="SM_Veh_Helicopter_Blades_Main_01" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1301740584]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.920824e-16, 3.704119, 1.052001)
 mesh = ExtResource("6_ejerd")
 surface_material_override/0 = ExtResource("4_j2a2o")
 
-[node name="SM_Veh_Helicopter_Glass_01" type="MeshInstance3D" parent="Lean/Chassis" unique_id=942482329]
+[node name="SM_Veh_Helicopter_Glass_01" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1714583933]
 mesh = ExtResource("7_wbo2f")
 surface_material_override/0 = ExtResource("8_jd55n")
 
-[node name="SM_Veh_Helicopter_Stick_01" type="MeshInstance3D" parent="Lean/Chassis" unique_id=366161526]
+[node name="SM_Veh_Helicopter_Stick_01" type="MeshInstance3D" parent="Lean/Chassis" unique_id=388259432]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4558655, 0.942905, 2.8273754)
 mesh = ExtResource("9_nuw4r")
 surface_material_override/0 = ExtResource("4_j2a2o")
 
-[node name="SM_Veh_Helicopter_Stick_02" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1314789682]
+[node name="SM_Veh_Helicopter_Stick_02" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1878365830]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4563084, 0.942905, 2.8273754)
 mesh = ExtResource("10_kanb1")
 surface_material_override/0 = ExtResource("4_j2a2o")
 
-[node name="SteeringWheel" type="Node3D" parent="Lean/Chassis" unique_id=1658632803]
+[node name="SteeringWheel" type="Node3D" parent="Lean/Chassis" unique_id=1096828138]
 
-[node name="Wheels" type="Node3D" parent="." unique_id=288619570]
+[node name="Wheels" type="Node3D" parent="." unique_id=1016649239]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
-[node name="Collision" type="CollisionShape3D" parent="." unique_id=1348776683]
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=619238737]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8955961, 1.0625691)
 shape = SubResource("BoxShape3D_oo07g")
 
-[node name="NavigationAgent" type="NavigationAgent3D" parent="." unique_id=1997382890]
+[node name="NavigationAgent" type="NavigationAgent3D" parent="." unique_id=108725841]
 path_desired_distance = 2.0
 target_desired_distance = 2.2
 
-[node name="SelectionRing" type="MeshInstance3D" parent="." unique_id=683975983]
+[node name="SelectionRing" type="MeshInstance3D" parent="." unique_id=929783441]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
 material_override = SubResource("StandardMaterial3D_cohrq")
 cast_shadow = 0

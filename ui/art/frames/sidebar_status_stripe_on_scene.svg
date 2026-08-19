@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="4" height="46" viewBox="0 0 4 46" fill="none" role="img" aria-label="Status stripe — on-scene">
+  <defs>
+    <linearGradient id="sson-_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0C860"/><stop offset="1" stop-color="#C79A2A"/></linearGradient>
+
+  </defs>
+  <rect x="0" y="0" width="4" height="46" rx="2" fill="url(#sson-_g)" fill-opacity="1"/>
+
+</svg>

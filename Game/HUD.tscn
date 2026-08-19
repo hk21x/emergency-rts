@@ -8,7 +8,7 @@
 [ext_resource type="Script" path="res://Game/UI/Minimap.gd" id="3_minimap"]
 [ext_resource type="Theme" path="res://Game/UI/Theme.tres" id="4_theme"]
 [ext_resource type="Script" path="res://Game/UI/Portrait.gd" id="5_portrait"]
-[ext_resource type="Script" path="res://Game/UI/Roster.gd" id="6_roster"]
+[ext_resource type="Script" path="res://Game/UI/RosterSidebar.gd" id="6_roster"]
 [ext_resource type="Script" path="res://Game/UI/CommandGrid.gd" id="7_commands"]
 [ext_resource type="Script" path="res://Game/UI/StatusStrip.gd" id="8_status"]
 [ext_resource type="Script" path="res://Game/UI/CallList.gd" id="9_calls"]
@@ -197,7 +197,12 @@ script = ExtResource("13_radio")
 ; left-hand column under the roster, and what is left here is the one thing that was
 ; genuinely a *door* rather than a readout. An icon, because a corner button that opens a
 ; storefront does not need a sentence.
+; **Retired August 2026.** The requisition sidebar carries a full-width REQUEST UNITS
+; button, so a second door into the same shop in the opposite corner was one too many.
+; Kept as a hidden node rather than deleted: it is still the tutorial's fallback target
+; before the sidebar exists, and removing it would mean re-anchoring everything below.
 [node name="BuyButton" type="Button" parent="Root/World"]
+visible = false
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
@@ -346,6 +351,7 @@ theme_type_variation = &"CardPanel"
 [node name="Heading" type="Label" parent="Root/Bar/Row/RosterBlock/Body"]
 theme_type_variation = &"HeaderLabel"
 text = "UNITS UNDER COMMAND"
+visible = false
 
 [node name="Roster" type="VBoxContainer" parent="Root/Bar/Row/RosterBlock/Body"]
 size_flags_vertical = 3

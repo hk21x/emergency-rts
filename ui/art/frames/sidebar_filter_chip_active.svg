@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="52" height="28" viewBox="0 0 52 28" fill="none" role="img" aria-label="Filter chip — active">
+  <defs>
+    <linearGradient id="fcact_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A7FE0"/><stop offset="1" stop-color="#125AAF"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="51" height="27" rx="3" fill="url(#fcact_g)" fill-opacity="1" stroke="#4A9CF0" stroke-width="1" stroke-opacity="1"/>
+  <path d="M6 2 H46" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="1" stroke-linecap="round"/>
+
+</svg>

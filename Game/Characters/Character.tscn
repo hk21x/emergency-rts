@@ -155,11 +155,11 @@ bind/48/name = &"RightUpperLeg"
 bind/48/bone = -1
 bind/48/pose = Transform3D(-0.9999999, -3.7252903e-09, 5.960465e-08, 1.4901161e-08, -0.99999994, -1.3089856e-13, -1.1869889e-07, -2.6047942e-08, 1, -0.09896705, 0.8315581, 0.020469073)
 
-[node name="Character" type="Node3D" unique_id=185975594]
+[node name="Character" type="Node3D" unique_id=335145556]
 
-[node name="Armature" type="Node3D" parent="." unique_id=1854718334]
+[node name="Armature" type="Node3D" parent="." unique_id=727462711]
 
-[node name="GeneralSkeleton" type="Skeleton3D" parent="Armature" unique_id=631199009]
+[node name="GeneralSkeleton" type="Skeleton3D" parent="Armature" unique_id=1796328642]
 unique_name_in_owner = true
 motion_scale = 0.8762761
 bones/0/name = "Root"
@@ -513,10 +513,10 @@ bones/49/position = Vector3(-1.3889266e-08, 0.07295751, -6.5228662e-09)
 bones/49/rotation = Quaternion(0.7071067, -2.7578793e-08, 5.4076054e-08, 0.7071068)
 bones/49/scale = Vector3(1.0000001, 1, 1.0000001)
 
-[node name="SM_Character_Male_01" type="MeshInstance3D" parent="Armature/GeneralSkeleton" unique_id=545774375]
+[node name="SM_Character_Male_01" type="MeshInstance3D" parent="Armature/GeneralSkeleton" unique_id=1014992992]
 mesh = ExtResource("1_vcgi2")
 skin = SubResource("Skin_xrst0")
 surface_material_override/0 = ExtResource("2_ysp4a")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1568327558]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1273344841]
 libraries/ = ExtResource("3_yxj88")

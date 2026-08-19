@@ -31,7 +31,7 @@ outer_radius = 2.6089
 rings = 48
 ring_segments = 8
 
-[node name="Vehicle" type="CharacterBody3D" unique_id=526607588]
+[node name="Vehicle" type="CharacterBody3D" unique_id=1579428933]
 collision_layer = 64
 collision_mask = 67
 platform_floor_layers = 1
@@ -51,88 +51,88 @@ display_name = "Van"
 portrait = ExtResource("2_c1n76")
 selection_ring_path = NodePath("SelectionRing")
 
-[node name="Lean" type="Node3D" parent="." unique_id=788212161]
+[node name="Lean" type="Node3D" parent="." unique_id=1272441245]
 
-[node name="Chassis" type="Node3D" parent="Lean" unique_id=827509764]
+[node name="Chassis" type="Node3D" parent="Lean" unique_id=1581032677]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
-[node name="Body" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1549451620]
+[node name="Body" type="MeshInstance3D" parent="Lean/Chassis" unique_id=919960018]
 mesh = ExtResource("3_ymhwb")
 surface_material_override/0 = ExtResource("4_5glmg")
 
-[node name="DoorL" type="MeshInstance3D" parent="Lean/Chassis" unique_id=438265208]
+[node name="DoorL" type="MeshInstance3D" parent="Lean/Chassis" unique_id=85869852]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.806267, 1.0849798, -2.2893221)
 mesh = ExtResource("5_k72up")
 surface_material_override/0 = ExtResource("4_5glmg")
 
-[node name="SM_Veh_Car_Van_Door_l_Glass" type="MeshInstance3D" parent="Lean/Chassis/DoorL" unique_id=113563769]
+[node name="SM_Veh_Car_Van_Door_l_Glass" type="MeshInstance3D" parent="Lean/Chassis/DoorL" unique_id=27752111]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.41974542, 0.47708273, 0.1011703)
 mesh = ExtResource("6_la7ti")
 surface_material_override/0 = ExtResource("7_fl4a8")
 
-[node name="DoorR" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1016407519]
+[node name="DoorR" type="MeshInstance3D" parent="Lean/Chassis" unique_id=2077939699]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.80626863, 1.0849798, -2.2893221)
 mesh = ExtResource("8_hfxlm")
 surface_material_override/0 = ExtResource("4_5glmg")
 
-[node name="SM_Veh_Car_Van_Door_r_Glass" type="MeshInstance3D" parent="Lean/Chassis/DoorR" unique_id=1039648647]
+[node name="SM_Veh_Car_Van_Door_r_Glass" type="MeshInstance3D" parent="Lean/Chassis/DoorR" unique_id=1562954325]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4197462, 0.47708273, 0.1011703)
 mesh = ExtResource("9_g0h73")
 surface_material_override/0 = ExtResource("7_fl4a8")
 
-[node name="SM_Veh_Car_Van_Glass" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1554217127]
+[node name="SM_Veh_Car_Van_Glass" type="MeshInstance3D" parent="Lean/Chassis" unique_id=998025324]
 mesh = ExtResource("10_tyddy")
 surface_material_override/0 = ExtResource("7_fl4a8")
 
-[node name="SM_Veh_Car_Van_Plates" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1483608395]
+[node name="SM_Veh_Car_Van_Plates" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1363511727]
 mesh = ExtResource("11_cancg")
 surface_material_override/0 = ExtResource("4_5glmg")
 
-[node name="SteeringWheel" type="MeshInstance3D" parent="Lean/Chassis" unique_id=898351717]
+[node name="SteeringWheel" type="MeshInstance3D" parent="Lean/Chassis" unique_id=1536505153]
 transform = Transform3D(1, 0, 0, 0, 0.35328916, 0.93551415, 0, -0.93551415, 0.35328916, 0.43126976, 1.2529176, 1.0940796)
 mesh = ExtResource("12_xnlll")
 surface_material_override/0 = ExtResource("4_5glmg")
 
-[node name="Wheels" type="Node3D" parent="." unique_id=1043499190]
+[node name="Wheels" type="Node3D" parent="." unique_id=1194814572]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
-[node name="FL" type="Node3D" parent="Wheels" unique_id=1244714913]
+[node name="FL" type="Node3D" parent="Wheels" unique_id=1710136222]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.81947315, 0.3975829, 1.8411695)
 
-[node name="Mesh" type="MeshInstance3D" parent="Wheels/FL" unique_id=1297174011]
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/FL" unique_id=125014889]
 mesh = ExtResource("13_pxmps")
 surface_material_override/0 = ExtResource("4_5glmg")
 
-[node name="FR" type="Node3D" parent="Wheels" unique_id=934098325]
+[node name="FR" type="Node3D" parent="Wheels" unique_id=469514154]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8194732, 0.3975829, 1.8411692)
 
-[node name="Mesh" type="MeshInstance3D" parent="Wheels/FR" unique_id=868246734]
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/FR" unique_id=642556002]
 mesh = ExtResource("14_2dnal")
 surface_material_override/0 = ExtResource("4_5glmg")
 
-[node name="RL" type="Node3D" parent="Wheels" unique_id=1858640495]
+[node name="RL" type="Node3D" parent="Wheels" unique_id=1821111934]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.81947315, 0.3975829, -1.4709787)
 
-[node name="Mesh" type="MeshInstance3D" parent="Wheels/RL" unique_id=1513785936]
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/RL" unique_id=1315205063]
 mesh = ExtResource("15_4d641")
 surface_material_override/0 = ExtResource("4_5glmg")
 
-[node name="RR" type="Node3D" parent="Wheels" unique_id=383322945]
+[node name="RR" type="Node3D" parent="Wheels" unique_id=700562688]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8194732, 0.3975829, -1.4709787)
 
-[node name="Mesh" type="MeshInstance3D" parent="Wheels/RR" unique_id=1004409395]
+[node name="Mesh" type="MeshInstance3D" parent="Wheels/RR" unique_id=1951349410]
 mesh = ExtResource("16_ppa77")
 surface_material_override/0 = ExtResource("4_5glmg")
 
-[node name="Collision" type="CollisionShape3D" parent="." unique_id=2125908930]
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=1575581517]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1920929e-07, 1.0137036, -0.08672094)
 shape = SubResource("BoxShape3D_0np88")
 
-[node name="NavigationAgent" type="NavigationAgent3D" parent="." unique_id=775781712]
+[node name="NavigationAgent" type="NavigationAgent3D" parent="." unique_id=1826679114]
 path_desired_distance = 2.0
 target_desired_distance = 2.2
 
-[node name="SelectionRing" type="MeshInstance3D" parent="." unique_id=1705057966]
+[node name="SelectionRing" type="MeshInstance3D" parent="." unique_id=358209836]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
 material_override = SubResource("StandardMaterial3D_vayvt")
 cast_shadow = 0

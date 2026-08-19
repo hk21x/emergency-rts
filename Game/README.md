@@ -11,7 +11,7 @@ unmodified, though the POLYGON City pack was relocated on import — see `PROGRE
 
 **All 15 planned phases are done, plus 16 (the world reacts), 17 (audio), 18 (game
 framing), 19 (the fire service) and all of phase 20 — the career economy and the
-campaign scenarios.** 1089 automated checks, all passing.
+campaign scenarios.** 1123 automated checks, all passing.
 
 A 260m city district — twenty-five blocks of varied size, with parks, parking lots and
 four tower families — with 60 pedestrians and 22 civilian cars going about their business.
@@ -46,6 +46,14 @@ Characters pack supplied a firefighter and a paramedic in their own kit, closing
 asset gap in the game. The paint check in the suite still guards them; it simply guards a
 real turnout kit now instead of a repaint.
 
+Since then the fleet has grown past the road: a **helicopter** that spools its rotors,
+climbs, turns on the way and holds a hover where it was sent; a **recovery truck** that
+winches away the wreck a collision leaves behind, so an RTC has a tail for the first time;
+and an **armed response unit** whose officer talks a weapon down before anybody moves in
+to arrest — the first time `Person.speciality` decides what a unit can do rather than only
+how fast it does it. The shop and the roster are the user's UI kit now: a requisition
+modal and a status sidebar, both drop-ins that kept the old public surface.
+
 `PROGRESS.md` is the status document — what each phase cost and what it taught.
 `NEXT.md` is what is still to do. This file is the technical reference: how each system
 works, and the traps found along the way.
@@ -74,12 +82,15 @@ Any Godot 4.6+ binary works (originally built on 4.6.3, verified on 4.7):
 | **Right click a stable casualty** (paramedic selected) | fetch the stretcher from the ambulance and wheel them aboard |
 | **Right click a suspect** (officer) | apprehend them; right-click again once cuffed to walk them to a patrol car |
 | **Right click a shed load** (officer or firefighter) | lug the spilled cargo off the carriageway until the street reopens |
+| **Right click a wreck** (recovery truck) | pull up alongside and winch it away, reopening the street |
+| **Right click an armed suspect** (ARV officer) | close in and talk the weapon down before anybody moves to arrest |
+| **Right click the ground** (helicopter, airborne) | fly there — it spools up, climbs, turns on the way and holds a hover on arrival |
 | **Shift + right click** | queue that order behind the current one |
 | `Ctrl` + `1`–`9` | assign a control group |
 | `1`–`9` | recall a control group |
-| `Z` `X` `C` `V` `B` `N` `M` `G` `H` `J` `K` `L` `T` | the command tiles, left to right |
-| Command tile | `Move`, `Treat`, `Extinguish`, `Cool`, `Secure`, `Clear`, `Board`, `Collect` arm the cursor for a target click; `Stop`, `Unload` and `Return` fire at once; `Lights` (`J`) and `Siren` (`K`) are toggles — the tile turns blue while one is running. `Clear` shares `J` with `Lights`: one lives on foot rosters, the other on vehicles, so they never meet |
-| Roster chip | click to isolate that unit, `Ctrl`-click to drop it, double-click to follow |
+| `Z` `X` `C` `V` `B` `N` `M` `G` `H` `J` `K` `L` `T` `Y` `U` `I` `O` `P` | the command tiles, left to right — bottom row, then home row, then top row |
+| Command tile | `Move`, `Treat`, `Extinguish`, `Cool`, `Secure`, `Clear` (`O`), `Board`, `Collect`, `Disarm` (`I`), `Connect` (`P`) and `Land` (`Y`) arm the cursor for a target click; `Stop`, `Unload`, `Return` and `Take off` (`U`) fire at once; `Lights` (`J`) and `Siren` (`K`) are toggles — the tile turns blue while one is running |
+| Roster row | click to isolate that unit, `Ctrl`-click to drop it, double-click to follow |
 | `Esc` | cancel an armed ability |
 | `F1` (or the CONTROLS chip above the bar) | open or close the controls card |
 | `W` `A` `S` `D` / arrows | pan the camera (hold `Shift` to pan faster) |
@@ -1294,6 +1305,36 @@ the debris origin and a person's capsule holds them ~0.3m off that, so the first
 2.6 left the officer pushing the boxes forever. Clearing scores `DEBRIS_POINTS` (60) on
 the cylinder's reasoning: a disaster prevented, not a job finished.
 
+### The wreck outlives its casualties
+
+Every other incident ends when the last body leaves. A road collision did too: the car was
+a script-free prop stripped of collision, drawn for the look of it, and freed with the
+call. So an RTC had no **tail** — the moment the second casualty was aboard the ambulance,
+the crossroads was a crossroads again.
+
+`Wreck` (`Game/Incidents/Wreck.gd`) is the first incident that is still there once nobody
+is hurt. It is modelled on `Debris`: its own group, an amber marker, a `Blocker`
+`StaticBody3D` on the world layer that traffic and pedestrians route around, and a
+`cleared` float that only the winch moves. `clear_per_second` is 0.1, so a recovery truck
+takes ten seconds on station; the street reopens when the wreck goes.
+
+**Three separate ways this shipped broken, all the same mistake.** Each time the check
+reached past the interface and vouched for nothing:
+
+- The first check called `wreck.clear(1.0)` directly, so it proved the float counts up and
+  nothing about whether a truck can reach one.
+- `WorkOrder` drove the truck at the wreck's *centre*, which is inside the blocker: it
+  wedged against the car it had come for and never arrived. `VEHICLE_STANDOFF` (3.4m)
+  aims it at a point out along the vector it approached from instead.
+- The truck did not carry `ClearAbility` at all. `can_tow` gated whether the ability
+  *would score*, but nothing put it in the unit's list, so a right-click on a wreck
+  resolved to Move — drive over, stop, lift nothing. Every check had built a
+  `ClearAbility.new()` by hand and so could not see it.
+
+`ClearOrder.VEHICLE_REACH` is 8.0 against the 3.6 a person works at, and it is **measured
+where the truck actually comes to rest** rather than derived from the standoff plus the
+blocker — the arithmetic answer was optimistic by enough to leave it winching thin air.
+
 ### The collapse nobody can diagnose
 
 `drunk` is the call the board cannot tell you the truth about, because nobody at the
@@ -1842,7 +1883,8 @@ a shopper for a casualty where they stand (`_spawn_medical`), so the collapse is
 somebody who was just there — the crowd is one lighter for the rest of the session —
 and only falls back to a bare pavement tile when nobody qualifies. A vehicle fire is
 a `Fire` with a script-free car prefab as a child, parked `KERB_OFFSET` off the
-centre line of a street leg; the wreck goes when the fire does.
+centre line of a street leg; that one is decoration and goes when the fire does. A
+collision's wreck is not — see "The wreck outlives its casualties".
 
 An RTC is two casualties in one crossroads — grouping and addressing came free from
 the call board; what was new is the **name**. `Incident.flavour` carries it, and
@@ -2243,6 +2285,39 @@ room for. Keeping the public out is a decision the crowd makes: `Civilian` check
 before fires, because an officer saying "not here" should move someone along whether or not
 anything is burning.
 
+### Armed response, and the first speciality that gates a verb
+
+`Person.speciality` had been in the codebase since the doctor was added and had never once
+decided what a unit *can do* — the doctor is a `Person` who treats faster, not one who can
+do something a paramedic cannot. Armed response is the first case where the hook does the
+job it was written for.
+
+An **armed** `Suspect` (`@export var armed := false`) is not offered `ApprehendAbility` at
+all. `ApprehendAbility.score()` returns `NOT_APPLICABLE` while the weapon is up, so an
+ordinary officer right-clicking one falls through the ladder to Move and walks over to
+stand next to an armed man, which is exactly the wrong outcome and exactly what the ladder
+is for: the verb is absent rather than refused. `DisarmAbility` scores 34 — above
+Apprehend's 30 — but only for a `Person` whose `speciality` is `Person.ARMED`, so the tile
+appears on the ARV and on nothing else.
+
+`disarm_per_second` is 0.25: about four seconds for one officer, two for a pair, after
+which `armed` goes false, the pistol leaves the suspect's hand, and the scene reverts to an
+ordinary arrest anybody can make. **Armed response makes the scene safe; it does not make
+the arrest.** That is the division of labour the whole call is built around — the ARV
+without a patrol car behind it achieves nothing.
+
+The officer holds the weapon on them while they work. `DisarmOrder.CLIP` is `Pistol_Idle`,
+and the weapon in hand is `SM_Wep_PistolSwat_01` — chosen because the shared animation
+library has six pistol clips and **no rifle clips at all**, so a rifle would have been a
+model held at the wrong angle by every animation the unit ever plays.
+
+> Two traps came with the weapon. Synty's weapon prefabs ship a `MeshCollider`
+> `StaticBody3D`; parented inside a character and teleported to the hand every frame, it
+> **shoves its own carrier** — the first ARV drifted 19.5m in six seconds with zero
+> velocity. `Unit.strip_collision()` is the shared answer. And the pose has to be sampled
+> *while the order is running*: the check first read the animation after the disarm
+> completed, by which point it is back to `Idle`, and reported a failure that was not one.
+
 ### The paramedic and the firefighter are wearing police blues
 
 The City pack ships police characters and nothing else — no paramedic, no firefighter —
@@ -2335,9 +2410,10 @@ Freeplay is where calls become what the game is judged on — see "Freeplay".
 bar owning the bottom 176px until August 2026 — portrait, roster, command tiles and
 dispatch laid out in one opaque strip — and the restructure onto the user's reference
 layout unpicked it. As it now stands: the roster down the left, commands along the
-bottom, minimap bottom-left, a cart button alone in the bottom-right corner, objective
-top-left, clock top-centre, purse and score and speed top-right, call board down the
-right. The
+bottom, minimap bottom-left, objective top-left, clock top-centre, purse and score and
+speed top-right, call board down the right. The corner cart button was **retired in
+August 2026** — the requisition sidebar carries a full-width REQUEST UNITS button of its
+own, and two ways into the same shop was one too many. The
 radio log is hidden (August 2026) — it kept composing its lines out of sight, and the
 board it duplicated took over the edge it left empty.
 
@@ -2466,6 +2542,54 @@ headless and never looks at a pixel, so a builder edit that dropped back to flat
 styleboxes would restore the old look with everything green. They assert a card is drawn
 from a texture under `Game/UI/Kit/` and that button labels are set in a face under
 `Game/UI/Fonts/`.
+
+### The shop and the roster are the kit's now
+
+Both were swapped in August 2026 for panels from the user's UI kit, and both were done the
+same way: **a drop-in that keeps the old public surface**. `RequisitionPanel` keeps
+`station`, `open_shop()`, `close_shop()` and `card_button(id)`; `RosterSidebar` keeps
+`controller`, `station`, `standby_chip`, and the `request_button()` the tutorial pulses.
+Nothing outside had to know. `ShopCatalogue` is the bridge: it reads `Station.TYPES` and
+hands back the kit's `UnitDef` records, so there is still exactly one list of what can be
+bought.
+
+The sidebar shows every unit as a row — callsign, type, a real render of the vehicle, a
+service stripe and a task line ("Fighting fire", "Treating", "Arresting") — and collapses
+to an 80px rail carrying per-service tallies.
+
+> **Rows are pooled, never freed.** The first version rebuilt them every tick, which
+> destroyed and recreated the `Button`s continuously — and broke **arrests**, ten checks
+> away, because an order held a reference to a control that no longer existed. The
+> population is counted before the decision: rebuild only when the on-map or waiting count
+> actually changed, otherwise restate the rows that are there.
+
+#### The crash, and why five attempts to reproduce it failed
+
+The game began dying with `EXC_BAD_ACCESS` (SIGBUS) inside Metal — always in play, never
+headlessly, because **headless has no Metal**. Three diagnoses were confidently wrong:
+deferred signals, the row pooling, the `AtlasTexture` cropping. What made it findable was
+the player noticing that *spawning armed response* did it reliably; that produced a 20
+-second staged probe with a 33–50% crash rate, and a real bisect became possible.
+
+| Variant | Crashes |
+| --- | --- |
+| Baseline sidebar | 4–7 of 12 |
+| Rows with no children | 6 of 12 |
+| No rows at all | 7 of 12 |
+| Sidebar never refreshed | **0 of 12** |
+| Refresh without selection marking | 3 of 12 |
+| Refresh without the layout call | 6 of 12 |
+| **Catalogue cached** | **0 of 24** |
+
+The cause was not the rows at all. `ShopCatalogue.units()` **instantiates and frees
+thirteen vehicle scenes** to measure them, and `RosterSidebar._rebuild()` was calling it
+once per unit — roughly 533 instantiate-and-free cycles per rebuild, several times a
+second, on the renderer's own resources. A `static var _cache` fixed it. A later play
+session ended with no crash report, which is the only confirmation that counts.
+
+The lesson is the bisect, not the cache: **the crash was in a file nobody had touched**,
+three panels away from anything on screen, and every attempt to reason about it from the
+symptom picked a wrong answer.
 
 ### The main menu
 
@@ -2659,7 +2783,20 @@ disarms, and `1`–`9` are control groups.
 
 Tiles are laid out in `RTSController.COMMAND_KEYS` order, not keycode order, so a
 tile's position along the row matches the key under the player's hand. Sorting by
-keycode would put them in alphabetical order instead, which teaches nothing.
+keycode would put them in alphabetical order instead, which teaches nothing. The list
+runs bottom row (`Z X C V B N M`), then home (`G H J K L`), then top (`T Y U I O P`) —
+and a verb whose key is *not* in it files last alongside every other unplaced verb,
+which is a silent way for the row to stop meaning anything.
+
+> **`Clear` was on `J` and so was `Lights`.** The rationale was written down as fact —
+> one is a foot verb, the other a vehicle verb, so they never meet — and it held until
+> `can_tow` gave the recovery truck the winch, making it the one unit carrying both.
+> `_handle_hotkey` takes the first match in tile order, so the truck's lightbar was
+> unreachable from the keyboard. Clear is `O` now, the only letter the camera does not
+> poll and no other verb had taken, and there is a check that sweeps **every** unit scene
+> for a key that answers twice, for a key the camera polls, and for a key with no slot in
+> `COMMAND_KEYS`. The lesson is not the key: it is that an invariant maintained by
+> reasoning about which units exist stops holding the moment a new unit does.
 
 ### Panels are wired from a setter, not from `_ready`
 
@@ -2820,6 +2957,44 @@ Two safeguards matter:
   knocked-over cone.
 
 Every number is an exported property, tunable in the inspector while the game runs.
+
+## The helicopter does not drive
+
+`Aircraft` (`Game/Units/Aircraft.gd`) is a `Unit` that ignores the navigation mesh
+entirely. There is no air layer and there does not need to be: nothing in the sky is an
+obstacle, so a flight is a straight line at `cruise_height` (24m) and the whole
+"navigation" problem disappears. It is the one unit in the game whose movement is not the
+autopilot.
+
+**Five phases, and the order of them was the whole feature.** `GROUNDED`, `SPOOLING`,
+`CLIMBING`, `CRUISING`, `DESCENDING`. Rotors were first driven off *altitude*, which is
+the obvious reading and wrong in both directions: it lifted off with the blades barely
+turning and it wound them **down** as it came in to land, which is precisely backwards
+from how a helicopter lands. They are driven off the phase now — `rotor_spool` is 4.0
+seconds of blades before the skids leave the ground, and they stay at full speed all the
+way down.
+
+`_leave_ground()` is a **single door**: `take_off()`, `navigate_to()` and `land_at()` all
+go through it, so there is no path into the air that skips the spool-up. `is_airborne()`
+deliberately excludes `SPOOLING` — a machine with its rotors running is not yet flying.
+
+Two things that each cost a debugging session:
+
+- **`_ground_y` cannot be read in `_ready`.** Anything positioned after it enters the tree
+  — which is every helicopter the map places — records the wrong ground, and a parked
+  aircraft sat on the forecourt spinning its blades. It is captured at `_leave_ground()`.
+- **`LandAbility` beat `Move` on every right-click.** It scored 12 against `MoveAbility`'s
+  floor of 0, so ordering a helicopter anywhere landed it there and hovering was
+  unreachable. It is armed-only now: `score()` returns `NOT_APPLICABLE` and `can_target()`
+  does the work, which is the pattern for any verb that should fire only when the player
+  asked for it by name. The suite had a landing check and it called `land_at()` directly,
+  so it never touched the ladder and never saw this.
+
+Turning is rate-limited (`turn_speed` 1.6 rad/s) rather than snapped, with `SIDEWAYS_SPEED`
+letting it drift a little while it comes round. Snapping to the new heading read as a
+sprite being rotated, which is what it was.
+
+Take off is `U` and fires at once; `Land` is `Y` and arms the cursor for a spot.
 
 ## The map
 
@@ -3202,9 +3377,9 @@ directly with `godot --path . res://Game/AnimationViewer.tscn`.
     godot --headless --fixed-fps 60 --path . --script res://Game/smoke_test.gd
 
 `--fixed-fps 60` decouples the headless loop from the wall clock: same fixed-step
-physics, same checks, ~20 seconds instead of ~9 minutes.
+physics, same checks, ~60 seconds instead of ~9 minutes.
 
-1089 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
+1123 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
 shift through the station (the map ships empty), and every bought unit is clickable
 from the opening view; the crowd strolls, runs from a fire and cannot be selected or
 picked through; traffic drives the roads and yields; units start parked, drive to a

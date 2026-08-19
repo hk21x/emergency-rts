@@ -356,6 +356,11 @@ const ENGINE_STREAMS := ["res://Game/Audio/engine.wav"]
 @export var stretchers := 1
 ## Detained suspects this vehicle can take to the station. The back seats, in effect.
 @export var cells := 1
+
+## Whether this body can recover a written-off vehicle. Only the recovery truck does, and
+## [ClearAbility] reads it to decide whether a [Wreck] is this unit's problem -- which is
+## what stops a patrol car being offered a job it has no winch for.
+@export var can_tow := false
 ## Metres behind the vehicle that dismounting crew are placed.
 @export var dismount_back := 3.2
 @export var dismount_side := 1.6
@@ -886,6 +891,12 @@ func _build_abilities() -> Array[Ability]:
 	# Ambient traffic gets its abilities from here too, and a taxi has no station to go
 	# back to -- nor a lightbar or a siren. Nothing can select one, but an empty roster
 	# entry would still be wrong.
+	# **The winch is a verb, not just a flag.** `can_tow` gated whether [ClearAbility]
+	# *would* score on a wreck, but the truck never carried the ability, so a right-click
+	# on one resolved to Move: it drove over, stopped, and lifted nothing. Every check
+	# built a `ClearAbility.new()` by hand and so never noticed the unit does not own it.
+	if can_tow:
+		list.append(ClearAbility.new())
 	if service != Service.NONE:
 		list.append(LightsAbility.new())
 		list.append(SirenAbility.new())

@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cuydgdh8iw6ro"
-path.s3tc="res://.godot/imported/Polygon_City_Characters_Texture_04_B.png-cd5776075f03195c642248bbc588e006.s3tc.ctex"
+path.s3tc="res://.godot/imported/Polygon_City_Characters_Texture_04_B.png-5d416e5db0d4c841dba2290ddff5b284.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Assets/Polygon-Characters/textures/Polygon_City_Characters_Texture_04_B.png"
-dest_files=["res://.godot/imported/Polygon_City_Characters_Texture_04_B.png-cd5776075f03195c642248bbc588e006.s3tc.ctex"]
+source_file="res://Assets/Polygon-Characters/Textures/Polygon_City_Characters_Texture_04_B.png"
+dest_files=["res://.godot/imported/Polygon_City_Characters_Texture_04_B.png-5d416e5db0d4c841dba2290ddff5b284.s3tc.ctex"]
 
 [params]
 

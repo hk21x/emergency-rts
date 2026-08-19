@@ -37,9 +37,9 @@ simulated seconds are real seconds when the scene is the 6,700-node tutorial tow
 
 ## Verification rules
 
-- **The suite is the arbiter.** 1089 checks, exits non-zero on failure. A change to
+- **The suite is the arbiter.** 1123 checks, exits non-zero on failure. A change to
   `Game/` is not done until it is green. It **reports its own total** —
-  `all checks passed (1089)` — so take the count from a run rather than from here or
+  `all checks passed (1123)` — so take the count from a run rather than from here or
   from memory; that number is why these documents have carried a stale figure twice.
 - **Do not run the suite inline — delegate it.** Ask the `godot-test-runner` agent
   and get one line back. A full run is ~550 lines of output, and output in the main
@@ -137,8 +137,13 @@ and civilians by their own `build_*.gd`. The rule for changes:
   same shape.
 - Adding a verb = a new `Ability` (+`Order`); it gets its command tile, hotkey and
   right-click meaning from the scoring ladder with no UI changes. Hotkeys `Z X C V
-  B N M G H J K L P T U Y` are the command keys; `W A S D Q E F R F1 F2 F3 F4 F5 Esc Enter
-  Space 1-9` are taken. **`P` is free** as of August 2026 -- pause moved to `Esc`.
+  B N M G H J K L T Y U I O P` are the command keys; `W A S D Q E F R F1 F2 F3 F4 F5 Esc Enter
+  Space 1-9` are taken. **`O` is the only letter still free** -- `P` went to Connect and
+  `I` to Disarm and `O` to Clear in August 2026, so the next verb after that one has no
+  key at all. A check sweeps every unit scene for a key that answers twice, for one the
+  camera polls, and for one with no slot in `COMMAND_KEYS` -- it exists because `Clear`
+  and `Lights` both sat on `J` until the recovery truck became the first unit to carry
+  both, and nothing noticed.
   `F3` files a black-box record, `F4` toggles the navigation overlay, and `F5` opens
   the call spawner -- pick any call kind instead of waiting for the director's
   weighted roll.

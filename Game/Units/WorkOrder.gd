@@ -22,6 +22,11 @@ var verb := "Working"
 var _working := false
 
 
+## Where a vehicle is sent: just outside the 2.75m face of a work target's blocker, so
+## the point is on road the agent can actually route to.
+const VEHICLE_STANDOFF := 3.4
+
+
 func _init(work_target: Node3D, reach: float, clip: String, label: String) -> void:
 	target = work_target
 	work_range = reach
@@ -96,9 +101,34 @@ func _work(_unit: Unit, _delta: float) -> bool:
 	return true
 
 
+## Drives or walks toward the job.
+##
+## **A vehicle is aimed beside the target, not at it.** Work targets that shut a street
+## carry a solid blocker around their centre -- that is what makes a vehicle stall against
+## them rather than drive through -- so a truck asked to navigate to the centre is asked
+## for a point its agent cannot reach. It closed to about 8m, turned, and wandered off,
+## winching nothing: the recovery truck could not do the one job it exists for.
+##
+## People still aim at the centre. They can stand against a blocker and be in range, that
+## path has worked since the shed load shipped, and changing it would risk a verb that is
+## already right for the sake of one that was not.
 func _approach(unit: Unit) -> void:
-	if is_target_valid():
+	if not is_target_valid():
+		return
+	if unit is not Vehicle:
 		unit.navigate_to(target.global_position)
+		return
+	var out := unit.global_position - target.global_position
+	out.y = 0.0
+	if out.length() < 0.1:
+		unit.navigate_to(target.global_position)
+		return
+	# **A fixed standoff, not one scaled off the reach.** Aiming at `work_range * 0.8` made
+	# the two chase each other: raising the reach pushed the aim point further out, so the
+	# truck parked further away and was still outside its own range. This aims just clear
+	# of the blocker and lets the vehicle stop wherever its own avoidance decides, which is
+	# what the reach is then sized to cover.
+	unit.navigate_to(target.global_position + out.normalized() * VEHICLE_STANDOFF)
 
 
 func _release(unit: Unit) -> void:

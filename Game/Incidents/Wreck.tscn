@@ -1,0 +1,52 @@
+; A written-off car shutting the street. Same pickable arrangement as the other incidents
+; -- layer 8, solid to nothing -- with one deliberate exception: the Blocker child is a
+; real collider on layer 1, a squat square slab across the carriageway, because a street
+; only reads as shut if a vehicle actually stalls against something. Square on purpose, so
+; the same scene shuts a north-south or an east-west street. The car itself is laid out by
+; Wreck.gd at runtime and collision-stripped as usual.
+
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Game/Incidents/Wreck.gd" id="1_script"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pick"]
+size = Vector3(4.5, 1.4, 4.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_block"]
+size = Vector3(5.5, 0.8, 5.5)
+
+[sub_resource type="TorusMesh" id="TorusMesh_marker"]
+inner_radius = 1.8
+outer_radius = 2.0
+rings = 32
+ring_segments = 6
+
+; Amber, like the shed load and the hazard: an obstruction is a warning, not a loss.
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_marker"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.66, 0.15, 0.8)
+
+[node name="Wreck" type="StaticBody3D"]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_script")
+display_name = "Written-off vehicle"
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+shape = SubResource("BoxShape3D_pick")
+
+[node name="Marker" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+material_override = SubResource("StandardMaterial3D_marker")
+cast_shadow = 0
+mesh = SubResource("TorusMesh_marker")
+
+[node name="Blocker" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="BlockerShape" type="CollisionShape3D" parent="Blocker"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+shape = SubResource("BoxShape3D_block")

@@ -5,11 +5,11 @@
 [ext_resource type="Material" path="res://Assets/Synty/PolygonCity/Materials/Alts/PolygonCity_01_A_mat.tres" id="3_02ur7"]
 [ext_resource type="AnimationLibrary" path="res://Game/Rigs/ual_standard.res" id="4_k8oej"]
 
-[node name="Character" type="Node3D" unique_id=2019300313]
+[node name="Character" type="Node3D" unique_id=1040949663]
 
-[node name="Armature" type="Node3D" parent="." unique_id=1890487424]
+[node name="Armature" type="Node3D" parent="." unique_id=1765230440]
 
-[node name="GeneralSkeleton" type="Skeleton3D" parent="Armature" unique_id=1530997009]
+[node name="GeneralSkeleton" type="Skeleton3D" parent="Armature" unique_id=1741254411]
 unique_name_in_owner = true
 process_mode = 1
 motion_scale = 0.8762761
@@ -471,10 +471,10 @@ metadata/humanoid_rotation_delta = {
 "UpperChest": Transform3D(-1.18958305e-07, 7.731659e-09, -1, 0.93853086, -0.34519565, -1.1431496e-07, -0.34519553, -0.93853116, 3.380747e-08, 0, 0, 0)
 }
 
-[node name="Character_BusinessMan_Suit" type="MeshInstance3D" parent="Armature/GeneralSkeleton" unique_id=586246809]
+[node name="Character_BusinessMan_Suit" type="MeshInstance3D" parent="Armature/GeneralSkeleton" unique_id=618746491]
 mesh = ExtResource("1_v48od")
 skin = ExtResource("2_u2qd2")
 surface_material_override/0 = ExtResource("3_02ur7")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=135876901]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=846855477]
 libraries/ = ExtResource("4_k8oej")

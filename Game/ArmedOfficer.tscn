@@ -1,0 +1,63 @@
+; Armed response on foot. The same body as Person.tscn with a different character, the
+; same POLICE service -- and a `speciality` of "armed", which is what actually changes
+; what this unit can do.
+;
+; **The first unit whose verbs come from its speciality rather than its service.** An
+; ordinary officer and this one are both POLICE; only this one is offered Disarm, and
+; only this one may approach a suspect carrying a weapon.
+
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Game/Units/Person.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://Game/Characters/ArmedOfficer.tscn" id="2_character"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.3
+height = 1.8
+
+[sub_resource type="TorusMesh" id="TorusMesh_ring"]
+inner_radius = 0.5
+outer_radius = 0.62
+rings = 32
+ring_segments = 6
+
+; Recoloured at runtime from the unit's service, so this is only the starting point.
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.25, 0.45, 0.95, 0.85)
+
+; Layer 4 marks people. They collide only with the static world (mask 1), not with
+; vehicles or each other.
+[node name="ArmedOfficer" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_script")
+display_name = "Armed Response"
+service = 1
+speciality = &"armed"
+weapon_scene = "res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_PistolSwat_01.tscn"
+selection_ring_path = NodePath("SelectionRing")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+; navigation_layers = 2 selects the person navigation mesh, baked with a small agent
+; radius. Vehicles use layer 1 and its much wider mesh.
+[node name="NavigationAgent" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.5
+target_desired_distance = 0.7
+navigation_layers = 2
+avoidance_enabled = false
+
+[node name="SelectionRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+material_override = SubResource("StandardMaterial3D_ring")
+cast_shadow = 0
+mesh = SubResource("TorusMesh_ring")
+
+; The character mesh faces +Z, but Godot's forward is -Z. Yaw the visual 180 so the
+; node's -Z really is its forward, or the firefighter moonwalks.
+[node name="Character" parent="." instance=ExtResource("2_character")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)

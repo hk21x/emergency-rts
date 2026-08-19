@@ -141,6 +141,17 @@ const TARGETS := [
 		"map": SYNTY,
 		"map_path": SYNTY_MAP,
 	},
+	# **The Heist pack's characters, on the same map as the Starter pack's.** Its rig uses
+	# the raw Synty names -- `Ankle_L`, `Clavicle_L`, `Spine_01` -- which is exactly what
+	# [constant SYNTY] renames. Without this the SWAT officer imports with those names, the
+	# animation library (which speaks the humanoid profile) resolves nothing, and the unit
+	# stands in bind pose: reported from play as "the response unit is in a T pose".
+	{
+		"import": "res://Assets/Synty/PolygonHeist/Model/Characters.fbx.import",
+		"skeleton": "Skeleton3D",
+		"map": SYNTY,
+		"map_path": SYNTY_MAP,
+	},
 	{
 		"import": "res://Assets/animations/UAL1_Standard.glb.import",
 		"skeleton": "Armature/Skeleton3D",

@@ -178,11 +178,11 @@ bind/47/name = &"toes_l"
 bind/47/bone = -1
 bind/47/pose = Transform3D(1, -8.704602e-16, -1.0660063e-31, 0, -1, -1.2246469e-16, 0, 1.2246469e-16, -1, -0.114443, -0.00297976, 0.13247)
 
-[node name="Character" type="Node3D" unique_id=287013246]
+[node name="Character" type="Node3D" unique_id=1633459983]
 
-[node name="Armature" type="Node3D" parent="." unique_id=1056122640]
+[node name="Armature" type="Node3D" parent="." unique_id=1309343567]
 
-[node name="GeneralSkeleton" type="Skeleton3D" parent="Armature" unique_id=1971924291]
+[node name="GeneralSkeleton" type="Skeleton3D" parent="Armature" unique_id=2077664814]
 unique_name_in_owner = true
 motion_scale = 0.8762761
 bones/0/name = "Hips"
@@ -571,9 +571,9 @@ bones/54/position = Vector3(0, 0, 0)
 bones/54/rotation = Quaternion(1.110223e-16, 0, 0, 1)
 bones/54/scale = Vector3(1, 1, 1)
 
-[node name="SK_Character_FireFighter" type="MeshInstance3D" parent="Armature/GeneralSkeleton" unique_id=456692592]
+[node name="SK_Character_FireFighter" type="MeshInstance3D" parent="Armature/GeneralSkeleton" unique_id=191191226]
 mesh = SubResource("ArrayMesh_nxp7m")
 skin = SubResource("Skin_1nl0h")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1674462757]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=690613007]
 libraries/ = ExtResource("2_5iti5")

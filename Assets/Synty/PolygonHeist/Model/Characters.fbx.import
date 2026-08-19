@@ -2272,6 +2272,9 @@ _subresources={
 "optimizer/enabled": true,
 "optimizer/max_angular_error": 0.00277777777777777,
 "optimizer/max_linear_error": 0.5
+},
+"PATH:Skeleton3D": {
+"retarget/bone_map": Resource("res://Game/Rigs/synty_bone_map.tres")
 }
 }
 }
