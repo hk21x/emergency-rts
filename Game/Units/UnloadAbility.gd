@@ -34,13 +34,18 @@ func is_instant() -> bool:
 func score(unit: Unit, target: Target) -> int:
 	if target == null or target.unit != unit:
 		return NOT_APPLICABLE
-	var vehicle := unit as Vehicle
-	if vehicle == null or vehicle.crew.is_empty():
+	if unit == null or unit.crew.is_empty():
+		return NOT_APPLICABLE
+	# **Not while it is in the air.** The crew contract is [Unit]'s now, so this applies to
+	# an [Aircraft] as well as a car -- and without this line "turn everybody out" at
+	# cruising height puts four firefighters on the ground from 24 metres up. The tile is
+	# simply absent while airborne, which is the ladder's usual way of saying no.
+	var aircraft := unit as Aircraft
+	if aircraft and aircraft.is_airborne():
 		return NOT_APPLICABLE
 	return 12
 
 
 func execute(unit: Unit) -> void:
-	var vehicle := unit as Vehicle
-	if vehicle:
-		vehicle.unload()
+	if unit:
+		unit.unload()

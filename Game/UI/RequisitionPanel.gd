@@ -3,7 +3,8 @@ class_name RequisitionPanel
 
 ## Hosts the Emergency Ops requisition modal and connects it to the career.
 ##
-## **A drop-in for [ShopPanel], on purpose.** It keeps that class's four public names --
+## **A drop-in for the old `ShopPanel`, on purpose.** It keeps that class's four public
+## names --
 ## `station`, `open_shop`, `close_shop`, `card_button` -- because three unrelated places
 ## reach for them: [HUD] wires the buy button, [GameMenu] closes the shop before it will
 ## open the pause card, and [TutorialDirector] spotlights a named card. Matching the
@@ -83,7 +84,7 @@ func card_button(id: StringName) -> Button:
 ## anything and the district was never frozen.
 ##
 ## The blanket `set_input_as_handled()` is the second half, inherited deliberately from
-## [ShopPanel]: while the storefront is up, `F2` must not open a shift underneath it.
+## the old `ShopPanel`: while the storefront is up, `F2` must not open a shift under it.
 func _input(event: InputEvent) -> void:
 	if not visible:
 		return

@@ -1,0 +1,105 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Theme" path="res://selection_panel/theme/selection_panel.tres" id="theme"]
+[ext_resource type="Script" path="res://selection_panel/unit_roster_strip.gd" id="s_strip"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/icons/icon_chevron_left.svg" id="i_left"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/icons/icon_chevron_right.svg" id="i_right"]
+
+[node name="UnitRosterStrip" type="Control"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("theme")
+script = ExtResource("s_strip")
+
+[node name="Row" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+
+[node name="PrevButton" type="Button" parent="Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+theme_type_variation = &"ERSScrollButton"
+
+
+[node name="PrevIcon" type="TextureRect" parent="Row/PrevButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -11.0
+offset_top = -11.0
+offset_right = 11.0
+offset_bottom = 11.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("i_left")
+stretch_mode = 5
+modulate = Color(0.561, 0.627, 0.698, 1)
+
+
+[node name="Scroll" type="ScrollContainer" parent="Row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 0
+
+
+[node name="Cards" type="HBoxContainer" parent="Row/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+
+[node name="NextButton" type="Button" parent="Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+theme_type_variation = &"ERSScrollButton"
+
+
+[node name="NextIcon" type="TextureRect" parent="Row/NextButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -11.0
+offset_top = -11.0
+offset_right = 11.0
+offset_bottom = 11.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("i_right")
+stretch_mode = 5
+modulate = Color(0.561, 0.627, 0.698, 1)
+
+
+[node name="EmptyLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"ERSBody"
+text = "No units deployed"
+horizontal_alignment = 1
+vertical_alignment = 1
+

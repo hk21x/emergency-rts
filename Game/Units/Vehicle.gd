@@ -351,19 +351,18 @@ const ENGINE_STREAMS := ["res://Game/Audio/engine.wav"]
 @export var hydrant_reach := 9.0
 
 @export_group("Crew")
-@export var seats := 2
-## Stabilised casualties this vehicle can carry to hospital.
-@export var stretchers := 1
 ## Detained suspects this vehicle can take to the station. The back seats, in effect.
-@export var cells := 1
+##
+## **Seats and stretchers used to live here too**; they are [Unit]'s now, because an
+## aircraft carries people and is not a [Vehicle]. Cells stayed: a helicopter has no cage,
+## and [LoadSuspectAbility] gates on POLICE service besides.
+@export var cells := 0
 
 ## Whether this body can recover a written-off vehicle. Only the recovery truck does, and
 ## [ClearAbility] reads it to decide whether a [Wreck] is this unit's problem -- which is
 ## what stops a patrol car being offered a job it has no winch for.
 @export var can_tow := false
 ## Metres behind the vehicle that dismounting crew are placed.
-@export var dismount_back := 3.2
-@export var dismount_side := 1.6
 
 @export_group("Visuals")
 ## Wheel mesh radius, from the mesh AABB (0.6656 / 2).
@@ -391,8 +390,6 @@ var handbrake_input := false
 ## Signed speed along the car's forward axis. Negative while reversing.
 var forward_speed := 0.0
 var move_target := Vector3.ZERO
-var crew: Array[Person] = []
-var casualties: Array[Casualty] = []
 var suspects: Array[Suspect] = []
 
 ## What is left in the tank, 0 to 1. Drawn down by the crew working off this
@@ -910,18 +907,6 @@ func _build_abilities() -> Array[Ability]:
 
 # --- Crew --------------------------------------------------------------------
 
-func has_free_seat() -> bool:
-	return crew.size() < seats
-
-
-## Takes a person aboard. Returns false if the seats filled up while they walked over.
-func take_aboard(person: Person) -> bool:
-	if not has_free_seat() or crew.has(person):
-		return false
-	crew.append(person)
-	open_doors()
-	return true
-
 
 # --- Water ---------------------------------------------------------------------
 
@@ -1006,9 +991,6 @@ func _update_water(delta: float) -> void:
 
 # --- Transport ---------------------------------------------------------------
 
-func has_stretcher_space() -> bool:
-	return casualties.size() < stretchers
-
 
 func has_cell_space() -> bool:
 	return suspects.size() < cells
@@ -1033,49 +1015,6 @@ func deliver_suspects() -> int:
 		if is_instance_valid(suspect):
 			suspect.deliver()
 	return carried.size()
-
-
-## Claims a stretcher. False if it filled up while the vehicle was driving over.
-func load_casualty(casualty: Casualty) -> bool:
-	if not has_stretcher_space() or casualties.has(casualty):
-		return false
-	casualties.append(casualty)
-	open_doors()
-	return true
-
-
-## Hands over everyone aboard. Called by Hospital when the vehicle drives in.
-func deliver_casualties() -> int:
-	var carried := casualties.duplicate()
-	casualties.clear()
-	if not carried.is_empty():
-		open_doors()
-	for casualty in carried:
-		if is_instance_valid(casualty):
-			casualty.deliver()
-	return carried.size()
-
-
-## Turns everyone out, spread behind the vehicle.
-func unload() -> void:
-	if not crew.is_empty():
-		open_doors()
-	var leaving := crew.duplicate()
-	crew.clear()
-	for i in leaving.size():
-		var person: Person = leaving[i]
-		if is_instance_valid(person):
-			person.disembark(_dismount_point(i))
-
-
-## A spot behind the car, alternating sides, snapped onto the navigation mesh so
-## nobody is ever put down inside a wall.
-func _dismount_point(index: int) -> Vector3:
-	var side := 1.0 if index % 2 == 0 else -1.0
-	var row := index / 2  # integer division: two per row, then step further out
-	var sideways := side * dismount_side * float(1 + row)
-	var spot := global_position + global_basis.z * dismount_back + global_basis.x * sideways
-	return NavigationServer3D.map_get_closest_point(get_world_3d().navigation_map, spot)
 
 
 func _reset_manoeuvre_state() -> void:

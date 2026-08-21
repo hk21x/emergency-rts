@@ -51,7 +51,6 @@ const ESCORT_GAP := 1.0
 ## moment they give it up -- which is the readable half of the whole mechanic: the player
 ## can see at a glance which suspect still has it.
 const WEAPON := "res://Assets/Synty/PolygonHeist/Prefab/Weapons/SM_Wep_PistolBandit_01.tscn"
-const HAND_BONE := &"RightHand"
 
 var _weapon: Node3D
 var _weapon_skeleton: Skeleton3D
@@ -77,20 +76,12 @@ func _update_weapon() -> void:
 		_weapon.name = "HeldWeapon"
 		Unit.strip_collision(_weapon)
 		add_child(_weapon)
+	# **Placed by [HeldItem].** This was a second, independently written copy of the
+	# officer's placement -- same bone constant, same two mistakes, and a fix had to be
+	# made twice to land. It is one function now.
 	if _weapon_skeleton == null:
-		_weapon_skeleton = get_node_or_null(
-			"Character/Armature/GeneralSkeleton") as Skeleton3D
-	if _weapon_skeleton == null:
-		_weapon.visible = false
-		return
-	var bone := _weapon_skeleton.find_bone(HAND_BONE)
-	if bone < 0:
-		_weapon.visible = false
-		return
-	_weapon.visible = true
-	_weapon.global_position = _weapon_skeleton.global_transform \
-		* _weapon_skeleton.get_bone_global_pose(bone).origin
-	_weapon.global_rotation = global_rotation
+		_weapon_skeleton = HeldItem.skeleton_of(self)
+	_weapon.visible = HeldItem.place(_weapon, _weapon_skeleton, WEAPON)
 
 
 ## Work from a [DisarmOrder]. Once it completes the weapon is gone and the suspect is an

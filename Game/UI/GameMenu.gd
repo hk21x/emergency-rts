@@ -498,13 +498,51 @@ func set_sfx_volume(value: float) -> void:
 ## warn or move the coordinate space out from under a thousand checks.
 func set_fullscreen(value: bool) -> void:
 	fullscreen = value
-	_apply_fullscreen()
+	# Asked for by name, so this one goes both ways -- including back to a window.
+	_apply_fullscreen(true)
 	_save_settings()
 	for i in _screen_buttons.size():
 		_screen_buttons[i].button_pressed = (i == 1) == fullscreen
 
 
-func _apply_fullscreen() -> bool:
+## What [method _apply_fullscreen] should do about the window.
+enum Action {
+	## The window already matches, or nobody asked for a change.
+	LEAVE,
+	## Ask the display server to change mode.
+	SET,
+	## The window is fullscreen and the setting disagrees -- take the window's word.
+	ADOPT,
+}
+
+
+## The decision, separated from the window so it can be tested.
+##
+## **Headless has no window at all** -- `get_window_list()` is empty and `window_set_mode`
+## is a silent no-op -- so an assertion about what the window did there cannot fail. The
+## decision is the part that can be wrong, so the decision is the part that is testable.
+static func window_action(want: bool, already: bool, deliberate: bool) -> Action:
+	if want == already:
+		return Action.LEAVE
+	# Filling the screen while the settings say otherwise: the player did that with the
+	# window manager, and a settings load is not a request to undo it.
+	if not want and not deliberate:
+		return Action.ADOPT
+	return Action.SET
+
+
+## Applies the setting to the window.
+##
+## **[param deliberate] is the difference between the player asking and the game
+## assuming.** Pressing WINDOWED on the settings card is a decision and puts the window
+## back; loading a settings file is not, and must never *take* fullscreen away.
+##
+## That distinction is the bug it was written for: a player who filled the screen with the
+## window manager rather than with this card still had `fullscreen=false` on disk, so
+## pressing PLAY changed scene, the district's menu loaded that stale false, and the game
+## dragged them out of fullscreen. Nothing had asked it to. Now a settings load can only
+## ever put the screen *into* fullscreen, never out of it.
+func _apply_fullscreen(deliberate := false) -> bool:
 	# **Returns whether it actually asked the display server for anything**, which exists
 	# for the check rather than for any caller. Sabotage proved the obvious assertion --
 	# that the headless viewport does not resize -- cannot fail: Godot's headless display
@@ -514,9 +552,19 @@ func _apply_fullscreen() -> bool:
 	# cannot.
 	if DisplayServer.get_name() == "headless":
 		return false
-	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if fullscreen
-		else DisplayServer.WINDOW_MODE_WINDOWED)
-	return true
+	var mode := DisplayServer.window_get_mode()
+	var already := mode == DisplayServer.WINDOW_MODE_FULLSCREEN \
+		or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN
+	match window_action(fullscreen, already, deliberate):
+		Action.ADOPT:
+			fullscreen = true
+			return false
+		Action.SET:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN
+				if fullscreen else DisplayServer.WINDOW_MODE_WINDOWED)
+			return true
+		_:
+			return false
 
 
 func set_volume(value: float) -> void:

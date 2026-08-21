@@ -1,0 +1,466 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Theme" path="res://ui/theme/emergency_ops.tres" id="theme"]
+[ext_resource type="Script" path="res://ui/unit_selection_panel.gd" id="s_sel"]
+[ext_resource type="Texture2D" path="res://ui/art/icons/icon_water_drop.svg" id="i_drop"]
+
+[node name="UnitSelectionPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(1100, 188)
+anchors_preset = 0
+theme = ExtResource("theme")
+theme_type_variation = &"ERSSelectionPanel"
+script = ExtResource("s_sel")
+
+[node name="Rows" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+
+[node name="HeaderWrap" type="MarginContainer" parent="Rows"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 10
+
+
+[node name="Header" type="HBoxContainer" parent="Rows/HeaderWrap"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+
+[node name="Eyebrow" type="Label" parent="Rows/HeaderWrap/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ERSEyebrow"
+text = "UNIT SELECTION"
+
+
+[node name="CountLabel" type="Label" parent="Rows/HeaderWrap/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ERSEyebrow"
+theme_override_colors/font_color = Color(0.29, 0.612, 0.941, 1)
+text = ""
+
+
+[node name="StatusDot" type="Panel" parent="Rows/HeaderWrap/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(8, 8)
+layout_mode = 2
+size_flags_vertical = 4
+
+
+[node name="StatusLabel" type="Label" parent="Rows/HeaderWrap/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ERSEyebrow"
+text = ""
+
+
+[node name="Empty" type="VBoxContainer" parent="Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+theme_override_constants/separation = 6
+
+
+[node name="EmptyTitle" type="Label" parent="Rows/Empty"]
+layout_mode = 2
+theme_type_variation = &"ERSBody"
+text = "No unit selected"
+horizontal_alignment = 1
+
+
+[node name="EmptyHint" type="Label" parent="Rows/Empty"]
+layout_mode = 2
+theme_type_variation = &"ERSBody"
+theme_override_font_sizes/font_size = 11
+text = "Click a unit on the map or in the roster"
+horizontal_alignment = 1
+
+
+[node name="BodyWrap" type="MarginContainer" parent="Rows"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+
+[node name="Body" type="HBoxContainer" parent="Rows/BodyWrap"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 14
+
+
+[node name="Identity" type="MarginContainer" parent="Rows/BodyWrap/Body"]
+custom_minimum_size = Vector2(416, 0)
+layout_mode = 2
+
+
+[node name="Detail" type="HBoxContainer" parent="Rows/BodyWrap/Body/Identity"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 14
+
+
+[node name="Portrait" type="PanelContainer" parent="Rows/BodyWrap/Body/Identity/Detail"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"ERSPortraitLarge"
+
+
+[node name="Glyph" type="TextureRect" parent="Rows/BodyWrap/Body/Identity/Detail/Portrait"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+
+[node name="Info" type="VBoxContainer" parent="Rows/BodyWrap/Body/Identity/Detail"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+
+
+[node name="NameRow" type="HBoxContainer" parent="Rows/BodyWrap/Body/Identity/Detail/Info"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+
+[node name="Callsign" type="Label" parent="Rows/BodyWrap/Body/Identity/Detail/Info/NameRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ERSTitle"
+theme_override_font_sizes/font_size = 26
+text = "F01"
+
+
+[node name="TypeLabel" type="Label" parent="Rows/BodyWrap/Body/Identity/Detail/Info/NameRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_type_variation = &"ERSEyebrow"
+theme_override_font_sizes/font_size = 15
+text = "FIRE ENGINE"
+
+
+[node name="HealthRow" type="HBoxContainer" parent="Rows/BodyWrap/Body/Identity/Detail/Info"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+
+[node name="HealthLabel" type="Label" parent="Rows/BodyWrap/Body/Identity/Detail/Info/HealthRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"ERSEyebrow"
+text = "HEALTH"
+
+
+[node name="HealthTrack" type="Panel" parent="Rows/BodyWrap/Body/Identity/Detail/Info/HealthRow"]
+custom_minimum_size = Vector2(160, 10)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+
+[node name="HealthFill" type="Panel" parent="Rows/BodyWrap/Body/Identity/Detail/Info/HealthRow/HealthTrack"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+
+
+[node name="HealthPct" type="Label" parent="Rows/BodyWrap/Body/Identity/Detail/Info/HealthRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 13
+text = "94%"
+horizontal_alignment = 2
+
+
+[node name="LiquidChip" type="PanelContainer" parent="Rows/BodyWrap/Body/Identity/Detail/Info"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 42)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"ERSStatChip"
+
+
+[node name="LiquidRow" type="HBoxContainer" parent="Rows/BodyWrap/Body/Identity/Detail/Info/LiquidChip"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+
+[node name="LiquidIcon" type="TextureRect" parent="Rows/BodyWrap/Body/Identity/Detail/Info/LiquidChip/LiquidRow"]
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("i_drop")
+stretch_mode = 5
+modulate = Color(0.498, 0.722, 0.961, 1)
+
+
+[node name="LiquidCol" type="VBoxContainer" parent="Rows/BodyWrap/Body/Identity/Detail/Info/LiquidChip/LiquidRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+
+[node name="LiquidTop" type="HBoxContainer" parent="Rows/BodyWrap/Body/Identity/Detail/Info/LiquidChip/LiquidRow/LiquidCol"]
+layout_mode = 2
+
+
+[node name="LiquidLabel" type="Label" parent="Rows/BodyWrap/Body/Identity/Detail/Info/LiquidChip/LiquidRow/LiquidCol/LiquidTop"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ERSEyebrow"
+text = "WATER"
+
+
+[node name="LiquidValue" type="Label" parent="Rows/BodyWrap/Body/Identity/Detail/Info/LiquidChip/LiquidRow/LiquidCol/LiquidTop"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "1,420 L"
+horizontal_alignment = 2
+
+
+[node name="LiquidTrack" type="Panel" parent="Rows/BodyWrap/Body/Identity/Detail/Info/LiquidChip/LiquidRow/LiquidCol"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+
+
+[node name="LiquidFill" type="Panel" parent="Rows/BodyWrap/Body/Identity/Detail/Info/LiquidChip/LiquidRow/LiquidCol/LiquidTrack"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+
+
+[node name="Group" type="VBoxContainer" parent="Rows/BodyWrap/Body/Identity"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+
+[node name="Slots" type="HBoxContainer" parent="Rows/BodyWrap/Body/Identity/Group"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+
+[node name="GroupRow" type="HBoxContainer" parent="Rows/BodyWrap/Body/Identity/Group"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+
+[node name="GroupLabel" type="Label" parent="Rows/BodyWrap/Body/Identity/Group/GroupRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"ERSEyebrow"
+text = "GROUP HEALTH"
+
+
+[node name="GroupTrack" type="Panel" parent="Rows/BodyWrap/Body/Identity/Group/GroupRow"]
+custom_minimum_size = Vector2(160, 10)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+
+[node name="GroupFill" type="Panel" parent="Rows/BodyWrap/Body/Identity/Group/GroupRow/GroupTrack"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+
+
+[node name="GroupPct" type="Label" parent="Rows/BodyWrap/Body/Identity/Group/GroupRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 13
+text = "86%"
+horizontal_alignment = 2
+
+
+[node name="GroupNote" type="Label" parent="Rows/BodyWrap/Body/Identity/Group"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = ""
+
+
+[node name="Sep1" type="VSeparator" parent="Rows/BodyWrap/Body"]
+layout_mode = 2
+
+
+[node name="Occupancy" type="VBoxContainer" parent="Rows/BodyWrap/Body"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+
+[node name="OccHead" type="HBoxContainer" parent="Rows/BodyWrap/Body/Occupancy"]
+layout_mode = 2
+
+
+[node name="OccLabel" type="Label" parent="Rows/BodyWrap/Body/Occupancy/OccHead"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ERSEyebrow"
+text = "OCCUPANCY"
+
+
+[node name="SeatCount" type="Label" parent="Rows/BodyWrap/Body/Occupancy/OccHead"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "0 / 0"
+
+
+[node name="Seats" type="GridContainer" parent="Rows/BodyWrap/Body/Occupancy"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 6
+
+
+[node name="Tally" type="VBoxContainer" parent="Rows/BodyWrap/Body/Occupancy"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+
+[node name="Sep2" type="VSeparator" parent="Rows/BodyWrap/Body"]
+layout_mode = 2
+
+
+[node name="Order" type="VBoxContainer" parent="Rows/BodyWrap/Body"]
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+
+[node name="OrderHead" type="Label" parent="Rows/BodyWrap/Body/Order"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ERSEyebrow"
+text = "CURRENT ORDER"
+
+
+[node name="OrderBlock" type="PanelContainer" parent="Rows/BodyWrap/Body/Order"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_type_variation = &"ERSTaskBlock"
+
+
+[node name="OrderCol" type="VBoxContainer" parent="Rows/BodyWrap/Body/Order/OrderBlock"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+
+[node name="OrderTop" type="HBoxContainer" parent="Rows/BodyWrap/Body/Order/OrderBlock/OrderCol"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+
+[node name="OrderIcon" type="TextureRect" parent="Rows/BodyWrap/Body/Order/OrderBlock/OrderCol/OrderTop"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+size_flags_vertical = 4
+stretch_mode = 5
+
+
+[node name="OrderTitle" type="Label" parent="Rows/BodyWrap/Body/Order/OrderBlock/OrderCol/OrderTop"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ERSTitle"
+theme_override_font_sizes/font_size = 16
+text = "En route"
+
+
+[node name="OrderDetail" type="Label" parent="Rows/BodyWrap/Body/Order/OrderBlock/OrderCol"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ERSBody"
+theme_override_font_sizes/font_size = 11
+text = ""
+clip_text = true
+
+
+[node name="OrderTrack" type="Panel" parent="Rows/BodyWrap/Body/Order/OrderBlock/OrderCol"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+
+[node name="OrderFill" type="Panel" parent="Rows/BodyWrap/Body/Order/OrderBlock/OrderCol/OrderTrack"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+
+
+[node name="OrderFoot" type="HBoxContainer" parent="Rows/BodyWrap/Body/Order/OrderBlock/OrderCol"]
+layout_mode = 2
+
+
+[node name="OrderLeft" type="Label" parent="Rows/BodyWrap/Body/Order/OrderBlock/OrderCol/OrderFoot"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = ""
+
+
+[node name="OrderRight" type="Label" parent="Rows/BodyWrap/Body/Order/OrderBlock/OrderCol/OrderFoot"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ERSBody"
+theme_override_font_sizes/font_size = 11
+text = ""
+
+
+[node name="Sep3" type="VSeparator" parent="Rows/BodyWrap/Body"]
+layout_mode = 2
+
+
+[node name="Commands" type="VBoxContainer" parent="Rows/BodyWrap/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+
+[node name="CommandHead" type="Label" parent="Rows/BodyWrap/Body/Commands"]
+layout_mode = 2
+theme_type_variation = &"ERSEyebrow"
+text = "COMMANDS"
+
+
+[node name="CommandGrid" type="GridContainer" parent="Rows/BodyWrap/Body/Commands"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 4
+

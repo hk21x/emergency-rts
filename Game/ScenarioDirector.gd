@@ -44,6 +44,12 @@ func begin(chosen: Dictionary) -> void:
 		# no record is set -- see Mission.shout_score.
 		mission.reset_tallies()
 		mission.par_seconds = float(scenario.get("par", 0.0))
+		# **Per scenario, not per game.** [member Mission.fail_on_casualty_lost] defaults
+		# true and nothing used to override it, so every designed shift ended the instant
+		# one casualty died. A scenario built around triage -- where the point is choosing
+		# who rides first and some of that choice is losing -- can now say so.
+		mission.fail_on_casualty_lost = bool(
+			scenario.get("fail_on_casualty_lost", true))
 		# Held from the first frame, because the map is clear until the first wave
 		# lands and a clear map is what the scripted rule reads as a job done.
 		mission.more_to_come = true
@@ -108,3 +114,23 @@ func _director() -> Director:
 		if sibling is Director:
 			return sibling as Director
 	return null
+
+
+## Another attempt at the same scenario, from the top.
+##
+## Wired to the debrief card's RETRY. Everything the last attempt left on the map goes
+## first -- incidents and the calls that held them -- because [method begin] resets the
+## mission's tallies and clock but has no opinion about the district, and a wave landing
+## beside the wreckage of the previous run is not the scenario as authored.
+func restart() -> void:
+	if scenario.is_empty():
+		return
+	_running = false
+	for node in get_tree().get_nodes_in_group(Incident.GROUP):
+		var incident := node as Incident
+		if incident and is_instance_valid(incident):
+			incident.queue_free()
+	for node in get_tree().get_nodes_in_group(Call.GROUP):
+		if is_instance_valid(node):
+			node.queue_free()
+	begin(scenario)

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" role="img" aria-label="Command button — pressed">
+  <defs>
+    <linearGradient id="cmpre_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12508F"/><stop offset="1" stop-color="#0E3F73"/></linearGradient>
+
+  </defs>
+  <rect x="0.8" y="0.8" width="42.4" height="42.4" rx="4" fill="url(#cmpre_g)" fill-opacity="1" stroke="#1668C8" stroke-width="1.6" stroke-opacity="1"/>
+  <path d="M6.6 2.6 H37.4" stroke="#FFFFFF" stroke-opacity="0.04" stroke-width="1" stroke-linecap="round"/>
+
+</svg>

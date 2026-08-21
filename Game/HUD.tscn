@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://Game/HUD.gd" id="1_hud"]
 [ext_resource type="Script" path="res://Game/UI/GameMenu.gd" id="12_menu"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://Game/UI/Portrait.gd" id="5_portrait"]
 [ext_resource type="Script" path="res://Game/UI/RosterSidebar.gd" id="6_roster"]
 [ext_resource type="Script" path="res://Game/UI/CommandGrid.gd" id="7_commands"]
+[ext_resource type="Script" path="res://Game/UI/SelectionPanel.gd" id="22_selection"]
 [ext_resource type="Script" path="res://Game/UI/StatusStrip.gd" id="8_status"]
 [ext_resource type="Script" path="res://Game/UI/CallList.gd" id="9_calls"]
 [ext_resource type="Script" path="res://Game/UI/DispatchPanel.gd" id="10_dispatch"]
@@ -338,7 +339,15 @@ script = ExtResource("5_portrait")
 ; takes three chips a row, and 308px of height holds the seven-unit fixture with a little
 ; to spare. Its height is content-driven, so a much larger fleet grows it downward into
 ; the dispatch block below; the overlap invariant is what would report that.
+; **Retired August 2026.** The bottom bar carries the fleet now -- a strip of cards
+; with service tabs, standby cards that dispatch, and its own REQUEST UNITS button,
+; which were the only two jobs this panel still had that nothing else did.
+;
+; Hidden rather than deleted, the same choice `PortraitBlock` and `CommandBlock`
+; made: `HUD.gd` reaches the roster with `$` and the suite holds it as a fixture, so
+; deleting the node breaks both while it goes on updating harmlessly out of sight.
 [node name="RosterBlock" type="PanelContainer" parent="Root/Bar/Row"]
+visible = false
 custom_minimum_size = Vector2(300, 0)
 offset_left = 22.0
 offset_top = 92.0
@@ -370,7 +379,34 @@ script = ExtResource("6_roster")
 ; the top one. -145..-22 reads like 145 and is 123, which is how this was first shipped
 ; wrong: the content minimum quietly won and the panel breathed with every selection.
 ; -172..-22 is 150, against a measured 141.
+; **The selection bar** (August 2026): who is selected, what is aboard them, and what
+; they can be told to do, on the user's `unit_selection_panel` art.
+;
+; It replaces what the portrait used to say and adds the thing nothing said before --
+; **occupancy**. A fire engine with four firefighters aboard and one with an empty cab
+; looked identical, and a van's six cells were invisible.
+;
+; 1100x188 is the kit scene's own minimum. Centred on the bottom edge rather than left,
+; because the roster owns the left column and the reference puts this under the middle.
+[node name="SelectionBlock" type="Control" parent="Root/Bar/Row"]
+custom_minimum_size = Vector2(0, 150)
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 300.0
+offset_top = -210.0
+offset_right = -22.0
+offset_bottom = -22.0
+grow_vertical = 0
+script = ExtResource("22_selection")
+
+; **Hidden, and kept.** The real [CommandGrid] inside is re-homed into the selection
+; panel at runtime by `SelectionPanel.adopt_command_grid` -- the panel adopts the kit's
+; *look*, not its fixed eight-button table, because this game's tiles come from the
+; scoring ladder and carry its hotkeys. The block stays in the tree because `HUD.gd`
+; reaches the grid through it with `$` and the suite holds it as a fixture.
 [node name="CommandBlock" type="PanelContainer" parent="Root/Bar/Row"]
+visible = false
 custom_minimum_size = Vector2(500, 0)
 anchor_left = 0.5
 anchor_top = 1.0

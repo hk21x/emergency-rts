@@ -48,6 +48,19 @@ const DEBRIS_POINTS := 60
 ## Per missing child found. Between an arrest and a delivered casualty: a person
 ## recovered, without the ambulance run that makes a delivery the dearer job.
 const MISSING_POINTS := 90
+## Per wreck winched off the road.
+##
+## **This paid nothing at all until August 2026**, and nobody noticed because the arm was
+## simply missing: the chain below tests `is Debris`, and [Wreck] extends [Incident]
+## directly rather than extending Debris, so it matched no branch and fell out of the
+## scoring entirely. The one job the £700 recovery truck exists to do earned neither a
+## point nor a penny -- which compounded the other half of the same bug, since the truck
+## was also the only way to close the collision that demanded it.
+##
+## Dearer than a shed load's 60: that is two pairs of hands for about five seconds, while
+## this is ten seconds of winching from a unit that had to be bought first. It sits with
+## the missing child, which is the other "one specialist, one long job" number.
+const WRECK_POINTS := 90
 ## What a lost casualty costs. More than a delivery earns, so a shift that loses one
 ## for every save is running at a loss.
 const LOST_PENALTY := 150
@@ -65,6 +78,8 @@ var casualties_lost := 0
 var arrests := 0
 var hazards_made_safe := 0
 var lanes_cleared := 0
+## Wrecks winched off the road. See [constant WRECK_POINTS].
+var wrecks_cleared := 0
 var children_found := 0
 var elapsed := 0.0
 
@@ -174,6 +189,7 @@ func reset_tallies() -> void:
 	arrests = 0
 	hazards_made_safe = 0
 	lanes_cleared = 0
+	wrecks_cleared = 0
 	children_found = 0
 	earned = 0
 	elapsed = 0.0
@@ -233,6 +249,9 @@ func summary() -> String:
 	if lanes_cleared > 0:
 		parts.append("%d shed load%s cleared"
 			% [lanes_cleared, "" if lanes_cleared == 1 else "s"])
+	if wrecks_cleared > 0:
+		parts.append("%d wreck%s recovered"
+			% [wrecks_cleared, "" if wrecks_cleared == 1 else "s"])
 	if children_found > 0:
 		parts.append("%d child%s found"
 			% [children_found, "" if children_found == 1 else "ren"])
@@ -277,6 +296,7 @@ func shout_score() -> int:
 		+ arrests * ARREST_POINTS \
 		+ hazards_made_safe * HAZARD_POINTS \
 		+ lanes_cleared * DEBRIS_POINTS \
+		+ wrecks_cleared * WRECK_POINTS \
 		+ children_found * MISSING_POINTS \
 		+ response_earned \
 		- casualties_lost * LOST_PENALTY
@@ -320,6 +340,8 @@ func shout_rows() -> Array[Dictionary]:
 		rows.append({"label": "Cylinders cooled", "value": str(hazards_made_safe)})
 	if lanes_cleared > 0:
 		rows.append({"label": "Shed loads cleared", "value": str(lanes_cleared)})
+	if wrecks_cleared > 0:
+		rows.append({"label": "Wrecks recovered", "value": str(wrecks_cleared)})
 	if children_found > 0:
 		rows.append({"label": "Children found", "value": str(children_found)})
 	# The same argument the shift card makes: crew hurt is a cost that would otherwise
@@ -367,6 +389,8 @@ func debrief_rows() -> Array[Dictionary]:
 		rows.append({"label": "Cylinders cooled", "value": str(hazards_made_safe)})
 	if lanes_cleared > 0:
 		rows.append({"label": "Shed loads cleared", "value": str(lanes_cleared)})
+	if wrecks_cleared > 0:
+		rows.append({"label": "Wrecks recovered", "value": str(wrecks_cleared)})
 	if children_found > 0:
 		rows.append({"label": "Children found", "value": str(children_found)})
 	return rows
@@ -494,6 +518,14 @@ func _on_resolved(incident: Incident, success: bool) -> void:
 			if scoring:
 				score += DEBRIS_POINTS
 				_pay(DEBRIS_POINTS)
+	elif incident is Wreck:
+		# Debris's shape, and it needs an arm of its own: [Wreck] extends [Incident],
+		# not Debris, so the branch above never caught it and the winch went unpaid.
+		if success:
+			wrecks_cleared += 1
+			if scoring:
+				score += WRECK_POINTS
+				_pay(WRECK_POINTS)
 	elif incident is MissingChild:
 		# The suspect's shape: no failure arm, because in this game a missing child is
 		# never *lost* -- only still missing when the clock runs out, which the failed

@@ -1,0 +1,421 @@
+[gd_resource type="Theme" load_steps=54 format=3]
+
+; Selection panel theme — only what this one component needs.
+; Drop-in note: if you already run the full Emergency Ops theme, delete this file
+; and the panel will pick the variations up from yours instead.
+
+[ext_resource type="FontFile" path="res://selection_panel/fonts/Rajdhani-Bold.ttf" id="f_bold"]
+[ext_resource type="FontFile" path="res://selection_panel/fonts/Rajdhani-SemiBold.ttf" id="f_semi"]
+[ext_resource type="FontFile" path="res://selection_panel/fonts/Barlow-Regular.ttf" id="f_body"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/sel_selection_panel.svg" id="t_panel"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/sel_portrait_large_default.svg" id="t_portrait"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/sel_portrait_large_selected.svg" id="t_portrait_s"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/sel_task_block.svg" id="t_task"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/sel_stat_chip.svg" id="t_chip"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/sel_command_button_default.svg" id="t_cmd_n"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/sel_command_button_hover.svg" id="t_cmd_h"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/sel_command_button_pressed.svg" id="t_cmd_p"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/sel_command_button_active.svg" id="t_cmd_a"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/sel_command_button_disabled.svg" id="t_cmd_d"]
+
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/roster_card_default.svg" id="t_rc_n"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/roster_card_hover.svg" id="t_rc_h"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/roster_card_selected.svg" id="t_rc_s"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/roster_card_alert.svg" id="t_rc_a"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/compact_row_default.svg" id="t_cr_n"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/compact_row_hover.svg" id="t_cr_h"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/compact_row_selected.svg" id="t_cr_s"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/compact_row_alert.svg" id="t_cr_a"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/column_header.svg" id="t_colhdr"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/table_header.svg" id="t_tblhdr"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/filter_chip_default.svg" id="t_chip_n"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/filter_chip_active.svg" id="t_chip_a"]
+
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/scroll_button_default.svg" id="t_sb_n"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/scroll_button_hover.svg" id="t_sb_h"]
+[ext_resource type="Texture2D" path="res://selection_panel/art/frames/scroll_button_disabled.svg" id="t_sb_d"]
+
+[sub_resource type="StyleBoxTexture" id="panel"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = ExtResource("t_panel")
+texture_margin_left = 14.0
+texture_margin_top = 42.0
+texture_margin_right = 14.0
+texture_margin_bottom = 14.0
+
+[sub_resource type="StyleBoxTexture" id="portrait"]
+content_margin_left = 6.0
+content_margin_top = 6.0
+content_margin_right = 6.0
+content_margin_bottom = 6.0
+texture = ExtResource("t_portrait")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="portrait_s"]
+content_margin_left = 6.0
+content_margin_top = 6.0
+content_margin_right = 6.0
+content_margin_bottom = 6.0
+texture = ExtResource("t_portrait_s")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="task"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+texture = ExtResource("t_task")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="chip"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+texture = ExtResource("t_chip")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="cmd_n"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+texture = ExtResource("t_cmd_n")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="cmd_h"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+texture = ExtResource("t_cmd_h")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="cmd_p"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+texture = ExtResource("t_cmd_p")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="cmd_a"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+texture = ExtResource("t_cmd_a")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="cmd_d"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+texture = ExtResource("t_cmd_d")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="rc_n"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+texture = ExtResource("t_rc_n")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="rc_h"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+texture = ExtResource("t_rc_h")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="rc_s"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+texture = ExtResource("t_rc_s")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="rc_a"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+texture = ExtResource("t_rc_a")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="cr_n"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+texture = ExtResource("t_cr_n")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="cr_h"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+texture = ExtResource("t_cr_h")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="cr_s"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+texture = ExtResource("t_cr_s")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="cr_a"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+texture = ExtResource("t_cr_a")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="colhdr"]
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+texture = ExtResource("t_colhdr")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="tblhdr"]
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+texture = ExtResource("t_tblhdr")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="chip_n"]
+content_margin_left = 10.0
+content_margin_top = 3.0
+content_margin_right = 10.0
+content_margin_bottom = 3.0
+texture = ExtResource("t_chip_n")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="chip_a"]
+content_margin_left = 10.0
+content_margin_top = 3.0
+content_margin_right = 10.0
+content_margin_bottom = 3.0
+texture = ExtResource("t_chip_a")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="sb_n"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = ExtResource("t_sb_n")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="sb_h"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = ExtResource("t_sb_h")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="sb_d"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = ExtResource("t_sb_d")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[resource]
+default_font = ExtResource("f_body")
+default_font_size = 13
+
+Label/colors/font_color = Color(0.8745, 0.9059, 0.9412, 1)
+Label/fonts/font = ExtResource("f_body")
+Label/font_sizes/font_size = 13
+
+ERSTitle/base_type = &"Label"
+ERSTitle/fonts/font = ExtResource("f_bold")
+ERSTitle/font_sizes/font_size = 20
+ERSTitle/colors/font_color = Color(0.8745, 0.9059, 0.9412, 1)
+
+ERSEyebrow/base_type = &"Label"
+ERSEyebrow/fonts/font = ExtResource("f_bold")
+ERSEyebrow/font_sizes/font_size = 11
+ERSEyebrow/colors/font_color = Color(0.5608, 0.6275, 0.698, 1)
+
+ERSBody/base_type = &"Label"
+ERSBody/fonts/font = ExtResource("f_body")
+ERSBody/font_sizes/font_size = 13
+ERSBody/colors/font_color = Color(0.5608, 0.6275, 0.698, 1)
+
+ERSSelectionPanel/base_type = &"PanelContainer"
+ERSSelectionPanel/styles/panel = SubResource("panel")
+ERSPortraitLarge/base_type = &"PanelContainer"
+ERSPortraitLarge/styles/panel = SubResource("portrait")
+ERSPortraitLargeSelected/base_type = &"PanelContainer"
+ERSPortraitLargeSelected/styles/panel = SubResource("portrait_s")
+ERSTaskBlock/base_type = &"PanelContainer"
+ERSTaskBlock/styles/panel = SubResource("task")
+ERSStatChip/base_type = &"PanelContainer"
+ERSStatChip/styles/panel = SubResource("chip")
+
+ERSCommand/base_type = &"Button"
+ERSCommand/styles/normal = SubResource("cmd_n")
+ERSCommand/styles/hover = SubResource("cmd_h")
+ERSCommand/styles/pressed = SubResource("cmd_p")
+ERSCommand/styles/disabled = SubResource("cmd_d")
+ERSCommand/styles/focus = SubResource("cmd_h")
+
+ERSCommandActive/base_type = &"Button"
+ERSCommandActive/styles/normal = SubResource("cmd_a")
+ERSCommandActive/styles/hover = SubResource("cmd_a")
+ERSCommandActive/styles/pressed = SubResource("cmd_a")
+ERSCommandActive/styles/disabled = SubResource("cmd_d")
+ERSCommandActive/styles/focus = SubResource("cmd_a")
+
+Button/colors/font_color = Color(0.8745, 0.9059, 0.9412, 1)
+Button/fonts/font = ExtResource("f_bold")
+Button/font_sizes/font_size = 13
+
+ERSRosterCard/base_type = &"Button"
+ERSRosterCard/styles/normal = SubResource("rc_n")
+ERSRosterCard/styles/hover = SubResource("rc_h")
+ERSRosterCard/styles/pressed = SubResource("rc_s")
+ERSRosterCard/styles/focus = SubResource("rc_h")
+
+ERSRosterCardAlert/base_type = &"Button"
+ERSRosterCardAlert/styles/normal = SubResource("rc_a")
+ERSRosterCardAlert/styles/hover = SubResource("rc_a")
+ERSRosterCardAlert/styles/pressed = SubResource("rc_a")
+ERSRosterCardAlert/styles/focus = SubResource("rc_a")
+
+ERSCompactRow/base_type = &"Button"
+ERSCompactRow/styles/normal = SubResource("cr_n")
+ERSCompactRow/styles/hover = SubResource("cr_h")
+ERSCompactRow/styles/pressed = SubResource("cr_s")
+ERSCompactRow/styles/focus = SubResource("cr_h")
+
+ERSCompactRowAlert/base_type = &"Button"
+ERSCompactRowAlert/styles/normal = SubResource("cr_a")
+ERSCompactRowAlert/styles/hover = SubResource("cr_a")
+ERSCompactRowAlert/styles/pressed = SubResource("cr_a")
+ERSCompactRowAlert/styles/focus = SubResource("cr_a")
+
+ERSColumnHeader/base_type = &"PanelContainer"
+ERSColumnHeader/styles/panel = SubResource("colhdr")
+ERSTableHeader/base_type = &"PanelContainer"
+ERSTableHeader/styles/panel = SubResource("tblhdr")
+
+ERSChip/base_type = &"Button"
+ERSChip/styles/normal = SubResource("chip_n")
+ERSChip/styles/hover = SubResource("chip_a")
+ERSChip/styles/pressed = SubResource("chip_a")
+ERSChip/styles/focus = SubResource("chip_a")
+ERSChip/font_sizes/font_size = 11
+ERSChip/colors/font_color = Color(0.5608, 0.6275, 0.698, 1)
+
+ERSChipActive/base_type = &"Button"
+ERSChipActive/styles/normal = SubResource("chip_a")
+ERSChipActive/styles/hover = SubResource("chip_a")
+ERSChipActive/styles/pressed = SubResource("chip_a")
+ERSChipActive/styles/focus = SubResource("chip_a")
+ERSChipActive/font_sizes/font_size = 11
+ERSChipActive/colors/font_color = Color(1, 1, 1, 1)
+
+ERSScrollButton/base_type = &"Button"
+ERSScrollButton/styles/normal = SubResource("sb_n")
+ERSScrollButton/styles/hover = SubResource("sb_h")
+ERSScrollButton/styles/pressed = SubResource("sb_h")
+ERSScrollButton/styles/disabled = SubResource("sb_d")
+ERSScrollButton/styles/focus = SubResource("sb_h")
+
+ERSRosterCardSelected/base_type = &"Button"
+ERSRosterCardSelected/styles/normal = SubResource("rc_s")
+ERSRosterCardSelected/styles/hover = SubResource("rc_s")
+ERSRosterCardSelected/styles/pressed = SubResource("rc_s")
+ERSRosterCardSelected/styles/focus = SubResource("rc_s")

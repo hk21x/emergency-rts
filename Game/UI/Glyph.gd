@@ -77,7 +77,7 @@ static func _fallback(target: CanvasItem, key: StringName, at: Vector2, r: float
 		&"box": _box(target, at, r, ink)
 		&"beacon": _beacon(target, at, r, ink)
 		&"horn": _horn(target, at, r, ink)
-		_: _unknown(target, at, r, ink)
+		_: _unknown(target, at, r, ink, key)
 
 
 # --- Command symbols ---------------------------------------------------------
@@ -236,7 +236,19 @@ static func _horn(target: CanvasItem, at: Vector2, r: float, ink: Color) -> void
 
 
 ## Deliberately loud: a symbol nobody wrote should look wrong, not absent.
-static func _unknown(target: CanvasItem, at: Vector2, r: float, ink: Color) -> void:
+## Keys that reached the question mark, in order, since the counter was last reset.
+##
+## **Because falling through is silent.** `_fallback` ends in `_: _unknown(...)`, so an
+## ability whose `icon()` returns a key nobody drew renders a `?` and ships -- it does not
+## warn, and at tile size a question mark reads as a deliberate symbol rather than as a
+## mistake. Nothing could see that from outside until this existed. The suite draws every
+## ability's icon for real and asserts this stayed empty.
+static var missed: Array[StringName] = []
+
+
+static func _unknown(target: CanvasItem, at: Vector2, r: float, ink: Color,
+		key := &"") -> void:
+	missed.append(key)
 	var font := ThemeDB.fallback_font
 	var height := roundi(r * 2.2)
 	var width := font.get_string_size("?", HORIZONTAL_ALIGNMENT_LEFT, -1, height).x

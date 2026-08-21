@@ -31,7 +31,7 @@ const LOAD_CLIP := "PickUp_Table"
 const RETARGET := 1.5
 
 var casualty: Casualty
-var vehicle: Vehicle
+var vehicle: Unit
 
 var _stage := Stage.TO_VEHICLE
 var _work_left := 0.0
@@ -45,16 +45,27 @@ func _init(target: Casualty) -> void:
 
 ## The nearest medical vehicle with a free stretcher slot. Static so the ability can
 ## ask the same question when deciding whether Collect applies at all.
-static func nearest_vehicle(unit: Unit) -> Vehicle:
-	var best: Vehicle = null
+static func nearest_vehicle(unit: Unit) -> Unit:
+	var best: Unit = null
 	var closest := INF
 	for node in unit.get_tree().get_nodes_in_group(Unit.GROUP):
-		var candidate := node as Vehicle
+		var candidate := node as Unit
 		if candidate == null or candidate is TrafficCar:
 			continue
-		if candidate.service != Unit.Service.MEDICAL:
+		# **A stretcher, not a service.** This asked for `service == MEDICAL`, which kept
+		# the air ambulance out: it flies for the fire service, and moving it to medical to
+		# satisfy this line would have taken it out of the fire tree it was bought into.
+		#
+		# Filtering on the stretcher instead was **unsafe until August 2026** and is not
+		# any more. `stretchers` used to default to 1, so every body that said nothing --
+		# a fire engine, a taxi -- silently qualified as an ambulance. The default is 0
+		# now and all nine scenes state their own number, which is what makes the honest
+		# test possible.
+		if candidate.stretchers <= 0 or not candidate.has_stretcher_space():
 			continue
-		if not candidate.has_stretcher_space():
+		# Nothing is loaded into an aircraft that is in the air.
+		var aircraft := candidate as Aircraft
+		if aircraft and aircraft.is_airborne():
 			continue
 		var distance := unit.global_position.distance_to(candidate.global_position)
 		if distance < closest:

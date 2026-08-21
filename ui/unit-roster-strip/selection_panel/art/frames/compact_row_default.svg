@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="34" viewBox="0 0 256 34" fill="none" role="img" aria-label="Compact row — default">
+  <defs>
+    <linearGradient id="crdef_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <rect x="0.5" y="0.5" width="255" height="33" rx="4" fill="url(#crdef_g)" fill-opacity="1" stroke="#212D3C" stroke-width="1" stroke-opacity="1"/>
+
+</svg>

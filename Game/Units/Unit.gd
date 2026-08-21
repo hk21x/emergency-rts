@@ -27,6 +27,34 @@ enum Service { NONE, POLICE, MEDICAL, FIRE }
 var type_id := &""
 
 @export var display_name := "Unit"
+
+@export_group("Carrying")
+## People this unit can take aboard.
+##
+## **On [Unit] rather than [Vehicle], because an aircraft carries people and is not a
+## Vehicle.** [Aircraft] extends Unit directly -- it has no lightbar, no siren and no
+## repair bill -- so while the crew contract lived on Vehicle, `BoardAbility` cast its
+## target to Vehicle, that cast returned null for every helicopter, and a £1,800 unit with
+## two seats could not be boarded by anybody. The seats were declared and dead.
+##
+## **Defaults to zero, deliberately.** It was 2 on Vehicle, which meant a scene that said
+## nothing got two seats -- and a `.tscn` omits any value equal to the default, so moving
+## the export with its old default would have silently emptied every car that had been
+## relying on it. That is exactly how `cells` once put a prisoner in a tow truck. Every
+## body states its own number now.
+@export var seats := 0
+## Stabilised casualties this unit can carry to hospital. Zero for anything that is not an
+## ambulance or an air ambulance -- see [member seats] on why the default is not 1.
+@export var stretchers := 0
+## Metres behind the unit that dismounting crew are placed.
+@export var dismount_back := 3.2
+## Metres to each side, alternating, so a full crew does not land in one heap.
+@export var dismount_side := 1.6
+
+## Who is riding in this unit.
+var crew: Array[Person] = []
+## Stabilised casualties aboard, on their way to hospital.
+var casualties: Array[Casualty] = []
 @export var service: Service = Service.NONE
 ## Rendered snapshot of this unit for the roster avatar, from `build_portraits.gd`.
 ## Left unset -- ambient traffic, the crowd -- the interface falls back to the drawn
@@ -350,3 +378,104 @@ func stop_navigating() -> void:
 ## True while still travelling. Orders use this to know when they are done.
 func is_navigating() -> bool:
 	return false
+
+
+# --- Carrying ------------------------------------------------------------------
+#
+# **Hoisted here from [Vehicle] in August 2026, so an aircraft can carry people.**
+# [Aircraft] extends Unit directly rather than Vehicle -- it has no lightbar, no siren,
+# no repair bill and no wheels -- so while this contract lived on Vehicle, every cast in
+# `BoardAbility`, `UnloadAbility`, `StretcherOrder` and `Hospital` returned null for a
+# helicopter. Two £1,800 units advertised seats that nothing in the game could fill.
+#
+# What stayed on Vehicle: cells and suspects. A helicopter has no cage, and doors, which
+# only a road body has -- [method open_doors] is a no-op here and a real animation there.
+
+
+func has_free_seat() -> bool:
+	return crew.size() < seats
+
+
+## Takes a person aboard. Returns false if the seats filled up while they walked over.
+func take_aboard(person: Person) -> bool:
+	if not has_free_seat() or crew.has(person):
+		return false
+	crew.append(person)
+	open_doors()
+	return true
+
+
+func has_stretcher_space() -> bool:
+	return casualties.size() < stretchers
+
+
+## Claims a stretcher. False if it filled up while the vehicle was driving over.
+func load_casualty(casualty: Casualty) -> bool:
+	if not has_stretcher_space() or casualties.has(casualty):
+		return false
+	casualties.append(casualty)
+	open_doors()
+	return true
+
+
+## Hands over everyone aboard. Called by Hospital when the vehicle drives in.
+func deliver_casualties() -> int:
+	var carried := casualties.duplicate()
+	casualties.clear()
+	if not carried.is_empty():
+		open_doors()
+	for casualty in carried:
+		if is_instance_valid(casualty):
+			casualty.deliver()
+	return carried.size()
+
+
+## Turns everyone out, spread behind the vehicle.
+func unload() -> void:
+	if not crew.is_empty():
+		open_doors()
+	var leaving := crew.duplicate()
+	crew.clear()
+	for i in leaving.size():
+		var person: Person = leaving[i]
+		if is_instance_valid(person):
+			person.disembark(_dismount_point(i))
+
+
+## Turns one person out, leaving everyone else aboard.
+##
+## **The single-passenger half of [method unload].** The bar's occupancy strip is clickable
+## -- a seat with somebody in it is a button that puts that somebody on the pavement -- and
+## "everybody out" is the wrong answer to a click on one seat.
+##
+## Only crew can be asked to leave this way. A casualty aboard is on their way to hospital
+## and a suspect is on their way to a cell; neither is a passenger who can be told to hop
+## out, and dropping one on the kerb would undo the job that put them there.
+func put_down(person: Person) -> bool:
+	if person == null or not crew.has(person):
+		return false
+	var seat := crew.find(person)
+	crew.erase(person)
+	open_doors()
+	if is_instance_valid(person):
+		person.disembark(_dismount_point(seat))
+	return true
+
+
+## A spot behind the car, alternating sides, snapped onto the navigation mesh so
+## nobody is ever put down inside a wall.
+func _dismount_point(index: int) -> Vector3:
+	var side := 1.0 if index % 2 == 0 else -1.0
+	var row := index / 2  # integer division: two per row, then step further out
+	var sideways := side * dismount_side * float(1 + row)
+	var spot := global_position + global_basis.z * dismount_back + global_basis.x * sideways
+	return NavigationServer3D.map_get_closest_point(get_world_3d().navigation_map, spot)
+
+
+## Swings whatever doors this unit has. Nothing, unless it is a [Vehicle] with some.
+##
+## A virtual rather than a check at each call site: `take_aboard` and `load_casualty` both
+## want to open up as somebody gets in, and neither should have to know what kind of body
+## it is attached to.
+func open_doors() -> void:
+	pass

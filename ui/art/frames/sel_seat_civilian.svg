@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" role="img" aria-label="Seat — Civilian">
+  <defs>
+    <linearGradient id="sfciv_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <rect x="0.8" y="0.8" width="22.4" height="22.4" rx="4" fill="url(#sfciv_g)" fill-opacity="1" stroke="#B6C4D4" stroke-width="1.5" stroke-opacity="0.85"/>
+  <g transform="translate(4 4) scale(0.66667)" color="#B6C4D4" opacity="1"><path d="M12 3.6a3.9 3.9 0 1 1 0 7.8 3.9 3.9 0 0 1 0-7.8Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 12.6c3.4 0 5.9 2.1 5.9 5.1v3.0H6.1v-3.0c0-3.0 2.5-5.1 5.9-5.1Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></g>
+
+</svg>

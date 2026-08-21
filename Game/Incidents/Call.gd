@@ -149,7 +149,11 @@ func describe() -> String:
 			cylinders += 1
 		elif incident is Suspect:
 			rowdy += 1
-		elif incident is Debris:
+		elif incident is Debris or incident is Wreck:
+			# A wreck shuts a lane exactly as a shed load does, and the board should say
+			# so. Only visible at a mixed scene -- a lone wreck takes the `live.size() ==
+			# 1` return below and reads its own state -- which is the first minute of
+			# every collision, when there are casualties beside it.
 			blocked += 1
 		elif incident is MissingChild:
 			searching += 1
@@ -282,9 +286,15 @@ func _recentre() -> void:
 			# cylinder still hot and the call is emphatically not a medical one, which
 			# is where it fell through to before this line existed.
 			burning = true
-		elif incident is Debris:
+		elif incident is Debris or incident is Wreck:
 			# The same argument as the cylinder: a shut street is a scene hazard, and
 			# without this line it fell through to MEDICAL and wore a cross.
+			#
+			# **[Wreck] rides with Debris rather than getting an arm of its own**, and it
+			# was missed when it was added: a collision whose casualties had all been
+			# delivered retyped itself MEDICAL and wore a cross over a car nobody was hurt
+			# in. It is the Debris lesson for the third time, which is the argument for
+			# the condition being a list rather than a chain of near-identical branches.
 			burning = true
 		elif incident is Casualty:
 			hurt = true

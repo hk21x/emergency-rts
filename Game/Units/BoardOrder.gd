@@ -11,12 +11,12 @@ const BOARD_DISTANCE := 3.2
 ## How far the vehicle must move before the walker bothers re-pathing.
 const RETARGET_DISTANCE := 1.5
 
-var vehicle: Vehicle
+var vehicle: Unit
 
 var _last_target := Vector3.INF
 
 
-func _init(target_vehicle: Vehicle) -> void:
+func _init(target_vehicle: Unit) -> void:
 	vehicle = target_vehicle
 
 

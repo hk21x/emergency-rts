@@ -90,8 +90,14 @@ const KERB_OFFSET := CityGrid.LANE_OFFSET + 1.5
 ## it was written: never set the district a job the roster cannot answer. It used to
 ## mean "no building fires, ever", because there was no fire service to buy.
 const KINDS := [
-	{"id": &"medical", "weight": 35},
-	{"id": &"fire", "weight": 25},
+	# **35 and 25 were these weights for as long as the table had seventeen rows.** The
+	# depth pass below added five, which would have taken the bread-and-butter call from
+	# 14.8% of the mix to 12.4% -- the staple getting rarer as a side effect nobody chose.
+	# 42 of 294 is 14.3%, and 29 is 9.9% against fire's old 10.5%, so both hold. `crime`
+	# is deliberately *not* bumped: `arson` and `affray` are both police work, so police
+	# calls rise in aggregate rather than falling, and topping it up would double-count.
+	{"id": &"medical", "weight": 42},
+	{"id": &"fire", "weight": 29},
 	# `wet_weight` replaces `weight` while the road is wet (rain or snow): collisions
 	# climb when the grip goes, which makes the weather a dispatch fact rather than a
 	# screen effect. See _kind_weight().
@@ -141,6 +147,49 @@ const KINDS := [
 	# stands at the last-seen report; the child strolls the walk graph unmarked, and a
 	# unit finds them by getting close. The first call the player *searches*.
 	{"id": &"missing_child", "weight": 8},
+
+	# --- The depth pass (August 2026) -------------------------------------------
+	#
+	# Five rows added at once, because an audit found that **seven of the fourteen
+	# buyable units had no scene that wanted them in particular**. Every row below is
+	# aimed at one purchase. Weights are modest: the point is that these turn up, not
+	# that they crowd out the district's ordinary day.
+
+	# **The call the road does not reach.** A collapse well inside a park: the ambulance
+	# stops at the kerb and the stretcher goes in and out on foot. An air ambulance lands
+	# beside the patient instead, which is the first time owning one is an *answer*
+	# rather than a faster way of arriving.
+	{"id": &"remote_medical", "weight": 10},
+	# **Police work that happens to be a fire.** A bin an officer's own extinguisher can
+	# deal with, and the person who lit it still standing over it -- so no engine is
+	# wanted, and what is wanted is the second thing an officer does. Every other fire in
+	# this table either needs a crew or merely tolerates an officer.
+	{"id": &"arson", "weight": 10},
+	# **The call that gives Secure something to be for.** A cordon elsewhere in this game
+	# is housekeeping around a scene already being dealt with; here it is the
+	# intervention, because the paramedic cannot work in the middle of a fight.
+	{"id": &"affray", "weight": 10},
+	# **The collision at the size where the winch is the whole job.** An ordinary `rtc`
+	# grows a wreck only once a career owns a recovery truck; this one is held back until
+	# it does, because it is nothing *but* wrecks. Gating a bigger version of a call the
+	# player already knows is the pattern BUILDING_SIZE endorses -- gating the only
+	# version is the one it warns about.
+	{"id": &"pile_up", "weight": 8, "wet_weight": 16, "needs_truck": true},
+	# **A hazard with the road shut in front of it.** The cylinder call has a tank and a
+	# fire; the shed load has a blocked street. This has both, and somebody down past the
+	# blockage -- so the crew are cooling, the road wants clearing, and the ambulance
+	# cannot get to the casualty until it is.
+	{"id": &"spill", "weight": 8, "needs_fire_service": true},
+	# **The only call that needs armed response and medical at once.** `armed_suspect` is
+	# police work alone and `collapse` is medical alone; this is the first row that cannot
+	# be finished by one service. Gated on the ARV for the same reason `armed_suspect` is:
+	# an armed suspect is not offered [ApprehendAbility] by anybody, so without a unit that
+	# can disarm them the scene has no ending and the call would sit open until
+	# [member overrun_grace] failed it.
+	#
+	# Rarer than the lone armed suspect, which is already the rarest police row: two
+	# weapons on the same pavement should be the shift a player remembers, not a Tuesday.
+	{"id": &"armed_robbery", "weight": 5, "needs_arv": true},
 ]
 
 ## What a vehicle fire leaves at the kerb. Plain mesh prefabs straight from the pack:
@@ -159,6 +208,20 @@ const BUS_WRECKS := [
 	"res://Assets/PolygonTown/Prefabs/Vehicles/SM_Veh_SchoolBus_01.tscn",
 ]
 const SHED_TRUCK := "res://Assets/PolygonTown/Prefabs/Vehicles/SM_Veh_Truck_Delivery_01.tscn"
+## What a robbery leaves on the pavement. Ground scatter only, and deliberately so: these
+## are laid flat on the pavement at the height everything else in this game stands on, and
+## a prefab designed to hang on a wall would float. `SM_Prop_Sign_Money_Bank_01` was named
+## in the plan for this call and is left out for exactly that reason -- **none of this is
+## visually verified**, because the generators need a window and the suite does not have
+## one, so the only safe rule is to place things whose own name says they belong on the
+## floor.
+const HEIST_PROPS := [
+	"res://Assets/Synty/PolygonHeist/Prefab/Items/SM_Item_DuffleBag_Open_Full_01.tscn",
+	"res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Stack_01.tscn",
+	"res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Money_Note_01.tscn",
+	"res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Glass_Shard_01.tscn",
+	"res://Assets/Synty/PolygonHeist/Prefab/Props/SM_Prop_Glass_Shard_02.tscn",
+]
 const DRINK_PROPS := [
 	"res://Assets/PolygonTown/Prefabs/Items/SM_Item_Alcohol_01.tscn",
 	"res://Assets/PolygonTown/Prefabs/Items/SM_Item_Alcohol_02.tscn",
@@ -368,6 +431,20 @@ func open_kind(kind: StringName) -> void:
 			_spawn_drunk()
 		&"missing_child":
 			_spawn_missing_child()
+		&"remote_medical":
+			_spawn_remote_medical()
+		&"arson":
+			_spawn_arson()
+		&"affray":
+			_spawn_affray()
+		&"pile_up":
+			var pile := _pick_junction()
+			if pile.x >= 0:
+				_spawn_pile_up(pile)
+		&"spill":
+			_spawn_spill()
+		&"armed_robbery":
+			_spawn_armed_robbery()
 		_:
 			_spawn_medical()
 	# A tick with nowhere to put a call simply skips it; the timer has already been
@@ -384,6 +461,11 @@ func _pick_kind() -> StringName:
 		if kind.get("needs_arv", false) and not _has_armed_response():
 			continue
 		if kind.get("needs_doctor", false) and not _has_doctor():
+			continue
+		# [method _leaves_a_wreck] is this same question -- can anybody on the books shift
+		# a written-off car -- asked as a gate rather than as a tail. A pile-up is nothing
+		# *but* wrecks, so for this row the two readings are the same one.
+		if kind.get("needs_truck", false) and not _leaves_a_wreck():
 			continue
 		offered.append(kind)
 		total += _kind_weight(kind, wet)
@@ -492,12 +574,19 @@ const BUS_SPOTS := [
 ## Whether the career could actually put a building out: an appliance to run the hose
 ## from, and somebody to hold it. Both, because either alone is no use -- and only one
 ## of each, because [constant BUILDING_SIZE] makes the fire fit whoever turns up.
-## Whether the career can finish a casualty that a paramedic cannot. The doctor alone is
-## enough -- unlike a building fire, which needs an appliance to reach it as well, a doctor
-## walks and any ambulance on the books can carry the patient once they are stable.
+## Whether the career can finish a casualty that a paramedic cannot.
+##
+## **A doctor is no longer enough on their own.** They used to be -- a doctor walks, and
+## any ambulance on the books could carry the patient once stable -- but the doctor gave up
+## [CollectAbility] in August 2026 to stop being a strict superset of the paramedic. So the
+## stretcher run now needs a paramedic on the books too, and without this line a
+## doctor-only career would be handed a `collapse` that nothing it owns could finish: the
+## casualty stabilises and then lies there, and the call closes as failed on
+## [member overrun_grace] ninety seconds later. That is the same trap the road collision
+## was in, arriving from the other direction.
 func _has_doctor() -> bool:
 	var station := get_tree().get_first_node_in_group(Station.GROUP) as Station
-	return station != null and station.owns(&"doctor")
+	return station != null and station.owns(&"doctor") and station.owns(&"paramedic")
 
 
 ## Whether anybody on the roster can face a weapon. The armed-suspect call is held back
@@ -512,6 +601,28 @@ func _can_fight_buildings() -> bool:
 	if station == null:
 		return false
 	return station.owns(&"engine") and station.owns(&"firefighter")
+
+
+## Whether a collision should leave a car behind for somebody to winch away.
+##
+## **Not a gate on the call, and the difference matters.** A [Wreck] can only be cleared by
+## a unit with `can_tow`, which is the £700 recovery truck and nothing else -- so a career
+## without one used to draw road collisions it could never close, and the only thing that
+## ended them was [member overrun_grace] counting them *failed*. The player was being
+## punished for a purchase they had not made, on the second-heaviest row in the table.
+##
+## The fix is not to hide the call. Hiding it would take the game's named set piece away
+## from every early career, which is the same mistake [constant BUILDING_SIZE] records
+## having shipped once already: *scale the job to the roster, do not withhold it.* It would
+## also read oddly, since `bus_rtc` frees its own bus and so would stay available -- the
+## bigger collision offered to a career the smaller one was hidden from.
+##
+## So the collision always happens, and it grows a tail the day the player can answer it.
+## That also makes the £700 a purchase they can already picture, which is a better prompt
+## than unlocking a call they have never seen.
+func _leaves_a_wreck() -> bool:
+	var station := get_tree().get_first_node_in_group(Station.GROUP) as Station
+	return station != null and station.owns(&"truck")
 
 
 ## How many firefighters the career owns, for sizing a fire it is about to open.
@@ -745,10 +856,16 @@ func _spawn_fire(spot: Vector3, kind := Fire.Kind.BIN, intensity := 0.3) -> Fire
 ##
 ## Sized to the roster on the way in, and capped on the way up, so a career with one
 ## officer gets a job one officer can finish and a career with four gets one worth four.
-func _spawn_disorder() -> void:
+##
+## Returns where the crowd was put, or [constant Vector3.INF] if there was nowhere to put
+## one -- [method _spawn_affray] needs the centre to lay a casualty in the middle of it,
+## and re-picking a kerb of its own would put the two halves of one scene in two streets.
+## [param flavour] names the job on the board: [method Call.title] takes the first
+## flavoured incident it finds, and the suspects are always the first here.
+func _spawn_disorder(flavour := "Public disorder") -> Vector3:
 	var kerb := _pick_kerb()
 	if kerb.is_empty():
-		return
+		return Vector3.INF
 	var spot: Vector3 = kerb["spot"]
 	var row := _disorder_size()
 	# Fanned along the kerb rather than stacked, or they spawn inside one another and the
@@ -758,9 +875,10 @@ func _spawn_disorder() -> void:
 		var suspect := _spawn_suspect(spot + offset)
 		if suspect == null:
 			continue
-		suspect.flavour = "Public disorder"
+		suspect.flavour = flavour
 		suspect.recruits = true
 		suspect.max_group = int(row["max_group"])
+	return spot
 
 
 ## The row of [constant DISORDER_SIZE] matching the officers on the books.
@@ -795,10 +913,12 @@ func _spawn_trapped() -> void:
 
 ## A collision at a crossroads: two casualties in the road, close enough that the board
 ## reads them as one job. Police to secure, a paramedic each, an ambulance out.
-## **A collision now leaves something behind.** Two casualties and a written-off car:
-## the bodies are dealt with in the first minute, and the street stays shut until a
-## recovery truck arrives. Every other call in this game finishes when the last casualty
-## is loaded; this is the first with a tail, and the reason to own a truck at all.
+## **A collision leaves something behind, once you can shift it.** Two casualties and --
+## for a career that owns a recovery truck -- a written-off car: the bodies are dealt with
+## in the first minute and the street stays shut until the winch arrives. Every other call
+## in this game finishes when the last casualty is loaded; this is the first with a tail,
+## and the reason to own a truck at all. Without one there is no car, because there would
+## be no way to move it: see [method _leaves_a_wreck].
 func _spawn_rtc(cell: Vector2i) -> void:
 	var centre := CityGrid.junction(cell)
 	# The car lies down one of the junction's own streets, as if it arrived that way --
@@ -816,6 +936,9 @@ func _spawn_rtc(cell: Vector2i) -> void:
 	var away := centre - along * 1.6
 	_spawn_casualty(away + across * 1.7, "Road traffic collision")
 	_spawn_casualty(away - across * 1.5, "Road traffic collision")
+	# **Only if somebody on the books can shift it** -- see [method _leaves_a_wreck].
+	if not _leaves_a_wreck():
+		return
 	var wreck := _spawn("res://Game/Incidents/Wreck.tscn") as Wreck
 	if wreck:
 		wreck.global_position = centre + along * 3.4
@@ -875,7 +998,12 @@ func _bus_size() -> Dictionary:
 	var station := get_tree().get_first_node_in_group(Station.GROUP) as Station
 	var medics := 0
 	if station:
-		medics = station.total(&"ambulance") + station.total(&"paramedic")
+		# The air ambulance counts as a pair of medical hands: it carries a stretcher, so
+		# it is another casualty off the road. Left out, this table would size a bus crash
+		# against a roster it had understated -- which is the one thing a roster-scaling
+		# table must not do.
+		medics = station.total(&"ambulance") + station.total(&"paramedic") \
+			+ station.total(&"rescue_heli")
 	var row: Dictionary = BUS_SIZE[0]
 	for candidate: Dictionary in BUS_SIZE:
 		if medics >= int(candidate["medics"]):
@@ -994,6 +1122,291 @@ func _child_spot(anchor: Vector3) -> Vector3:
 	return candidates[_rng.randi_range(0, candidates.size() - 1)]
 
 
+## A collapse well inside a park, where no road goes.
+##
+## **The one medical call the kerb does not reach.** Every other shout in this table opens
+## on a pavement a vehicle can pull up to; this one opens at least [constant PARK_DEPTH]
+## from the nearest centre line, so the ambulance stops at the road and the paramedic
+## walks the stretcher in and back out again. An air ambulance simply lands beside the
+## patient, which is the first thing in this game that makes owning one an *answer*
+## rather than a faster way of arriving.
+##
+## Sized against what the district actually affords rather than against a figure that
+## sounded right: the deepest tile either park offers stands 22.5m off a road, so a
+## threshold above that would ask for ground the map does not have and the call would
+## silently never open. It is tight without a helicopter, not impossible -- the same
+## bargain [constant BUILDING_SIZE] strikes, and for the same reason.
+func _spawn_remote_medical() -> void:
+	var spot := _pick_parkland()
+	if spot == Vector3.INF:
+		return
+	var casualty := _spawn_casualty(spot, "Collapse in the park, no vehicle access")
+	if casualty == null:
+		return
+	# Steeper than the street collapse, because here the distance is the difficulty and a
+	# casualty declining at the ordinary rate would simply wait out the walk.
+	casualty.decline_per_second *= 1.5
+
+
+## A fire somebody lit, with the person who lit it still standing over it.
+##
+## **Police work that happens to be a fire.** A bin is a fire the extinguisher in a patrol
+## car can honestly deal with, so no engine is wanted; what is wanted is the second thing
+## an officer does, and then a car to take the arrest in. Ungated for that reason -- every
+## career starts able to answer it, and it is the only call in the table that asks one
+## service to do two unrelated jobs at one scene.
+func _spawn_arson() -> void:
+	var spot := _pick_pavement(true)
+	if spot == Vector3.INF:
+		return
+	var fire := _spawn_fire(spot, Fire.Kind.BIN, 0.35)
+	if fire == null:
+		return
+	# The fire carries the flavour because [method Call.title] takes the first flavoured
+	# incident it finds, and this is the one that names the job.
+	fire.flavour = "Fire set deliberately, suspect on scene"
+	# Far enough not to be standing in the flames, close enough that the board reads one
+	# call. Through _beside, so a frontage facing the wrong way cannot put them indoors.
+	var watching := _beside(spot, Vector3(3.5, 0.0, 1.5))
+	if watching != Vector3.INF:
+		_spawn_suspect(watching)
+
+
+## A disturbance with somebody hurt in the middle of it.
+##
+## **The call that gives Secure something to be for.** A cordon everywhere else in this
+## game is housekeeping -- it keeps the crowd off a scene that is already being dealt
+## with, and the job would finish without it. Here it is the intervention: the paramedic
+## cannot work in the middle of a fight, so the officers clear the ground first and
+## medical follows them into it.
+func _spawn_affray() -> void:
+	var spot := _spawn_disorder("Affray, person injured")
+	if spot == Vector3.INF:
+		return
+	# In among them rather than off to one side, because being in among them is the whole
+	# reason the cordon is the answer. Well inside Call.GROUPING_RADIUS either way, so the
+	# board reads one job rather than a disorder and a separate medical.
+	var lying := _beside(spot, Vector3(0.0, 0.0, 2.6))
+	if lying == Vector3.INF:
+		return
+	var casualty := _spawn_casualty(lying, "")
+	if casualty:
+		# Gentled on the trapped call's terms. The pressure here is the fight, not the
+		# clock, and running both hard at once makes a scene unreadable rather than hard.
+		casualty.decline_per_second *= 0.6
+
+
+## Two cars written off at one junction, with three people on the road around them.
+##
+## **The collision at the size where the winch is the entire job.** An ordinary [code]rtc[/code]
+## grows a wreck only for a career that owns a recovery truck -- see
+## [method _leaves_a_wreck] for why that is a tail rather than a gate. This one is a gate,
+## because there is nothing else here to do: take the wrecks away and the street opens.
+##
+## Everything sits within about 7m of the junction centre. [constant Call.GROUPING_RADIUS]
+## is 14m to a centroid that *moves* as each incident is adopted, so a scene laid out any
+## wider would arrive on the board as two calls that happen to share a crossroads.
+func _spawn_pile_up(cell: Vector2i) -> void:
+	var centre := CityGrid.junction(cell)
+	# Lying along one of the junction's own streets, as if they arrived down it -- the
+	# same arrangement the single collision and the bus use.
+	var exits := CityGrid.neighbours(cell)
+	var along := Vector3(0.0, 0.0, 1.0)
+	if not exits.is_empty():
+		var toward: Vector2i = exits[_rng.randi_range(0, exits.size() - 1)]
+		along = (CityGrid.junction(toward) - centre).normalized()
+	var across := Vector3(-along.z, 0.0, along.x)
+
+	# Nose to tail, 4.5m apart: a shunt rather than two unrelated cars.
+	for forward in [2.0, 6.5]:
+		var wreck := _spawn("res://Game/Incidents/Wreck.tscn") as Wreck
+		if wreck:
+			wreck.global_position = centre + along * forward
+			wreck.flavour = "Multi-vehicle collision, road blocked"
+
+	# **Thrown clear, and further clear than a single collision throws them.** Wreck.tscn
+	# carries a 5.5m blocker; with two of them a casualty has to sit outside both, which
+	# the ordinary RTC's 1.6m setback does not manage -- that call learned the same lesson
+	# once already, when its casualties spawned underneath its wreck and could not be
+	# reached. Nearest pair here is 7.3m. Offsets are (across, along).
+	for offset in [Vector2(2.0, -5.0), Vector2(-2.2, -5.0), Vector2(0.5, -7.0)]:
+		var casualty := _spawn_casualty(
+			centre + across * offset.x + along * offset.y, "")
+		if casualty:
+			# Three at once against one ambulance's two stretchers: the triage question
+			# `bus_rtc` asks, so the gentler decline `bus_rtc` answers it with.
+			casualty.decline_per_second *= 0.6
+
+
+## A tanker down at the kerb, its load across the road, and somebody hurt past it.
+##
+## **The first hazard with the street shut in front of it.** The gas leak has a cylinder
+## and a fire and nobody hurt; the shed load has a blocked carriageway and nothing that
+## can go off. This has all three at one kerb: a tank cooking, the load down in the
+## carriageway, and somebody hurt further along the same street -- so the crew are
+## choosing between the thing that will explode and the thing that is in the way, while
+## medical waits on which of them wins.
+##
+## **The fire is not decoration.** [Hazard] heats only from a [Fire] within its
+## `heat_range`, and it finishes only once it has been threatened and then cooled -- so a
+## tank with nothing burning near it never resolves *and* never blows, and the call would
+## sit on the board until [member overrun_grace] failed it. A spill without a fire in it
+## would be a hang, not a gentler call.
+func _spawn_spill() -> void:
+	var kerb := _pick_kerb()
+	if kerb.is_empty():
+		return
+	var spot: Vector3 = kerb["spot"]
+	var hazard := _spawn("res://Game/Incidents/Hazard.tscn") as Hazard
+	if hazard == null:
+		return
+	hazard.global_position = spot
+	hazard.flavour = "Tanker spill, road blocked"
+	# Cooking it, on the gas leak's geometry: inside heat_range, far enough that the crew
+	# can work one without standing in the other. Guarded, because _beside returns INF
+	# when it cannot find ground and a fire placed at infinity is worse than no fire --
+	# and without a fire this call cannot finish at all, see above.
+	var burning := _beside(spot, Vector3(4.0, 0.0, 1.0))
+	if burning != Vector3.INF:
+		_spawn_fire(burning, Fire.Kind.BIN, 0.45)
+
+	var debris := _spawn("res://Game/Incidents/Debris.tscn") as Debris
+	if debris:
+		debris.global_position = kerb["centre"]
+	var parent := get_node_or_null(incidents_path)
+	if parent:
+		var truck := (load(SHED_TRUCK) as PackedScene).instantiate() as Node3D
+		_strip_collision(truck)
+		parent.add_child(truck)
+		truck.global_position = spot
+		truck.rotation.y = kerb["yaw"]
+		# The truck leaves with the tank rather than with the load: the hazard is the
+		# incident this scene is named for, and a lorry left parked beside a cleared road
+		# reads as a bug.
+		hazard.tree_exited.connect(func() -> void:
+			if is_instance_valid(truck):
+				truck.queue_free())
+
+	# **Down the street from the tank, not across the road from it.** Two things go wrong
+	# with the perpendicular: the kerb spot already stands 4m off the centre line, so
+	# ten metres across clears the carriageway and lands inside the block opposite --
+	# where _beside sweeps a metre and a half around ground that is not standable, finds
+	# nothing, and the call opens with no casualty in it at all. And _beside keeps the
+	# offset's *length* while turning it, so "ten metres out" is really 8.5 to 11.5 --
+	# and 8.5 is inside `Hazard.blast_range` (9.0), where `blast_harm` of 1.2 against a
+	# full 1.0 of health kills outright. Along the kerb line the ground is standable by
+	# construction and the spread is 10.3m to 12.7m: outside the blast, inside
+	# Call.GROUPING_RADIUS, so it presses without punishing.
+	var down_street := Vector3(sin(kerb["yaw"]), 0.0, cos(kerb["yaw"]))
+	var lying := _beside(spot + down_street * 11.5, Vector3(1.2, 0.0, 0.0))
+	if lying != Vector3.INF:
+		_spawn_casualty(lying, "")
+
+
+## A robbery out on the pavement: two armed suspects, somebody hurt, and the takings all
+## over the flagstones.
+##
+## **The only call in the table that no single service can finish.** A building fire wants
+## two services and lets either start; this needs armed response *before* the police half
+## can happen at all, because an armed suspect is offered [ApprehendAbility] by nobody --
+## an ordinary officer right-clicking one gets Move. Disarm first, then the arrest is
+## anybody's. The casualty is independent of all that and can be worked from the moment
+## anyone arrives.
+##
+## **What this call is not.** The plan that proposed it called it the first scene where
+## *order of arrival* is a safety question rather than a speed one. It is not, and the
+## claim is written down here so nobody re-derives it from the docstring: a [Suspect]
+## harms only the officer who has hands on them (`fight_harm_per_second`, applied to
+## `arresting` alone), so an armed robber standing over a casualty does not endanger the
+## paramedic treating them. Making that true would mean giving an armed suspect a threat
+## radius, which is a real mechanic and a separate decision. What is true today is the
+## gate: two weapons on the pavement is a scene that *cannot end* without the £550 unit.
+##
+## **The bank interior is deliberately out of scope.** [method CityGrid.standable] returns
+## false inside every block footprint, so an interior needs geometry, collision and a
+## windowed nav bake -- a second project, not a fallback. The job happens out front, which
+## is where this kind of scene happens anyway.
+func _spawn_armed_robbery() -> void:
+	var spot := _pick_pavement(true)
+	if spot == Vector3.INF:
+		return
+	var placed: Array[Node3D] = []
+
+	# Two of them, either side of the doorway they came out of. Through _beside so a
+	# frontage facing the wrong way cannot stand them inside the building.
+	for offset in [Vector3(2.2, 0.0, 0.8), Vector3(-2.0, 0.0, 1.1)]:
+		var where := _beside(spot, offset)
+		if where == Vector3.INF:
+			continue
+		var robber := _spawn_suspect(where)
+		if robber == null:
+			continue
+		robber.armed = true
+		# Only the first carries the flavour: [method Call.title] takes the first it finds,
+		# and two identical strings would be one line of luck away from reading oddly.
+		if placed.is_empty():
+			robber.flavour = "Armed robbery, suspects on scene"
+		placed.append(robber)
+	# **No suspects means no call.** Every other spawner here tolerates a partial scene,
+	# because a fire with no casualty is still a fire -- but a robbery with nobody to
+	# disarm is a casualty call wearing a robbery's name, and it would open on a career
+	# that was gated into seeing it precisely because it can answer the armed half.
+	if placed.is_empty():
+		return
+
+	# Somebody caught in it. Ordinary decline: the pressure on this call is the two
+	# weapons, and running the clock hard as well would make it unreadable rather than
+	# hard -- the same judgement the collapse and the affray make.
+	var hurt := _beside(spot, Vector3(0.4, 0.0, 3.2))
+	if hurt != Vector3.INF:
+		var casualty := _spawn_casualty(hurt, "")
+		if casualty:
+			placed.append(casualty)
+
+	_scatter_heist_props(spot, placed)
+
+
+## The takings and the broken glass, laid round [param spot] and freed once every incident
+## in [param placed] has left the scene.
+##
+## Collision-stripped and script-free, exactly as the shed load's truck and the bus
+## collision's bus are: these are scenery, and a prop with a body in it would stall a
+## patrol car on its way to the arrest. Freed on the *last* incident rather than the first,
+## on the bus collision's own reasoning -- a half-worked scene keeps its dressing.
+func _scatter_heist_props(spot: Vector3, placed: Array[Node3D]) -> void:
+	var parent := get_node_or_null(incidents_path)
+	if parent == null or placed.is_empty():
+		return
+	var dressing: Array[Node3D] = []
+	for i in HEIST_PROPS.size():
+		# Fanned on a circle rather than randomly, so nothing lands inside anything else
+		# and the scatter reads as one dropped bag rather than a pile.
+		var angle := TAU * float(i) / float(HEIST_PROPS.size())
+		var where := _beside(spot, Vector3(sin(angle), 0.0, cos(angle)) * 1.9)
+		if where == Vector3.INF:
+			continue
+		var prop := (load(str(HEIST_PROPS[i])) as PackedScene).instantiate() as Node3D
+		if prop == null:
+			continue
+		_strip_collision(prop)
+		parent.add_child(prop)
+		prop.global_position = where
+		prop.rotation.y = _rng.randf_range(0.0, TAU)
+		dressing.append(prop)
+	if dressing.is_empty():
+		return
+	# The captured Array is scanned by reference -- an int counter would be a copy, which
+	# is the trap the bus collision's own lambda records falling into.
+	for incident in placed:
+		incident.tree_exited.connect(func() -> void:
+			for other in placed:
+				if is_instance_valid(other) and other.is_inside_tree():
+					return
+			for prop in dressing:
+				if is_instance_valid(prop):
+					prop.queue_free())
+
+
 func _spawn(scene_path: String, outfit := "") -> Node3D:
 	var parent := get_node_or_null(incidents_path)
 	if parent == null:
@@ -1079,12 +1492,49 @@ func _pick_pavement(roadside := false) -> Vector3:
 ## from the centre line of the road it faces (5m of half-road, 2.5m of half-tile);
 ## anything deeper into a block -- a park interior -- reads well past 8.
 func _roadside(point: Vector3) -> bool:
+	return _road_gap(point) < 8.0
+
+
+## How far [param point] lies from the nearest road's centre line.
+##
+## Extracted from [method _roadside] rather than copied into [method _pick_parkland],
+## because the two want the same measurement and different thresholds: "against a road"
+## and "far enough in that the answer is a walk" are one number read twice.
+func _road_gap(point: Vector3) -> float:
 	var nearest := INF
 	for band in CityGrid.BANDS:
 		nearest = minf(nearest, minf(
 			absf(point.x - CityGrid.band_centre_x(band)),
 			absf(point.z - CityGrid.band_centre_z(band))))
-	return nearest < 8.0
+	return nearest
+
+
+## How deep into a park a call has to open before answering it means walking.
+##
+## **Set from the map, not from taste.** [method CityGrid.pavement_points] offers every
+## tile of a park block, and the deepest either park has stands 22.5m off a road -- so a
+## threshold at, say, 25 would ask for ground the district does not contain and
+## [method _pick_parkland] would return INF for ever, which is a call that silently never
+## opens. 16.0 is two tiles past the ring and leaves both parks with candidates.
+const PARK_DEPTH := 16.0
+
+
+## A pavement tile deep enough inside a park that no vehicle can pull up to it.
+##
+## The inverse of [method _pick_pavement]'s `roadside` filter rather than a second copy
+## of it: same candidate list, same [method _clear] funnel, opposite question -- and a
+## different threshold, because "not roadside" is only 8m and a tile one ring in is a
+## two-second walk, not a reason to own a helicopter.
+func _pick_parkland() -> Vector3:
+	var candidates: Array[Vector3] = []
+	for point in CityGrid.pavement_points():
+		if _road_gap(point) < PARK_DEPTH:
+			continue
+		if _clear(point):
+			candidates.append(point)
+	if candidates.is_empty():
+		return Vector3.INF
+	return candidates[_rng.randi_range(0, candidates.size() - 1)]
 
 
 ## A junction, under the same rules. Returns (-1, -1) when nowhere qualifies.

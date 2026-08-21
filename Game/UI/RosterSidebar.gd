@@ -251,56 +251,23 @@ func _instance_for(unit: Unit, issued: Dictionary) -> UnitInstance:
 
 ## The next callsign for [param service] -- P01, A02, F03 -- counted per service in
 ## [param issued]. The letters are the kit's own convention.
-static func _callsign(service: int, issued: Dictionary) -> String:
-	var prefix: String = UnitSidebar.PREFIX.get(
-		ShopCatalogue.CATEGORY.get(service, &"support"), "U")
-	var next: int = int(issued.get(prefix, 0)) + 1
-	issued[prefix] = next
-	return "%s%02d" % [prefix, next]
-
-
-## What the unit is actually doing, in the two or three words the row has room for.
+## The three readouts below are [UnitReadout]'s.
 ##
-## Read off the order it is carrying out rather than stored, so it cannot fall out of step
-## with the unit. The table is deliberately short of exhaustive: anything unlisted falls
-## back to the order's own name with the spaces put back, which reads acceptably for a
-## verb nobody has taught it yet.
+## **They used to live here, and the selection panel needs the same three.** Two panels
+## deriving "what is this unit doing" separately is two answers waiting to disagree, and
+## the callsign is the sharp case: the nth police vehicle is P0n only if one pass counts
+## them, so a second panel keeping its own tally would label the same engine F01 in one
+## corner of the screen and F03 in another.
+static func _callsign(service: int, issued: Dictionary) -> String:
+	return UnitReadout.callsign(service, issued)
+
+
 static func _task_of(unit: Unit) -> String:
-	var person := unit as Person
-	if person and person.health < 0.35:
-		return "Hurt"
-	if not unit.has_orders():
-		return "Standing by"
-	var order := unit.current_order()
-	if order == null:
-		return "Standing by"
-	var kind: String = order.get_script().resource_path.get_file().trim_suffix("Order.gd")
-	if TASKS.has(kind):
-		return String(TASKS[kind])
-	var spaced := ""
-	for i in kind.length():
-		var ch: String = kind[i]
-		if i > 0 and ch == ch.to_upper() and ch != ch.to_lower():
-			spaced += " " + ch.to_lower()
-		else:
-			spaced += ch
-	return spaced
+	return UnitReadout.task_of(unit)
 
 
-## EN_ROUTE while it is driving to something, ON_SCENE while it is working, RETURNING on
-## the way home, AVAILABLE when it is standing about with nothing to do.
 func _status_of(unit: Unit) -> UnitInstance.Status:
-	if not unit.has_orders():
-		return UnitInstance.Status.AVAILABLE
-	var order := unit.current_order()
-	if order == null:
-		return UnitInstance.Status.AVAILABLE
-	var kind: String = order.get_script().resource_path.get_file()
-	if kind.begins_with("Return"):
-		return UnitInstance.Status.RETURNING
-	if kind.begins_with("Move"):
-		return UnitInstance.Status.EN_ROUTE
-	return UnitInstance.Status.ON_SCENE
+	return UnitReadout.status_of(unit)
 
 
 ## People carry `health`; vehicles do not, so they read as sound. The same split
@@ -422,6 +389,29 @@ func rows() -> Array:
 		if row != null and is_instance_valid(row) and row.visible:
 			found.append(row)
 	return found
+
+
+## The callsign this panel has issued to [param unit], or "" if it has none.
+##
+## **The selection panel asks rather than counting.** Callsigns are issued by walking the
+## whole roster in order -- the nth police vehicle is P0n -- so a second panel running its
+## own tally would number the same engine differently. There is exactly one tally and it
+## lives here, because this is the panel that walks every unit anyway.
+func callsign_for(unit: Unit) -> String:
+	if unit == null or _sidebar == null:
+		return ""
+	for instance: UnitInstance in _sidebar.units:
+		# **Typed before compared.** A standby row's `_behind` entry is a Dictionary -- the
+		# catalogue row for a unit still in the house -- and `Dictionary == Object` is not
+		# a false comparison in GDScript, it is a runtime error. Harmless-looking until
+		# something asked for a callsign while a standby row existed, which is every frame
+		# the fleet strip is up.
+		var behind: Variant = _behind.get(instance)
+		if behind is Dictionary or not is_instance_valid(behind):
+			continue
+		if behind == unit:
+			return instance.callsign
+	return ""
 
 
 ## The world unit a row stands for, or null if the row is a unit waiting in the house.

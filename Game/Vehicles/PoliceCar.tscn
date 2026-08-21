@@ -55,6 +55,7 @@ script = ExtResource("1_w1j1m")
 max_speed = 26.0
 wheelbase = 2.8820567
 siren_path = NodePath("Lean/Chassis/Siren")
+seats = 2
 stretchers = 0
 cells = 2
 dismount_back = 3.679311418533325

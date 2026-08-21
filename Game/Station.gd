@@ -177,7 +177,13 @@ const TYPES := [
 	{
 		"id": &"paramedic", "label": "Paramedic", "scene": "res://Game/Paramedic.tscn",
 		"service": Unit.Service.MEDICAL, "vehicle": false, "price": 250,
-		"portrait": "Character_Female_Police",
+		# **Their own face at last.** This pointed at `Character_Female_Police` from the
+		# days when a paramedic *was* a repainted police model. The real character shipped
+		# with the POLYGON City Characters pack in August 2026 and `build_portraits` has
+		# been rendering `Paramedic.png` ever since -- but nothing repointed the catalogue,
+		# so the roster, the shop and the selection bar all went on showing a police
+		# officer wherever a paramedic was meant to be.
+		"portrait": "Paramedic",
 		"blurb": ["Treats casualties where they lie,",
 			"then wheels them to the ambulance."],
 	},

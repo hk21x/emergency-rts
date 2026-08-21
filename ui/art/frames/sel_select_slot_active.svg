@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="52" height="58" viewBox="0 0 52 58" fill="none" role="img" aria-label="Multi-select slot — active">
+  <defs>
+    <linearGradient id="msact_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16283F"/><stop offset="1" stop-color="#101C2C"/></linearGradient>
+
+  </defs>
+  <rect x="0.8" y="0.8" width="50.4" height="56.4" rx="4" fill="url(#msact_g)" fill-opacity="1" stroke="#4A9CF0" stroke-width="1.6" stroke-opacity="1"/>
+
+</svg>

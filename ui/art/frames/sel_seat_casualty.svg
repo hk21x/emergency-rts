@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" role="img" aria-label="Seat — Casualty">
+  <defs>
+    <linearGradient id="sfcas_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <rect x="0.8" y="0.8" width="22.4" height="22.4" rx="4" fill="url(#sfcas_g)" fill-opacity="1" stroke="#F0C860" stroke-width="1.5" stroke-opacity="0.85"/>
+  <g transform="translate(4 4) scale(0.66667)" color="#F0C860" opacity="1"><path d="M5.6 8.4a2.9 2.9 0 1 1 0 5.8 2.9 2.9 0 0 1 0-5.8Z" fill="currentColor" fill-rule="nonzero"/><path d="M9.4 8.8h8.2a1.7 1.7 0 0 1 1.7 1.7v3.0a1.7 1.7 0 0 1-1.7 1.7H9.4Z" fill="currentColor" fill-rule="nonzero"/><path d="M2.4 18.2h19.2" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/></g>
+
+</svg>

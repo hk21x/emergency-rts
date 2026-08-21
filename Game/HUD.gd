@@ -36,6 +36,7 @@ extends CanvasLayer
 @onready var _portrait: Portrait = $Root/Bar/Row/PortraitBlock/Portrait
 @onready var _roster: RosterSidebar = $Root/Bar/Row/RosterBlock/Body/Roster
 @onready var _commands: CommandGrid = $Root/Bar/Row/CommandBlock/Body/CommandGrid
+@onready var _selection: SelectionPanel = $Root/Bar/Row/SelectionBlock
 
 var _mission: Mission
 var _director: Director
@@ -85,6 +86,11 @@ func _ready() -> void:
 		_director.shift_started.connect(func() -> void:
 			_debrief.visible = false
 			_debrief_card.hide_card())
+	# The card knows a player asked for another go; it does not know what they were
+	# playing. Finding the runner here keeps that split -- and there may be none, because
+	# freeplay and scripted shouts show the same card.
+	if _debrief_card:
+		_debrief_card.retry_requested.connect(_on_retry_requested)
 		if _station:
 			_station.roster_changed.connect(_refresh_hint)
 
@@ -112,7 +118,22 @@ func _ready() -> void:
 	# Not to build anything with -- the menu needs it to tell "cancel what I am doing"
 	# from "open the menu" now that both are Escape.
 	_menu.controller = controller
+	# **Re-homed before it is wired, and the order is load-bearing.** Re-parenting a node
+	# runs its `_ready` again, which rebuilds the grid from an empty tile list -- so
+	# handing it the controller first and moving it second left a grid that had been
+	# built and then emptied, offering nothing for any selection.
+	#
+	# It is authored into `CommandBlock` so `$` above can find it, and moves into the
+	# selection panel's own command slot: the panel takes the kit's look and keeps this
+	# game's tiles, which come from the scoring ladder and carry its hotkeys.
+	_selection.adopt_command_grid(_commands)
 	_commands.controller = controller
+	# Asked for callsigns, so the same engine is F01 in both panels rather than being
+	# numbered twice by two tallies.
+	_selection.roster = _roster
+	# The bar dispatches units and opens the shop now, so it needs the books.
+	_selection.station = _station
+	_selection.controller = controller
 	_calls.controller = controller
 	_dispatch.controller = controller
 	var controls := get_node_or_null(
@@ -211,9 +232,13 @@ func _show_banner(state: Mission.State) -> void:
 			if _mission:
 				_debrief_card.show_shout(_mission)
 		Mission.State.LOST:
-			_banner.text = "CASUALTY LOST"
-			_banner.add_theme_color_override("font_color", Palette.CASUALTY_DEEP)
-			_banner.visible = true
+			# **The card, not a bare word.** This drew "CASUALTY LOST" over the district
+			# and stopped there: no debrief, no par time, no way back in, in the one mode
+			# built to be replayed until it is beaten. It gets what the won case gets,
+			# plus a RETRY.
+			_banner.visible = false
+			if _mission:
+				_debrief_card.show_lost(_mission)
 		Mission.State.OVER:
 			# End of a freeplay shift. The card carries its own heading, so the banner
 			# and the one-line debrief both stand down rather than repeating it above a
@@ -228,3 +253,19 @@ func _show_banner(state: Mission.State) -> void:
 			# it, and takes its hold on the mouse with it: a modal left standing over a
 			# live district would swallow every order the player gave.
 			_debrief_card.hide_card()
+
+
+## Runs the current scenario again from the top, if one is running.
+##
+## The runner is found by type among the scene's children, the same way
+## [ScenarioDirector] finds the Mission and the Director -- none of the three is in a
+## group, and adding one for a single lookup would be the larger change.
+func _on_retry_requested() -> void:
+	var scene := get_parent()
+	if scene == null:
+		return
+	for child in scene.get_children():
+		var runner := child as ScenarioDirector
+		if runner:
+			runner.restart()
+			return

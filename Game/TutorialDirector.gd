@@ -147,22 +147,30 @@ func _point_at_the_next_thing() -> void:
 	var targets: Array[Control] = []
 	var shop := get_node_or_null("../HUD/Root/Shop") as RequisitionPanel
 
+	# **The bar, not the sidebar.** Both doors this points at moved to the bottom bar in
+	# August 2026, and `RosterBlock` was left in the scene `visible = false` rather than
+	# deleted -- so the old lookups went on succeeding, returned real controls, and the
+	# spotlight pulsed them where nobody could see. The lesson still read correctly and
+	# nothing glowed, which is the worst shape a broken cue can take: no error, no missing
+	# node, just a tutorial that stopped pointing.
+	var bar := get_node_or_null("../HUD/Root/Bar/Row/SelectionBlock") as SelectionPanel
+
 	if not _to_buy.is_empty():
 		if shop and shop.visible:
 			for id in _to_buy:
 				targets.append(shop.card_button(id))
 		else:
-			# The corner buy button was retired when the sidebar gained REQUEST UNITS;
-			# the tutorial points at whichever door actually exists.
-			var panel := get_node_or_null(
-				"../HUD/Root/Bar/Row/RosterBlock/Body/Roster") as RosterSidebar
-			targets.append(panel.request_button() if panel else null)
+			targets.append(bar.request_button() if bar else null)
 	elif not _to_send.is_empty():
-		var roster := get_node_or_null(
-			"../HUD/Root/Bar/Row/RosterBlock/Body/Roster") as RosterSidebar
-		if roster:
+		if bar:
 			for id in _to_send:
-				targets.append(roster.standby_chip(id))
+				# **The strip shows one service at a time**, so the card the lesson means
+				# may not be on it at all -- a player told to send the ambulance while POL
+				# is up is looking at a strip with no ambulance in it. Point at the tab
+				# that brings it up instead, which teaches the filter rather than leaving
+				# the step unanswerable.
+				var card := bar.standby_card(id)
+				targets.append(card if card != null else bar.tab_for(id))
 
 	_spotlight.point_at(targets)
 

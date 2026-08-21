@@ -60,6 +60,7 @@ wheelbase = 3.3136296
 siren_path = NodePath("Lean/Chassis/Siren")
 door_left_path = NodePath("Lean/Chassis/DoorL")
 door_right_path = NodePath("Lean/Chassis/DoorR")
+seats = 2
 stretchers = 2
 cells = 0
 dismount_back = 3.583573007583618

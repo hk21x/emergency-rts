@@ -38,6 +38,19 @@ func has_destination() -> bool:
 
 
 ## Short label for the HUD.
+## How far through this order is, 0 to 1 -- or -1 when it has no meaningful answer.
+##
+## **-1 rather than 0, and the distinction is the whole point.** A bar drawn from 0 for an
+## order that cannot report progress is a bar that never moves, which reads as a job that
+## has stalled. The panel draws nothing at all for -1 and a real bar for anything else.
+##
+## Most work orders answer with their target's own [method Incident.progress]: a fire
+## reports how far it is out, a wreck how far it is winched. Orders whose work is a clock
+## rather than a state -- setting a cordon -- report the clock.
+func progress() -> float:
+	return -1.0
+
+
 func describe() -> String:
 	return "Order"
 

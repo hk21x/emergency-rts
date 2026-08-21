@@ -53,6 +53,7 @@ script = ExtResource("1_cgxl6")
 max_speed = 20.0
 wheelbase = 3.0777634382247925
 siren_path = NodePath("Lean/Chassis/Siren")
+seats = 2
 stretchers = 0
 cells = 0
 can_tow = true

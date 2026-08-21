@@ -81,7 +81,10 @@ const NOZZLE_LENGTH := 0.52
 
 ## The bone the nozzle is held in. The characters are retargeted to SkeletonProfile-
 ## Humanoid, so this name is the same on every one of them.
-const HAND_BONE := &"RightHand"
+## The hand everything is held in. Deferred to [HeldItem] so the name exists once: this
+## file and [Suspect] each declared their own identical copy, which is the shape a rule
+## drifts out of.
+const HAND_BONE := HeldItem.HAND_BONE
 
 @export_group("Animation")
 ## Fraction of [member run_speed] above which the jog clip is used.
@@ -98,7 +101,7 @@ var move_target := Vector3.ZERO
 ## Set while riding in a vehicle. An aboard person is hidden, has no collision and
 ## cannot be selected.
 var is_aboard := false
-var carrier: Vehicle
+var carrier: Unit
 
 ## Clip forced by a WorkOrder while the person is doing a job. Overrides locomotion.
 var action_clip := ""
@@ -225,6 +228,19 @@ func has_advanced_care() -> bool:
 func _build_abilities() -> Array[Ability]:
 	match service:
 		Service.MEDICAL:
+			# **The doctor does not run the stretcher.** These two had identical verb
+			# lists, which made the £600 doctor a strict superset of the £250 paramedic
+			# -- same six tiles plus advanced care -- and the paramedic's only
+			# distinguishing feature being that they are cheaper. A doctor stabilises;
+			# a paramedic moves the patient. That is the division of labour the doctor's
+			# own catalogue blurb already claimed, and now the verbs agree with it.
+			#
+			# `Director._has_doctor()` widened in the same change to require a paramedic
+			# as well, or a doctor-only career would be handed a `collapse` that nothing
+			# on its books could finish.
+			if speciality == DOCTOR:
+				return [MoveAbility.new(), TreatAbility.new(),
+					BoardAbility.new(), StopAbility.new(), ReturnAbility.new()]
 			return [MoveAbility.new(), TreatAbility.new(), CollectAbility.new(),
 				BoardAbility.new(), StopAbility.new(), ReturnAbility.new()]
 		Service.POLICE:
@@ -382,7 +398,7 @@ func _rejoin_play(at: Vector3) -> void:
 
 ## Climbs into a vehicle. The seat is claimed by [method Vehicle.take_aboard] first;
 ## this is only the passenger's half of it.
-func board(vehicle: Vehicle) -> void:
+func board(vehicle: Unit) -> void:
 	if is_aboard:
 		return
 	is_aboard = true
@@ -676,27 +692,12 @@ func _update_weapon() -> void:
 		_weapon.name = "HeldWeapon"
 		Unit.strip_collision(_weapon)
 		add_child(_weapon)
-	var hand := _weapon_hand_point()
-	if hand == Vector3.INF:
-		_weapon.visible = false
-		return
-	_weapon.visible = true
-	_weapon.global_position = hand
-	# Along the body's own facing, so it points where the officer does.
-	_weapon.global_rotation = global_rotation
-
-
-## The right hand, for anything held. Same lookup as [method _hand_point] without the fire
-## service gate -- that one is about the hose and answers INF for everybody else.
-func _weapon_hand_point() -> Vector3:
+	# **Placed by [HeldItem], which owns the correction and the wrist.** This used to drop
+	# the prop on the hand bone's origin and take the *body's* yaw -- see that class for
+	# what both of those cost.
 	if _skeleton == null:
-		_skeleton = get_node_or_null("Character/Armature/GeneralSkeleton") as Skeleton3D
-	if _skeleton == null:
-		return Vector3.INF
-	var bone := _skeleton.find_bone(HAND_BONE)
-	if bone < 0:
-		return Vector3.INF
-	return _skeleton.global_transform * _skeleton.get_bone_global_pose(bone).origin
+		_skeleton = HeldItem.skeleton_of(self)
+	_weapon.visible = HeldItem.place(_weapon, _skeleton, weapon_scene)
 
 
 ## Where this person's right hand is, or [constant Vector3.INF] if they have no skeleton

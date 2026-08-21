@@ -1,0 +1,174 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Theme" path="res://selection_panel/theme/selection_panel.tres" id="theme"]
+[ext_resource type="Script" path="res://demo/demo.gd" id="s_demo"]
+[ext_resource type="PackedScene" path="res://selection_panel/unit_selection_panel.tscn" id="panel"]
+
+[node name="Demo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("theme")
+script = ExtResource("s_demo")
+
+[node name="Bg" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.031, 0.051, 0.078, 1)
+
+
+[node name="Controls" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 30.0
+offset_right = 300.0
+offset_bottom = 150.0
+grow_horizontal = 2
+
+
+[node name="Pad" type="MarginContainer" parent="Controls"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+
+[node name="Col" type="VBoxContainer" parent="Controls/Pad"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+
+[node name="Row1" type="HBoxContainer" parent="Controls/Pad/Col"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+
+[node name="UnitPicker" type="OptionButton" parent="Controls/Pad/Col/Row1"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+
+[node name="StatusButton" type="Button" parent="Controls/Pad/Col/Row1"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Cycle status"
+
+
+[node name="LayoutPicker" type="OptionButton" parent="Controls/Pad/Col/Row1"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ClearButton" type="Button" parent="Controls/Pad/Col/Row1"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Deselect"
+
+
+[node name="Row2" type="HBoxContainer" parent="Controls/Pad/Col"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+
+[node name="HealthLabel" type="Label" parent="Controls/Pad/Col/Row2"]
+layout_mode = 2
+theme_type_variation = &"ERSEyebrow"
+text = "HEALTH"
+
+
+[node name="HealthSlider" type="HSlider" parent="Controls/Pad/Col/Row2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 100.0
+value = 94.0
+
+
+[node name="LiquidLabel" type="Label" parent="Controls/Pad/Col/Row2"]
+layout_mode = 2
+theme_type_variation = &"ERSEyebrow"
+text = "LIQUID"
+
+
+[node name="LiquidSlider" type="HSlider" parent="Controls/Pad/Col/Row2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 100.0
+value = 79.0
+
+
+[node name="Row3" type="HBoxContainer" parent="Controls/Pad/Col"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+
+[node name="AddCrew" type="Button" parent="Controls/Pad/Col/Row3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+ Firefighter"
+
+
+[node name="AddCasualty" type="Button" parent="Controls/Pad/Col/Row3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+ Casualty"
+
+
+[node name="RemoveSeat" type="Button" parent="Controls/Pad/Col/Row3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "- Seat"
+
+
+[node name="Log" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 164.0
+offset_right = 300.0
+offset_bottom = 190.0
+grow_horizontal = 2
+theme_type_variation = &"ERSBody"
+text = "Drag a slider or swap the unit type"
+horizontal_alignment = 1
+
+
+[node name="Dock" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -560.0
+offset_top = -216.0
+offset_right = 560.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+
+
+[node name="Panel" parent="Dock" instance=ExtResource("panel")]
+unique_name_in_owner = true
+layout_mode = 2

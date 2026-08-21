@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="116" height="124" viewBox="0 0 116 124" fill="none" role="img" aria-label="Roster card — alert">
+  <defs>
+    <linearGradient id="rcale_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#291619"/><stop offset="1" stop-color="#180E11"/></linearGradient>
+
+  </defs>
+  <rect x="1.0" y="1.0" width="114" height="122" rx="5" fill="url(#rcale_g)" fill-opacity="1" stroke="#E8735C" stroke-width="2" stroke-opacity="1"/>
+  <path d="M7 3 H109" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1" stroke-linecap="round"/>
+
+</svg>

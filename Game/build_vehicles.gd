@@ -156,7 +156,13 @@ const VEHICLES := [
 		"out": "PoliceVan.tscn",
 		"display": "Police Van",
 		"service": Unit.Service.POLICE,
-		"seats": 2,
+		# **Six, and that is what the van is for.** It shipped carrying two like every
+		# other car, which made it "the patrol car with more cells" -- a quantity, not a
+		# job. Six seats make it the personnel carrier: four officers and an armed
+		# response unit to a disorder in one trip, against a `DISORDER_SIZE` table that
+		# runs to eight suspects. The body is the pack's SWAT van; this is it behaving
+		# like one.
+		"seats": 6,
 		"stretchers": 0,
 		"cells": 6,
 		# Van-shaped: heavier than a patrol car, lighter than the appliance.
@@ -182,9 +188,14 @@ const VEHICLES := [
 		"service": Unit.Service.POLICE,
 		"seats": 2,
 		"stretchers": 0,
-		"cells": 2,
-		# The quickest car on the road: past the patrol car's 26 and the doctor car's 27.
-		"max_speed": 28.0,
+		# **One, against the patrol car's two.** A pursuit car that also holds the same
+		# number of prisoners was strictly better than the £600 car for £300 more, which
+		# is not a decision. Give up a cell for the speed and it becomes one.
+		"cells": 1,
+		# The quickest thing on the road by a clear margin -- past the patrol car's 26 and
+		# the doctor car's 27, and matching the helicopters' 34. It was 28, which is a 7%
+		# lift for a 50% price rise: a difference the player could not feel.
+		"max_speed": 34.0,
 		# **Derived rather than read straight off**, because this hull's 2.22 maximum is
 		# its antennae, not its roof. The patrol car sits its beads 0.34 above its own
 		# glass line (glass 1.44, siren 1.78), and this glass tops at 1.55 -- so 1.89.
@@ -207,7 +218,12 @@ const VEHICLES := [
 		# `Game/Materials/` because `Assets/Synty/` is vendor and never edited.
 		"palette": "res://Game/Materials/RescueLivery.tres",
 		"seats": 2,
-		"stretchers": 0,
+		# **One stretcher, which is what makes this a different unit from Air Support.**
+		# The two airframes were identical but for a name, a service and a paint job. This
+		# one is the air ambulance: it flies a casualty to hospital over traffic that a
+		# road ambulance has to sit in. It stays in the FIRE tree, where it was bought
+		# from -- `StretcherOrder` asks for a stretcher now rather than for a service.
+		"stretchers": 1,
 		"max_speed": 34.0,
 	},
 	# **The recovery truck.** The unit that gives a road traffic collision a *tail*: every

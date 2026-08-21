@@ -18,6 +18,13 @@ class_name DebriefCard
 ## when they are not zero -- a clean shift should not announce the nothing it lost.
 const MUTED_ALPHA := 0.45
 
+## Asked for another attempt at the shout that was just lost.
+##
+## A signal rather than a direct call into the scenario runner: this card is also shown
+## for a won shout and for the end of a freeplay shift, and it has no business knowing
+## which of those the district is in the middle of.
+signal retry_requested
+
 var _body: VBoxContainer
 
 
@@ -63,6 +70,21 @@ func show_shout(mission: Mission) -> void:
 	_fill("SHOUT COMPLETE", mission.shout_rows(), true)
 
 
+## The end of a scripted shout that was lost, as a modal with a way back in.
+##
+## **A scenario used to end on a bare red banner.** One casualty dying set
+## [member Mission.fail_on_casualty_lost] and the HUD drew "CASUALTY LOST" over the
+## district -- no debrief, no par time, no way to try again, in the one mode whose whole
+## point is being replayed until it is beaten. The player was left looking at a word.
+##
+## It gets the same card the won case gets, plus a RETRY, because what a player wants at
+## the end of a failed attempt is the same table and another go.
+func show_lost(mission: Mission) -> void:
+	if mission == null:
+		return
+	_fill("CASUALTY LOST", mission.shout_rows(), true, true)
+
+
 func hide_card() -> void:
 	visible = false
 	# Handed straight back. A modal that stayed modal after it was dismissed would take
@@ -70,7 +92,8 @@ func hide_card() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
-func _fill(heading_text: String, rows: Array[Dictionary], modal: bool) -> void:
+func _fill(heading_text: String, rows: Array[Dictionary], modal: bool,
+		retryable := false) -> void:
 	if _body == null:
 		return
 	# Removed as well as freed. queue_free() alone does not take effect until the end of
@@ -98,9 +121,19 @@ func _fill(heading_text: String, rows: Array[Dictionary], modal: bool) -> void:
 		spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_body.add_child(spacer)
 
+		if retryable:
+			# First, and the primary: after a failed attempt the thing the player came
+			# for is another go, not a way to put the card away.
+			var again := Button.new()
+			again.name = "Retry"
+			again.theme_type_variation = &"PrimaryButton"
+			again.text = "RETRY"
+			again.pressed.connect(_on_retry)
+			_body.add_child(again)
+
 		var dismiss := Button.new()
 		dismiss.name = "Dismiss"
-		dismiss.theme_type_variation = &"PrimaryButton"
+		dismiss.theme_type_variation = &"PrimaryButton" if not retryable else &"Button"
 		dismiss.text = "CONTINUE"
 		dismiss.pressed.connect(hide_card)
 		_body.add_child(dismiss)
@@ -136,3 +169,10 @@ func _row(row: Dictionary) -> Control:
 	if bool(row.get("muted", false)):
 		line.modulate.a = MUTED_ALPHA
 	return line
+
+
+func _on_retry() -> void:
+	# Down before the signal goes out, so whatever restarts the scenario is not doing it
+	# underneath a modal that still holds the mouse.
+	hide_card()
+	retry_requested.emit()

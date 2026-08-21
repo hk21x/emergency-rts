@@ -42,10 +42,6 @@ class_name Aircraft
 ## paid to learn once, in a car.
 const SIDEWAYS_SPEED := 0.3
 
-## The generator sets these on every vehicle it builds; a helicopter carries crew and has
-## no stretchers, no cells and no tank.
-@export var seats := 2
-
 ## Where the generator parents the prefab's parts. The two rotors are found by name
 ## rather than wired by path, because the pack names them and the generator copies them
 ## through unchanged -- a path in a config would be a third place to keep in step.
@@ -187,6 +183,10 @@ func _build_abilities() -> Array[Ability]:
 	var list: Array[Ability] = [MoveAbility.new(), StopAbility.new()]
 	list.append(TakeOffAbility.new())
 	list.append(LandAbility.new())
+	# **It can carry people now**, so it needs the verb that turns them out again. The
+	# ability declines while airborne on its own, so the tile is there on the ground and
+	# gone in the air rather than being offered and refusing.
+	list.append(UnloadAbility.new())
 	if service != Service.NONE:
 		list.append(ReturnAbility.new())
 	return list

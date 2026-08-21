@@ -78,8 +78,19 @@ func _attach(control: Control) -> void:
 
 	var button := control as Button
 	if button != null:
-		if not button.pressed.is_connected(_play_click):
-			button.pressed.connect(_play_click)
+		# **`button_down`, not `pressed`.** Godot's `pressed` is a button-*up* signal: it
+		# fires when the mouse is released, so the click sound arrived at the end of the
+		# gesture rather than the start and the interface sounded like it was lagging
+		# behind the hand. Reported from play, and the fix was already written down three
+		# lines below -- `_on_gui_input` takes the press "because that is when the thing it
+		# does happens", and only the Button branch disagreed with it.
+		#
+		# The *action* stays on `pressed`, deliberately: releasing is when a button should
+		# act, because it is what lets a player slide off a control to cancel. Feedback
+		# leads the action by a few tens of milliseconds, which is the way round that reads
+		# as responsive.
+		if not button.button_down.is_connected(_play_click):
+			button.button_down.connect(_play_click)
 	elif control.mouse_filter == Control.MOUSE_FILTER_STOP \
 			and control.gui_input.get_connections().size() > 0:
 		if not control.gui_input.is_connected(_on_gui_input):

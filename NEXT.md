@@ -14,9 +14,10 @@ worth reading first have both since been closed — the crowd refills now, and t
 economy has a sink — so pick by what you want the game to be, not by urgency.
 
 **The one exception is the section immediately below.** "Debts owed" is not a menu: it is
-what the last stretch of work left unfinished, including four features' worth of checks
-that have never been proven to detect anything and a live hotkey collision that the
-reference file still describes as impossible. Clear those before starting something new.
+what the last stretch of work left unfinished. Both of the debts it was written for are
+now closed -- the hotkey collision, and the checks that had never been proven to detect
+anything. The August 2026 sabotage pass took twenty of those through the ritual and is
+written up in `PROGRESS.md`; what remains unproven is listed at the end of that section.
 
 ---
 
@@ -49,10 +50,11 @@ sentinel satisfied. Only one of those is "the check is bad" in the ordinary sens
 under sabotage starts a diagnosis rather than ending one, and the question to ask of the
 output is not whether the measurement *moved* but whether it *shows the fault*.
 
-**Still worth doing**, in the same family: `Glyph._fallback` ends in `_: _unknown(...)`, so
-a typo'd `icon()` key draws a generic symbol and ships silently. Nothing asserts every
-ability's icon resolves. Three verbs already share `shield` (`apprehend`, `escort`,
-`disarm`) and an armed officer offers all three, so that grid carries three identical tiles.
+**The icon half is now closed too** — every ability's `icon()` is drawn for real and
+asserted not to fall through to `Glyph`'s question mark. What remains there is cosmetic
+rather than a defect: three verbs share `shield` (`apprehend`, `escort`, `disarm`) and an
+armed officer offers all three, so that grid carries three identical tiles. It resolves,
+it just does not distinguish.
 
 ### ~~`Clear` and `Lights` both answer to `J`~~ — closed August 2026
 
@@ -78,38 +80,127 @@ a typo'd icon key draws a generic symbol and ships. Worth noting while looking: 
 already share `shield` (`apprehend`, `escort`, `disarm`) and an armed officer offers all
 three, so that grid has three identical tiles. Not a defect — but not a design either.
 
-### `ShopPanel.gd` is dead; `Roster.gd` is not
+### ~~`ShopPanel.gd` is dead~~ — deleted. `Roster.gd` is still a decision
 
-`Game/UI/ShopPanel.gd` has **zero references anywhere** — the requisition modal replaced
-it entirely. Delete it.
+`Game/UI/ShopPanel.gd` is gone; the requisition modal had replaced it entirely. Its only
+remaining traces are two `[ShopPanel]` doc links in `RequisitionPanel.gd`, now reworded to
+plain prose so they do not point at a class that no longer exists.
 
 `Game/UI/Roster.gd` looks equally dead and is not: `RosterSidebar` loads it by path under
-`LEGACY_ROSTER=1` as a bisect escape hatch. Deleting it means deciding that hatch has
-served its purpose — which it arguably has, now that the crash it was built to bisect is
-found and fixed. That is a call to make deliberately rather than by tidying.
+`LEGACY_ROSTER=1` as a bisect escape hatch. **Left in place deliberately, and it wants a
+decision rather than a tidy-up.** The argument for removing it: the crash it was built to
+bisect is found, fixed and confirmed in play, and the repository has git history, so the
+hatch is no longer the only way back. The argument for keeping it: it costs nothing while
+unset. Not a call to make on tidiness grounds — the roster's default has been changed once
+without being asked for, and that was the wrong call.
 
-### Twelve probes and a diagnostic still on disk
+### ~~Twelve probes and a diagnostic still on disk~~ — resolved August 2026, mostly by *not* deleting them
 
-`Game/probe_*.gd` (twelve of them) and `Game/diagnose_driving.gd`, referenced only from
-comments. **Move the measurements those comments cite into `Game/README.md` first** — a
-live comment pointing at a deleted file is worse than the dead file it points at.
+This entry was **wrong**, and the way it was wrong is worth keeping. It called the probes
+"referenced only from comments" and proposed deleting all thirteen. Counting the references
+before acting showed that only three had none at all — and that several of the rest are
+named in these documents as **instruments to re-run**, in the present tense: *"probe_journeys.gd
+is kept, and the metric…"*, *"must be measured on escape count with `probe_journeys.gd`
+before it is believed"*, *"Both probes are kept."* Deleting them would have destroyed the
+measuring apparatus this file tells a future reader to use, on the strength of a tidiness
+claim nobody checked.
 
-### The suite is one 12,815-line file, and it is the next thing to grow
+Deleted: `probe_click.gd`, `probe_departure.gd`, `probe_tutorial_drive.gd` (398 lines, zero
+references anywhere), plus `Game/ChaseCamera.gd`, `Game/Car.tscn` and `Game/UI/ShopPanel.gd`.
+Kept: the eight probes and `diagnose_driving.gd` that the docs cite — `probe_corner`,
+`probe_journeys`, `probe_kerb`, `probe_mount`, `probe_orbit`, `probe_route`, `probe_stall`,
+`probe_wedge`.
 
-`Game/smoke_test.gd` is now **12,815 lines** — comfortably the largest file in the project
-and around a third of all the GDScript in it. It has grown ~1,000 lines in a month, and
-anything done to the campaign adds a hundred checks on top of that.
+The `Car.tscn` deletion did cost three corrections in `Game/README.md`, which used it as the
+live example for the palette swaps, the `+Z` mesh orientation and the prefab's `StaticBody3D`
+wrappers. That is exactly the "a live comment pointing at a deleted file is worse than the
+dead file" hazard this entry warned about, arriving from the one file it did not warn about.
 
-Split it as a **pure move**, proving nothing broke by check-count identity: `all checks
-passed (1123)` before and after, with no other change in the same pass. A
-`Game/Tests/TestCase.gd` holding the fixture, N files cut along the section comments
-already in the file, and a ~100-line runner summing per-file counts.
+### ~~The suite is one 12,815-line file~~ — split August 2026
 
-The per-file counts are the real prize rather than the tidiness. A runtime error inside a
-check **skips the rest of that check silently** — the suite still reports green and only
-the total falls, which is how two checks stopped short for months and cost three out of six
-hundred without anybody noticing. Per-file totals make that failure mode legible for the
-first time.
+Done, as a pure move: `Game/Tests/TestCase.gd` (fixture + 78 helpers), fourteen section
+files cut along the banners already in the file, and `smoke_test.gd` reduced to a 397-line
+leaf holding the run order. Chained by script inheritance, so one `self`, one set of fixture
+fields, and **no test body edited**. Proven by check-count identity at 1164 with the `ok`
+line count agreeing independently. Every run now prints a per-section tally, and a tally
+that does not sum to the total fails the run.
+
+**What is left here**: `FreeplayTheDirectorAndTheScore.gd` is 5,560 lines and 551 of the
+1,126 checks — nearly half the suite in one file. The same cut can be applied again along
+its internal structure, and the tally now makes the imbalance visible rather than merely
+true. Not urgent; the reason the original split mattered was legibility, and that is bought.
+
+### The fleet-depth work — three phases shipped, two left
+
+An August 2026 audit found **seven of the fourteen purchasable units had no scene that
+wanted them in particular**. Both helicopters owned only Move/Stop/Take off/Land/Return,
+the Interceptor was a patrol car with more speed, and the paramedic's ability list was the
+doctor's character for character. Three phases of the fix have shipped:
+
+- **Six defects closed** — the RTC that could not be cleared without a £700 truck, a
+  cleared wreck paying £0, `_recentre()` retyping an RTC as medical, wrecks missing from
+  `describe()`, the hand-mapped gate captions in `CallSpawner`, and the campaign's
+  bare-banner instant-loss.
+- **Air Rescue became a carrier** — the crew/stretcher contract hoisted from `Vehicle` up
+  to `Unit`, `BoardAbility`'s `as Vehicle` cast fixed, `UnloadAbility` declining while
+  airborne.
+- **Five call kinds** — `remote_medical`, `arson`, `affray`, `pile_up`, `spill`. Written
+  up in `PROGRESS.md` and `Game/README.md`.
+
+**`armed_robbery` shipped in August 2026** — see `Game/README.md`. One phase is left, plus
+one mechanic the robbery turned up as missing:
+
+- **An armed suspect has no threat radius.** The plan sold the robbery as the first scene
+  where *order of arrival* is a safety question, and it is not: `fight_harm_per_second`
+  reaches only the officer with hands on them, so an armed robber standing over a casualty
+  is no danger to the paramedic. Giving one a radius that harms nearby non-armed
+  responders would make the claim true and would be the first genuine *positioning*
+  decision in the game. It is a real mechanic and wants designing, not bolting on — a
+  radius that punishes a player for arriving in the wrong order is a short step from one
+  that punishes them for arriving.
+- **`ObserveAbility` on Air Support** (~150 lines). A toggle in the `Lights`/`Siren`
+  shape — no `Order`, no target — revealing within ~35m while airborne: setting
+  `MissingChild.sighted` (distinct from `found`; a child cannot walk at heel behind a
+  helicopter) and marking fleeing suspects.
+  **Sequenced last on purpose.** Observation is the better idea, but it pays on
+  `missing_child` alone — 8 of 294, one call in thirty-odd. With the robbery in and five
+  new kinds to reveal, the same feature is worth several times as much.
+  Hotkey: **`KEY_0`, appended to `COMMAND_KEYS`** — all 18 command letters are bound and
+  `W A S D Q E` are polled by the camera. Forgetting the append reddens the `unplaced` leg
+  of `_test_no_unit_offers_two_verbs_on_one_key`, which is that check working.
+
+Deliberately not doing, with reasons: a fifth `Call.Kind` with its own marker (four UI
+files for a cosmetic gain); reworking the Doctor Car (its distinguishing property is
+negative and is defended in `Station.TYPES`); speed-based helicopter design (24m climb +
+4s spool + 24m descent is ~11s of vertical overhead per sortie, so at 34 m/s a 200m hop is
+a wash against a patrol car); water rescue, fixed-wing and upper-floor ladder rescue (all
+blocked on *level design* rather than art — there is no water on the map, and `standable()`
+is false inside footprints; the ladder already animates, which makes it a tempting trap
+rather than a cheap win).
+
+### Held props are placeable now, but not yet placed
+
+`HeldItem.OFFSETS` exists, both callers go through it, and the prop turns with the wrist
+instead of the torso. **Every row in it is still zero**, which is the old placement minus
+the body-yaw bug — better, and not yet right.
+
+Filling it in is a windowed job and cannot be delegated to a headless run:
+
+```
+godot --path . res://Game/HandCalibration.tscn
+```
+
+Nudge until it looks held, press `P`, paste the printed row into `HeldItem.OFFSETS`. Two
+props are in play (`SM_Wep_PistolSwat_01` on the ARV, `SM_Wep_PistolBandit_01` on
+suspects). **Tune in the clip the unit is actually seen in** — the ARV's sidearm is on
+screen during the pistol pose of a disarm, not the idle, and the two will want different
+compromises now that the prop follows the hand.
+
+The firefighter's hose nozzle is the third held thing and does **not** go through
+`HeldItem`: it is aimed at the spray point by `look_at` rather than held in a fixed grip,
+and it carries its own hand-tuned `rotation.x = PI / 2` for the barrel running down -Y.
+Folding it in would mean teaching `HeldItem` about props whose orientation is driven by a
+target rather than by the wrist. Worth doing only if a second aimed prop ever appears.
 
 ### The game has never been built
 

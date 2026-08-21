@@ -11,11 +11,11 @@ unmodified, though the POLYGON City pack was relocated on import — see `PROGRE
 
 **All 15 planned phases are done, plus 16 (the world reacts), 17 (audio), 18 (game
 framing), 19 (the fire service) and all of phase 20 — the career economy and the
-campaign scenarios.** 1123 automated checks, all passing.
+campaign scenarios.** 1308 automated checks, all passing.
 
 A 260m city district — twenty-five blocks of varied size, with parks, parking lots and
 four tower families — with 60 pedestrians and 22 civilian cars going about their business.
-The map opens **quiet and empty** — a career starts with £2,000 and no units, buys
+The map opens **quiet and empty** — a career starts with £3,200 and no units, buys
 its fleet from the DISPATCH block, and keeps it between sessions. `F2` opens a
 **freeplay shift**: five, ten or fifteen minutes of calls the district produces — busier
 towards the end — scored per call cleared and weighted by response time, with every
@@ -152,7 +152,7 @@ Keys are bound to **physical** keycodes, so the layout holds on AZERTY and QWERT
 | `UI/Glyph.gd` | Every symbol: pack icons with drawn fallbacks, shared by tiles, avatars and pills |
 | `UI/ControlsPanel.gd` | The controls card: keycap icons, sectioned by function |
 | `UI/GameMenu.gd` | The framing: title card, pause menu (`ESC`), settings, game speed |
-| `UI/ShopPanel.gd` | The unit shop: portraits, prices, blurbs, BUY |
+| `UI/RequisitionPanel.gd` | The unit shop: a modal storefront on the user's UI kit, with a cart |
 | `UI/Icons/`, `UI/Keys/` | Curated icons and keycaps from the pack under `Assets/padding` |
 | `UI/Portrait.gd` | Who is selected and what they are doing |
 | `UI/Roster.gd`, `UnitChip.gd` | Every unit under command, as clickable avatars |
@@ -172,7 +172,6 @@ Keys are bound to **physical** keycodes, so the layout holds on AZERTY and QWERT
 | `UI/SelectionBox.gd` | Draws the drag rectangle |
 | `Vehicles/PoliceCar.tscn`, `Ambulance.tscn` | **Generated** from City prefabs |
 | `build_vehicles.gd` | Generates the vehicle scenes |
-| `Car.tscn` | The original Starter car. Unused, kept as a reference |
 | `Person.tscn`, `Paramedic.tscn` | The two crews on foot. Service decides their verbs |
 | `Characters/PoliceOfficer.tscn`, `Paramedic.tscn` | **Generated** from the City police characters |
 | `HUD.tscn`, `HUD.gd` | The floating command panels and the world overlays |
@@ -190,7 +189,6 @@ Keys are bound to **physical** keycodes, so the layout holds on AZERTY and QWERT
 | `inspect_animations.gd` | Lists animation clips and skeleton bone names |
 | `inspect_rigs.gd` | Dumps rig node trees and their importer subresource keys |
 | `AnimationViewer.tscn` | Standalone clip viewer, run it directly |
-| `ChaseCamera.gd` | **Unused.** The follow camera from the manual-driving version, kept in case it is wanted again. It needs a `cam_cycle` input action, which no longer exists. |
 
 ## Unit architecture
 
@@ -431,7 +429,7 @@ did not exist and refused doctors that did. Units now carry the catalogue id the
 as (`Unit.type_id`, stamped in `dispatch()`), and the scan survives only as a fallback for a
 unit nobody bought. Any specialist added from here would have re-broken it identically.
 
-A second, smaller one: `ShopPanel` read `config["portrait"]` unguarded while `Station` reads
+A second, smaller one: the shop panel read `config["portrait"]` unguarded while `Station` reads
 the same key with `has()`. One catalogue entry without a portrait threw inside `_ready`,
 which builds the whole shop, and took out every card and six unrelated checks with it.
 
@@ -1298,7 +1296,7 @@ need telling:
   machinery see the pile, which is what unlocks the street write-off, the reroute and
   the pavement mount that already existed for walls of traffic.
 
-The verb is `Clear` (`J`), a `WorkOrder` in the Free mould, and unusually it belongs to
+The verb is `Clear` (`O`), a `WorkOrder` in the Free mould, and unusually it belongs to
 **two services** — officers and firefighters both — because box-lugging is not
 specialist work. Its `REACH` of 3.6 is load-bearing: the Blocker's face is 2.75m from
 the debris origin and a person's capsule holds them ~0.3m off that, so the first cut's
@@ -1390,6 +1388,284 @@ counts.
 No child-sized mesh exists in any pack — Synty's "SchoolBoy" is a school uniform on
 the standard 1.84m adult rig — so Child.tscn scales an ordinary outfit to 0.7. At RTS
 distance, small is young.
+
+### The depth pass — five calls, each aimed at one purchase
+
+An audit in August 2026 asked a blunt question of the shop: which of the fourteen
+purchasable units has a scene that wants *it*? The answer was seven of fourteen. Both
+helicopters owned only Move/Stop/Take off/Land/Return; the Interceptor was a patrol car
+with more speed; the paramedic's ability list was the doctor's, character for character.
+
+The fleet half of that was fixed by giving units capabilities. This is the other half:
+five rows in `Director.KINDS` that exist so a particular purchase has a day where it is
+the answer.
+
+| Kind | Weight | Gate | Wants |
+|---|---|---|---|
+| `remote_medical` | 10 | — | **Air Rescue.** A collapse deep in a park, where the ambulance stops at the kerb and the stretcher goes in and out on foot. A helicopter lands beside the patient. |
+| `arson` | 10 | — | **Officer.** A bin fire and the person who lit it: an extinguisher and an arrest at one scene, with no engine involved. |
+| `affray` | 10 | — | **Van + paramedic.** A disorder with somebody hurt in the middle, so the cordon is what buys the medic room to work. |
+| `pile_up` | 8 (16 wet) | `needs_truck` | **Recovery Truck.** Two wrecks and three casualties at one junction. |
+| `spill` | 8 | `needs_fire_service` | **Engine + firefighter.** A tanker down at the kerb, its load in the carriageway, a tank cooking and somebody hurt down the street. |
+
+Four things in here are worth carrying forward, because each was a constraint the map or
+an existing class imposed rather than a choice.
+
+**`PARK_DEPTH` is set from the map, not from taste.** `remote_medical` needs ground no
+vehicle can reach, which means somewhere well inside a park. `_roadside()` answers at 8m,
+but a tile one ring in is a two-second walk — no reason to own a helicopter. The honest
+figure comes from measuring: `pavement_points()` offers every tile of a park block, both
+parks are 6–10 tiles across, and **the deepest tile either one has stands 22.5m off the
+nearest centre line**. A threshold above that would ask for ground the district does not
+contain, `_pick_parkland()` would return `INF` for ever, and the call would silently never
+open — a failure with no symptom except a kind that never comes round. 16.0 is two tiles
+past the ring and leaves both parks with candidates. `_road_gap()` was extracted from
+`_roadside()` so the two share one measurement read at two thresholds.
+
+**A `Hazard` with no fire beside it is a hang, not a gentler call.** The first sketch of
+`spill` had a tank, a blocked road and a casualty, and no fire — a quieter cylinder call.
+It cannot work: `Hazard` heats only from a `Fire` inside `heat_range`, and its made-safe
+exit requires `_was_threatened` to have gone true first. With nothing burning, the tank
+neither blows nor resolves, and the call sits on the board until `overrun_grace` fails it.
+The fire is load-bearing and the check asserts it, along with the 4.1m gap that puts it
+inside the 7.0m `heat_range`.
+
+**`_beside()` keeps the offset's length and sweeps its direction**, which is easy to
+forget when placing a body relative to something dangerous. `spill` first placed its
+casualty ten metres perpendicular from the kerb — which is 8.5m to 11.5m once `_beside`
+has turned it, and 8.5 is inside `Hazard.blast_range` (9.0) where `blast_harm` of 1.2
+against 1.0 of health kills outright. The perpendicular was doubly wrong: a kerb spot
+already stands 4m off the centre line, so ten metres across clears the 10m carriageway and
+lands *inside the block opposite*, where the sweep finds no standable ground and the call
+opens with no casualty at all. That is what shipped to the first suite run and what the
+check caught. It is placed 11.5m down the street now — standable by construction, 10.3m to
+12.7m from the tank, outside the blast and inside `GROUPING_RADIUS`.
+
+**`pile_up` is gated where `rtc` is not, and the difference is the point.** `_leaves_a_wreck()`
+governs both: for an ordinary collision it decides whether the scene grows a *tail*, so a
+career with no truck still gets the set piece, just without the car (see "The wreck outlives
+its casualties"). For a pile-up it is a *gate*, because a pile-up is nothing but wrecks —
+take them away and there is no call left. Same predicate, read two ways, which is why no
+second helper was added for it.
+
+Two smaller notes. The three casualties sit 7.3m from the nearest wreck rather than the
+single collision's 1.6m setback: with two blockers in play, the offset that fixed the
+original "casualties trapped under the car" bug is not enough, and the check asserts the
+clearance against `Wreck.CLEAR_RADIUS` (3.6) rather than assuming it. And `_spawn_disorder()`
+now **returns its kerb spot and takes a flavour**, so `affray` can lay a casualty in the
+middle of the crowd it just created — picking a second kerb of its own would have put the
+two halves of one scene in two different streets.
+
+**The weights were rebalanced deliberately.** Five new rows take the table from 237 to 294,
+which would have moved `medical` from 14.8% of the mix to 12.4% — the bread-and-butter call
+getting rarer as a side effect nobody chose. `medical` 35→42 and `fire` 25→29 hold both at
+their old share. `crime` is deliberately *not* topped up: `arson` and `affray` are both
+police work, so police calls rise in aggregate and bumping it too would double-count.
+
+Adding `needs_truck` also exercised the gate-caption sweep from the F5 spawner: a new
+`needs_*` key that nobody adds to `CallSpawner.GATE_CAPTIONS` reddens a check that walks
+`KINDS` for every gate key it can find. That is the check working — it was written after
+`needs_arv` was added and forgotten.
+
+### The armed robbery — the call no one service can finish
+
+`armed_robbery` is gated on owning armed response, weight 5: the rarest row in the table,
+because two weapons on one pavement should be the shift a player remembers rather than a
+Tuesday. Two armed `Suspect`s outside a frontage, somebody hurt beside them, and the
+takings scattered across the flagstones as collision-stripped Heist-pack props.
+
+**The gate is the design.** An armed suspect is offered `ApprehendAbility` by *nobody* — an
+ordinary officer right-clicking one gets Move — so without a unit that can disarm them the
+scene has no ending at all, and the call would sit open until `overrun_grace` failed it.
+That is the same rule `armed_suspect` runs on. What makes this row different is that it is
+the only one in the table that **no single service can finish**: `armed_suspect` is police
+work alone, `collapse` is medical alone, and this needs both. And the gate is a *sequence*
+rather than a lockout — disarmed, the arrest is anybody's, which is the whole point of the
+£550.
+
+**What this call is not, written down so it is not re-derived.** The plan that proposed it
+described it as the first scene where *order of arrival* is a safety question rather than a
+speed one. **It is not.** A `Suspect` applies `fight_harm_per_second` to `arresting` alone —
+the officer with hands on them — so an armed robber standing over a casualty does nothing
+whatever to the paramedic treating them, and sending medical in first costs nothing.
+Making that claim true would mean giving an armed suspect a threat radius, which is a real
+mechanic and a separate decision. The docstring on `_spawn_armed_robbery` carries the same
+warning, because that is where the next person will look.
+
+**The bank interior is deliberately out of scope.** `CityGrid.standable()` returns false
+inside every block footprint, so an interior needs geometry, collision and a windowed nav
+bake — a second project, not a fallback. The job happens out front.
+
+Two things the sabotage pass established about the dressing. **Three of the five Heist
+props ship wrapped in a `StaticBody3D`** — the duffle bag and both money prefabs, six
+bodies between them; the two glass shards are clean. Left in, they would stall the patrol
+car sent to take the arrest away, which is the same trap the shed load's truck and the
+ARV's own pistol were stripped for, and the check counts bodies rather than trusting it.
+And `SM_Prop_Sign_Money_Bank_01`, named in the plan, is **left out**: everything here is
+laid flat at ground height and a prefab meant to hang on a wall would float. That is
+inference from the prop's own name, not inspection — the generators need a window and the
+suite has none, so **no part of this scene's appearance is verified**.
+
+### `mouse_filter` does not inherit — the dead avatar
+
+Reported from play: clicking a unit's **avatar** on the roster strip did nothing, while
+clicking the card around it worked. The card is a `Button` with its decoration built inside
+it, and the decoration was eating the click.
+
+The trap is that `mouse_filter` is **per node and does not inherit**, and the per-type
+defaults are uneven. Measured rather than assumed, because guessing them is what produced
+the bug:
+
+| Control | Default |
+|---|---|
+| `Label` | `IGNORE` |
+| `VBoxContainer`, `HBoxContainer`, `TextureRect` | `PASS` |
+| `Panel`, `PanelContainer` | **`STOP`** |
+
+`_card()` already set `IGNORE` on the `VBoxContainer` holding everything, which looks like
+it should cover the card — it covers exactly one node. Underneath it, the portrait's
+`PanelContainer` frame, the status stripe and the condition track were all `Panel`-family
+and all `STOP`.
+
+**The avatar's own `TextureRect` was innocent.** It is `PASS`: it forwards the click
+upward, straight into the `PanelContainer` frame drawn around it, which stops it dead. That
+is worth recording precisely because `TextureRect` is the node this project distrusts —
+`EXPAND_KEEP_SIZE` has caused six bugs here — and the instinct to blame it again would have
+found nothing. Two other dead spots came with it: the status stripe along the top of the
+card and the condition bar along the bottom. The avatar is simply the one a player notices,
+being the biggest target and the most obviously a thing you would click.
+
+The fix sweeps **every** Control descendant to `IGNORE` rather than naming the three
+offenders, because the bug is the *default* and the next decoration added to a card would
+arrive carrying it. `find_children` returns descendants only, so the Button keeps its own
+`STOP`.
+
+Two things the sabotage pass established here:
+
+- **The existing click legs are blind to this.** `_test_the_bar_can_buy_and_send_units`
+  presses the card with `pressed.emit()`, which bypasses hit-testing entirely — it printed
+  `8 units, was 7` identically with the fault present and absent. Removing the decoration
+  sweep reddens exactly one leg in the whole suite.
+- **Both directions need a leg.** A sweep that caught the `Button` too would make every
+  card in the strip inert to a real mouse, and the "nothing takes input" leg cannot see
+  that — it stays green, because the descendants are still correct. The paired leg asserts
+  the card itself still takes a click.
+
+Every part of a card is given an explicit `name` for the sake of that first leg. Built with
+`Type.new()` they arrive as `@Panel@8612`, so a failure line read as three indistinguishable
+panels carrying a per-run instance counter; named, it reads `StatusStripe(Panel),
+PortraitFrame(PanelContainer), ConditionTrack(Panel)`.
+
+### The delay between the click and the game — two causes, neither of them the click
+
+Reported from play as "a delay between clicking and the actual action taking place (or
+audio playing)". It was two unrelated faults arriving as one symptom.
+
+**The bar was the only panel in the interface that polled.** `RTSController` emits
+`selection_changed`, and `CommandGrid`, `Roster` and `RosterSidebar` have all listened to
+it since the signal existed. `SelectionPanel` — the newest panel — was written as a pure
+poll loop on a `TICK` of 0.12s with no path from input at all, so clicking a unit could
+take a seventh of a second to show on the bar. It answers the signal now. The tick stays,
+and should: it carries what changes *without* a click — condition, task, water, order
+progress — which is what polling is for. What it should never have carried is the response
+to input.
+
+**The click sound fired on button-up.** `ClickSounds` connected to `Button.pressed`, which
+in Godot is a *release* signal, so the sound landed at the end of the gesture instead of
+the start. The fix was already written three lines below in the same file: the non-Button
+branch takes the press *"because that is when the thing it does happens"*, and only the
+Button branch disagreed. The **action** deliberately stays on `pressed` — releasing is when
+a button should act, because that is what lets a player slide off a control to cancel — so
+feedback now leads the action by a few tens of milliseconds, which is the way round that
+reads as responsive.
+
+**Left-click selection in the world is not one of these**, and cannot be. The controller
+cannot tell a click from a drag-box until the button comes up, so `_handle_click` runs on
+release by necessity. Right-click orders already fire on the press.
+
+Neither fault had a witness. Every existing assertion about the bar waits `_idle(14)` or
+more before looking — past the tick — so a poll-only bar was indistinguishable from an
+instant one; and the click-sound leg called a helper that pushes press *and* release and
+read afterwards, by which time both wirings have fired. Both now have checks that read at
+one frame and between press and release respectively, and both were proven to redden.
+
+### The tutorial stopped pointing, and nothing noticed
+
+The tutorial pulses the control its words are naming. Both controls it points at — the shop
+door and the standby card — moved to the bottom bar in August 2026, and `RosterBlock` was
+left in the scene `visible = false` rather than deleted. So the old lookups went on
+succeeding, returned real live controls, and the spotlight dutifully pulsed them where
+nobody could see them. No error, no missing node, no failing check: the lesson still read
+correctly and simply stopped pointing at anything.
+
+**The check could not see it because it asserted identity and never visibility.** It pinned
+*which* control was lit — deliberately, since "the wrong thing glows" is the failure worth
+catching — and a hidden control satisfies that perfectly. The leg added alongside it asserts
+every lit control `is_visible_in_tree()`, and names any that is not. That is the one that
+generalises: it will catch the next thing that moves.
+
+One genuinely new problem the rebuild introduced: **the strip shows one service at a time.**
+A player told to send the ambulance while POL is up is looking at a strip with no ambulance
+card in it, so a cue pointing at the card alone would point at nothing. `TutorialDirector`
+falls back to `SelectionPanel.tab_for()` — the tab that would bring the card up — which
+teaches the filter rather than leaving the step unanswerable.
+
+### Held props, and the tool for placing them
+
+Reported from play: the things characters hold sit wrong. It was not a tuning problem —
+**there was nothing to tune.** Both places that put a prop in a hand, `Person` for the
+officer's sidearm and `Suspect` for the robber's, did the same two lines:
+
+```gdscript
+item.global_position = skeleton.global_transform * pose(bone).origin
+item.global_rotation = global_rotation
+```
+
+No correction of any kind, so every pack model was taken exactly as its author left it: a
+pistol whose origin sits at the muzzle hangs a barrel-length out of the fist, one whose
+grip runs along +X points sideways, and there was nowhere to put a fix even once you knew
+the number.
+
+The second fault is the one that shapes the tooling. `global_rotation` is the **body's**
+yaw, so a prop tracked the torso and not the wrist — it would read correctly in one pose
+and wrong the moment a clip turned the hand, and the pistol pose and the walk cycle
+disagreed with each other. That is why a contact sheet cannot settle this: you would fix
+the idle from a screenshot and ship the walk broken.
+
+`HeldItem` is the one placement function now — the two callers had written it separately
+and identically, down to their own copies of the `RightHand` constant, so a fix had to
+land twice. It reads the bone's full basis and applies a per-prop row from
+`HeldItem.OFFSETS`: metres, degrees (a person types these), and a uniform scale.
+
+`Game/HandCalibration.tscn` is where the rows come from. It needs a window — it is the
+only tool here that genuinely cannot run headless, because the whole job is looking. It
+holds the camera 55cm off the hand with the near plane at 0.01 (the default clips the prop
+away exactly at the zoom you want), cycles prop × character × clip, nudges the correction
+live on hotkeys with the numbers on screen, and prints a finished row to paste back. It
+places through `HeldItem.place()` with an override rather than composing the transform
+itself — a calibration tool that composes differently from the game shows numbers that are
+wrong the moment you paste them.
+
+**What the suite can and cannot hold here**, because the distinction is the whole point:
+
+- It can assert every calibrated path resolves — a typo is not an error anywhere, `load`
+  returns null, the caller clears `weapon_scene`, and the officer is quietly unarmed.
+- It can assert every character the harness offers has the bone the harness assumes.
+- It can assert the prop **turns with the wrist**, by posing the hand bone through a right
+  angle and requiring the prop's basis to move. That is the mechanism fix, and under the
+  shipped code the prop does not move at all.
+- It can assert a known correction moves the prop by exactly that much. **This leg is not
+  optional**: every shipped row is zero today, so a `place()` that discarded the table
+  outright would put every prop in precisely the right spot — a sabotage that did exactly
+  that passed 1308/1308 until this leg existed.
+- It **cannot** judge whether a prop looks held. That is a human's call in a window, and
+  no assertion replaces it.
+
+One leg is deliberately labelled as not carrying its weight: "the sidearm is in the hand
+rather than near it" printed `0.000m` through all three sabotages of `place()`, because
+with every offset at zero the prop sits on the bone origin whatever the code does. It is
+live against the drift class it names — this project has had a held prop travel 19m in six
+seconds — and against nothing else.
 
 ### Spawning a call on demand — F5
 
@@ -2125,7 +2401,7 @@ but a longer walk. The hospital stays what it already was: where casualties are
 delivered.
 
 **The map ships empty and nothing is free.** A new career opens with
-`Station.STARTING_FUNDS` (£2,000) and buys its fleet:
+`Station.STARTING_FUNDS` and buys its fleet:
 
 | Type | Price |
 | --- | --- |
@@ -2144,7 +2420,7 @@ already the punishment and a fined career spirals. Funds and the owned fleet per
 in `user://career.cfg` — the third and last save-shaped file — with RESET CAREER in
 the settings card.
 
-**Buying is the shop** (`UI/ShopPanel.gd`): a storefront overlay opened from the
+**Buying is the shop** (`UI/RequisitionPanel.gd`): a storefront overlay opened from the
 DISPATCH heading ("DISPATCH · £1,250 · BUY") or by clicking any row that owns
 nothing. One card per type — the rendered portrait, the price, a two-line blurb of
 what the unit is for (all from `Station.TYPES`), the owned count, and a BUY button.
@@ -2542,6 +2818,40 @@ headless and never looks at a pixel, so a builder edit that dropped back to flat
 styleboxes would restore the old look with everything green. They assert a card is drawn
 from a texture under `Game/UI/Kit/` and that button labels are set in a face under
 `Game/UI/Fonts/`.
+
+### The bottom bar is the kit's too, and it says who is aboard
+
+`SelectionPanel` hosts the user's `unit_selection_panel` scene: callsign and type, a
+condition bar, the tank in litres, the current order, and **occupancy** -- one pip per
+seat, coloured by who is in it, with a tally under it. That last one is why the swap
+happened. A patrol car carrying two officers and an empty one looked identical, and a
+police van's six cells said nothing about who was in the back.
+
+> **The command grid is the game's, not the kit's.** The scene ships a fixed table of eight
+> buttons with hardcoded ids. This game builds its grid from
+> `RTSController.available_abilities()`, so a verb gets its tile, its hotkey and its
+> right-click meaning from the scoring ladder with no UI file touched. Adopting the kit's
+> table would have deleted the ladder and every verb added since it was written. The kit's
+> grid is hidden and the real one re-homed beside it: **the look, not the mechanism.**
+>
+> The grid therefore does **not** live where `HUD.tscn` puts it. It is authored into a
+> hidden `CommandBlock` so `HUD.gd` can reach it with `$`, then moved at startup -- so
+> anything resolving it by its authored path finds nothing at runtime, and there is a check
+> asserting it ends up inside the panel the player is looking at. Parentage, not
+> visibility: `is_visible_in_tree()` reads false headlessly for both the healthy and the
+> broken tree and cannot tell them apart.
+
+**`UnitReadout`** holds callsign, status, task, condition and occupancy for both this panel
+and the roster, because two panels deriving them separately is two answers waiting to
+disagree. Callsigns are issued by counting the whole roster in one pass, so the panel asks
+the roster for one rather than starting a second tally -- otherwise the same engine is F01
+in one corner of the screen and F03 in another.
+
+A vehicle's condition is its **repair bill** scaled against `UnitReadout.BILL_SCALE`, not
+health. "A bill, not health" is a real distinction the roster asserts and a check guards --
+but a panel that draws a bar for a person and a blank for a vehicle reads as a missing
+feature rather than as a difference, so the bill is drawn *as* a condition and the row's
+label changes to say which is meant. A vehicle at 0% is not wrecked; it is expensive.
 
 ### The shop and the roster are the kit's now
 
@@ -3379,7 +3689,14 @@ directly with `godot --path . res://Game/AnimationViewer.tscn`.
 `--fixed-fps 60` decouples the headless loop from the wall clock: same fixed-step
 physics, same checks, ~60 seconds instead of ~9 minutes.
 
-1123 checks. Runs real physics without a renderer: the fixtures buy and dispatch a
+1308 checks, in fourteen section files under `Game/Tests/` with the fixture and helpers
+in `Tests/TestCase.gd`. They are chained by plain script inheritance ending at
+`smoke_test.gd`, which holds only the run order — one `self`, one set of fixture fields, so
+the split out of the single 13,000-line file cost no change to any test body. Every run
+prints a per-section tally before the summary, which is what makes a silently truncated
+check legible: one number for the whole suite hides it, fourteen do not.
+
+Runs real physics without a renderer: the fixtures buy and dispatch a
 shift through the station (the map ships empty), and every bought unit is clickable
 from the opening view; the crowd strolls, runs from a fire and cannot be selected or
 picked through; traffic drives the roads and yields; units start parked, drive to a
@@ -3452,10 +3769,10 @@ casualty is actually lying down. Both would otherwise pass while looking wrong.
 - **The pack ships no `.fbx` files** (bar `Characters.fbx`) — the meshes are
   pre-extracted `.res` files under `Models/extracted/`. Nothing is missing.
 - **`Mat_01` … `Mat_04` are palette swaps** over identical UVs: 01 blue, 02 red,
-  04 orange. That is how the pack's own Demo scene gets its colour variety. The car is
-  red because `Car.tscn` overrides to `Mat_02`; change that one line to recolour it.
-- **The Synty meshes face `+Z`**, but Godot's forward is `-Z`. `Car.tscn`,
-  `Person.tscn`, `Paramedic.tscn` and `Suspect.tscn` all yaw their visuals 180° to
+  04 orange. That is how the pack's own Demo scene gets its colour variety — a body is
+  recoloured by overriding which palette it points at, not by tinting anything.
+- **The Synty meshes face `+Z`**, but Godot's forward is `-Z`. `Person.tscn`,
+  `Paramedic.tscn` and `Suspect.tscn` all yaw their visuals 180° to
   correct it. Miss that on a character and it moonwalks — steering is right, the
   model just looks backwards — and *every other test still passes*, because nothing
   in code reads the model's orientation. It has now happened twice (the officer, then
@@ -3464,9 +3781,12 @@ casualty is actually lying down. Both would otherwise pass while looking wrong.
   character facing the wrong *target*: the suspect's punches played perfectly while
   landing on empty air, until a check compared the model's forward axis with the
   bearing to the officer.
-- **`Car.tscn` does not instance the car prefab.** That prefab wraps its chassis and
-  each wheel in `StaticBody3D` nodes, which would fight the `CharacterBody3D`. It
-  references the same meshes directly; wheel offsets match the prefab exactly.
+- **A vehicle never instances the pack's car prefab.** That prefab wraps its chassis and
+  each wheel in `StaticBody3D` nodes, which would fight the `CharacterBody3D` driving it.
+  `build_vehicles.gd` references the same meshes directly and matches the prefab's wheel
+  offsets. The same trap bit the ARV from a different direction in August 2026 — Synty's
+  *weapon* prefabs carry a `MeshCollider` body, and one parented into a character shoves
+  its own carrier across the map.
 - **The POLYGON City kit is a strict 5m grid**, with a corner origin at `x[0,5]
   z[-5,0]`. Ground tiles, façade courses and roof caps all share it, so one placement
   helper serves the lot. Two-tile pieces (`Road_ParkingLines_01`, `Shop_03`) and the

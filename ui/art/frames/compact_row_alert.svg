@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="34" viewBox="0 0 256 34" fill="none" role="img" aria-label="Compact row — alert">
+  <defs>
+    <linearGradient id="crale_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#291619"/><stop offset="1" stop-color="#180E11"/></linearGradient>
+
+  </defs>
+  <rect x="0.8" y="0.8" width="254.4" height="32.4" rx="4" fill="url(#crale_g)" fill-opacity="1" stroke="#E8735C" stroke-width="1.6" stroke-opacity="1"/>
+
+</svg>

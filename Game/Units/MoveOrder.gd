@@ -34,6 +34,9 @@ var _shut := {}
 ## Nearest this car has been to what it is currently aiming at, and how long it has
 ## been no nearer.
 var _closest := INF
+## The furthest this journey has ever had to run, and how far is left, for [method progress].
+var _start_gap := 0.0
+var _last_gap := 0.0
 var _no_progress := 0.0
 ## Set for one aim after a give-up, so the car is allowed to swing its nose round at a
 ## waypoint it would normally be made to drive round to.
@@ -87,6 +90,13 @@ func start(unit: Unit) -> void:
 
 
 func tick(unit: Unit, _delta: float) -> bool:
+	# Sampled here rather than at `start`, because a route is not planned yet at that point
+	# and the first frame's gap is the honest baseline.
+	var flat := unit.global_position - point
+	flat.y = 0.0
+	_last_gap = flat.length()
+	_start_gap = maxf(_start_gap, _last_gap)
+
 	if unit is Vehicle and _watch_progress(unit, _delta):
 		return false
 
@@ -111,6 +121,20 @@ func tick(unit: Unit, _delta: float) -> bool:
 
 func cancel(unit: Unit) -> void:
 	unit.stop_navigating()
+
+
+## How much of the journey is behind the unit.
+##
+## Measured from the distance still to run against the furthest it has ever been from the
+## destination, which is normally where it set off. Using the *furthest* rather than the
+## start point is what keeps the bar honest through a turn-round or a detour round a shut
+## street -- a unit that has to drive away from its target first would otherwise show the
+## bar going backwards.
+func progress() -> float:
+	if _start_gap <= 0.0:
+		return -1.0
+	var left := _last_gap
+	return clampf(1.0 - left / _start_gap, 0.0, 1.0)
 
 
 func destination() -> Vector3:

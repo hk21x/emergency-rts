@@ -60,6 +60,7 @@ siren_path = NodePath("Lean/Chassis/Siren")
 door_left_path = NodePath("Lean/Chassis/DoorL")
 door_right_path = NodePath("Lean/Chassis/DoorR")
 stretchers = 0
+seats = 6
 cells = 6
 dismount_back = 4.1782502174377445
 wheel_radius = 0.5120535

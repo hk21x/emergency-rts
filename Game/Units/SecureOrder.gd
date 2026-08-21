@@ -28,6 +28,13 @@ func _init(parent: Node, point: Vector3, radius := 6.0) -> void:
 	super(cordon, REACH, CLIP, "Securing the scene")
 
 
+## A cordon is not a state that creeps up -- it is up or it is not -- so this reports the
+## officer's own clock instead. It is the case the request named: a bar that starts empty
+## and fills as the cones go out.
+func progress() -> float:
+	return clampf(_spent / DURATION, 0.0, 1.0)
+
+
 func _work(_unit: Unit, delta: float) -> bool:
 	var cordon := target as Cordon
 	if cordon == null:

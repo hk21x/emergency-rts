@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" role="img" aria-label="Seat — empty">
+  <defs>
+    <linearGradient id="se_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0C121B"/><stop offset="1" stop-color="#080D14"/></linearGradient>
+
+  </defs>
+  <rect x="0.7" y="0.7" width="22.6" height="22.6" rx="4" fill="url(#se_g)" fill-opacity="1" stroke="#18222E" stroke-width="1.4" stroke-opacity="1"/>
+  <circle cx="12" cy="12" r="3" fill="#55636F" fill-opacity="0.5"/>
+
+</svg>

@@ -10,7 +10,7 @@ const GROUP := &"hospitals"
 ## Delivery is automatic on arrival rather than another order to issue: the player has
 ## already said what they mean by driving here.
 
-signal delivered(vehicle: Vehicle, count: int)
+signal delivered(vehicle: Unit, count: int)
 
 
 func _ready() -> void:
@@ -19,7 +19,10 @@ func _ready() -> void:
 
 
 func _on_body_entered(body: Node3D) -> void:
-	var vehicle := body as Vehicle
+	# **A [Unit], not a [Vehicle].** The air ambulance lands on the hospital pad and is
+	# not a Vehicle -- it has no wheels, no lightbar and no repair bill -- so this cast
+	# returned null for it and a helicopter could fly a casualty in and deliver nobody.
+	var vehicle := body as Unit
 	if vehicle == null:
 		return
 	var count := vehicle.deliver_casualties()

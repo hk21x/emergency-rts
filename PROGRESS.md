@@ -209,7 +209,7 @@ starting shift felt wrong once returning units vanished into it. Now nothing is
 free and nothing vanishes.
 
 - **The map ships empty.** The generator places no units; a check pins the count
-  at zero. A new career opens with **£2,000** — deliberately tight: one patrol
+  at zero. A new career opens with **£3,200** — deliberately tight: one patrol
   (£600), one officer (£200), one ambulance (£900) and one paramedic (£250) with
   £50 to spare.
 - **Money follows the points, 1:1.** Every positive scoring event — £50 a fire,
@@ -626,6 +626,305 @@ sibling stays green, which is the whole fault in two lines.
   `overrun_grace` (90s): past it, whatever is still on the board closes as failed and
   the shift ends. Generous enough that it only ever fires on a job that was not going to
   finish.
+
+### The bar became the fleet as well (August 2026)
+
+The bottom bar has two states now: the **fleet strip** when nothing is selected, and the
+unit's detail when something is. One or the other, never both -- which is the kit's own
+design and the only arrangement that fits 188px, since side by side the two would want
+2,200. Service tabs across the top filter the strip, and there is deliberately **no ALL**:
+the bar shows one service at a time and opens on one the career actually owns units in.
+
+The strip arrived as a **whole second Godot project** dropped inside `ui/`, carrying its
+own `project.godot` and duplicate `class_name` declarations for `UnitDef`, `UnitInstance`
+and `UnitSelectionPanel`. It was inert only because Godot happened not to scan it; a
+`.gdignore` makes that a rule rather than luck, and the pieces actually needed were copied
+into `ui/` with their paths repointed. **The kit's newer selection panel was not adopted**
+-- its API is `show_unit` and `command_issued(action, unit)`, one unit at a time, and this
+game has box-select and control groups.
+
+Five faults on the way in, and the shape of them is the point:
+
+- **The strip had no background.** It is a bare `Control`; in its own project the panel
+  drew the frame around it. Hosted as a sibling and shown while the panel was hidden, it
+  floated on the bare map with its labels spilling over the world. It lives inside the
+  frame now -- and the reason the miss was invisible from the code was a **silent
+  fallback**: `%Rows` does not resolve (that node carries no `unique_name_in_owner`), and
+  the fallback quietly parented the strip to the dock instead of complaining.
+- **`icon_.svg`.** The strip derived an icon *path* back out of `def.icon.resource_path`
+  and loaded it again -- fine while every icon is one of its own SVGs, fatal when handed a
+  `.png` render or an [AtlasTexture] crop whose path is empty. 17.9MB of "Resource file
+  not found" in one run.
+- **The card avatars blew the cards up to the height of the bar.** A `TextureRect` defaults
+  to `EXPAND_KEEP_SIZE`, so a 192px render sets the *minimum* size and `custom_minimum_size`
+  is only a floor. **The sixth time that exact default has cost this project a bug.**
+- **Every helicopter wore the red damaged border** while reporting itself AVAILABLE. The
+  strip carried a private copy of the alert rule without the `condition >= 0.0` floor --
+  and a negative condition means *this unit has none*, not that it is wrecked. The model's
+  own `needs_attention()` has that guard, and a comment recording the identical fault from
+  when it hit the roster rows. **A sentinel is only safe while every reader knows it is
+  one**, and the fix is to have one reader.
+- **The tabs opened on an empty strip**, twice. First because the "pick a service the career
+  owns" scan ran in `_ready`, before a single unit existed; then because the opening guess
+  went through `_on_filter`, which marks the choice as the player's and stopped the scan
+  ever running. Both were caught by the same assertion, which is the one that reads
+  `showing a service the career actually owns (0 units)`.
+
+Also found while wiring the seat pips: the paramedic's catalogue portrait had pointed at
+`Character_Female_Police` since the days when a paramedic *was* a repainted police model.
+`Paramedic.png` had been shipping for weeks. They were wearing a police officer's face in
+the roster, the shop and the debrief -- not just the new bar.
+
+### The bottom bar says who is aboard (August 2026)
+
+The selection bar is the user's `unit_selection_panel` art now: callsign and type, a
+condition bar, the tank in litres, the current order with its progress, and -- the reason
+for the swap -- **occupancy**. A patrol car with two officers in it and an empty one looked
+identical from outside, and a van's six cells said nothing about who was in the back, so
+"where is everybody" was a question the interface could not answer and the player had to
+hold in their head.
+
+**The kit's own command table was not adopted, and that was the whole design decision.**
+The scene ships eight buttons with hardcoded ids (`move`, `rescue`, `resupply`, `hold`);
+this game generates its grid from `RTSController.available_abilities()`, which is what
+gives a verb its tile, its hotkey and its right-click meaning off the scoring ladder with
+no UI change at all. Taking the table would have thrown the ladder away and every verb
+added since. So the kit's grid is hidden and the real one is **re-homed into the slot
+beside it** -- the look, not the mechanism.
+
+`UnitReadout` came out of it: callsign, status, task, condition and occupancy in one place,
+because the roster and the selection panel both need all five and two panels deriving them
+separately is two answers waiting to disagree. The callsign is the sharp case -- the nth
+police vehicle is P0n only if **one** pass counts them, so the panel asks the roster rather
+than starting its own tally.
+
+Four faults on the way, and three of them were invisible to the suite:
+
+- **The bar ran off the bottom of the screen and sat on the minimap's zoom buttons.** An
+  `HFlowContainer` of fourteen tiles in a narrow column reports the whole stack as its
+  minimum height, and a `PanelContainer` grows to its content. The suite has a geometry
+  invariant that would have caught it and **could not see the panel, because the panel was
+  not on its list** -- a geometry guard only guards what it is handed. It is on the list now.
+- **Freeing the kit's buttons instead of hiding them produced 6,540 `previously freed
+  instance` errors in one run, with every check green and the check count unmoved.** The
+  kit keeps its buttons in a dictionary and walks it every refresh. Nothing the suite
+  reports could see it, which is exactly the volume of noise that hides a genuinely
+  truncated check -- so the regression is now asserted directly.
+- **The water read 36,000 L on a fire pump.** `tank_capacity` is a multiplier, not a
+  volume. A units error is invisible to arithmetic: every sum is self-consistent at any
+  scale, so the check asserts the *magnitude* a pump carries rather than the sum.
+- **`shown_units()` reported off the panel's own bookkeeping**, set on the line after the
+  draw call -- so severing the draw entirely left it claiming one unit while the bar showed
+  nothing, and the check watching it passed. An accessor for a panel has to ask the thing
+  that draws.
+
+All six legs were sabotage-proven. The freed-button guard is the one worth keeping in
+mind: under sabotage the run carried **6,536 `previously freed instance` errors and still
+printed `all checks passed`** -- the check count did not move either, so every signal the
+suite reports said the tree was healthy. A guard asserted directly is the only thing that
+sees that class of fault.
+
+Two of the cycles corrected the instructions rather than the code. One sabotage was aimed
+at `BOTTOM_MARGIN` to push the dock off screen, which cannot work -- that constant feeds
+the dock's *height*, and its bottom edge is fixed by an offset in `HUD.tscn`. And removing
+the portrait's `expand_mode` no longer overflows anything: the dock grows to 253px and
+stays on screen, so that line is now a sizing preference rather than the fix it started as.
+**The height leg moved 65px and stayed satisfied, which is what proves it reads the content
+rather than a constant.**
+
+A note for the next kit drop, because this one cost an hour: **it overwrote seven files the
+game had adapted**, including `UnitSidebar.row_for()` and `UnitRow.rebind()` -- the pooled-row
+machinery that fixed the SIGBUS crash. The tree was red before any of this work started and
+the cause was not obvious, because a `--check-only` parse of the affected file reports the
+same errors whether or not it is broken. The suite is the only honest signal, and the rule
+that follows is: **run it first, before believing anything about a tree you have just been
+handed.**
+
+### Seven units that were the same unit (August 2026)
+
+The fleet audit's headline: **seven of the fourteen purchasable units had no capability
+that distinguished them from another**. The interceptor was a patrol car with two more
+metres per second for fifty per cent more money. The doctor's verb list was the paramedic's
+*exactly*, plus advanced care -- a strict superset, which left the £250 paramedic's only
+distinguishing feature being that they are cheaper than the £600 doctor.
+
+Three changes, all small:
+
+- **The police van seats six.** It shipped carrying two like every other car, which made it
+  "the patrol car with more cells" -- a quantity, not a job. Six turns it into the
+  personnel carrier: four officers and an armed response unit to a disorder in one trip,
+  against a `DISORDER_SIZE` table that runs to eight suspects. The body is the pack's SWAT
+  van; this is it behaving like one.
+- **The interceptor trades a cell for real speed** -- 34 rather than 28, matching the
+  helicopters and clear of the doctor car's 27, and one prisoner rather than two. A car
+  that was faster *and* held as many people was strictly better than the £600 patrol car,
+  which is not a decision.
+- **The doctor stopped running the stretcher.** A doctor stabilises; a paramedic moves the
+  patient. That is the division of labour the doctor's own catalogue blurb already claimed,
+  and now the verbs agree with it.
+
+The doctor change carried a trap that had to ship with it: `Director._has_doctor()` gates
+the `collapse` call, and a career holding a doctor and no paramedic could now stabilise a
+casualty and own nothing that could move them -- the call staying open until
+`overrun_grace` closed it as failed. **The road-collision trap, arriving from the other
+direction, in the same afternoon.** The predicate requires both now.
+
+**`_test_no_two_purchasable_units_are_the_same_unit`** is the standing guard against the
+whole class: every unit in the catalogue is added to the tree, fingerprinted on its sorted
+verb ids plus service, seats, cells, stretchers, tow and water, and all fourteen must be
+distinct. It earned itself twice within the hour -- it caught the doctor/paramedic collapse
+from the other end during a sabotage cycle, and its census leg caught a truncated sweep
+passing the distinctness comparison vacuously.
+
+Two lessons, both from checks catching their own author:
+
+- **The doctor check's first run failed the leg it was written to pass.** The fixture set
+  `treatment = 1.0` and not `is_stable`, so Treat (30) still outscored Collect (25) and
+  *both* units resolved to `treat` -- meaning the doctor's leg passed while proving
+  nothing. Asserting both sides is what surfaced it; the one-sided version would have gone
+  green and stayed there.
+- **The paramedic term in `_has_doctor()` was completely unprotected.** A sabotage cycle
+  run purely as a question -- *does anything redden if I revert this?* -- came back with a
+  clean `all checks passed`. The nearest existing check buys a doctor into a fixture career
+  that already owns paramedics, so both its legs read identically with the term and
+  without it: numerically inert, not merely green. The new leg erases the paramedic count
+  and rolls 400 times; sabotaged it reads 32 of 400.
+
+### Six defects the fleet audit found, none of them in a check (August 2026)
+
+The question was "what should we expand?", and answering it honestly meant auditing the
+fleet first. **Seven of the fourteen purchasable units turned out to have no unique
+capability** -- but the more urgent finding was six live defects, five of them clustered
+around the [Wreck], which was the last thing added and had been given an arm in none of
+the places that branch on incident class.
+
+- **A road collision could not be cleared without a £700 recovery truck.** `_spawn_rtc`
+  always dropped a wreck; only `can_tow` clears one; `rtc` is ungated at weight 15 -- 30
+  in the rain, the second-heaviest row in the table. So a career that had not bought a
+  truck drew collisions it could never close, and the only thing that ended them was
+  `overrun_grace` counting them **failed** ninety seconds later. The player was being
+  punished for a purchase they had not made.
+
+  Fixed by making the *wreck* conditional rather than the call: `_leaves_a_wreck()`. The
+  alternative -- a `needs_truck` gate -- would have hidden the game's named set piece from
+  every early career, which is the mistake `BUILDING_SIZE`'s own docstring records having
+  shipped once already. **Scale the job to the roster; do not withhold it.** It also makes
+  the £700 a purchase the player can already picture, which beats unlocking a call they
+  have never seen.
+- **Clearing a wreck paid nothing.** `Mission._on_resolved()` is an `if incident is …`
+  chain, and `Wreck extends Incident` rather than extending `Debris`, so it matched no arm
+  and fell out of the scoring in silence. The one job the truck exists for earned neither
+  a point nor a penny -- which is a poor argument for buying one, and compounded the bug
+  above.
+- **A worked-out collision retyped itself as a medical call.** `Call._recentre()` had arms
+  for Fire, Hazard, Debris, Casualty, Suspect and MissingChild. Once the casualties were
+  delivered and only the car was left, the job fell through to MEDICAL and wore a cross
+  over a vehicle nobody was hurt in. The `Debris` arm's own comment records this exact
+  fault having shipped twice before.
+- **The board could not see a wreck at all.** `Call.describe()` counted every incident
+  class except this one, so the second column said nothing about the lane being shut --
+  visible only at a mixed scene, which is the first minute of every collision.
+- **A gate caption nobody could forget had already been forgotten.** `CallSpawner` carried
+  a hand-written `if`/`elif` over two of the three gate keys, under a comment promising a
+  third "cannot be added there and quietly forgotten here". `needs_arv` had been added and
+  forgotten, so the armed-suspect button printed no note. It is a table now, and the check
+  walks `Director.KINDS` for every `needs_*` key -- **a promise in a comment is not a
+  mechanism.**
+- **A scenario ended on a bare word.** `Mission.fail_on_casualty_lost` defaults true and no
+  scenario overrode it, so one death ended a designed shift with "CASUALTY LOST" drawn over
+  the district: no debrief, no par time, no way back in, in the one mode whose whole point
+  is being replayed until it is beaten. It gets the card the won case gets now, plus a
+  RETRY wired to `ScenarioDirector.restart()`, and the flag is a per-scenario key.
+
+All five new checks were sabotage-proven in one pass, every leg red, and the two-sided one
+earned its keep immediately: with `_leaves_a_wreck()` forced false the *first* assertion
+stayed green trivially, which is exactly the "wrecks stopped existing entirely" case a
+one-sided check would have waved through.
+
+Also corrected: the docs said a career starts with **£2,000** in four places. It has been
+£3,200 since the doctor arrived -- and `PROGRESS.md` recorded the change while three other
+paragraphs went on quoting the old figure, which is what restating a constant in five
+places buys you.
+
+### The suite became fifteen files, and no test body changed (August 2026)
+
+`smoke_test.gd` had reached **12,999 lines** — around a third of all the GDScript in the
+project — and the campaign will add a hundred checks on top. It is now
+`Game/Tests/TestCase.gd` (the fixture, the 36 declarations and all 78 helpers), fourteen
+section files cut along the banner comments already in the file, and `smoke_test.gd` as a
+397-line leaf holding the run order and nothing else.
+
+**The mechanism is a plain script-inheritance chain**, and choosing it is the whole reason
+this was cheap. The obvious designs both fail: only one script can *be* the `SceneTree`, and
+a context object passed to section classes would have meant rewriting every `_check(...)`
+and every `_car` in 13,000 lines — not a move at all, and a change to the arbiter with no
+way to verify it. Chaining instead (`TestCase` → each section → `smoke_test`) gives one
+`self`, one set of fixture fields, helpers visible everywhere by bare name, and
+`await physics_frame` working unchanged because the leaf really is the tree. **Not one test
+body was edited.** A three-file prototype established that the chain worked before any of
+the real file was touched.
+
+The split was done by script with two assertions standing over it: the 351 top-level blocks
+must reassemble to the byte-identical original before anything is written, and every block
+must be placed exactly once afterwards. Verified by check-count identity —
+`all checks passed (1164)` before and after, with `grep -c '^  ok'` independently agreeing.
+
+**The per-section tally is what the exercise was actually for.** A runtime error inside a
+check skips the rest of it silently: the suite reports green and only the total falls, which
+is how two checks stopped short for months and cost three out of six hundred unnoticed. One
+number hides that. Fourteen do not — a section that loses a check moves its own line, and
+the line names the file to open. Attribution comes from the call stack rather than from
+markers in the run order, so a check added to a section file is counted there with nothing
+to remember. The tally's own sum is asserted against the total, and a mismatch **fails the
+run** rather than printing a warning, because a `!!` line among 1,126 `ok` lines is exactly
+what gets scrolled past.
+
+| Section | Checks |
+| --- | --- |
+| Freeplay: the director and the score | 551 |
+| Autopilot | 88 |
+| Calls | 86 |
+| Dispatch | 80 |
+| Ambient population | 79 |
+| Interface | 67 |
+| Incidents | 51 |
+| Lightbar and doors | 45 |
+| Selection and orders | 24 |
+| Roles | 21 |
+| Harness | 15 |
+| Multi-selection | 8 |
+| Order queue | 7 |
+| Camera | 4 |
+
+Freeplay at 551 of 1,126 is the next thing to divide, and now that the tally prints it, it
+is visible rather than merely true.
+
+### The question mark nobody would have noticed (August 2026)
+
+`Glyph._fallback` ends in `_: _unknown(...)`, which paints a question mark. So an ability
+whose `icon()` names a symbol nobody drew — a typo, or one planned and never made — renders
+a `?` on its command tile and ships without a warning. At tile size a question mark reads as
+a deliberate symbol rather than as a mistake, which is how it would survive being looked at.
+
+The check draws **every** ability's icon for real, in a real `_draw()` pass, and asserts
+none fell through. Reading a list of keys and comparing it against a list of files would
+have tested two lists against each other and nothing against the code — and it would have
+been wrong anyway, since `box` has no PNG and is drawn from primitives. `_draw()` runs
+headless under the dummy driver, which is what makes the honest version possible; that was
+worth a two-minute probe to establish before committing to a design.
+
+All 21 symbols resolve. Proven three ways: a plausible typo (`&"cone"` → `&"cordon"`) reddens
+the leg naming the bad key; commenting out the recorder in `_unknown` reddens the *two-sided*
+leg while leaving the first one green, which is exactly why the two-sided leg exists — with
+a dead instrument "none missed" is what a healthy game prints too; and pointing the sweep at
+a folder with no abilities in it reddens the census at 0 of 21, with the question-mark leg
+passing vacuously beside it.
+
+One wrinkle worth keeping for the next census guard: the first attempt at that third
+sabotage pointed `DirAccess.open` at a folder that does not exist, and the check's own
+`if dir == null` guard caught it and returned early — three legs vanished and nothing was
+learned. A census guard has to be sabotaged with a **real folder containing nothing that
+matches**, not with a missing one.
 
 ### Three tries to make one check see one bug (August 2026)
 
@@ -2696,7 +2995,7 @@ proved the driving fix and the manhole rule had **no witness at all** until a
 behavioural drive check and a direct assertion were added, and then caught that the
 new manhole check drew its subjects from the very constant it tested.
 
-**1123 automated checks**, all passing. Run them with any Godot 4.6+ binary
+**1164 automated checks**, all passing. Run them with any Godot 4.6+ binary
 (`--fixed-fps 60` decouples the loop from the wall clock — ~20s instead of ~9min):
 
     godot --headless --fixed-fps 60 --path . --script res://Game/smoke_test.gd
@@ -2714,7 +3013,7 @@ drive the streets, keeping right.
 
 The session opens on a **title card** over the idling district — `PLAY` drops you
 in, `P` pauses, and settings choose the shift length. The map ships **empty of
-units**: a career starts with **£2,000 and nothing else**, buys its first vehicles
+units**: a career starts with **£3,200 and nothing else**, buys its first vehicles
 and staff from the DISPATCH block, and earns the rest by working calls — every task
 pays what it scores, weighted by response speed, and the purse and fleet persist
 between sessions. The district stays **quiet** until `F2` starts a freeplay shift
@@ -2966,6 +3265,130 @@ Two ordering faults it turned up, both of the kind that pass by luck:
   being so the day something spawned further from its parent.
 - An incident that is **freed** rather than resolved emits nothing, so the call holding
   it sat on the board forever with a list of dangling references.
+
+### The depth pass — five call kinds (August 2026)
+
+An audit of the shop asked which of the fourteen purchasable units had a scene that
+wanted *it*, and answered: seven of fourteen. Five rows were added to `Director.KINDS` to
+close that — `remote_medical`, `arson`, `affray`, `pile_up` and `spill` — each aimed at a
+purchase. The table and the reasoning are in `Game/README.md`; what belongs here is what
+the exercise taught.
+
+**Three of the five were green on their first run, and the two that were not failed for
+opposite reasons — which is the useful part.**
+
+- **`spill` was a real defect the check caught.** The casualty was placed ten metres
+  perpendicular from the kerb, and `_beside()` keeps an offset's *length* while sweeping
+  its direction — so "ten metres" is 8.5 to 11.5, and 8.5 is inside `Hazard.blast_range`
+  (9.0), where `blast_harm` of 1.2 against 1.0 of health kills outright. Worse, the kerb
+  spot already stands 4m off the centre line, so ten metres across clears the 10m
+  carriageway and lands inside the block opposite — no standable ground within the sweep,
+  `INF` returned, and the call opened **with no casualty in it at all**. That is what the
+  first run reported, and it is the failure it should have reported.
+- **`pile_up` was a defect in the check, on a scene that was correct.** It reached for the
+  `_wrecks()` fixture helper, which matches children named `SM_Veh_*` — the loose car
+  *bodies* a vehicle fire leaves at the kerb. A `Wreck` is an incident named `Wreck` that
+  carries its car as a child, so the helper found none and reported "two cars written off
+  (0)" about a call that had raised correctly, named itself correctly, and placed all
+  three casualties. The right question was `Wreck.WRECK_GROUP`.
+
+The second one is worth remembering next to this project's usual lesson. The standing
+warning is that a check reaching past the interface vouches for nothing; here a check
+reached past the interface and **cried wolf** — the same mistake pointing the other way.
+Either way the fix is the same: ask the thing you mean to ask, through the name the game
+itself uses.
+
+**Both failures tripped early `return` guards, and the check count is what showed it.**
+The run reported 1260 where a clean one reports 1269 — nine legs silently skipped behind
+two `FAIL`s. That is exactly the truncation detector the verification rules describe,
+working on a red run rather than a green one, and it is the reason to read the count
+rather than the verdict.
+
+**Two constraints came from classes rather than from design, and both would have shipped
+as hangs.** A `Hazard` heats only from a `Fire` inside its `heat_range`, and its
+made-safe exit requires having been threatened first — so the quieter version of `spill`,
+with a tank and a blocked road and nothing burning, neither blows nor resolves and sits on
+the board until `overrun_grace` fails it. And `PARK_DEPTH` had to be measured off the map
+rather than chosen: both parks top out at 22.5m from the nearest centre line, and a
+threshold above that would have made `_pick_parkland()` return `INF` for ever — a call
+kind that silently never opens, with no symptom at all.
+
+**The weights were rebalanced as part of the change, not after it.** Five rows take the
+table from 237 to 294; left alone, `medical` would have gone from 14.8% of the mix to
+12.4% — the staple getting rarer as a side effect nobody chose. `medical` and `fire` were
+bumped to hold their share; `crime` deliberately was not, because `arson` and `affray` are
+both police work and topping it up would double-count.
+
+### The sabotage backlog — twenty checks proven (August 2026)
+
+The interface rebuild and the fleet-depth work between them added roughly a hundred and
+fifty checks that had passed on every run they had ever had and been proven to detect
+nothing. This is what clearing that backlog found. Every fault was reinstated one at a
+time, watched go red, and restored; every restore was verified byte-identical by md5.
+
+**Collateral was zero in nineteen of twenty cycles**, which is the headline: the faults
+were in the behaviours, not in the game. The single crossing was the `as Vehicle` gate on
+`UnitReadout.seats_of()`, which reddened both the selection panel and the helicopter
+boarding check — two witnesses for one hoist, which is what that work should have.
+
+**The reds were the boring part.** Almost every real finding came from reading the *green*
+lines beside them, and specifically from asking which legs printed an **identical value in
+the sabotaged and the restored run**. That question is the one this pass was worth:
+
+- **Legs that are degenerately true under precisely the fault they exist to catch.** The
+  boarding check asserted "nobody falls out while it hovers" by comparing the crew count
+  to itself, so under the cast that killed helicopter boarding it read `0 of 0` and stayed
+  green. Same shape on "a flying helicopter will not turn its crew out", which printed
+  `nothing` in both trees — an empty cabin satisfies "will not unload" for free, and that
+  leg is the rule stopping a crew stepping out at 24 metres. Both now require somebody
+  aboard before the claim means anything.
+- **Legs green in every possible world.** "It goes back to seats once the bill is paid"
+  printed `(0, was 0)` healthy, sabotaged and restored: the baseline is deliberately
+  zeroed first, so a card that never shows money satisfies it trivially. It now has to see
+  the count rise before it can claim it fell. "A portrait with no border to spare is left
+  alone" was satisfied by a crop function that does nothing at all — the likely failure
+  direction — and now asserts this picture was kept *while the car's was cropped*.
+- **A leg measuring a pinned quantity.** "Its bottom edge is on the screen" printed
+  `878 of 900` through five runs of two different height sabotages, because the dock is
+  bottom-anchored and the sizing code only ever writes `offset_top`: the bottom is
+  viewport-height minus the margin **by construction**, and no fault in the code under
+  test can move it. It measures the whole rect now, because the top edge is the one that
+  goes off screen when the dock grows.
+- **A leg with no witness anywhere in the suite.** "Is drawn as needing attention" printed
+  `(true)` in all six runs of one batch. It reads `condition`, which a vehicle derives from
+  its repair bill, and never reads `owed` — so zeroing the bill plumbing leaves it
+  correctly true while the figure beside it stops arriving. Not a defect; it is annotated
+  so nobody counts it as a third money witness.
+
+**Two independent things can look like one.** Killing a seat pip's tooltip left "clicking
+it sends that officer out" green: `gui_input` binds the rider directly, so the tooltip and
+the click path are wired separately. Each needs its own witness and each has one — but
+only because they were sabotaged separately rather than assumed to travel together.
+
+**A failing check should fail alone.** The one collateral cluster in the pass came from a
+check's own cleanup: `_buy` raises the owned count before anything reaches the map, so a
+run where the standby card fails to send the car left the fixture an eighth patrol and
+reddened three checks in two other files, none of them about that behaviour. The cleanup
+now puts the purchase back whether or not the dispatch happened.
+
+**Two complementary height legs, neither of which subsumes the other.** Sizing the dock to
+whichever state is showing reddens "the same height with a unit selected and without" while
+leaving "tall enough for what is in it" green — sizing to current content is by definition
+tall enough. Pinning it short does the reverse: a pinned height is equal in both states,
+which is exactly why the original clipped-dock bug survived every measurement in the suite.
+
+**A procedural finding, and a lesson about where figures come from.** Two sabotage cycles
+overran a 590s and a 600s Bash timeout and were pushed into the background with the tree
+still broken — the one state that must never be left unattended. The arrangement that does
+not race is to background the run deliberately and block on a `pgrep` loop.
+
+The *explanation* offered for those overruns did not survive checking, and that is the more
+useful half. Three subagents reported this suite taking seven to ten minutes and put it
+down to failing checks sitting out their full wait loops. It was written into two documents
+on their word. A direct `time` of a green run then measured **1:08.63** at 1295 checks — so
+raw runtime cannot account for an eight-fold overrun, and the cause remains unexplained.
+The reports were plausible, internally consistent, mutually corroborating and wrong.
+**Measure a number before repeating it, especially one that arrives already agreed on.**
 
 ## Freeplay
 

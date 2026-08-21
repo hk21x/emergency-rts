@@ -38,6 +38,23 @@ var _weather_row: HBoxContainer
 var _open := false
 
 
+
+## What each of the director's gate keys should say on a button.
+##
+## **A table because the comment below used to be a lie.** It claimed a new gate "cannot be
+## added there and quietly forgotten here" while the code was a hand-written `if`/`elif`
+## that knew two of the three keys -- `needs_arv` had already been added to
+## [constant Director.KINDS] and forgotten here, so the armed-suspect button printed no
+## note at all. A check now walks `KINDS` for every `needs_*` key and asserts it resolves
+## in this dictionary, which is what makes the claim true rather than merely written down.
+const GATE_CAPTIONS := {
+	&"needs_fire_service": "needs a fire crew",
+	&"needs_doctor": "needs a doctor",
+	&"needs_arv": "needs armed response",
+	&"needs_truck": "needs a recovery truck",
+}
+
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
 	if key == null or not key.pressed or key.echo:
@@ -83,14 +100,13 @@ func _build() -> void:
 		var button := Button.new()
 		# The gate is named rather than hidden: `building`, `rescue`, `gas_leak` and
 		# `trapped` are refused by the director unless the career owns a fire service,
-		# `collapse` unless it owns a doctor, and a button that silently did nothing would
-		# read as a broken tool. Read off the same table the director filters on, so a new
-		# gate cannot be added there and quietly forgotten here.
+		# `collapse` unless it owns a doctor, `armed_suspect` unless it owns an ARV -- and
+		# a button that silently did nothing would read as a broken tool.
 		var gate := ""
-		if bool(row.get("needs_fire_service", false)):
-			gate = "   (needs a fire crew)"
-		elif bool(row.get("needs_doctor", false)):
-			gate = "   (needs a doctor)"
+		for key: StringName in GATE_CAPTIONS:
+			if bool(row.get(key, false)):
+				gate = "   (%s)" % GATE_CAPTIONS[key]
+				break
 		button.text = "%s%s" % [String(kind).capitalize(), gate]
 		button.pressed.connect(spawn_call.bind(kind))
 		body.add_child(button)

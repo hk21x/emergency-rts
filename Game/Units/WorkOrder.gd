@@ -89,6 +89,18 @@ func describe() -> String:
 
 ## An incident that has been resolved is freed at the end of the frame, so the active
 ## flag has to be trusted rather than is_instance_valid alone.
+## The incident's own reading of how far along it is.
+##
+## Every worked incident already publishes one -- a casualty's treatment, a fire's douse, a
+## wreck's winch -- so the order does not have to keep a second copy that could disagree
+## with it.
+func progress() -> float:
+	if not is_target_valid():
+		return -1.0
+	var incident := target as Incident
+	return incident.progress() if incident else -1.0
+
+
 func is_target_valid() -> bool:
 	if not is_instance_valid(target):
 		return false

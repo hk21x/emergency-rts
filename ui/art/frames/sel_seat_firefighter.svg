@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" role="img" aria-label="Seat — Firefighter">
+  <defs>
+    <linearGradient id="sffir_g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18222F"/><stop offset="1" stop-color="#0E1620"/></linearGradient>
+
+  </defs>
+  <rect x="0.8" y="0.8" width="22.4" height="22.4" rx="4" fill="url(#sffir_g)" fill-opacity="1" stroke="#E8734B" stroke-width="1.5" stroke-opacity="0.85"/>
+  <g transform="translate(4 4) scale(0.66667)" color="#E8734B" opacity="1"><path d="M12 2.6a4.8 4.8 0 0 0-4.8 4.8v1.4h9.6V7.4A4.8 4.8 0 0 0 12 2.6Z" fill="currentColor" fill-rule="nonzero"/><path d="M5.0 9.6h14a.9.9 0 0 1 .88 1.08l-.22 1.1A1.4 1.4 0 0 1 18.3 12.9H5.7a1.4 1.4 0 0 1-1.36-1.12l-.22-1.1A.9.9 0 0 1 5.0 9.6Z" fill="currentColor" fill-rule="nonzero"/><path d="M12 13.6c3.5 0 6.0 2.0 6.0 5.0v2.2H6.0v-2.2c0-3.0 2.5-5.0 6.0-5.0Z" fill="currentColor" fill-rule="nonzero"/></g>
+
+</svg>
